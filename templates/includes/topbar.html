@@ -1,0 +1,87 @@
+{% load static %}
+
+<!-- Header Topbar Start -->
+<div class="header-topbar style-2">
+    <div class="container padding-none">
+        <div class="row">
+
+            <!-- Contact Information -->
+            <div class="col-md-8 col-sm-6 welcome-top">
+                <ul class="list-inline top-icon">
+
+                    {% if site_settings.email %}
+                    <li>
+                        <a href="mailto:{{ site_settings.email }}" class="topbar-link">
+                            <i class="fa-regular fa-envelope-open" aria-hidden="true"></i>
+                            {{ site_settings.email }}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if site_settings.phone %}
+                    <li>
+                        <a href="tel:{{ site_settings.phone }}" class="topbar-link call-cta">
+                            <i class="fa-solid fa-phone-volume" aria-hidden="true"></i>
+                            {{ site_settings.phone }}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if site_settings.city or site_settings.country %}
+                    <li class="topbar-location">
+                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                        <span>
+                            {% if site_settings.city %}{{ site_settings.city }} &amp; {% endif %}
+                            {{ site_settings.country }}
+                        </span>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+
+            <!-- Social Media -->
+            <div class="col-md-4 col-sm-6 text-right">
+                <ul class="list-inline icon-style-1 social-icons">
+
+                    {% if site_settings.whatsapp %}
+                    <li>
+                        <a href="https://wa.me/{{ site_settings.whatsapp }}" title="WhatsApp" aria-label="WhatsApp"
+                            target="_blank">
+                            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if site_settings.facebook %}
+                    <li>
+                        <a href="{{ site_settings.facebook }}" title="Facebook" aria-label="Facebook" target="_blank">
+                            <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if site_settings.instagram %}
+                    <li>
+                        <a href="{{ site_settings.instagram }}" title="Instagram" aria-label="Instagram"
+                            target="_blank">
+                            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if site_settings.linkedin %}
+                    <li>
+                        <a href="{{ site_settings.linkedin }}" title="LinkedIn" aria-label="LinkedIn" target="_blank">
+                            <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Header Topbar End -->

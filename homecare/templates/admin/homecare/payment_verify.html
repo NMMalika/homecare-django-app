@@ -1,0 +1,238 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Payment Verification | {{ site_title|default:"Django site admin" }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .verification-wrapper {
+        max-width: 760px;
+        margin: 35px auto;
+    }
+
+    .verification-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .verification-header {
+        background: #0d6efd;
+        color: #fff;
+        padding: 22px 28px;
+    }
+
+    .verification-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .verification-body {
+        padding: 28px;
+    }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .payment-row:last-child {
+        border-bottom: 0;
+    }
+
+    .payment-label {
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .payment-value {
+        color: #212529;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .amount-match {
+        display: inline-block;
+        background: #d1e7dd;
+        color: #0f5132;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+    }
+
+    .amount-warning {
+        display: inline-block;
+        background: #f8d7da;
+        color: #842029;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+    }
+
+    .verification-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 25px;
+        margin-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .verification-actions a,
+    .verification-actions button {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 6px;
+        border: 0;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .cancel-button {
+        background: #6c757d;
+        color: #fff !important;
+    }
+
+    .verify-button {
+        background: #198754;
+        color: #fff;
+    }
+
+    .verify-button:hover {
+        background: #157347;
+    }
+
+    .cancel-button:hover {
+        background: #5c636a;
+    }
+
+    @media (max-width: 600px) {
+        .verification-wrapper {
+            margin: 15px 8px;
+        }
+
+        .verification-body {
+            padding: 20px;
+        }
+
+        .payment-row {
+            display: block;
+        }
+
+        .payment-value {
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        .verification-actions {
+            flex-direction: column-reverse;
+        }
+
+        .verification-actions a,
+        .verification-actions button {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verification-wrapper">
+
+    <div class="verification-card">
+
+        <div class="verification-header">
+            <h1>PAYMENT VERIFICATION</h1>
+        </div>
+
+        <div class="verification-body">
+
+            <div class="payment-row">
+                <div class="payment-label">Client:</div>
+                <div class="payment-value">
+                    {{ homecare_request.full_name }}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Quotation:</div>
+                <div class="payment-value">
+                    #{{ quotation.id }}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Transaction Code:</div>
+                <div class="payment-value">
+                    {{ payment.payment_code|default:"Not provided" }}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Amount Paid:</div>
+                <div class="payment-value">
+                    N$ {{ payment_amount }}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Quotation Total:</div>
+                <div class="payment-value">
+                    N$ {{ quotation_amount }}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Amount Check:</div>
+                <div class="payment-value">
+                    {% if amount_matches %}
+                    <span class="amount-match">
+                        ✓ AMOUNT MATCHES
+                    </span>
+                    {% else %}
+                    <span class="amount-warning">
+                        ⚠ AMOUNT MISMATCH
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="payment-row">
+                <div class="payment-label">Payment Method:</div>
+                <div class="payment-value">
+                    {{ payment_method }}
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="verification-actions">
+
+                    <a href="{% url 'admin:homecare_payment_changelist' %}" class="cancel-button">
+                        CANCEL
+                    </a>
+
+                    <button type="submit" class="verify-button"
+                        onclick="return confirm('Are you sure you want to verify this payment?');">
+                        ✓ VERIFY PAYMENT
+                    </button>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,927 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+{% if form.instance.pk %}
+Edit Caregiver Assignment | Hands-On Health
+{% else %}
+New Caregiver Assignment | Hands-On Health
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ============================================================
+       HANDS-ON HEALTH — CAREGIVER ASSIGNMENT FORM
+       ============================================================ */
+
+    .form-wrapper {
+        max-width: 950px;
+        margin: 0 auto;
+        padding: 0 0 3rem;
+    }
+
+    /* ------------------------------------------------------------
+       HEADER
+       ------------------------------------------------------------ */
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-header-titles h1 {
+        margin: 0 0 0.3rem;
+        color: #0f172a;
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+
+    .form-header-titles h1 i {
+        color: #2563eb;
+        font-size: 1.45rem;
+    }
+
+    .form-header-titles p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    /* ------------------------------------------------------------
+       CARD
+       ------------------------------------------------------------ */
+
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        box-shadow:
+            0 4px 6px -1px rgba(15, 23, 42, 0.03),
+            0 2px 4px -1px rgba(15, 23, 42, 0.03);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 1.2rem 1.5rem;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .form-card-header h5 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-card-header h5 i {
+        color: #2563eb;
+    }
+
+    .form-card-body {
+        padding: 2rem 1.5rem;
+    }
+
+    /* ------------------------------------------------------------
+       GRID
+       ------------------------------------------------------------ */
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .col-span-12 {
+        grid-column: span 12;
+    }
+
+    .col-span-6 {
+        grid-column: span 6;
+    }
+
+    .col-span-4 {
+        grid-column: span 4;
+    }
+
+    @media (max-width: 768px) {
+
+        .col-span-6,
+        .col-span-4 {
+            grid-column: span 12;
+        }
+
+        .form-header {
+            flex-direction: column;
+        }
+    }
+
+    /* ------------------------------------------------------------
+       FIELD GROUPS
+       ------------------------------------------------------------ */
+
+    .form-field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        min-width: 0;
+    }
+
+    .form-field-group>label {
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .form-field-group>label i {
+        margin-right: 0.3rem;
+    }
+
+    /* ------------------------------------------------------------
+       DJANGO FORM CONTROLS
+       ------------------------------------------------------------ */
+
+    .form-field-group select,
+    .form-field-group input[type="text"],
+    .form-field-group input[type="number"],
+    .form-field-group input[type="date"],
+    .form-field-group input[type="time"],
+    .form-field-group input[type="datetime-local"],
+    .form-field-group input[type="email"],
+    .form-field-group textarea {
+        width: 100% !important;
+        min-height: 42px;
+        box-sizing: border-box;
+
+        padding: 0.65rem 0.85rem !important;
+
+        color: #1e293b !important;
+        background: #f8fafc !important;
+
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 0.55rem !important;
+
+        outline: none !important;
+
+        font-family: inherit;
+        font-size: 0.875rem !important;
+
+        transition:
+            border-color 0.2s ease,
+            background-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .form-field-group select {
+        cursor: pointer;
+    }
+
+    .form-field-group textarea {
+        min-height: 125px;
+        resize: vertical;
+        line-height: 1.55;
+    }
+
+    .form-field-group select:focus,
+    .form-field-group input:focus,
+    .form-field-group textarea:focus {
+        background: #ffffff !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .form-field-group select:hover,
+    .form-field-group input:hover,
+    .form-field-group textarea:hover {
+        border-color: #94a3b8 !important;
+    }
+
+    /* ------------------------------------------------------------
+       SELECT MULTIPLE
+       ------------------------------------------------------------ */
+
+    .form-field-group select[multiple] {
+        min-height: 120px;
+        padding: 0.5rem !important;
+    }
+
+    .form-field-group select[multiple] option {
+        padding: 0.5rem;
+        border-radius: 0.35rem;
+    }
+
+    /* ------------------------------------------------------------
+       SELECTED REQUEST
+       ------------------------------------------------------------ */
+
+    .selected-request-card {
+        padding: 0.85rem 0.95rem;
+        border: 1px solid #bfdbfe;
+        border-radius: 0.55rem;
+        background: #eff6ff;
+        color: #1e3a8a;
+    }
+
+    .selected-request-name {
+        display: block;
+        color: #1e3a8a;
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .selected-request-meta {
+        display: block;
+        margin-top: 0.25rem;
+        color: #475569;
+        font-size: 0.8rem;
+    }
+
+    /* ------------------------------------------------------------
+       REQUESTED SERVICES
+       ------------------------------------------------------------ */
+
+    .services-box {
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.65rem;
+        background: #f8fafc;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.65rem;
+    }
+
+    .service-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.75rem;
+        background: #ffffff;
+        border: 1px solid #dbeafe;
+        border-radius: 0.5rem;
+    }
+
+    .service-item i {
+        margin-top: 0.15rem;
+        color: #059669;
+    }
+
+    .service-item span {
+        color: #334155;
+        font-size: 0.875rem;
+    }
+
+    .empty-services {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    /* ------------------------------------------------------------
+       ERRORS
+       ------------------------------------------------------------ */
+
+    .error-alert {
+        margin-bottom: 1.5rem;
+        padding: 0.875rem 1rem;
+
+        color: #991b1b;
+        background: #fee2e2;
+
+        border: 1px solid #fca5a5;
+        border-radius: 0.5rem;
+
+        font-size: 0.875rem;
+    }
+
+    .field-error {
+        margin-top: 0.15rem;
+        color: #dc2626;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    /* ------------------------------------------------------------
+       ACTIONS
+       ------------------------------------------------------------ */
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.75rem;
+
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+
+        padding: 0.65rem 1.2rem;
+
+        border-radius: 0.5rem;
+
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.15s ease;
+    }
+
+    .btn-custom:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-custom-secondary {
+        color: #475569;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+    }
+
+    .btn-custom-secondary:hover {
+        color: #1e293b;
+        background: #e2e8f0;
+    }
+
+    .btn-custom-primary {
+        color: #ffffff;
+        background: #2563eb;
+        border: 1px solid #2563eb;
+    }
+
+    .btn-custom-primary:hover {
+        color: #ffffff;
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    /* ------------------------------------------------------------
+       MOBILE
+       ------------------------------------------------------------ */
+
+    @media (max-width: 576px) {
+        .form-wrapper {
+            padding-bottom: 2rem;
+        }
+
+        .form-card-body {
+            padding: 1.25rem;
+        }
+
+        .form-card-header {
+            padding: 1rem 1.25rem;
+        }
+
+        .form-header-titles h1 {
+            font-size: 1.4rem;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .form-actions .btn-custom {
+            width: 100%;
+        }
+
+        .form-header>.btn-custom {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="form-wrapper">
+
+
+    <!-- ========================================================
+     PAGE HEADER
+     ======================================================== -->
+
+    <div class="form-header">
+
+        <div class="form-header-titles">
+
+            <h1>
+                <i class="fa-solid fa-user-check"></i>
+
+                {% if form.instance.pk %}
+                Edit Caregiver Assignment
+                {% else %}
+                New Caregiver Assignment
+                {% endif %}
+            </h1>
+
+            <p>
+                {% if form.instance.pk %}
+                Update the caregiver assignment parameters and schedule below.
+                {% else %}
+                Match and assign an active caregiver to a patient home-care request.
+                {% endif %}
+            </p>
+
+        </div>
+
+        <a href="{% url 'staff:caregiver_assignments' %}" class="btn-custom btn-custom-secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Assignments</span>
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================
+     FORM CARD
+     ======================================================== -->
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+
+            <h5>
+                <i class="fa-solid fa-clipboard-list"></i>
+                Assignment Record Details
+            </h5>
+
+        </div>
+
+
+        <div class="form-card-body">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- ====================================================
+                 NON FIELD ERRORS
+                 ==================================================== -->
+
+                {% if form.non_field_errors %}
+
+                <div class="error-alert">
+
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="form-grid">
+
+
+                    <!-- ==================================================
+                     CAREGIVER
+                     ================================================== -->
+
+                    <div class="col-span-6 form-field-group">
+
+                        <label for="{{ form.caregiver.id_for_label }}">
+                            <i class="fa-solid fa-user-nurse"></i>
+                            Caregiver
+                        </label>
+
+                        {{ form.caregiver }}
+
+                        {% if form.caregiver.errors %}
+
+                        <div class="field-error">
+                            {% for error in form.caregiver.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     HOME CARE REQUEST
+                     ================================================== -->
+
+                    <div class="col-span-6 form-field-group">
+
+                        {% if selected_request %}
+
+                        <label>
+                            <i class="fa-solid fa-house-medical"></i>
+                            Patient / Home Care Request
+                        </label>
+
+                        <div class="selected-request-card">
+
+                            <strong class="selected-request-name">
+                                {{ selected_request.full_name }}
+                            </strong>
+
+                            {% if selected_request.phone %}
+                            <span class="selected-request-meta">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ selected_request.phone }}
+                            </span>
+                            {% endif %}
+
+                            <span class="selected-request-meta">
+                                <i class="fa-solid fa-hashtag"></i>
+                                Request #{{ selected_request.pk }}
+                            </span>
+
+                        </div>
+
+
+                        {# Preserve selected request on submission #}
+
+                        {% if form.homecare_request %}
+
+                        <div style="display:none;">
+                            {{ form.homecare_request }}
+                        </div>
+
+                        {% elif form.home_care_request %}
+
+                        <div style="display:none;">
+                            {{ form.home_care_request }}
+                        </div>
+
+                        {% endif %}
+
+
+                        {% elif form.homecare_request %}
+
+                        <label for="{{ form.homecare_request.id_for_label }}">
+                            <i class="fa-solid fa-house-medical"></i>
+                            Home Care Request
+                        </label>
+
+                        {{ form.homecare_request }}
+
+                        {% if form.homecare_request.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.homecare_request.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% elif form.home_care_request %}
+
+                        <label for="{{ form.home_care_request.id_for_label }}">
+                            <i class="fa-solid fa-house-medical"></i>
+                            Home Care Request
+                        </label>
+
+                        {{ form.home_care_request }}
+
+                        {% if form.home_care_request.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.home_care_request.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ==================================================
+                     SERVICE DATE
+                     ================================================== -->
+
+                    {% if form.service_date %}
+
+                    <div class="col-span-4 form-field-group">
+
+                        <label for="{{ form.service_date.id_for_label }}">
+                            <i class="fa-regular fa-calendar"></i>
+                            Service Date
+                        </label>
+
+                        {{ form.service_date }}
+
+                        {% if form.service_date.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.service_date.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- ==================================================
+                     SERVICE TIME
+                     ================================================== -->
+
+                    {% if form.service_time %}
+
+                    <div class="col-span-4 form-field-group">
+
+                        <label for="{{ form.service_time.id_for_label }}">
+                            <i class="fa-regular fa-clock"></i>
+                            Service Time
+                        </label>
+
+                        {{ form.service_time }}
+
+                        {% if form.service_time.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.service_time.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- ==================================================
+                     STATUS
+                     ================================================== -->
+
+                    {% if form.status %}
+
+                    <div class="col-span-4 form-field-group">
+
+                        <label for="{{ form.status.id_for_label }}">
+                            <i class="fa-solid fa-circle-half-stroke"></i>
+                            Status
+                        </label>
+
+                        {{ form.status }}
+
+                        {% if form.status.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.status.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- ==================================================
+                     REQUESTED SERVICES
+                     ================================================== -->
+
+                    <div class="col-span-12 form-field-group">
+
+                        <label>
+                            <i class="fa-solid fa-list-check" style="color:#2563eb;"></i>
+                            Requested Services
+                        </label>
+
+                        <div class="services-box">
+
+                            {% if requested_services %}
+
+                            <div class="services-grid">
+
+                                {% for service in requested_services %}
+
+                                <div class="service-item">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    <span>
+                                        {{ service }}
+                                    </span>
+
+                                </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                            {% elif selected_request %}
+
+                            <p class="empty-services">
+                                No services are linked to this home-care request yet.
+                            </p>
+
+                            {% else %}
+
+                            <p class="empty-services">
+                                Select a home-care request to view its requested services.
+                            </p>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                    
+
+<!-- ==================================================
+     DURATION
+     ================================================== -->
+
+{% if form.duration %}
+
+<div class="col-span-4 form-field-group">
+
+    <label for="{{ form.duration.id_for_label }}">
+        <i class="fa-regular fa-hourglass-half"></i>
+        Duration
+    </label>
+
+    {{ form.duration }}
+
+    {% if form.duration.help_text %}
+    <small style="color:#64748b; font-size:0.75rem;">
+        {{ form.duration.help_text }}
+    </small>
+    {% endif %}
+
+    {% if form.duration.errors %}
+
+    <div class="field-error">
+
+        {% for error in form.duration.errors %}
+        <div>{{ error }}</div>
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+
+<!-- ==================================================
+     REPORT FREQUENCY
+     ================================================== -->
+
+{% if form.report_frequency %}
+
+<div class="col-span-4 form-field-group">
+
+    <label for="{{ form.report_frequency.id_for_label }}">
+        <i class="fa-solid fa-repeat"></i>
+        Report Frequency
+    </label>
+
+    {{ form.report_frequency }}
+
+    {% if form.report_frequency.help_text %}
+    <small style="color:#64748b; font-size:0.75rem;">
+        {{ form.report_frequency.help_text }}
+    </small>
+    {% endif %}
+
+    {% if form.report_frequency.errors %}
+
+    <div class="field-error">
+
+        {% for error in form.report_frequency.errors %}
+        <div>{{ error }}</div>
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+
+                    <!-- ==================================================
+                     NOTES
+                     ================================================== -->
+
+                    {% if form.notes %}
+
+                    <div class="col-span-12 form-field-group">
+
+                        <label for="{{ form.notes.id_for_label }}">
+                            <i class="fa-regular fa-note-sticky"></i>
+                            Assignment Notes
+                        </label>
+
+                        {{ form.notes }}
+
+                        {% if form.notes.errors %}
+
+                        <div class="field-error">
+
+                            {% for error in form.notes.errors %}
+                            <div>{{ error }}</div>
+                            {% endfor %}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+                <!-- ====================================================
+                 ACTION BUTTONS
+                 ==================================================== -->
+
+                <div class="form-actions">
+
+                    <a href="{% url 'staff:caregiver_assignments' %}" class="btn-custom btn-custom-secondary">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>Cancel</span>
+                    </a>
+
+                    <button type="submit" class="btn-custom btn-custom-primary">
+
+                        {% if form.instance.pk %}
+
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Update Assignment</span>
+
+                        {% else %}
+
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Create Assignment</span>
+
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+ 
+
+</div>
+
+{% endblock %}

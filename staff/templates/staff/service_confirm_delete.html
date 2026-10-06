@@ -1,0 +1,119 @@
+{% extends "staff/base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card shadow-sm border-0">
+
+                <!-- HEADER -->
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Delete Service
+                    </h5>
+                </div>
+
+                <div class="card-body p-5 text-center">
+
+                    <!-- WARNING ICON -->
+                    <div class="mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 55px;"></i>
+                    </div>
+
+                    <h3 class="mb-3">
+                        Are you sure?
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        You are about to permanently delete the following
+                        service:
+                    </p>
+
+                    <!-- SERVICE DETAILS -->
+                    <div class="bg-light rounded p-4 mb-4 text-start">
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                Service:
+                            </div>
+
+                            <div class="col-sm-8">
+                                {{ service.name }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-semibold">
+                                Category:
+                            </div>
+
+                            <div class="col-sm-8">
+                                {% if service.category %}
+                                {{ service.category.name }}
+                                {% else %}
+                                <span class="text-muted">
+                                    —
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4 fw-semibold">
+                                Price:
+                            </div>
+
+                            <div class="col-sm-8">
+                                N$ {{ service.price|floatformat:2 }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- WARNING -->
+                    <div class="alert alert-warning text-start">
+                        <i class="fas fa-info-circle me-2"></i>
+
+                        <strong>Warning:</strong>
+
+                        This action cannot be undone. The service will be
+                        permanently removed from the system.
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="d-flex justify-content-center gap-2">
+
+                            <a href="{% url 'staff:services' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Cancel
+                            </a>
+
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i>
+                                Yes, Delete Service
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

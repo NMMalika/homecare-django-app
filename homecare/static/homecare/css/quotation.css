@@ -1,0 +1,1047 @@
+/* =========================================================
+   HANDS-ON HEALTH
+   HOME CARE QUOTATION
+   Modern + Responsive + Mobile Friendly
+========================================================= */
+
+
+/* =========================================================
+   ROOT VARIABLES
+========================================================= */
+
+:root {
+    --quotation-primary: #2563eb;
+    --quotation-primary-dark: #1d4ed8;
+    --quotation-primary-soft: #eff6ff;
+
+    --quotation-success: #16a34a;
+    --quotation-danger: #dc2626;
+
+    --quotation-text: #1e293b;
+    --quotation-text-soft: #64748b;
+    --quotation-border: #e2e8f0;
+    --quotation-background: #f8fafc;
+    --quotation-card: #ffffff;
+
+    --quotation-radius: 18px;
+    --quotation-radius-small: 12px;
+
+    --quotation-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.07);
+
+    --quotation-shadow-hover:
+        0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   PAGE BACKGROUND
+========================================================= */
+
+body {
+    background:
+        linear-gradient(180deg,
+            #f8fbff 0%,
+            #f8fafc 45%,
+            #ffffff 100%);
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.quotation-card {
+    position: relative;
+    overflow: hidden;
+
+    background: var(--quotation-card);
+
+    border-radius: var(--quotation-radius) !important;
+
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+
+    box-shadow: var(--quotation-shadow);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+/* subtle top accent */
+
+.quotation-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 4px;
+
+    background:
+        linear-gradient(90deg,
+            var(--quotation-primary),
+            #60a5fa);
+
+    z-index: 2;
+}
+
+
+/* desktop hover */
+
+@media (min-width: 992px) {
+
+    .quotation-card:hover {
+        transform: translateY(-3px);
+
+        box-shadow: var(--quotation-shadow-hover);
+
+        border-color: #dbeafe !important;
+    }
+
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.quotation-card h2,
+h1.h3 {
+    color: var(--quotation-text);
+    letter-spacing: -0.02em;
+}
+
+
+/* Financial Workspace badge */
+
+.bg-primary-soft {
+    background: var(--quotation-primary-soft) !important;
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.quotation-card .card-header {
+    padding: 1.35rem 1.5rem !important;
+
+    background:
+        linear-gradient(180deg,
+            #ffffff 0%,
+            #fbfdff 100%) !important;
+}
+
+
+/* calculator / user icons */
+
+.quotation-card .card-header i {
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: var(--quotation-primary-soft);
+}
+
+
+/* =========================================================
+   REQUEST INFORMATION
+========================================================= */
+
+.info-group {
+    padding: 0.2rem 0;
+}
+
+
+.info-label {
+    display: block;
+
+    margin-bottom: 0.35rem;
+
+    font-size: 0.72rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.07em;
+
+    text-transform: uppercase;
+
+    color: var(--quotation-text-soft);
+}
+
+
+.info-value {
+    color: var(--quotation-text);
+
+    font-size: 0.94rem;
+
+    line-height: 1.55;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   SERVICE LIST
+========================================================= */
+
+.service-list-box {
+    background:
+        linear-gradient(135deg,
+            #f8fbff,
+            #f8fafc);
+
+    border: 1px solid var(--quotation-border);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+
+.service-list-box ul {
+    margin: 0;
+}
+
+
+.service-list-box li {
+    min-height: 44px;
+
+    gap: 12px;
+
+    color: var(--quotation-text);
+
+    border-color: #edf2f7 !important;
+}
+
+
+.service-list-box li:last-child {
+    border-bottom: 0 !important;
+}
+
+
+.service-list-box .badge {
+    flex-shrink: 0;
+
+    padding: 0.45rem 0.65rem;
+
+    border-radius: 8px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+#quotationForm {
+    width: 100%;
+}
+
+
+/* labels */
+
+#quotationForm .form-label {
+    color: var(--quotation-text);
+
+    font-size: 0.88rem;
+
+    margin-bottom: 0.5rem;
+}
+
+
+/* required star */
+
+#quotationForm .text-danger {
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+#quotationForm .form-control,
+#quotationForm .form-select {
+
+    min-height: 48px;
+
+    padding: 0.72rem 0.9rem;
+
+    color: var(--quotation-text);
+
+    background-color: #ffffff;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 11px;
+
+    font-size: 0.95rem;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+#quotationForm .form-control:hover {
+    border-color: #bfdbfe;
+}
+
+
+#quotationForm .form-control:focus,
+#quotationForm .form-select:focus {
+
+    border-color: var(--quotation-primary);
+
+    background-color: #ffffff;
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+
+/* placeholder */
+
+#quotationForm .form-control::placeholder {
+    color: #94a3b8;
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   MONEY INPUT GROUPS
+========================================================= */
+
+#quotationForm .input-group {
+    position: relative;
+}
+
+
+#quotationForm .input-group-text {
+
+    min-width: 48px;
+
+    justify-content: center;
+
+    color: var(--quotation-primary) !important;
+
+    background: var(--quotation-primary-soft) !important;
+
+    border: 1px solid #dbe2ea;
+
+    border-right: 0;
+
+    border-radius: 11px 0 0 11px;
+
+    font-weight: 800;
+}
+
+
+#quotationForm .input-group .form-control {
+
+    border-radius: 0 11px 11px 0;
+}
+
+
+/* =========================================================
+   FINAL PAYABLE TOTAL
+========================================================= */
+
+#id_amount {
+
+    background:
+        linear-gradient(135deg,
+            #eff6ff,
+            #f8fbff) !important;
+
+    color: var(--quotation-primary) !important;
+
+    border-color: #bfdbfe !important;
+
+    font-size: 1.12rem !important;
+
+    font-weight: 800;
+
+    letter-spacing: 0.01em;
+}
+
+
+#id_amount:focus {
+
+    background: #eff6ff !important;
+
+    border-color: var(--quotation-primary) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+#id_description {
+
+    min-height: 145px;
+
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   TOTAL SUMMARY
+========================================================= */
+
+#quotationForm .bg-light.border {
+
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(135deg,
+            #f8fbff 0%,
+            #f1f5f9 100%) !important;
+
+    border: 1px solid #dbeafe !important;
+
+    border-radius: 15px !important;
+
+    padding: 1.2rem !important;
+}
+
+
+#quotationForm .bg-light.border::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 4px;
+
+    background: var(--quotation-primary);
+}
+
+
+#quotationForm .bg-light.border hr {
+
+    margin: 0.9rem 0;
+
+    border-color: #dbeafe;
+
+    opacity: 1;
+}
+
+
+#summaryTotal {
+
+    font-size: 1.25rem;
+
+    letter-spacing: 0.01em;
+}
+
+
+/* =========================================================
+   NOTICE BOX
+========================================================= */
+
+.notice-box {
+
+    background:
+        linear-gradient(135deg,
+            #eff6ff,
+            #f8fbff);
+
+    border: 1px solid #dbeafe;
+
+    border-left: 4px solid var(--quotation-primary);
+
+    box-shadow:
+        0 4px 12px rgba(37, 99, 235, 0.04);
+}
+
+
+.notice-box i {
+
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 6px rgba(37, 99, 235, 0.08);
+}
+
+
+.notice-box strong {
+    color: var(--quotation-text);
+}
+
+
+.notice-box p {
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+#quotationForm .btn {
+
+    min-height: 46px;
+
+    border-radius: 11px !important;
+
+    font-size: 0.9rem;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+#quotationForm .btn-primary {
+
+    background:
+        linear-gradient(135deg,
+            #2563eb,
+            #1d4ed8);
+
+    border: none;
+
+    box-shadow:
+        0 7px 18px rgba(37, 99, 235, 0.20);
+}
+
+
+#quotationForm .btn-primary:hover {
+
+    transform: translateY(-2px);
+
+    background:
+        linear-gradient(135deg,
+            #1d4ed8,
+            #1e40af);
+
+    box-shadow:
+        0 10px 24px rgba(37, 99, 235, 0.28);
+}
+
+
+#quotationForm .btn-primary:active {
+
+    transform: translateY(0);
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, 0.20);
+}
+
+
+#quotationForm .btn-primary:disabled {
+
+    opacity: 0.75;
+
+    transform: none;
+
+    cursor: not-allowed;
+}
+
+
+#quotationForm .btn-outline-secondary {
+
+    color: #475569;
+
+    border-color: #cbd5e1;
+
+    background: #ffffff;
+}
+
+
+#quotationForm .btn-outline-secondary:hover {
+
+    color: #1e293b;
+
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+}
+
+
+/* =========================================================
+   ERROR MESSAGES
+========================================================= */
+
+#quotationForm .text-danger.small {
+
+    display: block;
+
+    padding: 0.45rem 0.65rem;
+
+    margin-top: 0.4rem !important;
+
+    border-radius: 7px;
+
+    background: #fef2f2;
+
+    color: var(--quotation-danger) !important;
+
+    font-size: 0.78rem;
+}
+
+
+/* invalid input */
+
+#quotationForm .is-invalid,
+#quotationForm .form-control:invalid:focus {
+
+    border-color: #fca5a5;
+}
+
+
+/* =========================================================
+   ATTACHMENT BUTTONS
+========================================================= */
+
+.quotation-card .btn-outline-light {
+
+    background: #ffffff;
+
+    border-color: #dbe2ea !important;
+
+    border-radius: 9px !important;
+
+    min-height: 40px;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.quotation-card .btn-outline-light:hover {
+
+    background: #eff6ff;
+
+    border-color: #bfdbfe !important;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.quotation-card .badge {
+
+    font-weight: 700;
+
+    letter-spacing: 0.01em;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .quotation-card {
+        border-radius: 16px !important;
+    }
+
+
+    .quotation-card .card-header {
+        padding: 1.2rem !important;
+    }
+
+
+    .quotation-card .card-body {
+        padding: 1.2rem !important;
+    }
+
+
+    h1.h3 {
+        font-size: 1.55rem;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    body {
+        background: #f8fafc;
+    }
+
+
+    .container.py-5 {
+        padding-top: 1.25rem !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+
+    .quotation-card {
+        border-radius: 15px !important;
+
+        box-shadow:
+            0 6px 20px rgba(15, 23, 42, 0.06);
+    }
+
+
+    .quotation-card .card-header {
+        padding: 1rem !important;
+    }
+
+
+    .quotation-card .card-body {
+        padding: 1rem !important;
+    }
+
+
+    /* page heading */
+
+    h1.h3 {
+        font-size: 1.35rem;
+
+        line-height: 1.3;
+    }
+
+
+    .mb-4.text-center.text-md-start p {
+        font-size: 0.88rem;
+
+        line-height: 1.5;
+    }
+
+
+    /* request detail columns become comfortable */
+
+    .quotation-card .row.g-2 {
+
+        row-gap: 0.75rem !important;
+
+    }
+
+
+    /* information text */
+
+    .info-value {
+        font-size: 0.9rem;
+    }
+
+
+    /* service items */
+
+    .service-list-box li {
+
+        align-items: flex-start !important;
+
+        padding-top: 0.7rem !important;
+
+        padding-bottom: 0.7rem !important;
+
+    }
+
+
+    .service-list-box li span:first-child {
+
+        min-width: 0;
+
+        overflow-wrap: anywhere;
+
+    }
+
+
+    /* form inputs */
+
+    #quotationForm .form-control {
+
+        min-height: 50px;
+
+        font-size: 16px;
+
+        /*
+         * Prevents iOS Safari from zooming
+         * when focusing form fields.
+         */
+    }
+
+
+    #id_description {
+
+        min-height: 135px;
+
+    }
+
+
+    /* total summary */
+
+    #quotationForm .bg-light.border {
+
+        padding: 1rem !important;
+
+    }
+
+
+    #summaryTotal {
+
+        font-size: 1.15rem;
+
+    }
+
+
+    /* buttons stack */
+
+    #quotationForm .pt-3.border-top {
+
+        flex-direction: column-reverse;
+
+        align-items: stretch !important;
+
+    }
+
+
+    #quotationForm .pt-3.border-top>* {
+
+        width: 100%;
+
+    }
+
+
+    #quotationForm .pt-3.border-top .btn {
+
+        width: 100%;
+
+        min-height: 50px;
+
+        justify-content: center;
+
+    }
+
+
+    /* make button easier to tap */
+
+    #submitQuotationBtn {
+
+        min-height: 52px !important;
+
+        font-size: 0.95rem !important;
+
+    }
+
+
+    /* notice */
+
+    .notice-box {
+
+        padding: 0.9rem !important;
+
+    }
+
+
+    .notice-box .d-flex {
+
+        gap: 0.7rem !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .container.py-5 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+
+    .quotation-card .card-header {
+        padding: 0.9rem !important;
+    }
+
+
+    .quotation-card .card-body {
+        padding: 0.9rem !important;
+    }
+
+
+    .quotation-card .card-header h2 {
+
+        font-size: 1rem;
+
+    }
+
+
+    .quotation-card .card-header h2 i {
+
+        width: 30px;
+
+        height: 30px;
+
+        margin-right: 0.4rem !important;
+
+    }
+
+
+    .badge {
+
+        font-size: 0.72rem;
+
+    }
+
+
+    .info-label {
+
+        font-size: 0.67rem;
+
+    }
+
+
+    .info-value {
+
+        font-size: 0.87rem;
+
+    }
+
+
+    .service-list-box {
+
+        padding: 0.75rem !important;
+
+    }
+
+
+    .service-list-box li {
+
+        font-size: 0.82rem;
+
+    }
+
+
+    .service-list-box li .badge {
+
+        font-size: 0.72rem;
+
+    }
+
+
+    #quotationForm .input-group-text {
+
+        min-width: 44px;
+
+        padding-left: 0.55rem;
+
+        padding-right: 0.55rem;
+
+    }
+
+
+    #quotationForm .form-control {
+
+        padding-left: 0.75rem;
+
+        padding-right: 0.75rem;
+
+    }
+
+
+    #quotationForm .bg-light.border {
+
+        font-size: 0.84rem;
+
+    }
+
+
+    #summaryTotal {
+
+        font-size: 1.05rem;
+
+    }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+#quotationForm button:focus-visible,
+#quotationForm a:focus-visible,
+#quotationForm input:focus-visible,
+#quotationForm textarea:focus-visible {
+
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        scroll-behavior: auto !important;
+
+        transition-duration: 0.01ms !important;
+
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+    }
+
+}

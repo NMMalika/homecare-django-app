@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5 my-3">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-10 col-lg-7">
+
+            <div class="text-center mb-4">
+
+                <span class="badge bg-primary-soft text-primary fw-semibold px-3 py-2 rounded-pill mb-2">
+                    <i class="fa-solid fa-credit-card me-1"></i>
+                    Payment Confirmation
+                </span>
+
+                <h1 class="h2 fw-bold text-slate-800 mb-1">
+                    Confirm Your Payment
+                </h1>
+
+                <p class="text-muted">
+                    Hands-On Health Home-Based Care Clinic
+                </p>
+
+            </div>
+
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="mb-4">
+
+                        <span class="text-uppercase text-muted fw-bold small">
+                            Client
+                        </span>
+
+                        <h2 class="h4 fw-bold text-slate-800 mb-0 mt-1">
+                            {{ homecare_request.full_name }}
+                        </h2>
+
+                    </div>
+
+
+                    <!-- AMOUNT -->
+
+                    <div class="summary-grid rounded-3 p-4 mb-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <span class="info-label">
+                                    Amount Due
+                                </span>
+
+                                <div class="fw-semibold text-slate-800">
+                                    Quotation #{{ quotation.id }}
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+
+                                <span class="fs-3 fw-bold text-primary">
+                                    N$ {{ quotation.amount|floatformat:2 }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INSTRUCTIONS -->
+
+                    <div class="alert alert-light border rounded-3 mb-4">
+
+                        <div class="d-flex gap-3">
+
+                            <i class="fa-solid fa-circle-info text-primary mt-1"></i>
+
+                            <div>
+
+                                <strong class="text-slate-800">
+                                    Before submitting
+                                </strong>
+
+                                <p class="small text-muted mb-0 mt-1">
+
+                                    Please make your payment using one of
+                                    the payment methods provided on your
+                                    quotation.
+
+                                    After completing the payment, enter the
+                                    transaction code below.
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAYMENT FORM -->
+
+                <form method="post" action="{% url 'homecare:submit_payment' token=quotation.access_token %}">
+
+                        {% csrf_token %}
+
+
+                        {% if form.non_field_errors %}
+
+                        <div class="alert alert-danger">
+
+                            {{ form.non_field_errors }}
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- PAYMENT METHOD -->
+
+                        <div class="mb-4">
+
+                            <label for="{{ form.payment_method.id_for_label }}" class="form-label fw-semibold">
+                                Payment Method
+                            </label>
+
+                            {{ form.payment_method }}
+
+                            {% for error in form.payment_method.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- PAYMENT CODE -->
+
+                        <div class="mb-4">
+
+                            <label for="{{ form.payment_code.id_for_label }}" class="form-label fw-semibold">
+                                Payment / Transaction Code
+                            </label>
+
+                            {{ form.payment_code }}
+
+                            {% if form.payment_code.help_text %}
+
+                            <div class="form-text">
+                                {{ form.payment_code.help_text }}
+                            </div>
+
+                            {% endif %}
+
+                            {% for error in form.payment_code.errors %}
+
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- WARNING -->
+
+                        <div class="alert alert-warning rounded-3 mb-4">
+
+                            <div class="d-flex gap-2 align-items-start">
+
+                                <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Important
+                                    </strong>
+
+                                    <p class="small mb-0 mt-1">
+
+                                        Submitting this form does not
+                                        immediately confirm your service.
+
+                                        Hands-On Health will verify the
+                                        transaction before your payment is
+                                        marked as paid.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SUBMIT -->
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+
+                            <i class="fa-solid fa-check-circle me-2"></i>
+
+                            I HAVE PAID
+
+                        </button>
+
+
+                    </form>
+
+
+                    <div class="text-center mt-4">
+
+                        <a href="{% url 'homecare:quotation_detail' quotation.access_token %}"
+                            class="text-decoration-none">
+
+                            <i class="fa-solid fa-arrow-left me-1"></i>
+
+                            Back to quotation
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="text-center mt-4">
+
+                <p class="small text-muted mb-0">
+
+                    Your payment information is submitted securely
+                    for verification by Hands-On Health.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

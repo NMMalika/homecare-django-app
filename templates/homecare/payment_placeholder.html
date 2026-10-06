@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-5 text-center">
+
+                    <div class="mb-4">
+
+                        <h1 class="h3">
+                            Complete Your Payment
+                        </h1>
+
+                        <p class="text-muted">
+                            Hands-On Health
+                        </p>
+
+                    </div>
+
+
+                    <div class="p-4 bg-light rounded mb-4">
+
+                        <p class="text-muted mb-1">
+                            Amount Due
+                        </p>
+
+                        <div class="fs-2 fw-bold">
+                            N$ {{ quotation.amount|floatformat:2 }}
+                        </div>
+
+                    </div>
+
+
+                    <h2 class="h5 mb-3">
+                        Online Payment Coming Soon
+                    </h2>
+
+
+                    <p class="text-muted">
+
+                        Online payment processing will be available
+                        shortly.
+
+                        For now, please contact Hands-On Health using
+                        the payment instructions provided with your
+                        quotation.
+
+                    </p>
+
+
+                    <div class="alert alert-info text-start">
+
+                        <strong>
+                            Important
+                        </strong>
+
+                        <p class="mb-0 mt-2">
+
+                            Your service is not confirmed until
+                            Hands-On Health receives and verifies
+                            your payment.
+
+                        </p>
+
+                    </div>
+
+
+                    <a href="{% url 'homecare:quotation_detail' quotation.access_token %}"
+                        class="btn btn-outline-primary">
+                        BACK TO QUOTATION
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

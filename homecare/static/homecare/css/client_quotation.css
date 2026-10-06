@@ -1,0 +1,902 @@
+/* =========================================================
+   HANDS-ON HEALTH
+   CLIENT QUOTATION
+   Premium Healthcare Design
+========================================================= */
+
+:root {
+    --hh-navy: #102A43;
+    --hh-navy-dark: #071B2E;
+    --hh-navy-light: #174A70;
+
+    --hh-teal: #16A394;
+    --hh-teal-dark: #087F72;
+    --hh-teal-soft: #E7F8F5;
+
+    --hh-blue: #1976D2;
+    --hh-blue-soft: #EAF3FF;
+
+    --hh-green: #2E9B6F;
+    --hh-green-soft: #E9F8F1;
+
+    --hh-orange: #F59E0B;
+    --hh-orange-soft: #FFF6DF;
+
+    --hh-red: #D9534F;
+
+    --hh-background: #EEF4F7;
+
+    --hh-card: #FFFFFF;
+
+    --hh-text: #172B3A;
+    --hh-muted: #718394;
+
+    --hh-border: #DCE7EC;
+
+    --hh-shadow:
+        0 18px 50px rgba(16, 42, 67, 0.09);
+
+    --hh-shadow-small:
+        0 8px 25px rgba(16, 42, 67, 0.06);
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.client-quotation-page,
+body {
+    background:
+        radial-gradient(circle at 5% 5%,
+            rgba(22, 163, 148, .08),
+            transparent 25%),
+        radial-gradient(circle at 95% 85%,
+            rgba(25, 118, 210, .08),
+            transparent 28%),
+        var(--hh-background);
+}
+
+
+/* =========================================================
+   TEXT HELPERS
+========================================================= */
+
+.text-slate-800 {
+    color: var(--hh-text) !important;
+}
+
+.text-slate-700 {
+    color: #405565 !important;
+}
+
+.text-slate-600 {
+    color: #5E7180 !important;
+}
+
+.text-primary {
+    color: var(--hh-teal-dark) !important;
+}
+
+.bg-primary-soft {
+    background: var(--hh-teal-soft) !important;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.client-quotation-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+
+.client-quotation-header .badge,
+.container>.row .badge.bg-primary-soft {
+    background:
+        var(--hh-teal-soft) !important;
+
+    color:
+        var(--hh-teal-dark) !important;
+
+    border:
+        1px solid rgba(22, 163, 148, .12);
+
+    font-size: 10px;
+
+    letter-spacing: .4px;
+}
+
+
+.container h1.text-slate-800 {
+    font-size: 30px;
+
+    font-weight: 800;
+
+    letter-spacing: -.7px;
+
+    color: var(--hh-navy) !important;
+}
+
+
+.container h1.text-slate-800+p {
+    color: var(--hh-muted) !important;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MAIN QUOTATION CARD
+========================================================= */
+
+.client-quotation-card {
+
+    position: relative;
+
+    border-radius: 22px !important;
+
+    background:
+        var(--hh-card);
+
+    border:
+        1px solid var(--hh-border) !important;
+
+    box-shadow:
+        var(--hh-shadow) !important;
+
+    overflow: hidden;
+}
+
+
+.client-quotation-card::before {
+
+    content: "";
+
+    display: block;
+
+    height: 5px;
+
+    background:
+        linear-gradient(90deg,
+            var(--hh-navy),
+            var(--hh-teal),
+            var(--hh-blue));
+}
+
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.client-quotation-card .card-body {
+
+    padding:
+        38px !important;
+}
+
+
+/* =========================================================
+   PREPARED FOR
+========================================================= */
+
+.client-quotation-card .border-bottom {
+
+    border-color:
+        var(--hh-border) !important;
+}
+
+
+.client-quotation-card .text-uppercase.text-muted {
+
+    color:
+        #8A9AA5 !important;
+
+    font-size: 9px;
+
+    letter-spacing: .8px;
+}
+
+
+.client-quotation-card h2 {
+
+    color:
+        var(--hh-navy) !important;
+
+    font-weight:
+        800 !important;
+
+    letter-spacing:
+        -.3px;
+}
+
+
+.client-quotation-card .badge.bg-light {
+
+    background:
+        var(--hh-blue-soft) !important;
+
+    color:
+        var(--hh-navy) !important;
+
+    border:
+        1px solid #D8E9FA !important;
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+}
+
+
+/* =========================================================
+   SUMMARY GRID
+========================================================= */
+
+.summary-grid {
+
+    background:
+        linear-gradient(135deg,
+            #F5F9FB,
+            #F0F7F8) !important;
+
+    border:
+        1px solid #E1EBEF;
+
+    border-radius:
+        16px !important;
+}
+
+
+.info-label {
+
+    display: block;
+
+    color:
+        #8495A1;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        .7px;
+
+    text-transform:
+        uppercase;
+
+    margin-bottom:
+        6px;
+}
+
+
+.info-value {
+
+    color:
+        var(--hh-text) !important;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.6;
+}
+
+
+.info-value .fa-check {
+
+    color:
+        var(--hh-teal) !important;
+
+    font-size:
+        10px;
+}
+
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+.client-quotation-card h3 {
+
+    color:
+        var(--hh-navy) !important;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800 !important;
+
+    letter-spacing:
+        .5px;
+}
+
+
+.client-quotation-card h3 i {
+
+    color:
+        var(--hh-teal) !important;
+}
+
+
+/* =========================================================
+   QUOTATION DESCRIPTION
+========================================================= */
+
+.quotation-body {
+
+    background:
+        #F6F9FA !important;
+
+    border:
+        1px solid #E5EDF0;
+
+    border-left:
+        4px solid var(--hh-teal);
+
+    border-radius:
+        12px !important;
+
+    color:
+        #536875 !important;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.8;
+
+    padding:
+        17px !important;
+}
+
+
+/* =========================================================
+   TOTAL PRICE BANNER
+========================================================= */
+
+.total-banner {
+
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(120deg,
+            #EAF7F5,
+            #EDF5FC) !important;
+
+    border:
+        1px solid #D7EAE9;
+
+    border-radius:
+        17px !important;
+
+    padding:
+        22px !important;
+}
+
+
+.total-banner::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        130px;
+
+    height:
+        130px;
+
+    right:
+        -65px;
+
+    top:
+        -65px;
+
+    border-radius:
+        50%;
+
+    border:
+        25px solid rgba(22, 163, 148, .07);
+}
+
+
+.total-banner .text-primary {
+
+    color:
+        var(--hh-teal-dark) !important;
+
+    font-size:
+        10px;
+
+    letter-spacing:
+        .7px;
+}
+
+
+.total-banner small {
+
+    color:
+        var(--hh-muted) !important;
+
+    font-size:
+        9px;
+}
+
+
+.total-amount {
+
+    position:
+        relative;
+
+    z-index:
+        2;
+
+    color:
+        var(--hh-navy) !important;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size:
+        27px !important;
+
+    font-weight:
+        800 !important;
+
+    letter-spacing:
+        -.5px;
+}
+
+
+/* =========================================================
+   PAYMENT DEADLINE
+========================================================= */
+
+.alert-deadline {
+
+    background:
+        var(--hh-orange-soft) !important;
+
+    border:
+        1px solid #F5E2AF !important;
+
+    color:
+        var(--hh-text);
+
+    border-radius:
+        14px !important;
+}
+
+
+.alert-deadline .fa-clock-rotate-left {
+
+    color:
+        var(--hh-orange) !important;
+}
+
+
+.alert-deadline strong {
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+
+.alert-deadline span {
+
+    font-size:
+        10px;
+
+    color:
+        #786B52 !important;
+}
+
+
+/* =========================================================
+   PAYMENT BOX
+========================================================= */
+
+.payment-box {
+
+    position:
+        relative;
+
+    background:
+        #FFFFFF !important;
+
+    border:
+        1px solid var(--hh-border);
+
+    border-radius:
+        15px !important;
+
+    box-shadow:
+        var(--hh-shadow-small);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.payment-box:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(16, 42, 67, .09);
+}
+
+
+.payment-box h4 {
+
+    color:
+        var(--hh-navy) !important;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+
+.payment-box h4 i {
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        9px;
+
+    background:
+        var(--hh-blue-soft);
+
+    color:
+        var(--hh-blue) !important;
+}
+
+
+.payment-box .small {
+
+    color:
+        #526875;
+
+    line-height:
+        1.7;
+}
+
+
+.payment-box strong {
+
+    color:
+        var(--hh-navy);
+}
+
+
+/* =========================================================
+   ADDITIONAL INSTRUCTIONS
+========================================================= */
+
+.alert-light {
+
+    background:
+        #F6F9FA !important;
+
+    border:
+        1px solid #E1EAEE !important;
+
+    border-radius:
+        13px !important;
+}
+
+
+.alert-light h4 {
+
+    color:
+        var(--hh-navy) !important;
+
+    font-size:
+        11px;
+}
+
+
+.alert-light p {
+
+    color:
+        #607481 !important;
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   CONFIRMATION WARNING
+========================================================= */
+
+.alert-warning-soft {
+
+    background:
+        #FFF9EA !important;
+
+    border:
+        1px solid #F3E4B7 !important;
+
+    border-left:
+        4px solid var(--hh-orange) !important;
+
+    border-radius:
+        12px !important;
+}
+
+
+.alert-warning-soft .fa-triangle-exclamation {
+
+    color:
+        var(--hh-orange) !important;
+}
+
+
+.alert-warning-soft strong {
+
+    color:
+        var(--hh-navy) !important;
+
+    font-size:
+        11px;
+}
+
+
+.alert-warning-soft p {
+
+    color:
+        #687985 !important;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.6;
+}
+
+
+/* =========================================================
+   PAID BUTTON
+========================================================= */
+
+.client-quotation-card .btn-primary {
+
+    min-height:
+        51px;
+
+    min-width:
+        180px;
+
+    padding:
+        0 28px;
+
+    border:
+        0 !important;
+
+    border-radius:
+        12px !important;
+
+    background:
+        linear-gradient(135deg,
+            var(--hh-navy),
+            var(--hh-navy-light)) !important;
+
+    color:
+        #fff !important;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        .5px;
+
+    box-shadow:
+        0 10px 25px rgba(16, 42, 67, .18);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.client-quotation-card .btn-primary:hover {
+
+    background:
+        linear-gradient(135deg,
+            var(--hh-teal-dark),
+            var(--hh-teal)) !important;
+
+    color:
+        #fff !important;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 14px 30px rgba(22, 163, 148, .22);
+}
+
+
+.client-quotation-card .btn-primary:active {
+
+    transform:
+        translateY(0);
+}
+
+
+.client-quotation-card .btn-primary i {
+
+    color:
+        #74DDD2;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.container .text-center>p.small.text-muted {
+
+    color:
+        #8495A1 !important;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767px) {
+
+    .client-quotation-card .card-body {
+
+        padding:
+            25px 18px !important;
+    }
+
+
+    .container h1.text-slate-800 {
+
+        font-size:
+            24px;
+    }
+
+
+    .total-banner {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start !important;
+
+        gap:
+            12px;
+    }
+
+
+    .total-amount {
+
+        font-size:
+            25px !important;
+    }
+
+
+    .summary-grid {
+
+        padding:
+            17px !important;
+    }
+
+
+    .client-quotation-card .border-bottom {
+
+        align-items:
+            flex-start !important;
+
+        gap:
+            15px;
+    }
+
+
+    .client-quotation-card .border-bottom .text-end {
+
+        text-align:
+            left !important;
+    }
+
+
+    .payment-box {
+
+        padding:
+            18px !important;
+    }
+
+
+    .client-quotation-card .btn-primary {
+
+        width:
+            100%;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .container.py-5 {
+
+        padding-top:
+            25px !important;
+
+        padding-bottom:
+            25px !important;
+    }
+
+
+    .client-quotation-card {
+
+        border-radius:
+            17px !important;
+    }
+
+
+    .client-quotation-card .card-body {
+
+        padding:
+            22px 15px !important;
+    }
+
+
+    .total-banner {
+
+        padding:
+            18px !important;
+    }
+
+}

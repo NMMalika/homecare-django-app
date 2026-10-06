@@ -1,0 +1,148 @@
+{% load static %}
+
+<!-- services start -->
+<section class="services-section modern-services-section">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-title text-center">
+            <span class="sub-title-badge">Home-Based Care Wherever You Need It</span>
+            <h2 class="main-heading">Comprehensive In-Home Healthcare &amp; Support</h2>
+            <div class="line-border-center"></div>
+            <p class="section-subtitle">Delivering structured, dignified clinical oversight, daily assistance, and
+                live-in care across Windhoek and nationwide.</p>
+        </div>
+
+        <!-- DYNAMIC SERVICE CATEGORIES -->
+        {% for category in categories %}
+        {% if category.services.all %}
+        <div class="service-category-block">
+            <h3 class="category-title">
+                <i class="{{ category.icon_class|default:'fa-solid fa-user-nurse' }}"></i> {{ category.name }}
+            </h3>
+            <div class="row display-flex">
+                {% for service in category.services.all %}
+                {% if service.is_active %}
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="service-card-3d">
+                        <div class="card-icon-glow">
+                            {% if service.image %}
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}"
+                                class="img-responsive card-custom-icon">
+                            {% else %}
+                            <i class="{{ service.icon_class|default:'fa-solid fa-heart-pulse' }}"></i>
+                            {% endif %}
+                        </div>
+                        <h4>{{ service.name }}</h4>
+                        <div class="border-center-blue"></div>
+                        <p>{{ service.short_description }}</p>
+
+                        {% if service.price > 0 %}
+                        <div class="service-price-badge"
+                            style="margin-bottom: 15px; font-weight: 600; color: var(--homecare-primary, #123f61);">
+                            <span>Starting at: {{ service.formatted_price }}</span>
+                        </div>
+                        {% endif %}
+
+                        <a href="{% url 'homecare:request' %}" class="btn btn-glow-card">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <div class="alert alert-info text-center">
+            <p>No services are currently listed. Please check back later or contact us directly.</p>
+        </div>
+        {% endfor %}
+
+        <!-- WHO WE CARE FOR -->
+        <div class="who-we-care-wrapper">
+            <div class="row display-flex align-items-center">
+                <div class="col-md-5 col-sm-12">
+                    <div class="care-image-box">
+                        <img src="{% static 'img/nurse1.jpeg' %}" alt="Caregiver with senior patient"
+                            class="img-responsive">
+                        <div class="care-floating-badge">
+                            <i class="fa-solid fa-shield-heart"></i>
+                            <span>Dignified Care for Every Stage</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7 col-sm-12">
+                    <div class="care-content-box">
+                        <span class="sub-title-badge">Tailored Patient Support</span>
+                        <h3 class="care-heading">Who We Care For</h3>
+                        <p class="care-description">Hands-on Health delivers compassionate home-based care customized to
+                            the specific medical condition and daily life requirements of:</p>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="care-pill-list">
+                                    <li><i class="fa-solid fa-circle-check"></i> Elderly patients</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Bedridden patients</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Surgical &amp; post-op recovery</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Hospital discharge recovery</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Chronic condition management</li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="care-pill-list">
+                                    <li><i class="fa-solid fa-circle-check"></i> Daily living activity support</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Palliative &amp; supportive care</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Short-term home assistance</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Long-term home nursing</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Families seeking caregiver relief</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUR SERVICE AREA -->
+        <div class="service-area-wrapper">
+            <div class="row display-flex align-items-center">
+                <div class="col-md-8 col-sm-12">
+                    <div class="area-content-box">
+                        <span class="sub-title-badge">Coverage &amp; Mobility</span>
+                        <h3 class="area-heading">Our Service Area</h3>
+                        <h4 class="area-subheading">Home-Based Care Wherever You Need It</h4>
+
+                        <p class="area-text">
+                            <strong>Hands-on Health</strong> is based in <strong>Windhoek</strong> and provides
+                            home-based care services according to availability and service arrangements.
+                        </p>
+
+                        <p class="area-text">
+                            Services can also be arranged <strong>outside Windhoek and in other parts of
+                                Namibia</strong>, subject to staff availability, travel requirements, and applicable
+                            fees.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-12">
+                    <div class="area-highlight-card">
+                        <div class="area-icon-box">
+                            <i class="fa-solid fa-house-medical-flag"></i>
+                        </div>
+                        <h5>Direct To Your Door</h5>
+                        <p class="area-tagline">We come to the patient — the patient does not come to us.</p>
+                        <a href="tel:+264858154948" class="btn btn-glow-action">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- services end -->

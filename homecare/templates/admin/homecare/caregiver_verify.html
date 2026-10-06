@@ -1,0 +1,633 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block title %}
+Verify Caregiver
+{% endblock %}
+
+{% block content %}
+
+<div style="max-width:1100px;">
+
+    <!-- ================================================== -->
+    <!-- HEADER -->
+    <!-- ================================================== -->
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:25px;
+    ">
+
+        <div>
+
+            <h1 style="margin-bottom:5px;">
+                Verify Caregiver
+            </h1>
+
+            <p style="color:#777;margin-top:0;">
+                Review the complete caregiver application,
+                certificates and professional documents.
+            </p>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'admin:homecare_caregiver_changelist' %}" class="button" style="
+                   padding:10px 15px;
+                   text-decoration:none;
+               ">
+                ← Back to Caregivers
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CAREGIVER HEADER -->
+    <!-- ================================================== -->
+
+    <div style="
+        background:white;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <div style="
+            display:flex;
+            gap:25px;
+            align-items:flex-start;
+        ">
+
+            <!-- PHOTO -->
+
+            <div>
+
+                {% if caregiver.photo %}
+
+                <img src="{{ caregiver.photo.url }}" alt="{{ caregiver.name }}" style="
+                            width:140px;
+                            height:140px;
+                            object-fit:cover;
+                            border-radius:8px;
+                            border:1px solid #ddd;
+                        ">
+
+                {% else %}
+
+                <div style="
+                        width:140px;
+                        height:140px;
+                        background:#eee;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        border-radius:8px;
+                        color:#777;
+                    ">
+                    No Photo
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- NAME -->
+
+            <div style="flex:1;">
+
+                <h2 style="margin-top:0;">
+                    {% if caregiver.name %}
+                    {{ caregiver.name }}
+                    {% elif caregiver.user %}
+                    {{ caregiver.user.get_full_name|default:caregiver.user.username }}
+                    {% else %}
+                    Unnamed Caregiver
+                    {% endif %}
+                </h2>
+
+                <p style="font-size:16px;color:#555;">
+                    {{ caregiver.professional_title }}
+                </p>
+
+                {% if caregiver.specialization %}
+
+                <p>
+                    <strong>Specialization:</strong>
+                    {{ caregiver.specialization }}
+                </p>
+
+                {% endif %}
+
+                <p>
+
+                    <strong>Status:</strong>
+
+                    {% if caregiver.verification_status == "APPROVED" %}
+
+                    <span style="
+                            background:#198754;
+                            color:white;
+                            padding:5px 10px;
+                            border-radius:5px;
+                            font-weight:700;
+                        ">
+                        APPROVED
+                    </span>
+
+                    {% elif caregiver.verification_status == "REJECTED" %}
+
+                    <span style="
+                            background:#dc3545;
+                            color:white;
+                            padding:5px 10px;
+                            border-radius:5px;
+                            font-weight:700;
+                        ">
+                        DECLINED
+                    </span>
+
+                    {% else %}
+
+                    <span style="
+                            background:#ffc107;
+                            color:#212529;
+                            padding:5px 10px;
+                            border-radius:5px;
+                            font-weight:700;
+                        ">
+                        PENDING VERIFICATION
+                    </span>
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- PERSONAL DETAILS -->
+    <!-- ================================================== -->
+
+    <div style="
+        background:white;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <h2>
+            Personal & Professional Details
+        </h2>
+
+        <table style="
+            width:100%;
+            border-collapse:collapse;
+        ">
+
+            <tr>
+                <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">
+                    Full Name
+                </th>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+
+                    {% if caregiver.name %}
+                    {{ caregiver.name }}
+                    {% elif caregiver.user %}
+                    {{ caregiver.user.get_full_name|default:caregiver.user.username }}
+                    {% else %}
+                    Not provided
+                    {% endif %}
+
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">
+                    Professional Title
+                </th>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    {{ caregiver.professional_title|default:"Not provided" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">
+                    Specialization
+                </th>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    {{ caregiver.specialization|default:"Not provided" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">
+                    Phone
+                </th>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    {{ caregiver.phone|default:"Not provided" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">
+                    Email
+                </th>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    {{ caregiver.email|default:"Not provided" }}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="text-align:left;padding:10px;">
+                    Availability
+                </th>
+
+                <td style="padding:10px;white-space:pre-wrap;">
+                    {{ caregiver.availability|default:"Not provided" }}
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- PROFESSIONAL DOCUMENTS -->
+    <!-- ================================================== -->
+
+    <div style="
+        background:white;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <h2>
+            Professional Documents
+        </h2>
+
+        <p>
+
+            <strong>CV:</strong>
+
+            {% if caregiver.cv %}
+
+            <a href="{{ caregiver.cv.url }}" target="_blank" style="
+                        background:#0d6efd;
+                        color:white;
+                        padding:7px 12px;
+                        border-radius:5px;
+                        text-decoration:none;
+                        font-weight:600;
+                    ">
+                VIEW / DOWNLOAD CV
+            </a>
+
+            {% else %}
+
+            <span style="color:#dc3545;">
+                No CV uploaded
+            </span>
+
+            {% endif %}
+
+        </p>
+
+        <p>
+
+            <strong>Certificates Submitted:</strong>
+
+            {% if caregiver.certificate_submitted %}
+
+            <span style="color:#198754;font-weight:700;">
+                YES
+            </span>
+
+            {% else %}
+
+            <span style="color:#dc3545;font-weight:700;">
+                NO
+            </span>
+
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CERTIFICATES -->
+    <!-- ================================================== -->
+
+    <div style="
+        background:white;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:25px;
+        margin-bottom:20px;
+    ">
+
+        <h2>
+            Certificates
+        </h2>
+
+        {% if certificates %}
+
+        {% for certificate in certificates %}
+
+        <div style="
+                    border:1px solid #ddd;
+                    border-radius:7px;
+                    padding:18px;
+                    margin-bottom:15px;
+                ">
+
+            <h3 style="margin-top:0;">
+
+                {{ certificate.certificate_name }}
+
+            </h3>
+
+            <p>
+                <strong>Certificate Number:</strong>
+                {{ certificate.certificate_number|default:"Not provided" }}
+            </p>
+
+            <p>
+                <strong>Issuing Organization:</strong>
+                {{ certificate.issuing_organization|default:"Not provided" }}
+            </p>
+
+            <p>
+                <strong>Issue Date:</strong>
+                {{ certificate.issue_date|default:"Not provided" }}
+            </p>
+
+            <p>
+                <strong>Expiry Date:</strong>
+                {{ certificate.expiry_date|default:"Not provided" }}
+            </p>
+
+            <p>
+
+                <strong>Verification:</strong>
+
+                {% if certificate.is_verified %}
+
+                <span style="
+                                color:#198754;
+                                font-weight:700;
+                            ">
+                    ✓ VERIFIED
+                </span>
+
+                {% else %}
+
+                <span style="
+                                color:#dc3545;
+                                font-weight:700;
+                            ">
+                    NOT VERIFIED
+                </span>
+
+                {% endif %}
+
+            </p>
+
+            <p>
+
+                <strong>Document:</strong>
+
+                {% if certificate.document %}
+
+                <a href="{{ certificate.document.url }}" target="_blank" style="
+                                    background:#0d6efd;
+                                    color:white;
+                                    padding:7px 12px;
+                                    border-radius:5px;
+                                    text-decoration:none;
+                                    font-weight:600;
+                                ">
+                    VIEW CERTIFICATE
+                </a>
+
+                {% else %}
+
+                <span style="color:#dc3545;">
+                    No document uploaded
+                </span>
+
+                {% endif %}
+
+            </p>
+
+            {% if certificate.verification_notes %}
+
+            <div style="
+                            background:#f8f9fa;
+                            padding:12px;
+                            border-radius:5px;
+                        ">
+
+                <strong>
+                    Certificate Notes:
+                </strong>
+
+                <div style="
+                                white-space:pre-wrap;
+                                margin-top:5px;
+                            ">
+                    {{ certificate.verification_notes }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+        {% else %}
+
+        <div style="
+                background:#fff3cd;
+                color:#664d03;
+                padding:15px;
+                border-radius:5px;
+            ">
+
+            ⚠ No certificates have been submitted.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- PREVIOUS VERIFICATION NOTES -->
+    <!-- ================================================== -->
+
+    {% if caregiver.verification_notes %}
+
+    <div style="
+            background:#f8f9fa;
+            border:1px solid #ddd;
+            border-radius:8px;
+            padding:25px;
+            margin-bottom:20px;
+        ">
+
+        <h2>
+            Previous Verification Comment
+        </h2>
+
+        <div style="
+                white-space:pre-wrap;
+            ">
+            {{ caregiver.verification_notes }}
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================== -->
+    <!-- VERIFICATION FORM -->
+    <!-- ================================================== -->
+
+    <div style="
+        background:white;
+        border:2px solid #ddd;
+        border-radius:8px;
+        padding:25px;
+        margin-bottom:40px;
+    ">
+
+        <h2>
+            Verification Decision
+        </h2>
+
+        <p style="color:#666;">
+            Review all information and certificates above
+            before making your decision.
+        </p>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div style="margin-bottom:20px;">
+
+                <label for="verification_comment" style="
+                        display:block;
+                        font-weight:700;
+                        margin-bottom:8px;
+                    ">
+                    Verification Comment
+                </label>
+
+                <textarea id="verification_comment" name="verification_comment" rows="6" style="
+                        width:100%;
+                        box-sizing:border-box;
+                        padding:12px;
+                        border:1px solid #bbb;
+                        border-radius:5px;
+                        font-size:14px;
+                    "
+                    placeholder="Example: Sorry, please attach your nursing certificate and current practicing license."></textarea>
+
+                <p style="
+                    color:#777;
+                    font-size:13px;
+                ">
+                    A comment is required when declining the caregiver.
+                </p>
+
+            </div>
+
+
+            <div style="
+                display:flex;
+                gap:12px;
+                flex-wrap:wrap;
+            ">
+
+                <!-- APPROVE -->
+
+                <button type="submit" name="verification_action" value="approve" style="
+                        background:#198754;
+                        color:white;
+                        border:none;
+                        padding:12px 22px;
+                        border-radius:5px;
+                        font-weight:700;
+                        cursor:pointer;
+                    ">
+                    ✓ APPROVE CAREGIVER
+                </button>
+
+
+                <!-- DECLINE -->
+
+                <button type="submit" name="verification_action" value="reject" style="
+                        background:#dc3545;
+                        color:white;
+                        border:none;
+                        padding:12px 22px;
+                        border-radius:5px;
+                        font-weight:700;
+                        cursor:pointer;
+                    ">
+                    ✕ DECLINE CAREGIVER
+                </button>
+
+
+                <!-- CANCEL -->
+
+                <a href="{% url 'admin:homecare_caregiver_changelist' %}" style="
+                        background:#6c757d;
+                        color:white;
+                        padding:12px 22px;
+                        border-radius:5px;
+                        text-decoration:none;
+                        font-weight:700;
+                    ">
+                    CANCEL
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,689 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#102A43">
+
+    <title>
+        {% block title %}
+        Hands-On Health
+        {% endblock %}
+    </title>
+
+
+    <!-- =====================================================
+         FONT AWESOME
+         ===================================================== -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- =====================================================
+         STAFF DASHBOARD CSS
+         ===================================================== -->
+
+    <link rel="stylesheet" href="{% static 'staff/css/dashboard.css' %}">
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+
+    <div class="app-shell">
+
+
+        <!-- =====================================================
+         MOBILE OVERLAY
+         ===================================================== -->
+
+        <div class="sidebar-overlay" id="sidebarOverlay">
+        </div>
+
+
+
+        <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+        <aside class="sidebar" id="sidebar">
+
+
+            <!-- =================================================
+             BRAND
+             ================================================= -->
+
+            <div class="brand">
+
+                <div class="brand-mark">
+                    H
+                </div>
+
+                <div>
+
+                    <div class="brand-name">
+                        Hands-On
+                    </div>
+
+                    <div class="brand-subtitle">
+                        HEALTH
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+             NAVIGATION
+             ================================================= -->
+
+            <nav class="sidebar-nav">
+
+
+                <!-- =================================================
+                 OVERVIEW
+                 ================================================= -->
+
+                <div class="nav-label">
+                    OVERVIEW
+                </div>
+
+
+                <!-- DASHBOARD -->
+
+                <a href="{% url 'staff:dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                    title="Dashboard">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </span>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 OPERATIONS
+                 ================================================= -->
+
+                <div class="nav-label">
+                    OPERATIONS
+                </div>
+
+
+
+                <!-- =================================================
+                 CAREGIVERS
+                 ================================================= -->
+
+                <a href="{% url 'staff:caregivers' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'caregivers' or request.resolver_match.url_name == 'caregiver_verify' %}active{% endif %}"
+                    title="Caregiver Management">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-user-nurse"></i>
+                    </span>
+
+                    <span>
+                        Caregivers
+                    </span>
+
+                    {% if pending_caregivers %}
+
+                    <span class="nav-badge">
+                        {{ pending_caregivers }}
+                    </span>
+
+                    {% endif %}
+
+                </a>
+
+
+
+                <!-- =================================================
+                 HOME CARE
+                 ================================================= -->
+
+                <a href="{% url 'staff:homecare_requests' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'homecare_requests' or request.resolver_match.url_name == 'homecare_request_add' or request.resolver_match.url_name == 'homecare_request_edit' %}active{% endif %}"
+                    title="Home Care Requests">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-house-medical"></i>
+                    </span>
+
+                    <span>
+                        Home Care
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 APPOINTMENTS
+                 ================================================= -->
+
+                <a href="{% url 'staff:appointments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}"
+                    title="Appointments">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </span>
+
+                    <span>
+                        Appointments
+                    </span>
+
+                </a>
+                <!-- =================================================
+                     REFERRALS
+                     ================================================= -->
+                
+                <a href="{% url 'staff:referrals' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}"
+                    title="Referral Management">
+                
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </span>
+                
+                    <span>
+                        Referrals
+                    </span>
+                
+                </a>
+
+
+
+
+                <!-- =================================================
+                 QUOTATIONS
+                 ================================================= -->
+
+                <a href="{% url 'staff:quotations' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'quotations' %}active{% endif %}"
+                    title="Quotations">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </span>
+
+                    <span>
+                        Quotations
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 PAYMENTS
+                 ================================================= -->
+
+                <a href="{% url 'staff:payments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'payments' or request.resolver_match.url_name == 'payment_verify' %}active{% endif %}"
+                    title="Payments">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </span>
+
+                    <span>
+                        Payments
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 CAREGIVER ASSIGNMENTS
+                 ================================================= -->
+
+                <a href="{% url 'staff:assignments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'assignments' or request.resolver_match.url_name == 'assignment_add' or request.resolver_match.url_name == 'assignment_edit' %}active{% endif %}"
+                    title="Caregiver Assignments">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-people-arrows"></i>
+                    </span>
+
+                    <span>
+                        Assignments
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 MANAGEMENT
+                 ================================================= -->
+
+                <div class="nav-label">
+                    MANAGEMENT
+                </div>
+
+
+
+                <!-- =================================================
+                 REPORTS
+                 ================================================= -->
+
+                <a href="{% url 'staff:reports' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'report_add' or request.resolver_match.url_name == 'report_edit' %}active{% endif %}"
+                    title="Caregiver Daily Reports">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-file-medical"></i>
+                    </span>
+
+                    <span>
+                        Daily Reports
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 SERVICES
+                 ================================================= -->
+
+                <a href="{% url 'staff:services' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'services' or request.resolver_match.url_name == 'service_add' or request.resolver_match.url_name == 'service_edit' %}active{% endif %}"
+                    title="Healthcare Services">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-hand-holding-medical"></i>
+                    </span>
+
+                    <span>
+                        Services
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 CAREGIVER PAYMENTS
+                 ================================================= -->
+
+                <a href="{% url 'staff:caregiver_payments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' %}active{% endif %}"
+                    title="Caregiver Payments">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                    </span>
+
+                    <span>
+                        Caregiver Payments
+                    </span>
+
+                </a>
+
+
+
+                <!-- =================================================
+                 SYSTEM
+                 ================================================= -->
+
+                <div class="nav-label">
+                    SYSTEM
+                </div>
+
+
+
+                <!-- SETTINGS -->
+
+                <a href="{% url 'staff:settings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+                    title="System Settings">
+
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-sliders"></i>
+                    </span>
+
+                    <span>
+                        Settings
+                    </span>
+
+                </a>
+
+
+            </nav>
+
+
+
+            <!-- =====================================================
+             SIDEBAR FOOTER
+             ===================================================== -->
+
+            <div class="sidebar-footer">
+
+
+                <!-- ADMIN PROFILE -->
+
+                <div class="admin-mini-profile">
+
+                    <div class="avatar">
+
+                        {{ request.user.get_full_name|default:request.user.username|first|upper }}
+
+                    </div>
+
+
+                    <div class="admin-mini-info">
+
+                        <strong>
+
+                            {{ request.user.get_full_name|default:request.user.username }}
+
+                        </strong>
+
+                        <span>
+                            Health Admin
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- LOGOUT -->
+
+                <a href="{% url 'staff:logout' %}" class="logout-link" title="Sign out">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    <span>
+                        Sign out
+                    </span>
+
+                </a>
+
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- =====================================================
+         MAIN AREA
+         ===================================================== -->
+
+        <main class="main-area">
+
+
+            <!-- =================================================
+             TOP BAR
+             ================================================= -->
+
+            <header class="topbar">
+
+
+                <!-- MOBILE MENU -->
+
+                <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation"
+                    title="Open navigation">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+
+                <!-- TOPBAR HEADING -->
+
+                <div class="topbar-heading">
+
+                    <span class="topbar-kicker">
+                        ADMINISTRATION
+                    </span>
+
+                    <span class="topbar-title">
+                        Hands-On Health
+                    </span>
+
+                </div>
+
+
+
+                <!-- TOPBAR ACTIONS -->
+
+                <div class="topbar-actions">
+
+
+                    <!-- SYSTEM STATUS -->
+
+                    <div class="status-indicator">
+
+                        <span></span>
+
+                        <span>
+                            System operational
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- USER -->
+
+                    <div class="topbar-user">
+
+                        <i class="fa-solid fa-user-shield"></i>
+
+                        {{ request.user.get_full_name|default:request.user.username }}
+
+                    </div>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- =================================================
+             MESSAGES
+             ================================================= -->
+
+            {% if messages %}
+
+            <div class="messages-container">
+
+                {% for message in messages %}
+
+                <div class="alert alert-{{ message.tags }}">
+
+                    {% if message.tags == "success" %}
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    {% elif message.tags == "error" %}
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    {% elif message.tags == "warning" %}
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    {% else %}
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    {% endif %}
+
+                    {{ message }}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+             PAGE CONTENT
+             ================================================= -->
+
+            <section class="page-content">
+
+                {% block content %}
+                {% endblock %}
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <!-- =========================================================
+     MOBILE SIDEBAR JAVASCRIPT
+     ========================================================= -->
+
+    <script>
+
+        const mobileMenu =
+            document.getElementById("mobileMenu");
+
+        const sidebar =
+            document.getElementById("sidebar");
+
+        const overlay =
+            document.getElementById("sidebarOverlay");
+
+
+        function closeSidebar() {
+
+            if (sidebar) {
+                sidebar.classList.remove("open");
+            }
+
+            if (overlay) {
+                overlay.classList.remove("active");
+            }
+
+        }
+
+
+        if (mobileMenu) {
+
+            mobileMenu.addEventListener(
+                "click",
+                function () {
+
+                    if (sidebar) {
+                        sidebar.classList.toggle("open");
+                    }
+
+                    if (overlay) {
+                        overlay.classList.toggle("active");
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (overlay) {
+
+            overlay.addEventListener(
+                "click",
+                closeSidebar
+            );
+
+        }
+
+
+        /*
+         * CLOSE MOBILE SIDEBAR AFTER CLICKING A LINK
+         */
+
+        document.querySelectorAll(
+            ".sidebar .nav-item, .logout-link"
+        ).forEach(function (link) {
+
+            link.addEventListener(
+                "click",
+                function () {
+
+                    if (window.innerWidth <= 768) {
+
+                        closeSidebar();
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        /*
+         * ESCAPE KEY CLOSES MOBILE SIDEBAR
+         */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+
+                    closeSidebar();
+
+                }
+
+            }
+        );
+
+
+    </script>
+
+
+
+    <!-- =========================================================
+     PAGE-SPECIFIC JAVASCRIPT
+     ========================================================= -->
+
+    {% block extra_js %}
+    {% endblock %}
+
+
+</body>
+
+</html>

@@ -1,0 +1,263 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+Caregivers | Hands-On Health
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <span class="eyebrow">
+            CAREGIVER MANAGEMENT
+        </span>
+
+        <h1>
+            Caregivers
+        </h1>
+
+        <p>
+            Review caregiver profiles, documents
+            and verification status.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FILTER BAR
+     ========================================================= -->
+
+<section class="filter-card">
+
+    <form method="get">
+
+        <div class="filter-search">
+
+            <input type="search" name="q" value="{{ search }}"
+                placeholder="Search caregiver name, phone or specialization...">
+
+        </div>
+
+
+        <div class="filter-select">
+
+            <select name="status">
+
+                <option value="">
+                    All verification statuses
+                </option>
+
+                {% for value, label in verification_choices %}
+
+                <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
+                    {{ label }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">
+            Search
+        </button>
+
+
+        <a href="{% url 'staff:caregivers' %}" class="btn btn-light">
+            Reset
+        </a>
+
+    </form>
+
+</section>
+
+
+<!-- =========================================================
+     CAREGIVER TABLE
+     ========================================================= -->
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <span class="eyebrow">
+                CAREGIVER DIRECTORY
+            </span>
+
+            <h2>
+                Applications
+            </h2>
+
+        </div>
+
+        <div class="result-count">
+            {{ caregivers|length }} shown
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="caregiver-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Caregiver
+                    </th>
+
+                    <th>
+                        Professional title
+                    </th>
+
+                    <th>
+                        Specialization
+                    </th>
+
+                    <th>
+                        Phone
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for caregiver in caregivers %}
+
+                <tr>
+
+                    <td>
+
+                        <div class="person-cell">
+
+                            {% if caregiver.photo %}
+
+                            <img src="{{ caregiver.photo.url }}" alt="{{ caregiver.name }}" class="person-photo">
+
+                            {% else %}
+
+                            <div class="person-placeholder">
+                                {{ caregiver.name|first|upper }}
+                            </div>
+
+                            {% endif %}
+
+
+                            <div>
+
+                                <strong>
+                                    {{ caregiver.name }}
+                                </strong>
+
+                                <span>
+                                    {{ caregiver.email|default:"No email provided" }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        {{ caregiver.professional_title }}
+                    </td>
+
+
+                    <td>
+                        {{ caregiver.specialization|default:"—" }}
+                    </td>
+
+
+                    <td>
+                        {{ caregiver.phone }}
+                    </td>
+
+
+                    <td>
+
+                        {% if caregiver.verification_status == "PENDING" %}
+
+                        <span class="status-pill warning">
+                            Pending verification
+                        </span>
+
+                        {% elif caregiver.verification_status == "APPROVED" %}
+
+                        <span class="status-pill success">
+                            Approved
+                        </span>
+
+                        {% elif caregiver.verification_status == "REJECTED" %}
+
+                        <span class="status-pill danger">
+                            Declined
+                        </span>
+
+                        {% elif caregiver.verification_status == "SUSPENDED" %}
+
+                        <span class="status-pill danger">
+                            Suspended
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-small btn-primary">
+                            Review
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="6" class="empty-state">
+                        No caregivers match your search.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

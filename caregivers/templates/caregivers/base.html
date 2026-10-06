@@ -1,0 +1,1786 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#102A43">
+
+    <title>
+        {% block title %}
+        Caregiver Portal |
+        {{ site_settings.business_name|default:"Hands-On Health" }}
+        {% endblock %}
+    </title>
+
+
+    <!-- =========================================================
+         GOOGLE FONTS
+    ========================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+
+    <!-- =========================================================
+         BOOTSTRAP
+    ========================================================== -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- =========================================================
+         BOOTSTRAP ICONS
+    ========================================================== -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+
+    <!-- =========================================================
+         CAREGIVER PORTAL CSS
+    ========================================================== -->
+
+    <style>
+        :root {
+
+            --navy: #102A43;
+            --navy-dark: #071B2E;
+            --navy-light: #163D5F;
+
+            --blue: #1976D2;
+            --blue-soft: #EAF3FF;
+
+            --teal: #16A394;
+            --teal-dark: #087F72;
+            --teal-soft: #E6F7F4;
+
+            --green: #2E9B6F;
+            --green-soft: #E9F8F1;
+
+            --orange: #F59E0B;
+            --orange-soft: #FFF6DF;
+
+            --red: #D9534F;
+            --red-soft: #FFF0F0;
+
+            --purple: #7057D9;
+            --purple-soft: #F0EDFF;
+
+            --page: #EEF4F7;
+
+            --card: #FFFFFF;
+
+            --text: #172B3A;
+
+            --muted: #718394;
+
+            --border: #DDE7EC;
+
+            --sidebar-width: 270px;
+
+            --shadow:
+                0 10px 35px rgba(16, 42, 67, 0.07);
+
+            --shadow-lg:
+                0 20px 55px rgba(16, 42, 67, 0.12);
+        }
+
+
+        /* =====================================================
+           GLOBAL
+        ====================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            background: var(--page);
+
+            color: var(--text);
+
+            font-family: "DM Sans", sans-serif;
+
+            font-size: 14px;
+        }
+
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+
+            font-family:
+                "Plus Jakarta Sans",
+                sans-serif;
+
+            color: var(--text);
+        }
+
+
+        a {
+            text-decoration: none;
+        }
+
+
+        button,
+        input,
+        textarea,
+        select {
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ====================================================== */
+
+        .caregiver-sidebar {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: var(--sidebar-width);
+
+            height: 100vh;
+
+            z-index: 1050;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow-y: auto;
+
+            background:
+
+                radial-gradient(circle at 15% 8%,
+                    rgba(43, 170, 158, 0.18),
+                    transparent 28%),
+
+                linear-gradient(180deg,
+                    #102A43 0%,
+                    #0B2238 55%,
+                    #071B2E 100%);
+
+            color: white;
+
+            box-shadow:
+                8px 0 35px rgba(7, 27, 46, 0.12);
+
+            scrollbar-width: thin;
+        }
+
+
+        /* =====================================================
+           BRAND
+        ====================================================== */
+
+        .sidebar-brand {
+
+            min-height: 88px;
+
+            padding: 20px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .08);
+        }
+
+
+        .brand-logo {
+
+            width: 44px;
+            height: 44px;
+
+            min-width: 44px;
+
+            border-radius: 12px;
+
+            background: #fff;
+
+            object-fit: contain;
+
+            padding: 7px;
+
+            margin-right: 11px;
+        }
+
+
+        .brand-icon {
+
+            width: 44px;
+            height: 44px;
+
+            min-width: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background: #fff;
+
+            color: var(--teal);
+
+            margin-right: 11px;
+
+            font-size: 22px;
+        }
+
+
+        .brand-name {
+
+            color: white;
+
+            font-family:
+                "Plus Jakarta Sans",
+                sans-serif;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            line-height: 1.25;
+        }
+
+
+        .brand-subtitle {
+
+            color: #83D8D0;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.1px;
+
+            margin-top: 4px;
+        }
+
+
+        /* =====================================================
+           USER PROFILE
+        ====================================================== */
+
+        .sidebar-user {
+
+            margin: 20px 16px 12px;
+
+            padding: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            border-radius: 16px;
+
+            background:
+                rgba(255, 255, 255, .06);
+
+            border:
+                1px solid rgba(255, 255, 255, .07);
+        }
+
+
+        .sidebar-avatar {
+
+            width: 42px;
+            height: 42px;
+
+            min-width: 42px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-right: 11px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(135deg,
+                    #21B6A8,
+                    #157B9B);
+
+            color: white;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 5px 18px rgba(22, 163, 148, .25);
+        }
+
+
+        .sidebar-user-name {
+
+            max-width: 155px;
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .sidebar-user-role {
+
+            color: #9CB1C1;
+
+            font-size: 10px;
+
+            margin-top: 2px;
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ====================================================== */
+
+        .sidebar-section-title {
+
+            padding:
+                14px 20px 7px;
+
+            color: #718DA3;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+
+            text-transform: uppercase;
+        }
+
+
+        .sidebar-nav {
+
+            padding:
+                0 12px;
+        }
+
+
+        .sidebar-nav a {
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 4px;
+
+            padding:
+                12px 14px;
+
+            border-radius: 12px;
+
+            color: #AFC0CD;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            transition: all .2s ease;
+        }
+
+
+        .sidebar-nav a i {
+
+            width: 20px;
+
+            min-width: 20px;
+
+            text-align: center;
+
+            font-size: 16px;
+        }
+
+
+        .sidebar-nav a:hover {
+
+            color: white;
+
+            background:
+                rgba(255, 255, 255, .07);
+
+            transform:
+                translateX(2px);
+        }
+
+
+        .sidebar-nav a.active {
+
+            color: white;
+
+            background:
+
+                linear-gradient(135deg,
+                    rgba(30, 183, 166, .24),
+                    rgba(25, 118, 210, .22));
+
+            box-shadow:
+                inset 3px 0 0 #27C4B2;
+        }
+
+
+        .sidebar-nav a.active i {
+
+            color: #54D5C7;
+        }
+
+
+        /* =====================================================
+           NAV BADGE
+        ====================================================== */
+
+        .nav-badge {
+
+            margin-left: auto;
+
+            min-width: 20px;
+
+            height: 20px;
+
+            padding:
+                0 6px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255, 255, 255, .10);
+
+            color: #BBD0DD;
+
+            font-size: 9px;
+
+            font-weight: 800;
+        }
+
+
+        .sidebar-nav a.active .nav-badge {
+
+            background:
+                rgba(84, 213, 199, .20);
+
+            color: #72E1D5;
+        }
+
+
+        /* =====================================================
+           SIDEBAR BOTTOM
+        ====================================================== */
+
+        .sidebar-bottom {
+
+            margin-top: auto;
+
+            padding: 14px;
+        }
+
+
+        .help-box {
+
+            padding: 16px;
+
+            border-radius: 16px;
+
+            background:
+
+                linear-gradient(135deg,
+                    rgba(22, 163, 148, .18),
+                    rgba(25, 118, 210, .12));
+
+            border:
+                1px solid rgba(111, 220, 209, .12);
+        }
+
+
+        .help-icon {
+
+            width: 34px;
+            height: 34px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin-bottom: 9px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255, 255, 255, .10);
+
+            color: #67DDD1;
+        }
+
+
+        .help-title {
+
+            margin-bottom: 4px;
+
+            color: white;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+
+        .help-text {
+
+            margin: 0;
+
+            color: #9EB2C1;
+
+            font-size: 9px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           LOGOUT
+        ====================================================== */
+
+        .logout-form {
+            margin: 0;
+        }
+
+
+        .logout-link {
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 10px;
+
+            padding:
+                11px 13px;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: #F4A7A4;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+
+        .logout-link:hover {
+
+            color: white;
+
+            background:
+                rgba(217, 83, 79, .14);
+        }
+
+
+        /* =====================================================
+           MAIN
+        ====================================================== */
+
+        .caregiver-main {
+
+            min-height: 100vh;
+
+            margin-left:
+                var(--sidebar-width);
+        }
+
+
+        /* =====================================================
+           TOPBAR
+        ====================================================== */
+
+        .caregiver-topbar {
+
+            height: 72px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 32px;
+
+            background:
+                rgba(255, 255, 255, .94);
+
+            border-bottom:
+                1px solid var(--border);
+
+            backdrop-filter:
+                blur(10px);
+        }
+
+
+        .topbar-label {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+
+        .topbar-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        /* =====================================================
+           ACCOUNT STATUS
+        ====================================================== */
+
+        .account-status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                7px 12px;
+
+            border-radius: 30px;
+
+            background:
+                var(--green-soft);
+
+            color: #23815A;
+
+            font-size: 10px;
+
+            font-weight: 700;
+        }
+
+
+        .status-dot {
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #2EAA76;
+        }
+
+
+        /* =====================================================
+           TOP AVATAR
+        ====================================================== */
+
+        .top-avatar {
+
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background:
+
+                linear-gradient(135deg,
+                    #153F68,
+                    #176B91);
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           MOBILE MENU
+        ====================================================== */
+
+        .mobile-menu {
+
+            display: none;
+
+            width: 40px;
+            height: 40px;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border: 0;
+
+            border-radius: 10px;
+
+            background:
+                var(--blue-soft);
+
+            color:
+                var(--navy);
+
+            font-size: 20px;
+
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           CONTENT
+        ====================================================== */
+
+        .caregiver-content {
+
+            width: 100%;
+
+            max-width: 1600px;
+
+            margin: 0 auto;
+
+            padding:
+                34px 36px 55px;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ====================================================== */
+
+        .caregiver-messages {
+
+            margin-bottom: 20px;
+        }
+
+
+        .caregiver-alert {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding:
+                13px 16px;
+
+            border: 0;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 18px rgba(16, 42, 67, .05);
+
+            font-size: 12px;
+        }
+
+
+        .caregiver-alert.alert-success {
+
+            background:
+                var(--green-soft);
+
+            color:
+                #237A57;
+        }
+
+
+        .caregiver-alert.alert-danger {
+
+            background:
+                var(--red-soft);
+
+            color:
+                #A63B37;
+        }
+
+
+        .caregiver-alert.alert-warning {
+
+            background:
+                var(--orange-soft);
+
+            color:
+                #95650A;
+        }
+
+
+        .caregiver-alert.alert-info {
+
+            background:
+                var(--blue-soft);
+
+            color:
+                #175E9E;
+        }
+
+
+        /* =====================================================
+           CARDS
+        ====================================================== */
+
+        .caregiver-card {
+
+            overflow: hidden;
+
+            background:
+                var(--card);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+
+        .caregiver-card-header {
+
+            padding:
+                18px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        .caregiver-card-body {
+
+            padding: 20px;
+        }
+
+
+        /* =====================================================
+           STAT CARDS
+        ====================================================== */
+
+        .caregiver-stat-card {
+
+            transition:
+                all .2s ease;
+
+            cursor: pointer;
+        }
+
+
+        .caregiver-stat-card:hover {
+
+            transform:
+                translateY(-4px);
+
+            box-shadow:
+                0 15px 35px rgba(16, 42, 67, .12) !important;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ====================================================== */
+
+        .btn-caregiver-primary {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            padding:
+                10px 16px;
+
+            border:
+                1px solid var(--teal);
+
+            border-radius: 10px;
+
+            background:
+                var(--teal);
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            transition: .2s;
+        }
+
+
+        .btn-caregiver-primary:hover {
+
+            background:
+                var(--teal-dark);
+
+            border-color:
+                var(--teal-dark);
+
+            color: white;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        .btn-caregiver-secondary {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            padding:
+                10px 16px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            transition: .2s;
+        }
+
+
+        .btn-caregiver-secondary:hover {
+
+            background:
+                var(--blue-soft);
+
+            color:
+                var(--navy);
+        }
+
+
+        /* =====================================================
+           FORM ELEMENTS
+        ====================================================== */
+
+        .caregiver-content .form-control,
+        .caregiver-content .form-select {
+
+            padding:
+                10px 12px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            color:
+                var(--text);
+
+            background:
+                white;
+
+            font-size: 13px;
+        }
+
+
+        .caregiver-content .form-control:focus,
+        .caregiver-content .form-select:focus {
+
+            border-color:
+                var(--teal);
+
+            box-shadow:
+                0 0 0 3px rgba(22, 163, 148, .10);
+        }
+
+
+        .caregiver-content label {
+
+            margin-bottom: 6px;
+
+            color:
+                var(--text);
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+        ====================================================== */
+
+        .caregiver-empty {
+
+            padding:
+                45px 20px;
+
+            text-align: center;
+
+            color:
+                var(--muted);
+        }
+
+
+        .caregiver-empty-icon {
+
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin:
+                0 auto 14px;
+
+            border-radius: 16px;
+
+            background:
+                var(--blue-soft);
+
+            color:
+                var(--blue);
+
+            font-size: 24px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR OVERLAY
+        ====================================================== */
+
+        .sidebar-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 1040;
+
+            background:
+                rgba(7, 27, 46, .55);
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (max-width: 1000px) {
+
+            .caregiver-sidebar {
+
+                transform:
+                    translateX(-100%);
+
+                transition:
+                    transform .25s ease;
+            }
+
+
+            .caregiver-sidebar.show {
+
+                transform:
+                    translateX(0);
+            }
+
+
+            .caregiver-main {
+
+                margin-left: 0;
+            }
+
+
+            .mobile-menu {
+
+                display: inline-flex;
+            }
+
+
+            .sidebar-overlay.show {
+
+                display: block;
+            }
+
+
+            .caregiver-topbar {
+
+                padding:
+                    0 20px;
+            }
+
+
+            .caregiver-content {
+
+                padding:
+                    25px 20px 45px;
+            }
+        }
+
+
+        @media (max-width: 576px) {
+
+            .account-status {
+
+                display: none;
+            }
+
+
+            .caregiver-topbar {
+
+                height: 64px;
+            }
+
+
+            .caregiver-content {
+
+                padding:
+                    20px 14px 35px;
+            }
+
+
+            .caregiver-card-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .sidebar-brand {
+
+                min-height: 76px;
+            }
+        }
+
+
+        /* =====================================================
+           PAGE-SPECIFIC CSS
+        ====================================================== */
+
+            {
+            % block extra_css %
+        }
+
+            {
+            % endblock %
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+     SIDEBAR
+========================================================== -->
+
+    <aside class="caregiver-sidebar" id="caregiverSidebar">
+
+
+        <!-- =====================================================
+         BRAND
+    ====================================================== -->
+
+        <div class="sidebar-brand">
+
+            {% if site_settings.logo %}
+
+            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name|default:'Hands-On Health' }}"
+                class="brand-logo">
+
+            {% else %}
+
+            <div class="brand-icon">
+
+                <i class="bi bi-heart-pulse-fill"></i>
+
+            </div>
+
+            {% endif %}
+
+
+            <div>
+
+                <div class="brand-name">
+
+                    {{ site_settings.business_name|default:"Hands-On Health" }}
+
+                </div>
+
+
+                <div class="brand-subtitle">
+
+                    CAREGIVER PORTAL
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+         CAREGIVER PROFILE
+    ====================================================== -->
+
+        {% if caregiver %}
+
+        <div class="sidebar-user">
+
+            <div class="sidebar-avatar">
+
+                {% if caregiver.name %}
+
+                {{ caregiver.name|first|upper }}
+
+                {% else %}
+
+                C
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+
+                <div class="sidebar-user-name">
+
+                    {{ caregiver.name|default:"Caregiver" }}
+
+                </div>
+
+
+                <div class="sidebar-user-role">
+
+                    {{ caregiver.professional_title|default:"Caregiver" }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+        {% if caregiver %}
+
+        <div class="sidebar-section-title">
+
+            Main Menu
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <!-- DASHBOARD -->
+
+            <a href="{% url 'caregivers:dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+
+                <i class="bi bi-grid-1x2-fill"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- ASSIGNMENTS -->
+
+            <a href="{% url 'caregivers:assignments' %}"
+                class="{% if request.resolver_match.url_name == 'assignments' or request.resolver_match.url_name == 'assignment_detail' or request.resolver_match.url_name == 'assignment_accept' or request.resolver_match.url_name == 'assignment_decline' or request.resolver_match.url_name == 'assignment_start' or request.resolver_match.url_name == 'assignment_complete' %}active{% endif %}">
+
+                <i class="bi bi-clipboard2-check"></i>
+
+                <span>
+                    My Assignments
+                </span>
+
+                {% if pending_count %}
+                <span class="nav-badge">
+                    {{ pending_count }}
+                </span>
+                {% endif %}
+
+            </a>
+
+
+            <!-- DAILY REPORTS -->
+
+            <a href="{% url 'caregivers:reports' %}"
+                class="{% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'daily_report_create' %}active{% endif %}">
+
+                <i class="bi bi-file-earmark-medical"></i>
+
+                <span>
+                    Daily Reports
+                </span>
+
+            </a>
+
+
+            <!-- WEEKLY SUMMARY -->
+
+            <a href="{% url 'caregivers:assignments' %}"
+                class="{% if request.resolver_match.url_name == 'weekly_summary' %}active{% endif %}">
+
+                <i class="bi bi-calendar-week"></i>
+
+                <span>
+                    Weekly Summary
+                </span>
+
+            </a>
+
+
+            <!-- PROFILE -->
+
+            <a href="{% url 'caregivers:profile' %}"
+                class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+
+                <i class="bi bi-person-circle"></i>
+
+                <span>
+                    My Profile
+                </span>
+
+            </a>
+
+        </nav>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+         SIDEBAR BOTTOM
+    ====================================================== -->
+
+        <div class="sidebar-bottom">
+
+            {% if caregiver %}
+
+            <div class="help-box">
+
+                <div class="help-icon">
+
+                    <i class="bi bi-headset"></i>
+
+                </div>
+
+
+                <div class="help-title">
+
+                    Need assistance?
+
+                </div>
+
+
+                <p class="help-text">
+
+                    Contact the Hands-On Health team if you need help
+                    with an assignment or patient.
+
+                </p>
+
+            </div>
+
+
+            <!-- LOGOUT -->
+
+            <form method="post" action="{% url 'caregivers:logout' %}" class="logout-form">
+
+                {% csrf_token %}
+
+                <button type="submit" class="logout-link">
+
+                    <i class="bi bi-box-arrow-right"></i>
+
+                    <span>
+                        Logout
+                    </span>
+
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+     MOBILE OVERLAY
+========================================================== -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()">
+    </div>
+
+
+    <!-- =========================================================
+     MAIN CONTENT
+========================================================== -->
+
+    <main class="caregiver-main">
+
+
+        <!-- =====================================================
+         TOPBAR
+    ====================================================== -->
+
+        <header class="caregiver-topbar">
+
+
+            <div class="d-flex align-items-center gap-3">
+
+
+                <!-- MOBILE MENU -->
+
+                <button type="button" class="mobile-menu" onclick="toggleSidebar()" aria-label="Open navigation">
+
+                    <i class="bi bi-list"></i>
+
+                </button>
+
+
+                <span class="topbar-label">
+
+                    Caregiver Portal
+
+                </span>
+
+            </div>
+
+
+            {% if caregiver %}
+
+            <div class="topbar-right">
+
+
+                <!-- ACCOUNT STATUS -->
+
+                <div class="account-status">
+
+                    <span class="status-dot"></span>
+
+                    Account Active
+
+                </div>
+
+
+                <!-- AVATAR -->
+
+                <div class="top-avatar">
+
+                    {% if caregiver.name %}
+
+                    {{ caregiver.name|first|upper }}
+
+                    {% else %}
+
+                    C
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </header>
+
+
+        <!-- =====================================================
+         PAGE CONTENT
+    ====================================================== -->
+
+        <div class="caregiver-content">
+
+
+            <!-- =================================================
+             DJANGO MESSAGES
+        ================================================== -->
+
+            {% if messages %}
+
+            <div class="caregiver-messages">
+
+                {% for message in messages %}
+
+                <div class="alert alert-{{ message.tags|default:'info' }} caregiver-alert" role="alert">
+
+
+                    {% if message.tags == "success" %}
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    {% elif message.tags == "error" or message.tags == "danger" %}
+
+                    <i class="bi bi-exclamation-circle-fill"></i>
+
+                    {% elif message.tags == "warning" %}
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    {% else %}
+
+                    <i class="bi bi-info-circle-fill"></i>
+
+                    {% endif %}
+
+
+                    <span>
+
+                        {{ message }}
+
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+            {% block content %}
+            {% endblock %}
+
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
+
+    <script>
+
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("caregiverSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+
+            if (sidebar) {
+
+                sidebar.classList.toggle("show");
+
+            }
+
+
+            if (overlay) {
+
+                overlay.classList.toggle("show");
+
+            }
+
+        }
+
+
+        function closeSidebar() {
+
+            const sidebar =
+                document.getElementById("caregiverSidebar");
+
+            const overlay =
+                document.getElementById("sidebarOverlay");
+
+
+            if (sidebar) {
+
+                sidebar.classList.remove("show");
+
+            }
+
+
+            if (overlay) {
+
+                overlay.classList.remove("show");
+
+            }
+
+        }
+
+
+        /*
+         * Close sidebar automatically after
+         * clicking a navigation link on mobile.
+         */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                document
+                    .querySelectorAll(".sidebar-nav a")
+                    .forEach(function (link) {
+
+                        link.addEventListener(
+                            "click",
+                            function () {
+
+                                if (window.innerWidth <= 1000) {
+
+                                    closeSidebar();
+
+                                }
+
+                            }
+                        );
+
+                    });
+
+            }
+        );
+
+
+    </script>
+
+
+    <!-- =========================================================
+     PAGE-SPECIFIC JAVASCRIPT
+========================================================== -->
+
+    {% block extra_js %}
+    {% endblock %}
+
+
+</body>
+
+</html>

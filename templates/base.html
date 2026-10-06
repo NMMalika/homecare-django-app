@@ -1,0 +1,90 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="description"
+        content="{% block meta_description %}Professional home-based care and medical services in Namibia.{% endblock %}">
+
+    <meta name="author" content="Hands-On Health">
+
+    <title>
+        {% block title %}
+        {{ site_settings.business_name|default:"Hands-On Health" }}
+        {% endblock %}
+    </title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Favicon -->
+    {% if site_settings.favicon %}
+    <link rel="icon" href="{{ site_settings.favicon.url }}" type="image/png">
+    {% else %}
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+    {% endif %}
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+    <div class="preloader"></div>
+
+    {% include "includes/topbar.html" %}
+
+    {% include "includes/navbar.html" %}
+
+    {% include "includes/messages.html" %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include "includes/footer.html" %}
+
+    {% include "includes/floating_buttons.html" %}
+
+
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <!-- Bootstrap -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <!-- Plugins -->
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/css3-animate-it.js' %}"></script>
+    <script src="{% static 'js/bootstrap-dropdownhover.min.js' %}"></script>
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'js/gallery.js' %}"></script>
+    <script src="{% static 'js/player.min.js' %}"></script>
+    <script src="{% static 'js/retina.js' %}"></script>
+
+    <!-- Main JS -->
+    <script src="{% static 'js/script.js' %}"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

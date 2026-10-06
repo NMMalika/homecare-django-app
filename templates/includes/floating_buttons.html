@@ -1,0 +1,42 @@
+
+
+<!-- Dynamic Floating WhatsApp Button -->
+{% if site_settings.whatsapp %}
+<a href="https://wa.me/{{ site_settings.whatsapp }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
+    aria-label="Chat on WhatsApp">
+
+    <i class="fa-brands fa-whatsapp"></i>
+
+</a>
+{% endif %}
+
+
+<!-- Ask Us Anything Floating Button -->
+<a href="#" class="ask-anything-float" aria-label="Ask Us Anything" style="position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #00b4d8;
+          color: #ffffff;
+          padding: 10px 18px;
+          border-radius: 30px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+          z-index: 999;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          text-decoration: none;
+          font-weight: 600;
+          font-size: 14px;">
+
+    <i class="fa-solid fa-comments"></i>
+    <span>Ask Us Anything</span>
+
+</a>
+
+
+<!-- Scroll Up Button -->
+<a href="#" class="scrollup" aria-label="Scroll Up">
+
+    <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+
+</a>

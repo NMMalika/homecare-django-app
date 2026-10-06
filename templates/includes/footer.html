@@ -1,0 +1,296 @@
+{% load static %}
+
+<!-- Footer Start -->
+<footer class="bg-faded">
+
+    <div class="container">
+        <div class="section-content">
+
+            <div class="row margin-top-30">
+
+                <!-- Company Information & Contact -->
+                <div class="col-md-4 col-sm-6">
+
+                    <div class="footer-item footer-widget-one">
+
+                        <!-- Dynamic Logo -->
+                        <a href="#">
+                            {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }} Logo"
+                                class="footer-logo">
+                            {% else %}
+                            <img src="{% static 'img/logo.png' %}" alt="Hands-On Health Logo" class="footer-logo">
+                            {% endif %}
+                        </a>
+
+                        <p>
+                            {% if site_settings.tagline %}
+                            {{ site_settings.tagline }}
+                            {% else %}
+                            Professional, compassionate, and reliable home-based healthcare for your loved ones in the
+                            comfort of their home.
+                            {% endif %}
+                        </p>
+
+                        <!-- Contact Details -->
+                        <ul class="address">
+
+                            {% if site_settings.phone %}
+                            <li>
+                                <i class="pe-7s-call"></i>
+                                <strong>Phone:</strong>
+                                <a href="tel:{{ site_settings.phone }}">
+                                    {{ site_settings.phone }}
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if site_settings.email %}
+                            <li>
+                                <i class="pe-7s-mail"></i>
+                                <strong>Email:</strong>
+                                <a href="mailto:{{ site_settings.email }}">
+                                    {{ site_settings.email }}
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if site_settings.city or site_settings.country %}
+                            <li>
+                                <i class="pe-7s-map-marker"></i>
+                                <strong>Location:</strong>
+                                {% if site_settings.city %}{{ site_settings.city }} &amp; {% endif %}{{ site_settings.country }}
+                            </li>
+                            {% endif %}
+
+                        </ul>
+
+                        <hr>
+
+                        <!-- Social Media Icons -->
+                        <ul class="social-icon bg-theme">
+
+                            {% if site_settings.facebook %}
+                            <li>
+                                <a href="{{ site_settings.facebook }}" target="_blank" rel="noopener noreferrer"
+                                    aria-label="Facebook">
+                                    <i class="fa-brands fa-facebook-f"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if site_settings.whatsapp %}
+                            <li>
+                                <a href="https://wa.me/{{ site_settings.whatsapp }}" target="_blank"
+                                    rel="noopener noreferrer" aria-label="WhatsApp">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if site_settings.instagram %}
+                            <li>
+                                <a href="{{ site_settings.instagram }}" target="_blank" rel="noopener noreferrer"
+                                    aria-label="Instagram">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if site_settings.linkedin %}
+                            <li>
+                                <a href="{{ site_settings.linkedin }}" target="_blank" rel="noopener noreferrer"
+                                    aria-label="LinkedIn">
+                                    <i class="fa-brands fa-linkedin-in"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Quick Navigation Pages -->
+                <div class="col-md-4 col-sm-6">
+
+                    <div class="footer-item">
+
+                        <div class="footer-title">
+                            <h4>Our Pages</h4>
+                            <div class="border-style-2"></div>
+                        </div>
+
+                        <ul class="footer-list border-deshed color-icon">
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">About Us</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Our Services</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#payments">Payment Options</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Testimonials</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Care Insights</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Contact Us</a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Home Care Services -->
+                <div class="col-md-4 col-sm-12">
+
+                    <div class="footer-item">
+
+                        <div class="footer-title">
+                            <h4>Our Services</h4>
+                            <div class="border-style-2"></div>
+                        </div>
+
+                        <ul class="footer-list border-deshed color-icon">
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Post-Operative Care</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Wound Care &amp; Dressing</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Vital Signs &amp; Health Monitoring</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Elderly Care &amp; Companionship</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Chronic Illness Management</a>
+                            </li>
+
+                            <li>
+                                <i class="pe-7s-angle-right"></i>
+                                <a href="#">Home Visits &amp; Care Monitoring</a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</footer>
+<!-- Footer End -->
+
+
+<!-- Copyright Section Start -->
+<section class="footer-copy-right" style="background-color: #030f26;
+                border-top: 1px solid #00b4d8;
+                padding: 20px 0;
+                color: #ffffff;">
+
+    <div class="container" style="max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 15px;">
+
+        <div class="row" style="display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;">
+
+            <!-- Dynamic Copyright -->
+            <div class="col-md-6 col-sm-12" style="text-align: left;
+                        font-size: 14px;
+                        color: #e0e0e0;">
+
+                <p style="margin: 0;">
+                    © {% now "Y" %}
+
+                    <a href="#" style="color: #ffffff;
+                              font-weight: 700;
+                              text-decoration: underline;
+                              text-decoration-color: #00b4d8;
+                              text-underline-offset: 4px;">
+
+                        {{ site_settings.business_name|upper }}
+
+                    </a>.
+
+                    All Rights Reserved.
+                </p>
+
+            </div>
+
+
+            <!-- Creator Badge -->
+            <div class="col-md-6 col-sm-12" style="text-align: right;
+                        font-size: 14px;
+                        color: #a0a0a0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        gap: 6px;">
+
+                <span>
+                    Crafted with
+                    <span style="color: #ff4d4d;">♥</span>
+                    by
+                </span>
+
+                <a href="#" style="background-color: #00a8ff;
+                          color: #ffffff;
+                          font-weight: 700;
+                          padding: 5px 18px;
+                          border-radius: 20px;
+                          text-decoration: none;
+                          box-shadow: 0 0 10px rgba(0, 168, 255, 0.6);
+                          display: inline-block;">
+
+                    Nimcity Enterprises
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- Copyright Section End -->

@@ -1,0 +1,1608 @@
+{% extends "staff/base.html" %}
+
+{% block content %}
+
+<style>
+    .service-editor {
+        --primary: #0879bd;
+        --primary-dark: #075d91;
+        --primary-light: #eaf6fd;
+        --teal: #13a68b;
+        --dark: #102a43;
+        --text: #243b53;
+        --muted: #7b8b9c;
+        --border: #e2e8f0;
+        --danger: #dc4c64;
+        --success: #169c69;
+
+        max-width: 1180px;
+        margin: 0 auto;
+        padding-bottom: 80px;
+    }
+
+    .service-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 14px;
+        padding: 14px 12px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(239, 249, 255, .95));
+        border: 1px solid #e3f0f7;
+        box-shadow: 0 8px 28px rgba(16, 42, 67, .035);
+    }
+
+    .service-heading {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .service-heading-icon {
+        width: 62px;
+        height: 62px;
+        flex: 0 0 62px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 21px;
+        background: linear-gradient(135deg, #0879bd, #13a68b);
+        box-shadow: 0 10px 25px rgba(8, 121, 189, .20);
+    }
+
+    .service-heading h1 {
+        margin: 0;
+        color: var(--dark);
+        font-size: 29px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .service-heading p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .back-button {
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--text);
+        border-radius: 11px;
+        padding: 10px 15px;
+        font-weight: 650;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+    .back-button:hover {
+        color: var(--primary);
+        border-color: #b9d8eb;
+        transform: translateY(-1px);
+    }
+
+    .service-form {
+        background: white;
+        border: 1px solid #e3edf4;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(16, 42, 67, .055);
+        overflow: hidden;
+    }
+
+    .form-section {
+        padding: 20px 18px 22px;
+        border-bottom: 1px solid #edf1f5;
+    }
+
+    .form-section:first-of-type {
+        padding-top: 20px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 23px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #f4faff 0%, #eef8fd 100%);
+        border: 1px solid #e8f2f8;
+    }
+
+    .section-heading::before {
+        content: "";
+        width: 3px;
+        height: 30px;
+        border-radius: 10px;
+        background: linear-gradient(180deg, var(--primary), var(--teal));
+        flex: 0 0 3px;
+    }
+
+    .section-heading-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        background: #ffffff;
+        border: 1px solid #dcebf4;
+        box-shadow: 0 3px 9px rgba(8, 121, 189, .05);
+        flex: 0 0 38px;
+        font-size: 15px;
+    }
+
+    .section-heading-icon i {
+        line-height: 1;
+    }
+
+    .section-heading>div:last-child {
+        min-width: 0;
+    }
+
+    .section-number {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .section-heading h2 {
+        margin: 0;
+        color: var(--dark);
+        font-size: 16px;
+        font-weight: 750;
+    }
+
+    .section-heading p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .form-label {
+        color: #41566b;
+        font-size: 12px;
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+    .required {
+        color: var(--danger);
+    }
+
+    .service-editor .form-control,
+    .service-editor .form-select {
+        min-height: 44px;
+        border: 1px solid #dce5ed;
+        border-radius: 11px;
+        background: #fbfcfe;
+        color: var(--text);
+        font-size: 14px;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .service-editor textarea.form-control {
+        min-height: 122px;
+        resize: vertical;
+    }
+
+    .service-editor .form-control:focus,
+    .service-editor .form-select:focus {
+        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(8, 121, 189, .09);
+    }
+
+    /* ============================================================
+       REFERENCE LAYOUT GRID
+       Keep the form layout independent of Bootstrap's grid.
+    ============================================================ */
+
+    .service-editor .row.g-4 {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 18px 20px !important;
+        margin: 0 !important;
+    }
+
+    .service-editor .row.g-4>[class*="col-"] {
+        width: auto !important;
+        max-width: none !important;
+        flex: none !important;
+        padding: 0 !important;
+        min-width: 0 !important;
+    }
+
+    .service-editor .row.g-4>.col-md-6,
+    .service-editor .row.g-4>.col-md-8,
+    .service-editor .row.g-4>.col-md-4 {
+        grid-column: span 6 !important;
+    }
+
+    .service-editor .row.g-4>.col-12 {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Section 2 in the reference is a balanced two-column layout. */
+    .service-editor .form-section:nth-of-type(2) .col-md-8,
+    .service-editor .form-section:nth-of-type(2) .col-md-4 {
+        grid-column: span 6 !important;
+    }
+
+    /* Pricing uses a compact half-width field. */
+    .service-editor .form-section:nth-of-type(3) .row {
+        display: grid !important;
+        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+        gap: 18px 20px !important;
+        margin: 0 !important;
+    }
+
+    .service-editor .form-section:nth-of-type(3) .row>[class*="col-"] {
+        grid-column: span 6 !important;
+        width: auto !important;
+        padding: 0 !important;
+    }
+
+    /* Reference-style section heading. */
+    .section-heading {
+        position: relative;
+        min-height: 58px;
+        box-sizing: border-box;
+    }
+
+    .section-heading>.section-number {
+        flex: 0 0 38px;
+    }
+
+    /* The large page header in the reference has a subtle blue wash. */
+    .service-page-header {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .service-page-header::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        right: 30px;
+        top: -105px;
+        border-radius: 50%;
+        background: rgba(8, 121, 189, .035);
+        pointer-events: none;
+    }
+
+    .service-page-header>* {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Match the reference's generous inner form spacing. */
+    .service-form {
+        border-radius: 20px;
+    }
+
+    .service-form>.form-section {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .service-form .form-label {
+        letter-spacing: .05px;
+    }
+
+    /* Make the upload area taller and more like the reference. */
+    .image-upload {
+        min-height: 155px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    /* Price field should not stretch across the whole page. */
+    .form-section:nth-of-type(3) .col-md-6 {
+        max-width: 360px !important;
+    }
+
+    @media (max-width: 767.98px) {
+
+        .service-editor .row.g-4,
+        .service-editor .form-section:nth-of-type(3) .row {
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+
+        .service-editor .row.g-4>[class*="col-"],
+        .service-editor .form-section:nth-of-type(2) .col-md-8,
+        .service-editor .form-section:nth-of-type(2) .col-md-4,
+        .service-editor .form-section:nth-of-type(3) .row>[class*="col-"] {
+            grid-column: 1 / -1 !important;
+        }
+
+        .form-section:nth-of-type(3) .col-md-6 {
+            max-width: none !important;
+        }
+    }
+
+
+    .form-help {
+        margin-top: 6px;
+        color: #91a0af;
+        font-size: 11px;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon>i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9aabb9;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .input-icon .form-control {
+        padding-left: 42px;
+    }
+
+    .category-box {
+        border: 1px solid #dce8f0;
+        border-radius: 14px;
+        background: #fbfdff;
+        padding: 12px;
+    }
+
+    .category-search {
+        position: relative;
+    }
+
+    .category-search i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #91a0af;
+        z-index: 2;
+    }
+
+    .category-search input {
+        padding-left: 40px;
+    }
+
+    .category-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .category-chip {
+        border: 1px solid #d6e6ef;
+        background: white;
+        color: #526679;
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: .18s ease;
+    }
+
+    .category-chip:hover {
+        border-color: #aad2e8;
+        background: #f0f8fc;
+        color: var(--primary);
+    }
+
+    .category-chip.selected {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(8, 121, 189, .18);
+    }
+
+    .category-chip i {
+        margin-right: 5px;
+    }
+
+    .new-category-area {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #dbe5ec;
+    }
+
+    .new-category-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #526679;
+        font-size: 11px;
+        font-weight: 750;
+        margin-bottom: 7px;
+    }
+
+    .new-category-label i {
+        color: var(--teal);
+    }
+
+    .new-category-input {
+        display: flex;
+        gap: 8px;
+    }
+
+    .new-category-input input {
+        flex: 1;
+    }
+
+    .add-category-btn {
+        min-width: 48px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--teal);
+        color: white;
+        font-size: 15px;
+        transition: .18s ease;
+    }
+
+    .add-category-btn:hover {
+        background: #0c927a;
+        transform: translateY(-1px);
+    }
+
+    .category-message {
+        margin-top: 8px;
+        color: var(--teal);
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    .textarea-wrapper {
+        position: relative;
+    }
+
+    .character-count {
+        position: absolute;
+        right: 12px;
+        bottom: 9px;
+        color: #9aa8b6;
+        font-size: 10px;
+        background: white;
+        padding: 2px 5px;
+        border-radius: 5px;
+    }
+
+    .image-upload {
+        border: 1.5px dashed #cbd8e3;
+        border-radius: 14px;
+        padding: 20px;
+        background: #f9fbfd;
+        text-align: center;
+        transition: .2s ease;
+    }
+
+    .image-upload:hover {
+        border-color: var(--primary);
+        background: #f5fbff;
+    }
+
+    .image-upload-icon {
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 10px;
+        border-radius: 15px;
+        background: #eaf6fd;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .image-upload-title {
+        color: var(--dark);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .image-upload-help {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    .current-image {
+        max-width: 180px;
+        max-height: 120px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .price-input {
+        display: flex;
+    }
+
+    .currency-box {
+        min-width: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dce5ed;
+        border-right: 0;
+        border-radius: 11px 0 0 11px;
+        background: #f3f7fa;
+        color: #607387;
+        font-weight: 750;
+        font-size: 13px;
+    }
+
+    .price-input input {
+        border-radius: 0 11px 11px 0 !important;
+    }
+
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 17px 18px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #fbfcfd;
+    }
+
+    .status-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .status-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f8f1;
+        color: var(--success);
+    }
+
+    .status-title {
+        color: var(--dark);
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .status-description {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+    }
+
+    .switch {
+        position: relative;
+        width: 50px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        inset: 0;
+        background: #cbd5df;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .slider:before {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        left: 3px;
+        top: 3px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .18);
+        transition: .2s ease;
+    }
+
+    .switch input:checked+.slider {
+        background: var(--success);
+    }
+
+    .switch input:checked+.slider:before {
+        transform: translateX(22px);
+    }
+
+    .form-footer {
+        padding: 20px 30px;
+        background: #f8fafc;
+        border-top: 1px solid #e9eef3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .form-footer-note {
+        color: #8a99a8;
+        font-size: 11px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 9px;
+    }
+
+    .cancel-btn,
+    .save-btn {
+        min-height: 44px;
+        border-radius: 10px;
+        padding: 0 19px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .cancel-btn {
+        border: 1px solid #dbe3ea;
+        background: white;
+        color: #617386;
+    }
+
+    .save-btn {
+        border: 0;
+        color: white;
+        background: linear-gradient(135deg, #0879bd, #13a68b);
+        box-shadow: 0 7px 18px rgba(8, 121, 189, .18);
+        transition: .2s ease;
+    }
+
+    .save-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 23px rgba(8, 121, 189, .25);
+        color: white;
+    }
+
+    .field-error {
+        color: var(--danger);
+        font-size: 11px;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .django-errors {
+        margin-bottom: 20px;
+        padding: 14px 16px;
+        border: 1px solid #f3c5ce;
+        border-radius: 12px;
+        background: #fff5f6;
+        color: #a52b42;
+        font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+
+        .service-editor {
+            padding: 0 8px 90px;
+        }
+
+        .service-page-header {
+            align-items: flex-start;
+        }
+
+        .service-heading-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+        }
+
+        .section-heading {
+            padding: 10px 11px;
+        }
+
+        .section-heading-icon {
+            width: 34px;
+            height: 34px;
+            flex-basis: 34px;
+        }
+
+        .service-heading h1 {
+            font-size: 23px;
+        }
+
+        .service-heading p {
+            font-size: 12px;
+        }
+
+        .back-button {
+            font-size: 12px;
+            padding: 9px 11px;
+        }
+
+        .form-section {
+            padding: 22px 17px;
+        }
+
+        .form-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            padding: 11px 14px;
+            box-shadow: 0 -5px 20px rgba(16, 42, 67, .10);
+        }
+
+        .form-footer-note {
+            display: none;
+        }
+
+        .form-actions {
+            width: 100%;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        .service-page-header {
+            gap: 10px;
+        }
+
+        .service-heading {
+            gap: 10px;
+        }
+
+        .service-heading-icon {
+            display: none;
+        }
+
+        .service-heading h1 {
+            font-size: 21px;
+        }
+
+        .back-button span {
+            display: none;
+        }
+
+        .form-section {
+            padding: 19px 14px;
+        }
+
+        .section-heading {
+            margin-bottom: 18px;
+        }
+
+        .new-category-input {
+            flex-direction: column;
+        }
+
+        .add-category-btn {
+            min-height: 44px;
+        }
+
+        .category-list {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+    }
+</style>
+
+<div class="service-editor">
+
+  
+    <!-- PAGE HEADER -->
+    <div class="service-page-header">
+
+        <div class="service-heading">
+
+            <div class="service-heading-icon">
+                <i class="fas fa-heart-pulse"></i>
+            </div>
+
+            <div>
+                <h1>{{ title|default:"Service" }}</h1>
+
+                <p>
+                    Manage the healthcare service information displayed on your website.
+                </p>
+            </div>
+
+        </div>
+
+        <a href="{% url 'staff:services' %}" class="back-button">
+            <i class="fas fa-arrow-left me-1"></i>
+            <span>Back to Services</span>
+        </a>
+
+    </div>
+
+
+    <!-- MAIN FORM -->
+    <form method="post" enctype="multipart/form-data" class="service-form">
+
+        {% csrf_token %}
+
+
+        <!-- DISPLAY NON-FIELD ERRORS -->
+        {% if form.non_field_errors %}
+        <div class="django-errors">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+
+        <!-- SECTION 1 -->
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-number">01</div>
+                <div class="section-heading-icon"><i class="fas fa-file-lines"></i></div>
+
+                <div>
+                    <h2>Service Information</h2>
+                    <p>Basic information patients will see.</p>
+                </div>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                <!-- SERVICE NAME -->
+                <div class="col-md-6">
+
+                    <label class="form-label" for="id_name">
+                        Service Name
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="input-icon">
+
+                        <i class="fas fa-stethoscope"></i>
+
+                        {{ form.name }}
+
+                    </div>
+
+                    {% for error in form.name.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- SLUG -->
+                <div class="col-md-6">
+
+                    <label class="form-label" for="id_slug">
+                        URL Slug
+                    </label>
+
+                    <div class="input-icon">
+
+                        <i class="fas fa-link"></i>
+
+                        {{ form.slug }}
+
+                    </div>
+
+                    <div class="form-help">
+                        Used in the service URL.
+                    </div>
+
+                    {% for error in form.slug.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- CATEGORY -->
+                <div class="col-12">
+
+                    <label class="form-label">
+                        Category
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="category-box">
+
+                        <div class="category-search">
+
+                            <i class="fas fa-search"></i>
+
+                            <input type="text" id="categorySearch" class="form-control"
+                                placeholder="Search existing categories...">
+
+                        </div>
+
+
+                        <div class="category-list" id="categoryList">
+
+                            {% for category in categories %}
+
+                            <button type="button" class="category-chip" data-category-id="{{ category.pk }}"
+                                data-category-name="{{ category.name|lower }}">
+                                <i class="fas fa-tag"></i>
+                                {{ category.name }}
+                            </button>
+
+                            {% empty %}
+
+                            <p class="text-muted small mb-0">
+                                No categories available. Add a new category below.
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <input type="hidden" name="category" id="selectedCategory"
+                            value="{{ form.category.value|default:'' }}">
+
+
+                        <div class="new-category-area">
+
+                            <div class="new-category-label">
+                                <i class="fas fa-circle-plus"></i>
+                                Type a new category
+                            </div>
+
+                            <div class="new-category-input">
+
+                                <input type="text" id="newCategoryInput" name="new_category" class="form-control"
+                                    placeholder="e.g. Physiotherapy, Palliative Care...">
+
+                                <button type="button" id="addCategoryButton" class="add-category-btn"
+                                    title="Use new category">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+
+                            </div>
+
+                            <div id="categoryMessage" class="category-message" style="display:none;"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    {% for error in form.category.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- SHORT DESCRIPTION -->
+                <div class="col-md-6">
+
+                    <label class="form-label" for="id_short_description">
+                        Short Description
+                    </label>
+
+                    <div class="textarea-wrapper">
+
+                        {{ form.short_description }}
+
+                        <span class="character-count" id="shortCount">0 / 300</span>
+
+                    </div>
+
+                    {% for error in form.short_description.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- FULL DESCRIPTION -->
+                <div class="col-md-6">
+
+                    <label class="form-label" for="id_description">
+                        Full Description
+                    </label>
+
+                    <div class="textarea-wrapper">
+
+                        {{ form.description }}
+
+                    </div>
+
+                    {% for error in form.description.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECTION 2 -->
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-number">02</div>
+                <div class="section-heading-icon"><i class="fas fa-desktop"></i></div>
+
+                <div>
+                    <h2>Website Display</h2>
+                    <p>Control how this service appears on the website.</p>
+                </div>
+
+            </div>
+
+
+            <div class="row g-4">
+
+                <!-- ICON -->
+                <div class="col-md-8">
+
+                    <label class="form-label" for="id_icon">
+                        Icon Class
+                    </label>
+
+                    <div class="input-icon">
+
+                        <i class="fas fa-icons"></i>
+
+                        {{ form.icon }}
+
+                    </div>
+
+                    <div class="form-help">
+                        Example:
+                        <strong>fas fa-heart-pulse</strong>
+                    </div>
+
+                    {% for error in form.icon.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- ORDER -->
+                <div class="col-md-4">
+
+                    <label class="form-label" for="id_order">
+                        Display Order
+                    </label>
+
+                    <div class="input-icon">
+
+                        <i class="fas fa-arrow-down-1-9"></i>
+
+                        {{ form.order }}
+
+                    </div>
+
+                    {% for error in form.order.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- IMAGE -->
+                <div class="col-12">
+
+                    <label class="form-label" for="id_image">
+                        Service Image
+                    </label>
+
+                    <div class="image-upload">
+
+                        <div class="image-upload-icon">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <div class="image-upload-title">
+                            Upload service image
+                        </div>
+
+                        <div class="image-upload-help">
+                            JPG, PNG or WEBP recommended
+                        </div>
+
+                        <div class="mt-3">
+                            {{ form.image }}
+                        </div>
+
+                        {% if service and service.image %}
+                        <div class="mt-3">
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}" class="current-image">
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    {% for error in form.image.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECTION 3 -->
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-number">03</div>
+                <div class="section-heading-icon"><i class="fas fa-circle-dollar-to-slot"></i></div>
+
+                <div>
+                    <h2>Pricing</h2>
+                    <p>Set the base price for this service.</p>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <label class="form-label" for="id_price">
+                        Base Price
+                    </label>
+
+                    <div class="price-input">
+
+                        <div class="currency-box">
+                            N$
+                        </div>
+
+                        {{ form.price }}
+
+                    </div>
+
+                    <div class="form-help">
+                        Enter 0.00 if the price should be quoted separately.
+                    </div>
+
+                    {% for error in form.price.errors %}
+                    <div class="field-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECTION 4 -->
+        <section class="form-section">
+
+            <div class="section-heading">
+
+                <div class="section-number">04</div>
+                <div class="section-heading-icon"><i class="fas fa-toggle-on"></i></div>
+
+                <div>
+                    <h2>Service Status</h2>
+                    <p>Control whether patients can see this service.</p>
+                </div>
+
+            </div>
+
+
+            <div class="status-box">
+
+                <div class="status-info">
+
+                    <div class="status-icon">
+                        <i class="fas fa-circle-check"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="status-title">
+                            Service is active
+                        </div>
+
+                        <div class="status-description">
+                            Active services are visible on the public website.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <label class="switch">
+
+                    {{ form.is_active }}
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+            {% for error in form.is_active.errors %}
+            <div class="field-error">
+                <i class="fas fa-circle-exclamation"></i>
+                {{ error }}
+            </div>
+            {% endfor %}
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <div class="form-footer">
+
+            <div class="form-footer-note">
+                <i class="fas fa-shield-heart me-1"></i>
+                Changes are saved securely to Hands-On Health.
+            </div>
+
+            <div class="form-actions">
+
+                <a href="{% url 'staff:services' %}" class="btn cancel-btn">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn save-btn">
+                    <i class="fas fa-check me-1"></i>
+                    {{ submit_label|default:"Save Service" }}
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+  
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* ============================================================
+           CATEGORY
+        ============================================================ */
+
+        const categorySearch =
+            document.getElementById("categorySearch");
+
+        const categoryButtons =
+            document.querySelectorAll(".category-chip");
+
+        const selectedCategory =
+            document.getElementById("selectedCategory");
+
+        const newCategoryInput =
+            document.getElementById("newCategoryInput");
+
+        const addCategoryButton =
+            document.getElementById("addCategoryButton");
+
+        const categoryMessage =
+            document.getElementById("categoryMessage");
+
+
+        /* ============================================================
+           RESTORE SELECTED CATEGORY
+        ============================================================ */
+
+        if (selectedCategory) {
+
+            const currentCategory =
+                selectedCategory.value;
+
+            categoryButtons.forEach(function (button) {
+
+                if (
+                    button.dataset.categoryId ===
+                    currentCategory
+                ) {
+                    button.classList.add("selected");
+                }
+
+            });
+
+        }
+
+
+        /* ============================================================
+           SELECT EXISTING CATEGORY
+        ============================================================ */
+
+        categoryButtons.forEach(function (button) {
+
+            button.addEventListener("click", function () {
+
+                categoryButtons.forEach(function (item) {
+                    item.classList.remove("selected");
+                });
+
+                button.classList.add("selected");
+
+                selectedCategory.value =
+                    button.dataset.categoryId;
+
+                newCategoryInput.value = "";
+
+                categoryMessage.style.display = "none";
+                categoryMessage.textContent = "";
+
+            });
+
+        });
+
+
+        /* ============================================================
+           CATEGORY SEARCH
+        ============================================================ */
+
+        if (categorySearch) {
+
+            categorySearch.addEventListener("input", function () {
+
+                const search =
+                    categorySearch.value
+                        .toLowerCase()
+                        .trim();
+
+                categoryButtons.forEach(function (button) {
+
+                    const name =
+                        button.dataset.categoryName || "";
+
+                    if (
+                        !search ||
+                        name.includes(search)
+                    ) {
+                        button.style.display =
+                            "inline-flex";
+                    } else {
+                        button.style.display =
+                            "none";
+                    }
+
+                });
+
+            });
+
+        }
+
+
+        /* ============================================================
+           NEW CATEGORY
+        ============================================================ */
+
+        function useNewCategory() {
+
+            const value =
+                newCategoryInput.value.trim();
+
+            if (!value) {
+
+                categoryMessage.style.display =
+                    "block";
+
+                categoryMessage.style.color =
+                    "#dc4c64";
+
+                categoryMessage.textContent =
+                    "Type a category name first.";
+
+                return;
+            }
+
+
+            categoryButtons.forEach(function (button) {
+                button.classList.remove("selected");
+            });
+
+
+            selectedCategory.value = "";
+
+
+            categoryMessage.style.display =
+                "block";
+
+            categoryMessage.style.color =
+                "#169c69";
+
+            categoryMessage.textContent =
+                'New category "' +
+                value +
+                '" will be created when you save.';
+
+        }
+
+
+        if (addCategoryButton) {
+
+            addCategoryButton.addEventListener(
+                "click",
+                useNewCategory
+            );
+
+        }
+
+
+        if (newCategoryInput) {
+
+            newCategoryInput.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (event.key === "Enter") {
+
+                        event.preventDefault();
+
+                        useNewCategory();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* ============================================================
+           AUTOMATIC SLUG
+        ============================================================ */
+
+        const nameInput =
+            document.getElementById("id_name");
+
+        const slugInput =
+            document.getElementById("id_slug");
+
+
+        if (nameInput && slugInput) {
+
+            nameInput.addEventListener(
+                "input",
+                function () {
+
+                    if (
+                        slugInput.dataset.manual ===
+                        "true"
+                    ) {
+                        return;
+                    }
+
+                    slugInput.value =
+                        nameInput.value
+                            .toLowerCase()
+                            .trim()
+                            .replace(/[^a-z0-9]+/g, "-")
+                            .replace(/^-+|-+$/g, "");
+
+                }
+            );
+
+
+            slugInput.addEventListener(
+                "input",
+                function () {
+
+                    slugInput.dataset.manual =
+                        "true";
+
+                }
+            );
+
+        }
+
+
+        /* ============================================================
+           CHARACTER COUNTER
+        ============================================================ */
+
+        const shortDescription =
+            document.getElementById(
+                "id_short_description"
+            );
+
+        const shortCount =
+            document.getElementById("shortCount");
+
+
+        function updateCounter() {
+
+            if (
+                shortDescription &&
+                shortCount
+            ) {
+
+                shortCount.textContent =
+                    shortDescription.value.length +
+                    " / 300";
+
+            }
+
+        }
+
+
+        if (shortDescription) {
+
+            shortDescription.addEventListener(
+                "input",
+                updateCounter
+            );
+
+            updateCounter();
+
+        }
+
+    });
+</script>
+
+{% endblock %}

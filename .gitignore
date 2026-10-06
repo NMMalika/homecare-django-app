@@ -1,0 +1,23 @@
+# Database
+db.sqlite3
+*.sqlite3
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+
+
+# Environment / secret files
+.env
+local_settings.py
+
+# System files
+.DS_Store
+Thumbs.db

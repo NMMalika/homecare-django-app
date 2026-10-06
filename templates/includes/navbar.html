@@ -1,0 +1,81 @@
+{% load static %}
+
+
+
+
+{% load static %}
+
+<!-- Main Navbar Start -->
+<div class="main-navbar conner-style style-2 position-fixed">
+    <div class="container padding-none">
+        <div class="row">
+            <div class="col-md-12">
+                <nav class="navbar navbar-default">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+
+                        <!-- Dynamic Logo -->
+                        <a class="navbar-brand" href="{% url 'home' %}">
+                            {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}"
+                                alt="{{ site_settings.business_name|default:'Hands-On Health' }} Logo"
+                                class="navbar-logo">
+                            {% else %}
+                            <img src="{% static 'img/logo.png' %}" alt="Hands-On Health Logo" class="navbar-logo">
+                            {% endif %}
+                        </a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav bg-none navbar-right style-3">
+                            <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                                <a href="{% url 'home' %}">Home</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                                <a href="{% url 'pages:about' %}">About Us</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">
+                                <a href="#">Our Services</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">
+                                <a href="#">How It Works</a>
+                            </li>
+
+                            <li
+                                class="{% if request.resolver_match.url_name == 'for_professionals' %}active{% endif %}">
+                                <a href="#">For Healthcare Professionals</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
+                                <a href="#">Reviews</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'faq' %}active{% endif %}">
+                                <a href="#">FAQ</a>
+                            </li>
+
+                            <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                                <a href="#">Contact</a>
+                            </li>
+
+                            <li class="nav-btn-wrapper">
+                                <a href="{% url 'homecare:request' %}" class="nav-cta-btn">Request Home Care</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Main Navbar End -->
+                           

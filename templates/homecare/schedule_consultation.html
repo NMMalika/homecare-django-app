@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-2">Manage Consultation Availability</h2>
+
+    <p class="text-muted mb-4">
+        Create the available consultation times for the patient.
+        Add all available slots first, then send the availability to the patient.
+    </p>
+
+
+    <!-- PATIENT INFORMATION -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">Patient Information</h5>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-2">
+                    <strong>Name:</strong>
+                    {{ consultation.first_name }}
+                    {{ consultation.last_name }}
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Phone:</strong>
+                    {{ consultation.phone }}
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Email:</strong>
+                    {{ consultation.email }}
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <strong>Status:</strong>
+                    <span class="badge bg-success">
+                        {{ consultation.get_status_display }}
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ADD SLOT -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">
+                Add Available Consultation Slot
+            </h5>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">
+                            Date
+                        </label>
+
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            Time
+                        </label>
+
+                        <input type="time" name="time" class="form-control" required>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            Duration
+                        </label>
+
+                        <select name="duration_minutes" class="form-select" required>
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="45">45 minutes</option>
+                            <option value="60">60 minutes</option>
+                            <option value="90">90 minutes</option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Add Slot
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- CONSULTATION SLOTS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <h5 class="fw-bold mb-0">
+                    Consultation Slots
+                </h5>
+
+                <span class="badge bg-primary">
+                    {{ slots|length }} slot{{ slots|length|pluralize }}
+                </span>
+
+            </div>
+
+
+            {% if slots %}
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for slot in slots %}
+
+                        <tr>
+
+                            <td>
+                                {{ slot.date|date:"l, d F Y" }}
+                            </td>
+
+                            <td>
+                                {{ slot.time|time:"h:i A" }}
+                            </td>
+
+                            <td>
+                                {{ slot.duration_minutes }} minutes
+                            </td>
+
+                            <td>
+
+                                {% if slot.is_selected %}
+
+                                <span class="badge bg-success">
+                                    Selected
+                                </span>
+
+                                {% elif slot.is_available %}
+
+                                <span class="badge bg-primary">
+                                    Available
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-secondary">
+                                    Unavailable
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if slot.is_selected %}
+
+                                <span class="text-muted">
+                                    Locked
+                                </span>
+
+                                {% else %}
+
+                                <form method="post" action="{% url 'homecare:delete_consultation_slot' slot.id %}"
+                                    onsubmit="return confirm('Remove this consultation slot?');">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        Remove
+                                    </button>
+
+                                </form>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- SEND AVAILABILITY -->
+
+            <div class="mt-4 p-3 bg-light border rounded">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h6 class="fw-bold mb-1">
+                            Ready to notify the patient?
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            The patient will receive a secure link
+                            to choose one of these available slots.
+                        </p>
+
+                    </div>
+
+
+                    <form method="post" action="{% url 'homecare:send_consultation_availability' consultation.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-success">
+                            Send Availability
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <div style="font-size: 48px;">
+                    📅
+                </div>
+
+                <h5 class="mt-3">
+                    No consultation slots created yet
+                </h5>
+
+                <p class="text-muted">
+                    Add the available consultation dates and times
+                    above before sending availability.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- WORKFLOW -->
+
+    <div class="alert alert-info">
+
+        <strong>Appointment Workflow</strong>
+
+        <ol class="mb-0 mt-2">
+
+            <li>
+                Add the available consultation dates and times.
+            </li>
+
+            <li>
+                Review the slots.
+            </li>
+
+            <li>
+                Click <strong>Send Availability</strong>.
+            </li>
+
+            <li>
+                The patient receives an email with the available slots.
+            </li>
+
+            <li>
+                The patient selects one slot.
+            </li>
+
+            <li>
+                The selected slot becomes the confirmed consultation time.
+            </li>
+
+        </ol>
+
+    </div>
+
+</div>
+
+{% endblock %}

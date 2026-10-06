@@ -1,0 +1,295 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = "staff"
+
+
+urlpatterns = [
+
+    # =========================================================
+    # AUTHENTICATION
+    # =========================================================
+
+    path(
+        "login/",
+        views.staff_login,
+        name="login",
+    ),
+
+    path(
+        "logout/",
+        views.staff_logout,
+        name="logout",
+    ),
+
+    path(
+        "change-password/",
+        views.change_password,
+        name="change_password",
+    ),
+
+
+    # =========================================================
+    # DASHBOARD
+    # =========================================================
+
+    path(
+        "",
+        views.dashboard,
+        name="dashboard",
+    ),
+
+
+    # =========================================================
+    # CAREGIVERS
+    # =========================================================
+
+    path(
+        "caregivers/",
+        views.caregivers,
+        name="caregivers",
+    ),
+
+    path(
+        "caregivers/<int:pk>/verify/",
+        views.caregiver_verify,
+        name="caregiver_verify",
+    ),
+
+
+
+# =========================================================
+# CAREGIVER ASSIGNMENTS
+# =========================================================
+
+# Main staff assignment list
+path(
+    "assignments/",
+    views.caregiver_assignments,
+    name="assignments",
+),
+
+# Compatibility alias for existing homecare/staff references
+path(
+    "assignments/",
+    views.caregiver_assignments,
+    name="caregiver_assignments",
+),
+
+path(
+    "assignments/add/",
+    views.caregiver_assignment_add,
+    name="caregiver_assignment_add",
+),
+
+path(
+    "assignments/add/",
+    views.caregiver_assignment_add,
+    name="assignment_add",
+),
+
+path(
+    "assignments/<int:pk>/edit/",
+    views.caregiver_assignment_edit,
+    name="caregiver_assignment_edit",
+),
+
+path(
+    "assignments/<int:pk>/edit/",
+    views.caregiver_assignment_edit,
+    name="assignment_edit",
+),
+
+path(
+    "assignments/<int:pk>/delete/",
+    views.caregiver_assignment_delete,
+    name="caregiver_assignment_delete",
+),
+
+path(
+    "assignments/<int:pk>/delete/",
+    views.caregiver_assignment_delete,
+    name="assignment_delete",
+),
+
+
+
+    # =========================================================
+    # CAREGIVER DAILY REPORTS
+    # =========================================================
+
+    path(
+        "reports/",
+        views.caregiver_daily_reports,
+        name="reports",
+    ),
+
+    path(
+        "reports/add/",
+        views.caregiver_daily_report_add,
+        name="report_add",
+    ),
+
+    path(
+        "reports/<int:pk>/edit/",
+        views.caregiver_daily_report_edit,
+        name="report_edit",
+    ),
+
+    path(
+        "reports/<int:pk>/delete/",
+        views.caregiver_daily_report_delete,
+        name="report_delete",
+    ),
+
+
+    # =========================================================
+    # HOME CARE REQUESTS
+    # =========================================================
+
+    path(
+        "homecare/",
+        views.homecare_requests,
+        name="homecare_requests",
+    ),
+
+    path(
+        "homecare/add/",
+        views.homecare_request_add,
+        name="homecare_request_add",
+    ),
+
+    path(
+        "homecare/<int:pk>/edit/",
+        views.homecare_request_edit,
+        name="homecare_request_edit",
+    ),
+
+    path(
+        "homecare/<int:pk>/delete/",
+        views.homecare_request_delete,
+        name="homecare_request_delete",
+    ),
+
+
+    # =========================================================
+    # REFERRALS
+    # =========================================================
+
+    path(
+        "referrals/",
+        views.referrals,
+        name="referrals",
+    ),
+
+
+    # =========================================================
+    # CONSULTATIONS
+    # =========================================================
+
+    path(
+        "appointments/",
+        views.appointments,
+        name="appointments",
+    ),
+
+
+    # =========================================================
+    # QUOTATIONS
+    # =========================================================
+
+    path(
+        "quotations/",
+        views.quotations,
+        name="quotations",
+    ),
+
+
+    # =========================================================
+    # PAYMENTS
+    # =========================================================
+
+    path(
+        "payments/",
+        views.payments,
+        name="payments",
+    ),
+
+    path(
+        "payments/<int:payment_id>/verify/",
+        views.payment_verify,
+        name="payment_verify",
+    ),
+
+
+    # =========================================================
+    # CAREGIVER PAYMENTS
+    # =========================================================
+
+    path(
+        "caregiver-payments/",
+        views.caregiver_payments,
+        name="caregiver_payments",
+    ),
+
+    path(
+        "caregiver-payments/add/",
+        views.caregiver_payment_add,
+        name="caregiver_payment_add",
+    ),
+
+    path(
+        "caregiver-payments/<int:pk>/edit/",
+        views.caregiver_payment_edit,
+        name="caregiver_payment_edit",
+    ),
+
+    path(
+        "caregiver-payments/<int:pk>/delete/",
+        views.caregiver_payment_delete,
+        name="caregiver_payment_delete",
+    ),
+
+
+    # =========================================================
+    # SERVICES
+    # =========================================================
+
+    path(
+        "services/",
+        views.services,
+        name="services",
+    ),
+
+    path(
+        "services/add/",
+        views.service_add,
+        name="service_add",
+    ),
+
+    path(
+        "services/<int:pk>/edit/",
+        views.service_edit,
+        name="service_edit",
+    ),
+
+    path(
+        "services/<int:pk>/delete/",
+        views.service_delete,
+        name="service_delete",
+    ),
+
+
+    # =========================================================
+    # SETTINGS
+    # =========================================================
+
+    path(
+        "settings/",
+        views.settings,
+        name="settings",
+    ),
+
+]

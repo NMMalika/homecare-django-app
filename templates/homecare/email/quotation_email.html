@@ -1,0 +1,599 @@
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Your Home Care Quotation</title>
+</head>
+
+<body style="
+        margin: 0;
+        padding: 0;
+        background: #f5f7fa;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #333333;
+    ">
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 30px 15px;">
+        <tr>
+            <td align="center">
+
+                <table width="600" cellpadding="0" cellspacing="0" style="
+                    max-width: 600px;
+                    width: 100%;
+                    background: #ffffff;
+                    border-radius: 8px;
+                    overflow: hidden;
+                ">
+
+                    <!-- HEADER -->
+
+                    <tr>
+                        <td style="
+                            padding: 30px;
+                            text-align: center;
+                            background: #0b3d5c;
+                            color: #ffffff;
+                        ">
+
+                            {% if site_settings.logo %}
+                            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }}" style="
+                                    max-width: 160px;
+                                    max-height: 70px;
+                                    margin-bottom: 15px;
+                                ">
+                            {% else %}
+                            <img src="{% static 'img/logo.png' %}" alt="Hands-On Health Logo" class="navbar-logo">
+                            {% endif %}
+
+                            <h1 style="
+                                margin: 0;
+                                font-size: 24px;
+                            ">
+                                {{ site_settings.business_name }}
+                            </h1>
+
+                            <p style="
+                                margin: 8px 0 0;
+                                font-size: 14px;
+                            ">
+                                {{ site_settings.tagline|default:"Home-Based Healthcare Services" }}
+                            </p>
+
+                        </td>
+                    </tr>
+
+
+                    <!-- MAIN CONTENT -->
+
+                    <tr>
+                        <td style="padding: 35px;">
+
+                            <h2 style="
+                                margin-top: 0;
+                                color: #0b3d5c;
+                            ">
+                                Your Home Care Quotation
+                            </h2>
+
+
+                            <p>
+                                Dear {{ homecare_request.full_name }},
+                            </p>
+
+
+                            <p>
+                                Thank you for contacting
+                                {{ site_settings.business_name }}.
+                                We have reviewed your home care request
+                                and prepared your quotation.
+                            </p>
+
+
+                            <!-- REQUEST SUMMARY -->
+
+                            <table width="100%" cellpadding="10" cellspacing="0" style="
+                                margin: 25px 0;
+                                background: #f7f9fb;
+                                border-radius: 6px;
+                            ">
+
+                                <tr>
+                                    <td>
+                                        <strong>Service</strong>
+                                    </td>
+
+                                    <td align="right">
+
+                                        {% if homecare_request.services.exists %}
+                                           {% for service in homecare_request.services.all %}
+                                                {{ service.name }}{% if not forloop.last %}<br>{% endif %}
+                                           {% endfor %}
+                                        {% else %}
+                                           Home Care Service
+                                        {% endif %}
+
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <strong>Location</strong>
+                                    </td>
+
+                                    <td align="right">
+                                        {{ homecare_request.location }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <strong>Preferred Date</strong>
+                                    </td>
+
+                                    <td align="right">
+                                        {{ homecare_request.preferred_date }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <strong>Preferred Time</strong>
+                                    </td>
+
+                                    <td align="right">
+                                        {{ homecare_request.preferred_time }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <strong>Total Amount</strong>
+                                    </td>
+
+                                    <td align="right" style="
+                                        font-size: 20px;
+                                        font-weight: bold;
+                                        color: #0b3d5c;
+                                    ">
+                                        N$ {{ quotation.amount|floatformat:2 }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        <strong>Payment Deadline</strong>
+                                    </td>
+
+                                    <td align="right">
+                                        {{ payment_deadline|date:"d F Y" }}
+                                        at
+                                        {{ payment_deadline|date:"h:i A" }}
+                                    </td>
+                                </tr>
+
+                            </table>
+
+
+                            <!-- QUOTATION DETAILS -->
+
+                            <h3 style="
+                                color: #0b3d5c;
+                                margin-top: 30px;
+                            ">
+                                Quotation Details
+                            </h3>
+
+
+                        <div style="
+                            background: #f7f9fb;
+                            padding: 18px;
+                            border-radius: 6px;
+                            line-height: 1.6;
+                        ">
+                        
+                            <strong>Services Requested:</strong>
+                        
+                            <table width="100%" cellpadding="8" cellspacing="0" style="margin-top: 12px;">
+                        
+                                {% for service in homecare_request.services.all %}
+                                <tr>
+                                    <td style="border-bottom: 1px solid #e5e5e5;">
+                                        {{ service.name }}
+                                    </td>
+                        
+                                    <td align="right" style="
+                                            border-bottom: 1px solid #e5e5e5;
+                                            font-weight: bold;
+                                        ">
+                                        N$ {{ service.price|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2">
+                                        No specific services listed.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                        
+                                <tr>
+                                    <td style="
+                                        padding-top: 15px;
+                                        font-weight: bold;
+                                    ">
+                                        Services Total
+                                    </td>
+                        
+                                    <td align="right" style="
+                                        padding-top: 15px;
+                                        font-weight: bold;
+                                        color: #0b3d5c;
+                                    ">
+                                        N$ {{ quotation.base_amount|floatformat:2 }}
+                                    </td>
+                                </tr>
+                        
+                                {% if quotation.transportation_fee %}
+                                <tr>
+                                    <td>
+                                        Transportation Fee
+                                    </td>
+                        
+                                    <td align="right">
+                                        N$ {{ quotation.transportation_fee|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                        
+                                {% if quotation.discount_amount %}
+                                <tr>
+                                    <td>
+                                        Discount
+                                    </td>
+                        
+                                    <td align="right">
+                                        - N$ {{ quotation.discount_amount|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                        
+                                <tr>
+                                    <td style="
+                                        padding-top: 12px;
+                                        font-size: 17px;
+                                        font-weight: bold;
+                                        color: #0b3d5c;
+                                    ">
+                                        Calculated Total Amount
+                                    </td>
+                        
+                                    <td align="right" style="
+                                        padding-top: 12px;
+                                        font-size: 17px;
+                                        font-weight: bold;
+                                        color: #0b3d5c;
+                                    ">
+                                        N$ {{ quotation.amount|floatformat:2 }}
+                                    </td>
+                                </tr>
+                        
+                            </table>
+                        
+                        </div>
+
+
+                            <!-- PAYMENT -->
+
+                            <h3 style="
+                                color: #0b3d5c;
+                                margin-top: 30px;
+                            ">
+                                Payment Information
+                            </h3>
+
+
+                            <p>
+                                Please use one of the payment methods below
+                                to complete your payment.
+                            </p>
+
+
+                            {% if site_settings.bank_name %}
+
+                            <table width="100%" cellpadding="8" cellspacing="0" style="
+                                background: #f7f9fb;
+                                border-radius: 6px;
+                                margin-top: 15px;
+                            ">
+
+                                <tr>
+                                    <td colspan="2">
+                                        <strong style="color: #0b3d5c;">
+                                            Bank Payment
+                                        </strong>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        Bank
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.bank_name }}
+                                    </td>
+                                </tr>
+
+
+                                {% if site_settings.account_name %}
+
+                                <tr>
+                                    <td>
+                                        Account Name
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.account_name }}
+                                    </td>
+                                </tr>
+
+                                {% endif %}
+
+
+                                {% if site_settings.account_number %}
+
+                                <tr>
+                                    <td>
+                                        Account Number
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.account_number }}
+                                    </td>
+                                </tr>
+
+                                {% endif %}
+
+
+                                {% if site_settings.branch_name %}
+
+                                <tr>
+                                    <td>
+                                        Branch
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.branch_name }}
+                                    </td>
+                                </tr>
+
+                                {% endif %}
+
+                            </table>
+
+                            {% endif %}
+
+
+                            {% if site_settings.mobile_money_name %}
+
+                            <table width="100%" cellpadding="8" cellspacing="0" style="
+                                background: #f7f9fb;
+                                border-radius: 6px;
+                                margin-top: 15px;
+                            ">
+
+                                <tr>
+                                    <td colspan="2">
+                                        <strong style="color: #0b3d5c;">
+                                            Mobile Money
+                                        </strong>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <td>
+                                        Provider
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.mobile_money_name }}
+                                    </td>
+                                </tr>
+
+
+                                {% if site_settings.mobile_money_number %}
+
+                                <tr>
+                                    <td>
+                                        Number
+                                    </td>
+
+                                    <td align="right">
+                                        {{ site_settings.mobile_money_number }}
+                                    </td>
+                                </tr>
+
+                                {% endif %}
+
+                            </table>
+
+                            {% endif %}
+
+
+                            
+
+                            <!-- PAYMENT REFERENCE & PAYMENT CODE -->
+
+                        <!-- PAYMENT REFERENCE & NEXT STEP -->
+                        
+                        <div style="
+                            margin-top: 25px;
+                            padding: 20px;
+                            background: #eef6fa;
+                            border: 1px solid #d5e7ef;
+                            border-radius: 6px;
+                        ">
+                        
+                            <p style="
+                                margin: 0 0 12px;
+                                color: #0b3d5c;
+                                font-weight: bold;
+                            ">
+                                Payment Instructions
+                            </p>
+                        
+                            <p style="
+                                margin: 0 0 12px;
+                                line-height: 1.6;
+                            ">
+                                Once you have completed your payment, click the button below
+                                to open your secure quotation page and submit your payment
+                                transaction code.
+                            </p>
+                        
+                            <p style="
+                                margin: 0;
+                                line-height: 1.6;
+                            ">
+                                Your service will only be confirmed after
+                                <strong>{{ site_settings.business_name }}</strong>
+                                verifies your payment.
+                            </p>
+                        
+                        </div>
+                        
+                        
+                        <!-- PAYMENT BUTTON -->
+                        
+                        <div style="
+                            text-align: center;
+                            margin: 35px 0;
+                        ">
+                        
+                            <a href="{{ quotation_url }}" style="
+                                display: inline-block;
+                                padding: 14px 30px;
+                                background: #0b3d5c;
+                                color: #ffffff;
+                                text-decoration: none;
+                                border-radius: 5px;
+                                font-weight: bold;
+                                font-size: 15px;
+                            ">
+                                VIEW QUOTATION &amp; SUBMIT PAYMENT
+                            </a>
+                        
+                        </div>
+
+
+                            <!-- PAYMENT BUTTON -->
+
+                            <div style="
+                                text-align: center;
+                                margin: 35px 0;
+                            ">
+
+                                <a href="{{ quotation_url }}" style="
+                                    display: inline-block;
+                                    padding: 14px 30px;
+                                    background: #0b3d5c;
+                                    color: #ffffff;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    font-weight: bold;
+                                    font-size: 15px;
+                                ">
+                                    PAID
+                                </a>
+
+                            </div>
+
+
+                           
+
+
+                            <!-- CONTACT -->
+
+                            <p style="margin-top: 30px;">
+
+                                If you have any questions, please contact us:
+
+                                {% if site_settings.phone %}
+                                <br>
+                                <strong>Phone:</strong>
+                                {{ site_settings.phone }}
+                                {% endif %}
+
+                                {% if site_settings.whatsapp %}
+                                <br>
+                                <strong>WhatsApp:</strong>
+                                {{ site_settings.whatsapp }}
+                                {% endif %}
+
+                                {% if site_settings.email %}
+                                <br>
+                                <strong>Email:</strong>
+                                {{ site_settings.email }}
+                                {% endif %}
+
+                            </p>
+
+
+                            <p>
+                                Kind regards,<br>
+
+                                <strong>
+                                    {{ site_settings.business_name }}
+                                </strong>
+                            </p>
+
+                        </td>
+                    </tr>
+
+
+                    <!-- FOOTER -->
+
+                    <tr>
+                        <td style="
+                            padding: 20px 35px;
+                            background: #f7f9fb;
+                            text-align: center;
+                            font-size: 12px;
+                            color: #777777;
+                        ">
+
+                            {{ site_settings.business_name }}
+
+                            <br>
+
+                            {{ site_settings.tagline|default:"Home-Based Healthcare Services" }}
+
+                            {% if site_settings.city %}
+                            <br>
+                            {{ site_settings.city }}, {{ site_settings.country }}
+                            {% endif %}
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

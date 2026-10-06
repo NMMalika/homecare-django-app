@@ -1,0 +1,631 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+Caregiver Assignments | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Custom polished styling to guarantee layout safety */
+    .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .app-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #0284c7;
+        margin-bottom: 0.25rem;
+    }
+
+    .app-title {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .app-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+
+    /* Modern Stats Dashboard Grid */
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .dash-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .dash-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .bg-blue-soft {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .bg-emerald-soft {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .bg-amber-soft {
+        background: #fffbeb;
+        color: #d97706;
+    }
+
+    .bg-purple-soft {
+        background: #f3e8ff;
+        color: #9333ea;
+    }
+
+    .dash-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dash-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+
+    .dash-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 0.125rem;
+    }
+
+    .dash-link {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #2563eb;
+        text-decoration: none;
+        margin-top: 0.125rem;
+    }
+
+    .dash-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Filter Toolbar Styling */
+    .filter-panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .filter-grid {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 1rem;
+    }
+
+    .filter-field {
+        flex: 1;
+        min-width: 260px;
+    }
+
+    .filter-field label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-select {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.50rem;
+        font-size: 0.875rem;
+        color: #1e293b;
+        background-color: #f8fafc;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .custom-select:focus {
+        border-color: #2563eb;
+        background-color: #fff;
+    }
+
+    .filter-btns {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Main Content Data Card */
+    .content-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+    }
+
+    .card-top {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .card-top h2 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .card-top p {
+        font-size: 0.8125rem;
+        color: #64748b;
+        margin: 0.125rem 0 0 0;
+    }
+
+    /* Enhanced Data Table */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .professional-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.875rem;
+    }
+
+    .professional-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .professional-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+    }
+
+    .professional-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Person Avatar & Lockup */
+    .person-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .person-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        background: #e0f2fe;
+        color: #0284c7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 0.75rem;
+    }
+
+    /* Status Pills */
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .pill-assigned {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .pill-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .pill-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .pill-default {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    /* Row Actions */
+    .action-group {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.375rem;
+    }
+
+    .icon-action-btn {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.375rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        background: transparent;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        text-decoration: none;
+    }
+
+    .icon-action-btn:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+    }
+
+    .icon-action-btn.danger:hover {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fca5a5;
+    }
+</style>
+
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
+<div class="app-header">
+    <div>
+        <div class="app-kicker">Home Care Operations</div>
+        <h1 class="app-title">Caregiver Assignments</h1>
+        <p class="app-subtitle">Manage caregiver assignments for home care patients smoothly and efficiently.</p>
+    </div>
+    <div>
+        <a href="{% url 'staff:caregiver_assignment_add' %}" class="btn btn-primary"
+            style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.625rem 1.25rem; font-weight: 600; border-radius: 0.5rem; text-decoration: none;">
+            <i class="fa-solid fa-plus"></i>
+            <span>New Assignment</span>
+        </a>
+    </div>
+</div>
+
+<!-- =========================================================
+     SUMMARY CARDS
+     ========================================================= -->
+<div class="dashboard-stats">
+
+    <!-- TOTAL -->
+    <div class="dash-card">
+        <div class="dash-icon bg-blue-soft">
+            <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="dash-content">
+            <span class="dash-label">Total Assignments</span>
+            <strong class="dash-value">{{ assignments|length }}</strong>
+        </div>
+    </div>
+
+    <!-- ASSIGNED -->
+    <div class="dash-card">
+        <div class="dash-icon bg-emerald-soft">
+            <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div class="dash-content">
+            <span class="dash-label">Assigned</span>
+            <strong class="dash-value">
+                {% with count=assignments|length %}
+                {{ count }}
+                {% endwith %}
+            </strong>
+        </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="dash-card">
+        <div class="dash-icon bg-amber-soft">
+            <i class="fa-solid fa-filter"></i>
+        </div>
+        <div class="dash-content">
+            <span class="dash-label">Current Filter</span>
+            <strong class="dash-value" style="font-size: 1.25rem; padding-top: 0.125rem;">
+                {% if current_status %}
+                {{ current_status|title }}
+                {% else %}
+                All
+                {% endif %}
+            </strong>
+        </div>
+    </div>
+
+    <!-- MANAGEMENT -->
+    <div class="dash-card">
+        <div class="dash-icon bg-purple-soft">
+            <i class="fa-solid fa-user-nurse"></i>
+        </div>
+        <div class="dash-content">
+            <span class="dash-label">Management</span>
+            <a href="{% url 'staff:caregiver_assignments' %}" class="dash-link">
+                Open Management &rarr;
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- =========================================================
+     FILTER BAR
+     ========================================================= -->
+<div class="filter-panel">
+    <form method="get" class="filter-grid">
+        <div class="filter-field">
+            <label for="status">Assignment Status</label>
+            <select name="status" id="status" class="custom-select">
+                <option value="">All statuses</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-btns">
+            <button type="submit" class="btn btn-primary"
+                style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; border-radius: 0.5rem; font-weight: 600;">
+                <i class="fa-solid fa-filter"></i>
+                <span>Filter</span>
+            </button>
+
+            {% if current_status %}
+            <a href="{% url 'staff:assignments' %}" class="btn btn-secondary"
+                style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none;">
+                <i class="fa-solid fa-xmark"></i>
+                <span>Clear</span>
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- =========================================================
+     ASSIGNMENTS TABLE CARD
+     ========================================================= -->
+<div class="content-card">
+
+    <div class="card-top">
+        <div>
+            <h2>Assignment Records</h2>
+            <p>Caregiver assignments currently recorded in the healthcare system.</p>
+        </div>
+        <a href="{% url 'staff:caregiver_assignments' %}" class="btn btn-secondary"
+            style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; border-radius: 0.5rem; text-decoration: none; font-weight: 500;">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Manage Assignments</span>
+        </a>
+    </div>
+
+    <div class="table-container">
+        <table class="professional-table">
+            <thead>
+                <tr>
+                    <th>Caregiver</th>
+                    <th>Patient / Home Care</th>
+                    <th>Service Date</th>
+                    <th>Service Time</th>
+                    <th>Status</th>
+                    <th>Assigned By</th>
+                    <th>Assigned At</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr>
+                    <!-- CAREGIVER -->
+                    <td>
+                        <div class="person-cell">
+                            <div class="person-icon">
+                                <i class="fa-solid fa-user-nurse"></i>
+                            </div>
+                            <div>
+                                <strong style="display: block; color: #0f172a; font-weight: 600;">
+                                    {% if assignment.caregiver %}
+                                    {{ assignment.caregiver.name }}
+                                    {% if assignment.caregiver.user %}
+                                    <small
+                                        style="display: block; font-weight: 400; color: #64748b; font-size: 0.75rem;">
+                                        {{ assignment.caregiver.user.email }}
+                                    </small>
+                                    {% endif %}
+                                    {% else %}
+                                    <span style="color: #94a3b8; font-style: italic;">Unassigned</span>
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- PATIENT -->
+                    <td>
+                        {% if assignment.homecare_request %}
+                        <strong style="display: block; color: #0f172a; font-weight: 600;">
+                            {{ assignment.homecare_request.full_name }}
+                        </strong>
+                        <span style="color: #64748b; font-size: 0.75rem;">
+                            {{ assignment.homecare_request.phone }}
+                        </span>
+                        {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">No request attached</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- SERVICE DATE -->
+                    <td style="white-space: nowrap;">
+                        {% if assignment.service_date %}
+                        <span style="display: inline-flex; align-items: center; gap: 0.375rem; color: #334155;">
+                            <i class="fa-regular fa-calendar" style="color: #94a3b8;"></i>
+                            {{ assignment.service_date|date:"d M Y" }}
+                        </span>
+                        {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">Not set</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- SERVICE TIME -->
+                    <td style="white-space: nowrap;">
+                        {% if assignment.service_time %}
+                        <span style="display: inline-flex; align-items: center; gap: 0.375rem; color: #334155;">
+                            <i class="fa-regular fa-clock" style="color: #94a3b8;"></i>
+                            {{ assignment.service_time|time:"H:i" }}
+                        </span>
+                        {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">Not set</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- STATUS -->
+                    <td style="white-space: nowrap;">
+                        {% if assignment.status == "ASSIGNED" %}
+                        <span class="pill pill-assigned">
+                            <i class="fa-solid fa-user-check"></i> Assigned
+                        </span>
+                        {% elif assignment.status == "COMPLETED" %}
+                        <span class="pill pill-completed">
+                            <i class="fa-solid fa-circle-check"></i> Completed
+                        </span>
+                        {% elif assignment.status == "CANCELLED" %}
+                        <span class="pill pill-cancelled">
+                            <i class="fa-solid fa-circle-xmark"></i> Cancelled
+                        </span>
+                        {% else %}
+                        <span class="pill pill-default">
+                            {{ assignment.get_status_display }}
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- ASSIGNED BY -->
+                    <td>
+                        {% if assignment.assigned_by %}
+                        {{ assignment.assigned_by.get_full_name|default:assignment.assigned_by.username }}
+                        {% else %}
+                        <span style="color: #64748b;">System</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- ASSIGNED AT -->
+                    <td style="font-size: 0.75rem; color: #64748b; white-space: nowrap;">
+                        {% if assignment.assigned_at %}
+                        <span>{{ assignment.assigned_at|date:"d M Y" }}</span>
+                        <span style="display: block; color: #94a3b8;">{{ assignment.assigned_at|time:"H:i" }}</span>
+                        {% else %}
+                        <span>—</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td style="text-align: right; white-space: nowrap;">
+                        <div class="action-group">
+                            <a href="{% url 'staff:assignment_edit' assignment.pk %}" class="icon-action-btn"
+                                title="Edit assignment">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <a href="{% url 'staff:caregiver_assignment_delete' assignment.pk %}"
+                                class="icon-action-btn danger" title="Delete assignment">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 3.5rem 1rem;">
+                        <div
+                            style="width: 3rem; height: 3rem; border-radius: 50%; background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.25rem;">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                        <h3 style="font-size: 1rem; font-weight: 600; color: #0f172a; margin: 0 0 0.25rem 0;">No
+                            caregiver assignments found</h3>
+                        <p style="font-size: 0.875rem; color: #64748b; margin: 0 auto 1.25rem auto; max-width: 300px;">
+                            {% if current_status %}
+                            There are no assignments matching your chosen status filter.
+                            {% else %}
+                            Get started by creating your first caregiver assignment record.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'staff:caregiver_assignment_add' %}" class="btn btn-primary"
+                            style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; text-decoration: none;">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Create Assignment</span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

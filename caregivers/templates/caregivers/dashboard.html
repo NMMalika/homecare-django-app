@@ -1,0 +1,726 @@
+{% extends "caregivers/base.html" %}
+
+{% block title %}
+Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid px-0 caregiver-dashboard-wrapper">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+
+    <div class="caregiver-page-header mb-4">
+        <div>
+            <div class="caregiver-eyebrow">
+                <i class="bi bi-shield-check"></i> Caregiver Portal
+            </div>
+            <h1 class="fw-extrabold mb-1">
+                Welcome back, {{ caregiver.name }}
+            </h1>
+            <p class="text-muted mb-0">
+                Monitor your active care assignments, track your metrics, and update patient progress.
+            </p>
+        </div>
+
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'caregivers:profile' %}"
+                class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 rounded-3 shadow-sm">
+                <i class="bi bi-person-gear"></i>
+                My Profile
+            </a>
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         STATISTICS
+    ========================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- PENDING -->
+        <div class="col-xl-4 col-md-6">
+            <a href="{% url 'caregivers:assignments' %}?status=pending" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 caregiver-stat-card warning-accent">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-category">Pending Assignments</span>
+                                <div class="display-6 fw-bold mt-2 text-dark">
+                                    {{ pending_count }}
+                                </div>
+                            </div>
+                            <div class="stat-icon-wrapper bg-warning-subtle text-warning">
+                                <i class="bi bi-clock-history fs-4"></i>
+                            </div>
+                        </div>
+                        <p class="small text-muted mt-3 mb-2">
+                            Assignments waiting for your acceptance.
+                        </p>
+                        <div class="small text-primary fw-semibold d-flex align-items-center gap-1">
+                            Review assignments
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <!-- ACTIVE -->
+        <div class="col-xl-4 col-md-6">
+            <a href="{% url 'caregivers:assignments' %}?status=active" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 caregiver-stat-card info-accent">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-category">Active Assignments</span>
+                                <div class="display-6 fw-bold mt-2 text-dark">
+                                    {{ active_count }}
+                                </div>
+                            </div>
+                            <div class="stat-icon-wrapper bg-info-subtle text-info">
+                                <i class="bi bi-clipboard2-check fs-4"></i>
+                            </div>
+                        </div>
+                        <p class="small text-muted mt-3 mb-2">
+                            Patients currently assigned to you.
+                        </p>
+                        <div class="small text-primary fw-semibold d-flex align-items-center gap-1">
+                            Manage active assignments
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <!-- COMPLETED -->
+        <div class="col-xl-4 col-md-6">
+            <a href="{% url 'caregivers:assignments' %}?status=completed" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 caregiver-stat-card success-accent">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="stat-category">Completed</span>
+                                <div class="display-6 fw-bold mt-2 text-dark">
+                                    {{ completed_count }}
+                                </div>
+                            </div>
+                            <div class="stat-icon-wrapper bg-success-subtle text-success">
+                                <i class="bi bi-check-circle fs-4"></i>
+                            </div>
+                        </div>
+                        <p class="small text-muted mt-3 mb-2">
+                            Successfully completed assignments.
+                        </p>
+                        <div class="small text-primary fw-semibold d-flex align-items-center gap-1">
+                            View completed
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MY ASSIGNMENTS
+    ========================================================== -->
+
+    <div id="assignments" class="card border-0 shadow-sm mb-4 caregiver-panel">
+
+        <div class="card-header bg-white border-0 p-4 pb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <span class="caregiver-eyebrow mb-1 d-block">Workflows</span>
+                    <h3 class="fw-bold mb-1 text-slate-800">
+                        My Assignments
+                    </h3>
+                    <p class="text-muted small mb-0">
+                        Accept, manage and complete your home-care assignments seamlessly.
+                    </p>
+                </div>
+
+                <a href="{% url 'caregivers:assignments' %}"
+                    class="btn btn-outline-primary btn-sm px-3 py-2 rounded-2 fw-semibold">
+                    <i class="bi bi-list-check me-1"></i>
+                    View All
+                </a>
+            </div>
+        </div>
+
+
+        <div class="card-body p-0">
+
+            {% if assignments %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light-subtle">
+                        <tr>
+                            <th class="px-4 py-3">Patient</th>
+                            <th class="py-3">Location</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Assigned Date</th>
+                            <th class="text-end px-4 py-3">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for assignment in assignments %}
+
+                        <tr>
+
+                            <!-- PATIENT -->
+                            <td class="px-4 py-3">
+                                <div class="fw-bold text-slate-800">
+                                    {{ assignment.homecare_request.full_name }}
+                                </div>
+                                {% if assignment.homecare_request.phone %}
+                                <div class="small text-muted mt-0.5">
+                                    <i class="bi bi-telephone me-1 text-primary"></i>
+                                    {{ assignment.homecare_request.phone }}
+                                </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- LOCATION -->
+                            <td class="py-3 text-secondary">
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-geo-alt text-muted small"></i>
+                                    {{ assignment.homecare_request.location|default:"—" }}
+                                </div>
+                            </td>
+
+                            <!-- STATUS -->
+                            <td class="py-3">
+                                {% if assignment.status == "PENDING" %}
+                                <span
+                                    class="badge rounded-pill bg-warning-subtle text-warning-emphasis px-3 py-2 fw-semibold">
+                                    <i class="bi bi-clock me-1"></i> Pending Acceptance
+                                </span>
+                                {% elif assignment.status == "ACCEPTED" %}
+                                <span
+                                    class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2 fw-semibold">
+                                    <i class="bi bi-check-circle me-1"></i> Accepted
+                                </span>
+                                {% elif assignment.status == "IN_PROGRESS" %}
+                                <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2 fw-semibold">
+                                    <i class="bi bi-play-circle me-1"></i> In Progress
+                                </span>
+                                {% elif assignment.status == "COMPLETED" %}
+                                <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2 fw-semibold">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Completed
+                                </span>
+                                {% elif assignment.status == "DECLINED" %}
+                                <span
+                                    class="badge rounded-pill bg-danger-subtle text-danger-emphasis px-3 py-2 fw-semibold">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Declined
+                                </span>
+                                {% elif assignment.status == "CANCELLED" %}
+                                <span
+                                    class="badge rounded-pill bg-secondary-subtle text-secondary px-3 py-2 fw-semibold">
+                                    <i class="bi bi-slash-circle me-1"></i> Cancelled
+                                </span>
+                                {% else %}
+                                <span class="badge rounded-pill bg-light text-dark px-3 py-2 fw-semibold">
+                                    {{ assignment.get_status_display }}
+                                </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- ASSIGNED DATE -->
+                            <td class="py-3">
+                                <span class="small text-secondary fw-medium">
+                                    {{ assignment.assigned_at|date:"d M Y" }}
+                                </span>
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td class="text-end px-4 py-3">
+
+                                <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+
+                                    <!-- PENDING / PENDING ACCEPTANCE -->
+                                    {% if assignment.status == "PENDING" or assignment.status == "PENDING_ACCEPTANCE" %}
+
+                                    <div class="caregiver-assignment-actions text-start">
+
+                                        <div
+                                            class="small fw-semibold text-warning mb-2 d-flex align-items-center gap-1">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            Action required
+                                        </div>
+
+                                        <!-- ACCEPT ASSIGNMENT -->
+                                        <form method="post"
+                                            action="{% url 'caregivers:assignment_accept' assignment.pk %}"
+                                            class="mb-2">
+
+                                            {% csrf_token %}
+
+                                            <button type="submit"
+                                                class="btn btn-success btn-sm caregiver-action-btn shadow-sm"
+                                                onclick="return confirm('Are you sure you want to accept this home-care assignment?');">
+
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                Accept Assignment
+
+                                            </button>
+
+                                        </form>
+
+                                        <!-- DECLINE ASSIGNMENT -->
+                                        <div class="decline-assignment-box">
+
+                                            <form method="post"
+                                                action="{% url 'caregivers:assignment_decline' assignment.pk %}"
+                                                class="decline-form"
+                                                onsubmit="return confirmDeclineAssignment('{{ assignment.pk }}');">
+
+                                                {% csrf_token %}
+
+                                                <div class="mb-2">
+
+                                                    <label for="response_note_{{ assignment.pk }}"
+                                                        class="form-label small fw-semibold text-danger mb-1">
+
+                                                        <i class="bi bi-chat-left-text me-1"></i>
+                                                        Reason for declining
+
+                                                    </label>
+
+                                                    <textarea name="response_note"
+                                                        id="response_note_{{ assignment.pk }}"
+                                                        class="form-control form-control-sm decline-reason" rows="3"
+                                                        placeholder="Please explain why you cannot accept this assignment..."
+                                                        required minlength="3"></textarea>
+
+                                                    <div class="form-text small mt-1">
+                                                        Your reason will be sent to the care coordination team.
+                                                    </div>
+
+                                                </div>
+
+                                                <button type="submit"
+                                                    class="btn btn-outline-danger btn-sm caregiver-action-btn shadow-sm">
+
+                                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                                    Decline Assignment
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                    {% elif assignment.status == "ACCEPTED" %}
+
+                                    <!-- START ASSIGNMENT -->
+                                    <form method="post" action="{% url 'caregivers:assignment_start' assignment.pk %}"
+                                        class="d-inline">
+
+                                        {% csrf_token %}
+
+                                        <button type="submit"
+                                            class="btn btn-sm btn-primary caregiver-action-btn shadow-sm"
+                                            onclick="return confirm('Start this assignment?');">
+
+                                            <i class="bi bi-play-circle-fill me-1"></i>
+                                            Start Assignment
+
+                                        </button>
+
+                                    </form>
+
+                                    {% elif assignment.status == "IN_PROGRESS" %}
+
+                                    <!-- ACTIVE ASSIGNMENT ACTIONS -->
+                                    <div class="caregiver-assignment-actions">
+
+                                        <a href="{% url 'caregivers:daily_report_create' assignment.pk %}"
+                                            class="btn btn-sm btn-primary caregiver-action-btn mb-2 shadow-sm">
+
+                                            <i class="bi bi-file-earmark-plus me-1"></i>
+                                            Daily Report
+
+                                        </a>
+
+                                        <a href="{% url 'caregivers:weekly_summary' assignment.pk %}"
+                                            class="btn btn-sm btn-outline-primary caregiver-action-btn">
+
+                                            <i class="bi bi-calendar-week me-1"></i>
+                                            Weekly Summary
+
+                                        </a>
+
+                                    </div>
+
+                                    {% elif assignment.status == "COMPLETED" %}
+
+                                    <!-- COMPLETED -->
+                                    <span class="text-success small fw-bold d-inline-flex align-items-center gap-1">
+
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Completed
+
+                                    </span>
+
+                                    {% elif assignment.status == "DECLINED" %}
+
+                                    <!-- DECLINED -->
+                                    <div class="text-end">
+
+                                        <span class="text-danger small fw-bold d-block">
+
+                                            <i class="bi bi-x-circle-fill me-1"></i>
+                                            Declined
+
+                                        </span>
+
+                                        {% if assignment.caregiver_response_note %}
+
+                                        <div class="small text-muted mt-1 text-truncate" style="max-width: 180px;"
+                                            title="{{ assignment.caregiver_response_note }}">
+
+                                            Reason provided
+
+                                        </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    {% else %}
+
+                                    <!-- OTHER STATUS -->
+                                    <span class="text-muted small">
+                                        No action available
+                                    </span>
+
+                                    {% endif %}
+
+                                    <!-- VIEW DETAILS -->
+                                    <a href="{% url 'caregivers:assignment_detail' assignment.pk %}"
+                                        class="btn btn-sm btn-outline-secondary px-3 rounded-2 fw-semibold">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        View
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <!-- NO ASSIGNMENTS -->
+            <div class="text-center py-5 px-3">
+                <div class="mb-3 text-muted opacity-50">
+                    <i class="bi bi-clipboard2-x display-4"></i>
+                </div>
+                <h5 class="fw-bold text-slate-800">No assignments found</h5>
+                <p class="text-muted mb-0 small">There are no care assignments currently linked to your profile.</p>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         PROFILE SUMMARY CARD
+    ========================================================== -->
+
+    <div id="profile" class="card border-0 shadow-sm mt-4 caregiver-panel">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center"
+                        style="width: 56px; height: 56px;">
+                        <i class="bi bi-person fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1 text-slate-800">
+                            {{ caregiver.name }}
+                        </h4>
+                        <div class="text-muted small">
+                            {{ caregiver.professional_title|default:"Caregiver Professional" }}
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'caregivers:profile' %}"
+                    class="btn btn-outline-primary btn-sm px-4 py-2 rounded-2 fw-semibold">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </a>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="text-muted small text-uppercase fw-bold tracking-wider mb-1">Email Address</div>
+                    <div class="fw-semibold text-slate-800 text-truncate">{{ caregiver.email|default:"—" }}</div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="text-muted small text-uppercase fw-bold tracking-wider mb-1">Phone Contact</div>
+                    <div class="fw-semibold text-slate-800">{{ caregiver.phone|default:"—" }}</div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="text-muted small text-uppercase fw-bold tracking-wider mb-1">Specialization</div>
+                    <div class="fw-semibold text-slate-800">{{ caregiver.specialization|default:"—" }}</div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="text-muted small text-uppercase fw-bold tracking-wider mb-1">Verification Status</div>
+                    <div class="fw-semibold text-success d-flex align-items-center gap-1">
+                        <i class="bi bi-patch-check-fill"></i>
+                        {{ caregiver.get_verification_status_display }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     DASHBOARD STYLING
+========================================================== -->
+
+{% block extra_css %}
+<style>
+    .caregiver-dashboard-wrapper {
+        max-width: 1550px;
+        margin: 0 auto;
+        padding-bottom: 3rem;
+    }
+
+    .caregiver-page-header {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .caregiver-eyebrow {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.375rem;
+    }
+
+    .fw-extrabold {
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+    }
+
+    .text-slate-800 {
+        color: #0f172a !important;
+    }
+
+    .caregiver-stat-card {
+        border-radius: 1rem !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01) !important;
+        transition: all 0.25s ease;
+        background: #ffffff;
+    }
+
+    .caregiver-stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.06) !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .stat-category {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+
+    .stat-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .caregiver-panel {
+        border-radius: 1rem !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01) !important;
+        overflow: hidden;
+    }
+
+    .table th {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        background-color: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .table td {
+        font-size: 0.875rem;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .caregiver-assignment-actions {
+        min-width: 170px;
+    }
+
+    .caregiver-action-btn {
+        width: 100%;
+        min-height: 36px;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    .modal-content {
+        border-radius: 1rem !important;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.05em;
+    }
+
+    /* =========================================================
+       DECLINE ASSIGNMENT
+    ========================================================== */
+
+    .decline-assignment-box {
+        background: #fff7f7;
+        border: 1px solid #fecaca;
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .decline-form {
+        width: 100%;
+    }
+
+    .decline-reason {
+        resize: vertical;
+        min-height: 75px;
+        border-color: #fca5a5;
+        background: #ffffff;
+        font-size: 0.8rem;
+    }
+
+    .decline-reason:focus {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.12);
+    }
+
+    .decline-reason::placeholder {
+        color: #94a3b8;
+    }
+
+    .decline-assignment-box .form-text {
+        color: #64748b;
+        line-height: 1.35;
+    }
+
+    .decline-assignment-box .btn-outline-danger {
+        border-width: 1px;
+    }
+
+    @media (max-width: 767.98px) {
+        .caregiver-page-header {
+            padding: 1.25rem;
+        }
+
+        .caregiver-assignment-actions {
+            min-width: 140px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDeclineAssignment(assignmentId) {
+        const textarea = document.getElementById(
+            "response_note_" + assignmentId
+        );
+
+        if (!textarea) {
+            return false;
+        }
+
+        const reason = textarea.value.trim();
+
+        if (!reason) {
+            alert("Please provide a reason for declining this assignment.");
+            textarea.focus();
+            return false;
+        }
+
+        if (reason.length < 3) {
+            alert("Please provide a little more detail about why you are declining this assignment.");
+            textarea.focus();
+            return false;
+        }
+
+        return confirm(
+            "Are you sure you want to decline this assignment?\n\n" +
+            "Your reason will be sent to the care coordination team."
+        );
+    }
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,427 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+{{ title }} | Hands-On Health
+{% endblock %}
+
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="page-kicker">
+            HOME CARE
+        </div>
+
+        <h1>
+            {{ title }}
+        </h1>
+
+        <p>
+            {% if homecare_request %}
+            Update the patient's home care request.
+            {% else %}
+            Create a new home care request for a patient.
+            {% endif %}
+        </p>
+
+    </div>
+
+
+    <div>
+
+        <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to Requests
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<form method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+
+    <!-- =====================================================
+         PATIENT INFORMATION
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>
+                    <i class="fa-solid fa-user"></i>
+                    Patient Information
+                </h2>
+
+                <span>
+                    Patient contact and location details
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="{{ form.full_name.id_for_label }}">
+                    Full Name
+                    <span class="required">*</span>
+                </label>
+
+                {{ form.full_name }}
+
+                {% if form.full_name.errors %}
+
+                <div class="field-error">
+                    {{ form.full_name.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.phone.id_for_label }}">
+                    Phone Number
+                    <span class="required">*</span>
+                </label>
+
+                {{ form.phone }}
+
+                {% if form.phone.errors %}
+
+                <div class="field-error">
+                    {{ form.phone.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email Address
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+
+                <div class="field-error">
+                    {{ form.email.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.city.id_for_label }}">
+                    City / Town
+                </label>
+
+                {{ form.city }}
+
+                {% if form.city.errors %}
+
+                <div class="field-error">
+                    {{ form.city.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="{{ form.address.id_for_label }}">
+                    Home Address
+                </label>
+
+                {{ form.address }}
+
+                {% if form.address.errors %}
+
+                <div class="field-error">
+                    {{ form.address.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SERVICE INFORMATION
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>
+                    <i class="fa-solid fa-hand-holding-medical"></i>
+                    Care Requirements
+                </h2>
+
+                <span>
+                    Select the services requested by the patient
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <div class="form-group full-width">
+
+                <label for="{{ form.services.id_for_label }}">
+
+                    Services
+
+                </label>
+
+                {{ form.services }}
+
+                <small class="form-help">
+
+                    Hold Ctrl/Cmd to select multiple services.
+
+                </small>
+
+                {% if form.services.errors %}
+
+                <div class="field-error">
+                    {{ form.services.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.preferred_date.id_for_label }}">
+
+                    Preferred Date
+
+                </label>
+
+                {{ form.preferred_date }}
+
+                {% if form.preferred_date.errors %}
+
+                <div class="field-error">
+                    {{ form.preferred_date.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.preferred_time.id_for_label }}">
+
+                    Preferred Time
+
+                </label>
+
+                {{ form.preferred_time }}
+
+                {% if form.preferred_time.errors %}
+
+                <div class="field-error">
+                    {{ form.preferred_time.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="{{ form.description.id_for_label }}">
+
+                    Patient Requirements / Description
+
+                </label>
+
+                {{ form.description }}
+
+                {% if form.description.errors %}
+
+                <div class="field-error">
+                    {{ form.description.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADMINISTRATION
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    Administration
+                </h2>
+
+                <span>
+                    Internal processing information
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="{{ form.status.id_for_label }}">
+                    Request Status
+                </label>
+
+                {{ form.status }}
+
+                {% if form.status.errors %}
+
+                <div class="field-error">
+                    {{ form.status.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="{{ form.admin_notes.id_for_label }}">
+
+                    Admin Notes
+
+                </label>
+
+                {{ form.admin_notes }}
+
+                {% if form.admin_notes.errors %}
+
+                <div class="field-error">
+                    {{ form.admin_notes.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NON-FIELD ERRORS
+         ===================================================== -->
+
+    {% if form.non_field_errors %}
+
+    <div class="card">
+
+        <div class="field-error">
+
+            {{ form.non_field_errors }}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         FORM ACTIONS
+         ===================================================== -->
+
+    <div class="form-footer">
+
+        <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary">
+
+            <i class="fa-solid fa-xmark"></i>
+
+            Cancel
+
+        </a>
+
+
+        <button type="submit" class="btn btn-primary">
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            {% if homecare_request %}
+
+            Save Changes
+
+            {% else %}
+
+            Create Home Care Request
+
+            {% endif %}
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

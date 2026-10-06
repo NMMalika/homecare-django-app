@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Referral Submitted - Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homecare/css/referral_submitted.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-4">
+    <div class="row justify-content-center me-0 ms-0">
+        <div class="col-12 col-md-10 col-lg-7 mx-auto text-center">
+
+            <div class="card referral-success-card border-0 shadow-sm p-4 p-md-5">
+
+                <!-- Animated Icon Wrapper -->
+                <div class="success-icon-wrapper mb-4 mx-auto">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <!-- Header Info -->
+                <span class="badge bg-success-soft text-success fw-semibold px-3 py-2 rounded-pill mb-3">
+                    Partner Program
+                </span>
+
+                <h1 class="h2 fw-bold text-slate-800 mb-3">
+                    Thank You for Your Referral!
+                </h1>
+
+                <p class="text-slate-600 lead-sm mb-4">
+                    We have successfully received your patient referral. Our care management team will review the
+                    details promptly to prepare a personalized care quotation.
+                </p>
+
+                <!-- Information Note -->
+                <div class="alert alert-info-soft rounded-3 p-3 text-start mb-4">
+                    <div class="d-flex gap-3 align-items-center">
+                        <i class="fa-solid fa-bell text-primary fs-5"></i>
+                        <p class="mb-0 small text-slate-700">
+                            Once the patient confirms and completes their service payment, you will receive an official
+                            confirmation notification from our team.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 pt-2">
+                    <a href="{% url 'homecare:referral' %}"
+                        class="btn btn-outline-primary px-4 py-3 rounded-3 fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Refer Another Patient
+                    </a>
+                    <a href="{% url 'home' %}"
+                        class="btn btn-primary px-4 py-3 rounded-3 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2">
+                        <i class="fa-solid fa-house"></i> Return to Home
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

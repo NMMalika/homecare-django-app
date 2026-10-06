@@ -1,0 +1,843 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+Referral Management | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .referrals-page {
+        width: 100%;
+        max-width: 1550px;
+        margin: 0 auto;
+        padding-bottom: 3.5rem;
+    }
+
+    .referrals-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .referrals-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .referrals-header h1 {
+        margin: 0 0 4px;
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+    }
+
+    .referrals-header p {
+        margin: 0;
+        color: #475569;
+        font-size: 0.9375rem;
+    }
+
+    .referral-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .referral-stat {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .referral-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .referral-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .referral-stat-content {
+        min-width: 0;
+    }
+
+    .referral-stat-value {
+        display: block;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.1;
+    }
+
+    .referral-stat-label {
+        display: block;
+        margin-top: 0.375rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+
+    .referral-toolbar {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .referral-filter-form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .referral-search {
+        flex: 1;
+        min-width: 280px;
+        position: relative;
+    }
+
+    .referral-search i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+
+    .referral-search input {
+        width: 100%;
+        box-sizing: border-box;
+        height: 42px;
+        padding: 0.625rem 1rem 0.625rem 2.5rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        outline: none;
+        font-size: 0.875rem;
+        background-color: #ffffff;
+        color: #1e293b;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .referral-search input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .referral-status-select {
+        height: 42px;
+        min-width: 200px;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background: #f8fafc;
+        color: #1e293b;
+        font-size: 0.875rem;
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+    }
+
+    .referral-status-select:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .referral-filter-button {
+        height: 42px;
+        padding: 0 1.25rem;
+        border: 0;
+        border-radius: 0.5rem;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .referral-filter-button:hover {
+        background: #1d4ed8;
+    }
+
+    .referral-reset-button {
+        height: 42px;
+        padding: 0 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .referral-reset-button:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .referrals-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .referrals-card-header {
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .referrals-card-header h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .referrals-card-header h2 i {
+        color: #2563eb;
+    }
+
+    .referrals-card-header span {
+        font-size: 0.8125rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .referrals-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .referrals-table {
+        width: 100%;
+        min-width: 1100px;
+        border-collapse: collapse;
+        background: #ffffff;
+    }
+
+    .referrals-table th {
+        padding: 1rem 1.25rem;
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .referrals-table td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 0.875rem;
+        color: #1e293b;
+    }
+
+    .referrals-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .referrals-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .referrals-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .referral-index {
+        font-weight: 700;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+    }
+
+    .person-name {
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .person-detail {
+        color: #64748b;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        margin-top: 0.125rem;
+    }
+
+    .services-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        max-width: 240px;
+    }
+
+    .service-tag {
+        display: inline-flex;
+        padding: 0.25rem 0.625rem;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid #dbeafe;
+    }
+
+    .no-service {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        font-style: italic;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: #c2410c;
+        border: 1px solid #ffedd5;
+    }
+
+    .status-completed {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #d1fae5;
+    }
+
+    .homecare-linked {
+        color: #047857;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.8125rem;
+    }
+
+    .homecare-not-linked {
+        color: #94a3b8;
+        font-size: 0.8125rem;
+    }
+
+    .points {
+        font-weight: 700;
+        color: #7c3aed;
+        background: #f5f3ff;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.8125rem;
+        border: 1px solid #ede9fe;
+    }
+
+    .referral-date {
+        white-space: nowrap;
+    }
+
+    .referral-date-main {
+        font-weight: 600;
+        color: #334155;
+        font-size: 0.8125rem;
+    }
+
+    .referral-date-time {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-top: 0.125rem;
+    }
+
+    .referrals-empty {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .referrals-empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+    }
+
+    .referrals-empty h3 {
+        margin: 0 0 7px;
+        color: #334155;
+        font-size: 17px;
+    }
+
+    .referrals-empty p {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+        .referral-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .referrals-header {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .referral-filter-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .referral-search {
+            min-width: 100%;
+        }
+
+        .referral-status-select,
+        .referral-filter-button,
+        .referral-reset-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="referrals-page">
+
+    <!-- HEADER -->
+    <div class="referrals-header">
+        <div>
+            <div class="referrals-kicker">
+                <i class="fa-solid fa-share-nodes"></i> Partnership & Growth
+            </div>
+            <h1>Referral Management</h1>
+            <p>
+                Manage patient referrals, track attribution statuses, and monitor loyalty incentives.
+            </p>
+        </div>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="referral-stats">
+
+        <div class="referral-stat">
+            <div class="referral-stat-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="referral-stat-content">
+                <span class="referral-stat-value">
+                    {{ total_referrals }}
+                </span>
+
+                <span class="referral-stat-label">
+                    Total Referrals
+                </span>
+            </div>
+        </div>
+
+
+        <div class="referral-stat">
+            <div class="referral-stat-icon" style="background: #fff7ed; color: #c2410c;">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+
+            <div class="referral-stat-content">
+                <span class="referral-stat-value">
+                    {{ pending_referrals }}
+                </span>
+
+                <span class="referral-stat-label">
+                    Pending Payment
+                </span>
+            </div>
+        </div>
+
+
+        <div class="referral-stat">
+            <div class="referral-stat-icon" style="background: #ecfdf5; color: #047857;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div class="referral-stat-content">
+                <span class="referral-stat-value">
+                    {{ completed_referrals }}
+                </span>
+
+                <span class="referral-stat-label">
+                    Completed & Paid
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- FILTERS -->
+    <div class="referral-toolbar">
+
+        <form method="get" action="{% url 'staff:referrals' %}" class="referral-filter-form">
+
+            <div class="referral-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text" name="q" value="{{ search }}"
+                    placeholder="Search referrer, patient, phone, email or facility...">
+            </div>
+
+
+            <select name="status" class="referral-status-select">
+
+                <option value="">
+                    All Statuses
+                </option>
+
+                {% for value, label in status_choices %}
+
+                <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <button type="submit" class="referral-filter-button">
+                <i class="fa-solid fa-filter"></i>
+                Filter Records
+            </button>
+
+
+            <a href="{% url 'staff:referrals' %}" class="referral-reset-button">
+                Reset
+            </a>
+
+        </form>
+
+    </div>
+
+
+    <!-- REFERRALS TABLE -->
+    <div class="referrals-card">
+
+        <div class="referrals-card-header">
+
+            <h2>
+                <i class="fa-solid fa-list-check"></i> Referral Records
+            </h2>
+
+            <span>
+                Showing {{ referrals|length }} record{{ referrals|length|pluralize }}
+            </span>
+
+        </div>
+
+
+        {% if referrals %}
+
+        <div class="referrals-table-wrapper">
+
+            <table class="referrals-table">
+
+                <thead>
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Referrer</th>
+
+                        <th>Patient</th>
+
+                        <th>Services Needed</th>
+
+                        <th>Status</th>
+
+                        <th>Home Care</th>
+
+                        <th>Loyalty Points</th>
+
+                        <th>Created Date</th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% for referral in referrals %}
+
+                    <tr>
+
+                        <!-- INDEX NUMBER -->
+                        <td>
+                            <span class="referral-index">
+                                {{ forloop.counter }}
+                            </span>
+                        </td>
+
+
+                        <!-- REFERRER -->
+                        <td>
+
+                            <div class="person-name">
+                                {{ referral.referrer_name }}
+                            </div>
+
+                            {% if referral.referrer_email %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                {{ referral.referrer_email }}
+                            </div>
+                            {% endif %}
+
+                            {% if referral.referrer_phone %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ referral.referrer_phone }}
+                            </div>
+                            {% endif %}
+
+                            {% if referral.referring_facility %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-hospital"></i>
+                                {{ referral.referring_facility }}
+                            </div>
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PATIENT -->
+                        <td>
+
+                            <div class="person-name">
+                                {{ referral.patient_name }}
+                            </div>
+
+                            {% if referral.patient_email %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                {{ referral.patient_email }}
+                            </div>
+                            {% endif %}
+
+                            {% if referral.patient_phone %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ referral.patient_phone }}
+                            </div>
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SERVICES -->
+                        <td>
+
+                            {% if referral.services_needed.all %}
+
+                            <div class="services-list">
+
+                                {% for service in referral.services_needed.all %}
+
+                                <span class="service-tag">
+                                    {{ service }}
+                                </span>
+
+                                {% empty %}
+
+                                <span class="no-service">
+                                    No services selected
+                                </span>
+
+                                {% endfor %}
+
+                            </div>
+
+                            {% else %}
+
+                            <span class="no-service">
+                                No services selected
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if referral.status == "PENDING" %}
+
+                            <span class="status-badge status-pending">
+                                <i class="fa-solid fa-clock"></i>
+                                &nbsp;Pending Payment
+                            </span>
+
+                            {% elif referral.status == "COMPLETED" %}
+
+                            <span class="status-badge status-completed">
+                                <i class="fa-solid fa-check"></i>
+                                &nbsp;Completed & Paid
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-badge">
+                                {{ referral.get_status_display }}
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- HOME CARE -->
+                        <td>
+
+                            {% if referral.homecare_request %}
+
+                            <span class="homecare-linked">
+                                <i class="fa-solid fa-link"></i>
+                                Linked
+                            </span>
+
+                            {% else %}
+
+                            <span class="homecare-not-linked">
+                                Not linked
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- LOYALTY POINTS -->
+                        <td>
+
+                            <span class="points">
+                                {{ referral.loyalty_points_awarded }} pts
+                            </span>
+
+                        </td>
+
+
+                        <!-- CREATED -->
+                        <td class="referral-date">
+
+                            <div class="referral-date-main">
+                                {{ referral.created_at|date:"d M Y" }}
+                            </div>
+
+                            <div class="referral-date-time">
+                                {{ referral.created_at|date:"H:i" }}
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="referrals-empty">
+
+            <div class="referrals-empty-icon">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+
+            <h3>
+                No referrals found
+            </h3>
+
+            <p>
+                No referral records match your current search or filter criteria.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

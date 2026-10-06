@@ -1,0 +1,709 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}
+Create Quotation - Hands-On Health Staff
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Professional Quotation Workspace Styling */
+    .quotation-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
+
+    .quotation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .quotation-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .quotation-title {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .patient-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        color: #475569;
+    }
+
+    .patient-badge strong {
+        color: #0f172a;
+    }
+
+    /* Cards & Containers */
+    .quotation-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .quotation-card-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .quotation-card-header h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .quotation-card-header h5 i {
+        color: #2563eb;
+    }
+
+    .quotation-card-body {
+        padding: 1.75rem;
+    }
+
+    /* Form Fields & Inputs */
+    .form-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.375rem;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        background-color: #f8fafc;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .input-group-text {
+        background-color: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+
+    .input-group .form-control {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    /* Quotation Item Rows */
+    .quotation-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important;
+        padding: 1.25rem !important;
+        margin-bottom: 1rem !important;
+        transition: all 0.2s ease;
+    }
+
+    .quotation-item:hover {
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .line-total {
+        background: #ffffff !important;
+        font-weight: 700;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Summary Card Styling */
+    .summary-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-size: 0.9375rem;
+        color: #475569;
+    }
+
+    .summary-row strong {
+        color: #1e293b;
+    }
+
+    .grand-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #cbd5e1;
+    }
+
+    /* Action Buttons */
+    .btn-primary-custom {
+        background: #2563eb;
+        color: #ffffff;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.625rem 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-primary-custom:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+    }
+
+    .btn-success-custom {
+        background: #16a34a;
+        color: #ffffff;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.75rem 1.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-success-custom:hover {
+        background: #15803d;
+        color: #ffffff;
+    }
+
+    .btn-secondary-custom {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.75rem 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .remove-service {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+    }
+</style>
+
+<div class="quotation-wrapper">
+
+    <!-- Header Section -->
+    <div class="quotation-header">
+        <div>
+            <div class="quotation-kicker">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Financial Document Workspace
+            </div>
+            <h1 class="quotation-title">Create Quotation</h1>
+        </div>
+
+        {% if homecare_request or consultation %}
+        <div class="patient-badge">
+            <i class="fa-regular fa-user text-primary"></i>
+            <span>Patient:
+                <strong>
+                    {% if homecare_request %}
+                    {{ homecare_request.full_name }}
+                    {% elif consultation %}
+                    {{ consultation.first_name }} {{ consultation.last_name }}
+                    {% endif %}
+                </strong>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} border-0 shadow-sm rounded-3 mb-4">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" id="quotationForm">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- ==================================================
+             QUOTATION ITEMS
+        =================================================== -->
+        <div class="quotation-card">
+            <div class="quotation-card-header">
+                <div>
+                    <h5>
+                        <i class="fa-solid fa-list-check"></i>
+                        Quotation Services
+                    </h5>
+                    <small class="text-muted" style="font-size: 0.8125rem;">Select an existing pre-configured service or
+                        specify custom line items.</small>
+                </div>
+                <button type="button" class="btn-primary-custom" id="addServiceBtn">
+                    <i class="fa-solid fa-plus"></i> Add Service Line
+                </button>
+            </div>
+
+            <div class="quotation-card-body">
+                {{ item_formset.management_form }}
+
+                {% if item_formset.non_form_errors %}
+                <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-3">
+                    {{ item_formset.non_form_errors }}
+                </div>
+                {% endif %}
+
+                <div id="quotationItems" data-formset-prefix="{{ item_formset.prefix }}">
+                    {% for item_form in item_formset %}
+                    <div class="quotation-item" data-item-row>
+                        {% for hidden in item_form.hidden_fields %}
+                        {{ hidden }}
+                        {% endfor %}
+
+                        <div class="row g-3 align-items-end">
+                            <!-- SERVICE -->
+                            <div class="col-lg-4">
+                                <label class="form-label">Service Directory</label>
+                                {{ item_form.service }}
+                                {% if item_form.service.errors %}
+                                <div class="text-danger small mt-1">{{ item_form.service.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- SERVICE NAME -->
+                            <div class="col-lg-3">
+                                <label class="form-label">Custom Service Name</label>
+                                {{ item_form.name }}
+                                {% if item_form.name.errors %}
+                                <div class="text-danger small mt-1">{{ item_form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- QUANTITY -->
+                            <div class="col-lg-1">
+                                <label class="form-label">Qty</label>
+                                {{ item_form.quantity }}
+                                {% if item_form.quantity.errors %}
+                                <div class="text-danger small mt-1">{{ item_form.quantity.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- UNIT PRICE -->
+                            <div class="col-lg-2">
+                                <label class="form-label">Unit Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">N$</span>
+                                    {{ item_form.unit_price }}
+                                </div>
+                                {% if item_form.unit_price.errors %}
+                                <div class="text-danger small mt-1">{{ item_form.unit_price.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- LINE TOTAL -->
+                            <div class="col-lg-1">
+                                <label class="form-label">Total</label>
+                                <div class="form-control line-total">N$ 0.00</div>
+                            </div>
+
+                            <!-- REMOVE -->
+                            <div class="col-lg-1">
+                                <button type="button" class="btn btn-outline-danger remove-service"
+                                    title="Remove line item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <label class="form-label">Item Description / Notes</label>
+                                {{ item_form.description }}
+                            </div>
+                        </div>
+
+                        {% if item_form.DELETE %}
+                        <div class="d-none">{{ item_form.DELETE }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- EMPTY TEMPLATE FOR JAVASCRIPT -->
+                <template id="emptyQuotationItem">
+                    <div class="quotation-item" data-item-row>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-lg-4">
+                                <label class="form-label">Service Directory</label>
+                                {{ item_formset.empty_form.service }}
+                            </div>
+                            <div class="col-lg-3">
+                                <label class="form-label">Custom Service Name</label>
+                                {{ item_formset.empty_form.name }}
+                            </div>
+                            <div class="col-lg-1">
+                                <label class="form-label">Qty</label>
+                                {{ item_formset.empty_form.quantity }}
+                            </div>
+                            <div class="col-lg-2">
+                                <label class="form-label">Unit Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">N$</span>
+                                    {{ item_formset.empty_form.unit_price }}
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <label class="form-label">Total</label>
+                                <div class="form-control line-total">N$ 0.00</div>
+                            </div>
+                            <div class="col-lg-1">
+                                <button type="button" class="btn btn-outline-danger remove-service"
+                                    title="Remove line item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <label class="form-label">Item Description / Notes</label>
+                                {{ item_formset.empty_form.description }}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- ==================================================
+             ADDITIONAL CHARGES & NOTES GRID
+        =================================================== -->
+        <div class="row">
+            <div class="col-lg-7">
+                <!-- ADDITIONAL CHARGES -->
+                <div class="quotation-card">
+                    <div class="quotation-card-header">
+                        <h5>
+                            <i class="fa-solid fa-calculator"></i> Additional Adjustments
+                        </h5>
+                    </div>
+                    <div class="quotation-card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Transportation Fee</label>
+                                {{ form.transportation_fee }}
+                                {% if form.transportation_fee.errors %}
+                                <div class="text-danger small mt-1">{{ form.transportation_fee.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Discount Code</label>
+                                {{ form.discount_code }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Discount Amount</label>
+                                {{ form.discount_amount }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTES -->
+                <div class="quotation-card">
+                    <div class="quotation-card-header">
+                        <h5>
+                            <i class="fa-regular fa-note-sticky"></i> Quotation Terms & Notes
+                        </h5>
+                    </div>
+                    <div class="quotation-card-body">
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <!-- TOTAL SUMMARY -->
+                <div class="quotation-card">
+                    <div class="quotation-card-header">
+                        <h5>
+                            <i class="fa-solid fa-receipt"></i> Summary Calculation
+                        </h5>
+                    </div>
+                    <div class="quotation-card-body">
+                        <div class="summary-box">
+                            <div class="summary-row">
+                                <span>Services Subtotal</span>
+                                <strong id="servicesSubtotal">N$ 0.00</strong>
+                            </div>
+                            <div class="summary-row">
+                                <span>Transportation Fee</span>
+                                <strong id="transportTotal">N$ 0.00</strong>
+                            </div>
+                            <div class="summary-row">
+                                <span>Applied Discount</span>
+                                <strong id="discountTotal">N$ 0.00</strong>
+                            </div>
+
+                            <div class="grand-total-row">
+                                <span class="fw-bold text-slate-800" style="font-size: 1.1rem;">Final Payable
+                                    Total</span>
+                                <strong class="text-success" style="font-size: 1.5rem;" id="grandTotal">N$ 0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================
+             SUBMISSION BUTTONS
+        =================================================== -->
+        <div class="d-flex justify-content-end gap-3 mt-4">
+            <a href="{% if homecare_request %}{% url 'admin:homecare_homecarerequest_change' homecare_request.pk %}{% elif consultation %}{% url 'admin:homecare_consultation_change' consultation.pk %}{% endif %}"
+                class="btn-secondary-custom">
+                <i class="fa-solid fa-arrow-left"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn-success-custom">
+                <i class="fa-solid fa-paper-plane"></i> Save & Send Quotation
+            </button>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById("quotationItems");
+        const addButton = document.getElementById("addServiceBtn");
+        const template = document.getElementById("emptyQuotationItem");
+        const totalForms = document.getElementById("id_{{ item_formset.prefix }}-TOTAL_FORMS");
+
+        function money(value) {
+            value = Number(value || 0);
+            return "N$ " + value.toFixed(2);
+        }
+
+        function numberValue(input) {
+            if (!input) return 0;
+            const value = parseFloat(input.value);
+            return isNaN(value) ? 0 : value;
+        }
+
+        function calculateRow(row) {
+            const quantityInput = row.querySelector(".quotation-quantity");
+            const priceInput = row.querySelector(".quotation-unit-price");
+            const totalElement = row.querySelector(".line-total");
+
+            const quantity = numberValue(quantityInput);
+            const price = numberValue(priceInput);
+            const total = quantity * price;
+
+            if (totalElement) {
+                totalElement.textContent = money(total);
+            }
+            return total;
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+
+            document.querySelectorAll("[data-item-row]").forEach(function (row) {
+                const deleteInput = row.querySelector('input[name$="-DELETE"]');
+                if (deleteInput && deleteInput.checked) return;
+                subtotal += calculateRow(row);
+            });
+
+            const transportInput = document.getElementById("id_transportation_fee");
+            const discountInput = document.getElementById("id_discount_amount");
+
+            const transportation = numberValue(transportInput);
+            const discount = numberValue(discountInput);
+            const grandTotal = Math.max(0, subtotal + transportation - discount);
+
+            document.getElementById("servicesSubtotal").textContent = money(subtotal);
+            document.getElementById("transportTotal").textContent = money(transportation);
+            document.getElementById("discountTotal").textContent = money(discount);
+            document.getElementById("grandTotal").textContent = money(grandTotal);
+        }
+
+        function setupServiceSelector(row) {
+            const serviceSelect = row.querySelector(".quotation-service");
+            const nameInput = row.querySelector(".quotation-name");
+            const priceInput = row.querySelector(".quotation-unit-price");
+
+            if (!serviceSelect) return;
+
+            serviceSelect.addEventListener("change", function () {
+                const selected = serviceSelect.options[serviceSelect.selectedIndex];
+
+                if (!serviceSelect.value) {
+                    nameInput.value = "";
+                    priceInput.value = "";
+                    nameInput.readOnly = false;
+                    return;
+                }
+
+                nameInput.value = selected.text.replace(/\s*\(N\$.*\)$/, "");
+                const servicePrice = selected.dataset.price;
+                if (servicePrice !== undefined) {
+                    priceInput.value = servicePrice;
+                }
+                nameInput.readOnly = false;
+                calculateTotals();
+            });
+        }
+
+        function initializeRows() {
+            document.querySelectorAll("[data-item-row]").forEach(function (row) {
+                setupServiceSelector(row);
+                const quantityInput = row.querySelector(".quotation-quantity");
+                const priceInput = row.querySelector(".quotation-unit-price");
+
+                if (quantityInput) quantityInput.addEventListener("input", calculateTotals);
+                if (priceInput) priceInput.addEventListener("input", calculateTotals);
+
+                const removeButton = row.querySelector(".remove-service");
+                if (removeButton) {
+                    removeButton.addEventListener("click", function () {
+                        removeRow(row);
+                    });
+                }
+            });
+        }
+
+        function removeRow(row) {
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            if (deleteInput) {
+                deleteInput.checked = true;
+                row.style.display = "none";
+            } else {
+                row.remove();
+            }
+            calculateTotals();
+        }
+
+        addButton.addEventListener("click", function () {
+            const index = parseInt(totalForms.value, 10);
+            let html = template.innerHTML.replace(/__prefix__/g, index);
+
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = html.trim();
+            const row = wrapper.firstElementChild;
+
+            container.appendChild(row);
+            totalForms.value = index + 1;
+
+            setupServiceSelector(row);
+
+            const quantityInput = row.querySelector(".quotation-quantity");
+            const priceInput = row.querySelector(".quotation-unit-price");
+
+            if (quantityInput) quantityInput.addEventListener("input", calculateTotals);
+            if (priceInput) priceInput.addEventListener("input", calculateTotals);
+
+            const removeButton = row.querySelector(".remove-service");
+            if (removeButton) {
+                removeButton.addEventListener("click", function () {
+                    removeRow(row);
+                });
+            }
+
+            calculateTotals();
+        });
+
+        const transportInput = document.getElementById("id_transportation_fee");
+        const discountInput = document.getElementById("id_discount_amount");
+
+        if (transportInput) transportInput.addEventListener("input", calculateTotals);
+        if (discountInput) discountInput.addEventListener("input", calculateTotals);
+
+        initializeRows();
+        calculateTotals();
+    });
+</script>
+{% endblock %}

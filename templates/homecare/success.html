@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Request Received | Hands-On Health
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homecare/css/request_received.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-4">
+    <div class="row justify-content-center me-0 ms-0">
+        <div class="col-12 col-md-10 col-lg-7 mx-auto text-center">
+
+            <div class="card request-success-card border-0 shadow-sm p-4 p-md-5">
+
+                <!-- Animated Icon Wrapper -->
+                <div class="success-icon-wrapper mb-4 mx-auto">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <!-- Header Info -->
+                <span class="badge bg-success-soft text-success fw-semibold px-3 py-2 rounded-pill mb-3">
+                    Submission Successful
+                </span>
+
+                <h1 class="h2 fw-bold text-slate-800 mb-3">
+                    Request Received
+                </h1>
+
+                <p class="text-slate-600 lead-sm mb-4">
+                    Thank you for reaching out to <strong>Hands-On Health</strong>. We have received your home care
+                    request, and our clinical care coordination team will review your details and contact you shortly to
+                    confirm arrangements.
+                </p>
+
+                <!-- Reference Badge Box -->
+                {% if reference %}
+                <div class="reference-badge-box p-3 rounded-3 mb-4 mx-auto">
+                    <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tracking Code</span>
+                    <span class="fs-5 fw-bold text-slate-800 tracking-wider">
+                        #{{ reference }}
+                    </span>
+                </div>
+                {% endif %}
+
+                <!-- Information Note -->
+                <div class="alert alert-info-soft rounded-3 p-3 text-start mb-4">
+                    <div class="d-flex gap-3 align-items-center">
+                        <i class="fa-solid fa-bell text-primary fs-5"></i>
+                        <p class="mb-0 small text-slate-700">
+                            Please keep an eye on your email inbox or mobile phone. We usually respond within a few
+                            hours.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-2">
+                    <a href="{% url 'home' %}"
+                        class="btn btn-primary px-4 py-3 rounded-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                        <i class="fa-solid fa-house"></i> Return to Homepage
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Delete Caregiver Assignment | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Professional Deletion Modal / Page Overhaul */
+    .delete-wrapper {
+        max-width: 650px;
+        margin: 0 auto;
+        padding-bottom: 3rem;
+    }
+
+    .delete-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .delete-header-titles h1 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.25rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .delete-header-titles h1 i {
+        color: #dc2626;
+        font-size: 1.5rem;
+    }
+
+    .delete-header-titles p {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* Main Card Container */
+    .delete-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.05), 0 8px 10px -6px rgba(220, 38, 38, 0.05);
+        overflow: hidden;
+    }
+
+    .delete-card-header {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: #ffffff;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .delete-card-header h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .delete-card-body {
+        padding: 2rem 1.5rem;
+    }
+
+    /* Warning Banner Icon */
+    .warning-icon-wrap {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        background: #fee2e2;
+        color: #dc2626;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin: 0 auto 1rem auto;
+    }
+
+    /* Details Summary Box */
+    .assignment-summary-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.875rem;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        margin-bottom: 0.625rem;
+    }
+
+    .summary-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-label {
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .summary-value {
+        color: #0f172a;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    /* Alert Box */
+    .warning-alert {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        color: #92400e;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        display: flex;
+        gap: 0.875rem;
+        align-items: flex-start;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .warning-alert i {
+        color: #d97706;
+        font-size: 1.125rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .warning-alert strong {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 0.125rem;
+    }
+
+    /* Action Footer Buttons */
+    .delete-actions {
+        border-top: 1px solid #e2e8f0;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .btn-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-custom-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+
+    .btn-custom-secondary:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .btn-custom-danger {
+        background: #dc2626;
+        color: #ffffff;
+        border: 1px solid transparent;
+    }
+
+    .btn-custom-danger:hover {
+        background: #b91c1c;
+    }
+
+    /* Status Badge Overrides */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #e2e8f0;
+        color: #334155;
+    }
+</style>
+
+<div class="delete-wrapper">
+
+    <!-- Header -->
+    <div class="delete-header">
+        <div class="delete-header-titles">
+            <h1>
+                <i class="fa-solid fa-trash-can"></i>
+                Delete Caregiver Assignment
+            </h1>
+            <p>
+                Confirm that you want to permanently remove this caregiver assignment record.
+            </p>
+        </div>
+
+        <a href="{% url 'staff:caregiver_assignments' %}" class="btn-custom btn-custom-secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Assignments</span>
+        </a>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="delete-card">
+
+        <div class="delete-card-header">
+            <h5>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Confirm Deletion Request
+            </h5>
+        </div>
+
+        <div class="delete-card-body">
+
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div class="warning-icon-wrap">
+                    <i class="fa-solid fa-user-xmark"></i>
+                </div>
+                <h4 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 0.25rem 0;">
+                    Are you completely sure?
+                </h4>
+                <p style="font-size: 0.875rem; color: #64748b; margin: 0;">
+                    This action will purge the assignment entry from the system database.
+                </p>
+            </div>
+
+            <!-- Assignment Information Summary Box -->
+            <div class="assignment-summary-box">
+                <div class="summary-title">
+                    Assignment Record Details
+                </div>
+
+                {% if assignment.caregiver %}
+                <div class="summary-row">
+                    <span class="summary-label">Caregiver</span>
+                    <span class="summary-value">
+                        {% if assignment.caregiver.name %}
+                        {{ assignment.caregiver.name }}
+                        {% elif assignment.caregiver.user %}
+                        {{ assignment.caregiver.user.get_full_name|default:assignment.caregiver.user.email }}
+                        {% else %}
+                        {{ assignment.caregiver }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if assignment.homecare_request %}
+                <div class="summary-row">
+                    <span class="summary-label">Patient</span>
+                    <span class="summary-value">{{ assignment.homecare_request.full_name }}</span>
+                </div>
+                {% elif assignment.home_care_request %}
+                <div class="summary-row">
+                    <span class="summary-label">Patient</span>
+                    <span class="summary-value">{{ assignment.home_care_request.full_name }}</span>
+                </div>
+                {% endif %}
+
+                {% if assignment.service_date %}
+                <div class="summary-row">
+                    <span class="summary-label">Service Date</span>
+                    <span class="summary-value" style="font-weight: 500;">{{ assignment.service_date|date:"d M Y"
+                        }}</span>
+                </div>
+                {% endif %}
+
+                {% if assignment.service_time %}
+                <div class="summary-row">
+                    <span class="summary-label">Service Time</span>
+                    <span class="summary-value" style="font-weight: 500;">{{ assignment.service_time|time:"H:i"
+                        }}</span>
+                </div>
+                {% endif %}
+
+                {% if assignment.status %}
+                <div class="summary-row">
+                    <span class="summary-label">Status</span>
+                    <span class="summary-value">
+                        <span class="badge-status">
+                            {{ assignment.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Warning Notice -->
+            <div class="warning-alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <div>
+                    <strong>Critical Warning</strong>
+                    <div>This action cannot be undone. The schedule link and assignment history tied to this record will
+                        be wiped out immediately.</div>
+                </div>
+            </div>
+
+            <!-- Delete Form Submission -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <a href="{% url 'staff:caregiver_assignments' %}" class="btn-custom btn-custom-secondary">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>Cancel</span>
+                    </a>
+
+                    <button type="submit" class="btn-custom btn-custom-danger">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Yes, Delete Assignment</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

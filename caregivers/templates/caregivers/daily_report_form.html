@@ -1,0 +1,243 @@
+{% extends "caregivers/base.html" %}
+
+{% block title %}Daily Care Report | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <a href="{% url 'caregivers:assignment_detail' assignment.pk %}" class="text-decoration-none small">
+
+            <i class="fa-solid fa-arrow-left me-1"></i>
+            Back to Assignment
+
+        </a>
+
+        <h2 class="fw-bold mt-2 mb-1">
+            Daily Care Report
+        </h2>
+
+        <p class="text-muted mb-0">
+            {{ assignment.homecare_request.patient_name }}
+        </p>
+
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4 p-md-5">
+
+            <div class="alert alert-info">
+
+                <i class="fa-solid fa-circle-info me-2"></i>
+
+                Assignment period:
+                <strong>
+                    {{ assignment_start|date:"d M Y" }}
+                    -
+                    {{ assignment_end|date:"d M Y" }}
+                </strong>
+
+            </div>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- DATE & VISIT TIME -->
+
+                <h5 class="fw-bold border-bottom pb-2 mb-4">
+                    Visit Information
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Report Date *
+                        </label>
+
+                        <input type="date" name="report_date" class="form-control"
+                            value="{% if report %}{{ report.report_date|date:'Y-m-d' }}{% endif %}"
+                            min="{{ assignment_start|date:'Y-m-d' }}" max="{{ assignment_end|date:'Y-m-d' }}" required>
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Visit Start Time
+                        </label>
+
+                        <input type="time" name="visit_start_time" class="form-control"
+                            value="{% if report.visit_start_time %}{{ report.visit_start_time|time:'H:i' }}{% endif %}">
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Visit End Time
+                        </label>
+
+                        <input type="time" name="visit_end_time" class="form-control"
+                            value="{% if report.visit_end_time %}{{ report.visit_end_time|time:'H:i' }}{% endif %}">
+
+                    </div>
+
+                </div>
+
+
+                <!-- PATIENT CONDITION -->
+
+                <h5 class="fw-bold border-bottom pb-2 mb-4 mt-4">
+                    Patient Condition
+                </h5>
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Current Patient Condition *
+                    </label>
+
+                    <select name="patient_condition" class="form-select" required>
+
+                        {% for value,label in condition_choices %}
+
+                        <option value="{{ value }}" {% if report.patient_condition == value %} selected {% elif not report
+                            and value=="STABLE" %} selected {% endif %}>
+
+                            {{ label }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- OBSERVATIONS -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Vital Signs / Observations
+                    </label>
+
+                    <textarea name="vital_observations" class="form-control" rows="4"
+                        placeholder="Record relevant vital signs and observations...">{% if report %}{{ report.vital_observations }}{% endif %}</textarea>
+
+                </div>
+
+
+                <!-- CARE PROVIDED -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Care Provided *
+                    </label>
+
+                    <textarea name="care_provided" class="form-control" rows="5" required
+                        placeholder="Describe the care and services provided today...">{% if report %}{{ report.care_provided }}{% endif %}</textarea>
+
+                </div>
+
+
+                <!-- PROGRESS -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Patient Progress *
+                    </label>
+
+                    <textarea name="patient_progress" class="form-control" rows="4" required
+                        placeholder="Describe the patient's progress today...">{% if report %}{{ report.patient_progress }}{% endif %}</textarea>
+
+                </div>
+
+
+                <!-- CONCERNS -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Concerns / Issues
+                    </label>
+
+                    <textarea name="concerns" class="form-control" rows="4"
+                        placeholder="Record any concerns, changes or issues...">{% if report %}{{ report.concerns }}{% endif %}</textarea>
+
+                </div>
+
+
+                <!-- CAREGIVER NOTES -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Caregiver Notes
+                    </label>
+
+                    <textarea name="caregiver_notes" class="form-control" rows="4"
+                        placeholder="Additional notes...">{% if report %}{{ report.caregiver_notes }}{% endif %}</textarea>
+
+                </div>
+
+
+                <!-- NEXT VISIT -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+                        Next Visit Date
+                    </label>
+
+                    <input type="date" name="next_visit_date" class="form-control"
+                        value="{% if report.next_visit_date %}{{ report.next_visit_date|date:'Y-m-d' }}{% endif %}">
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <a href="{% url 'caregivers:assignment_detail' assignment.pk %}" class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+
+                        <i class="fa-solid fa-save me-2"></i>
+
+                        {% if report %}
+                        Update Report
+                        {% else %}
+                        Submit Report
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

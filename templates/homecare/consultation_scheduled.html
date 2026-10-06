@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+
+{% block title %}
+Consultation Scheduled Successfully
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .scheduled-page {
+        max-width: 800px;
+        margin: 60px auto;
+        padding: 20px;
+    }
+
+    .scheduled-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 45px 35px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
+        border: 1px solid #e7edf3;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: #e4f7ec;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: bold;
+    }
+
+    .scheduled-card h1 {
+        color: #073b67;
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    .scheduled-card .intro {
+        color: #667085;
+        font-size: 16px;
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+
+    .appointment-details {
+        background: #f7fafc;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+
+    .appointment-details h3 {
+        color: #073b67;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5eaf0;
+        color: #526273;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-row strong {
+        color: #073b67;
+    }
+
+    .join-section {
+        background: #eef8ff;
+        border: 1px solid #cce9f7;
+        border-radius: 14px;
+        padding: 25px;
+        margin-top: 25px;
+    }
+
+    .join-section h3 {
+        color: #073b67;
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .join-section p {
+        color: #667085;
+        line-height: 1.6;
+    }
+
+    .join-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 14px 28px;
+        background: #287db5;
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+        transition: 0.2s ease;
+    }
+
+    .join-btn:hover {
+        background: #073b67;
+        transform: translateY(-1px);
+    }
+
+    .email-notice {
+        margin-top: 25px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        color: #667085;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .privacy-note {
+        margin-top: 20px;
+        color: #8a94a6;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+
+        .scheduled-page {
+            margin: 25px auto;
+            padding: 15px;
+        }
+
+        .scheduled-card {
+            padding: 30px 20px;
+        }
+
+        .scheduled-card h1 {
+            font-size: 24px;
+        }
+
+        .detail-row {
+            display: block;
+        }
+
+        .detail-row strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .join-btn {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+
+<div class="scheduled-page">
+
+    <div class="scheduled-card">
+
+        <!-- SUCCESS ICON -->
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h1>
+            Consultation Scheduled Successfully
+        </h1>
+
+        <p class="intro">
+
+            Dear
+            <strong>
+                {{ consultation.first_name }}
+                {{ consultation.last_name }}
+            </strong>,
+
+            your consultation appointment has been successfully scheduled.
+
+        </p>
+
+
+        <!-- APPOINTMENT DETAILS -->
+
+        <div class="appointment-details">
+
+            <h3>
+                Appointment Details
+            </h3>
+
+            <div class="detail-row">
+
+                <strong>
+                    Date
+                </strong>
+
+                <span>
+                    {{ consultation.consultation_date|date:"l, d F Y" }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>
+                    Time
+                </strong>
+
+                <span>
+                    {{ consultation.consultation_time|time:"h:i A" }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>
+                    Duration
+                </strong>
+
+                <span>
+                    {{ consultation.duration_minutes }} minutes
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>
+                    Status
+                </strong>
+
+                <span>
+                    Scheduled
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- TELEMEDICINE -->
+
+        <div class="join-section">
+
+            <h3>
+                Your Telemedicine Consultation
+            </h3>
+
+            <p>
+
+                Your secure telemedicine consultation link has been
+                generated successfully.
+
+                You can use the button below to join your consultation
+                at the scheduled time.
+
+            </p>
+
+
+            {% if consultation.patient_join_url %}
+
+            <a href="{{ consultation.patient_join_url }}" class="join-btn">
+                🎥 Join Telemedicine Consultation
+            </a>
+
+            {% else %}
+
+            <p>
+                Your telemedicine link will be sent to your email.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- EMAIL NOTICE -->
+
+        <div class="email-notice">
+
+            <strong>
+                📧 Confirmation Email Sent
+            </strong>
+
+            <br>
+
+            A confirmation email containing your secure
+            telemedicine link has been sent to:
+
+            <br>
+
+            <strong>
+                {{ consultation.email }}
+            </strong>
+
+        </div>
+
+
+        <!-- PRIVACY -->
+
+        <div class="privacy-note">
+
+            🔒 Please keep your telemedicine link private.
+            Do not share it with anyone else.
+
+            <br>
+
+            Use the link only for your scheduled consultation.
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

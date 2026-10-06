@@ -1,0 +1,1247 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Hands-On Health Home-Based Care Service
+{% endblock %}
+
+{% block content %}
+
+<!-- Paste the homepage content here -->
+<!-- Hero section -->
+<!-- Start Hero Slider -->
+
+<div id="bootstrap-touch-slider" class="carousel bs-slider fade control-round indicators-line" data-ride="carousel"
+    data-pause="hover" data-interval="6000">
+
+    <!-- Indicators -->
+
+    <ol class="carousel-indicators">
+
+        <li data-target="#bootstrap-touch-slider" data-slide-to="0" class="active">
+        </li>
+
+        <li data-target="#bootstrap-touch-slider" data-slide-to="1">
+        </li>
+
+        <li data-target="#bootstrap-touch-slider" data-slide-to="2">
+        </li>
+
+    </ol>
+
+
+    <div class="carousel-inner" role="listbox">
+
+
+        <!-- Slide 1 -->
+
+        <div class="item active">
+
+            <img src="{% static 'img/nurse1.jpeg' %}" alt="Compassionate professional home-based care in Namibia"
+                class="slide-image">
+
+            <div class="bs-slider-overlay"></div>
+
+
+            <div class="slide-text text-left">
+
+                <div class="container">
+
+                    <div class="row">
+
+                        <div class="col-md-8 col-lg-7">
+
+                            <span class="hero-tagline">
+                                Compassionate • Reliable • Dignified
+                            </span>
+
+
+                            <h1>
+                                Quality Care in the Comfort &amp; Dignity of Home
+                            </h1>
+
+
+                            <p>
+                                Professional mobile nursing and personal care
+                                for elderly, recovering, and dependent loved
+                                ones across Namibia.
+                            </p>
+
+
+                            <div class="slider-btn-group">
+
+                                <a href="{% url 'homecare:request' %}" class="btn btn-hero-primary">
+
+                                    Request Home Care
+
+                                </a>
+
+
+                                <a {% if site_settings.whatsapp %}href="https://wa.me/{{ site_settings.whatsapp }}" {% endif %}target="_blank" rel="noopener"
+                                    class="btn btn-hero-whatsapp">
+
+                                    <i class="fa-brands fa-whatsapp"></i>
+
+                                    WhatsApp Us
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Slide 2 -->
+
+        <div class="item">
+
+            <img src="{% static 'img/nurse2.jpeg' %}" alt="Clinical nursing support and home healthcare in Namibia"
+                class="slide-image">
+
+            <div class="bs-slider-overlay"></div>
+
+
+            <div class="slide-text text-left">
+
+                <div class="container">
+
+                    <div class="row">
+
+                        <div class="col-md-8 col-lg-7">
+
+                            <span class="hero-tagline">
+                                Professional Nursing Support
+                            </span>
+
+
+                            <h2>
+                                Clinical Care Beyond Hospital Walls
+                            </h2>
+
+
+                            <p>
+                                Vital signs monitoring, wound dressing,
+                                post-surgery recovery, and chronic condition
+                                management at home.
+                            </p>
+
+
+                            <div class="slider-btn-group">
+
+                                <a href="{% url 'homecare:request' %}" class="btn btn-hero-primary">
+
+                                    Request Home Care
+
+                                </a>
+
+
+                                <a href="{% url 'homecare:referral' %}" class="btn btn-hero-secondary">
+
+                                    Make a Referral
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Slide 3 -->
+
+        <div class="item">
+
+            <img src="{% static 'img/nurse1.jpeg' %}" alt="Dedicated caregiver support for families in Namibia"
+                class="slide-image">
+
+            <div class="bs-slider-overlay"></div>
+
+
+            <div class="slide-text text-left">
+
+                <div class="container">
+
+                    <div class="row">
+
+                        <div class="col-md-8 col-lg-7">
+
+                            <span class="hero-tagline">
+                                Support for Patients &amp; Families
+                            </span>
+
+
+                            <h2>
+                                Dependable Assistance Tailored Around You
+                            </h2>
+
+
+                            <p>
+                                Dedicated daily living support, bedridden care,
+                                and extended family respite delivered with
+                                genuine respect.
+                            </p>
+
+
+                            <div class="slider-btn-group">
+
+                                <a href="{% url 'homecare:request' %}" class="btn btn-hero-primary">
+
+                                    Request Home Care
+
+                                </a>
+
+
+                                <a href="#" class="btn btn-hero-secondary">
+
+                                    Contact Us
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Controls -->
+
+    <a class="left carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="prev">
+
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+
+        <span class="sr-only">
+            Previous
+        </span>
+
+    </a>
+
+
+    <a class="right carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="next">
+
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+
+        <span class="sr-only">
+            Next
+        </span>
+
+    </a>
+
+</div>
+
+<!-- End Hero Slider -->
+<!-- divider start -->
+<section class="about-3col animatedParent animateOnce modern-feature-section">
+    <div class="container">
+        <div class="section-content">
+            <div class="row">
+                <div class="about-feature style-2 feature-grid-3d">
+
+                    <!-- Card 1: Request Home Care -->
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                        <div class="appointment-item card-3d">
+                            <div class="card-glow-bg"></div>
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-house-medical"></i>
+                            </div>
+                            <h5><a href="#book">Professional Care. In the Comfort of Home.</a></h5>
+                            <div class="line-border-center bg-teal margin-bottom-20"></div>
+                            <p>Hands-on Health brings quality home-based care directly to patients and families, helping
+                                people receive appropriate support while remaining in the comfort and dignity of their
+                                own homes.</p>
+                            <a href="{% url 'homecare:request' %}" class="btn btn-theme btn-sm btn-glow btn-glow-action">
+                                Request Home Care <i class="fa-solid fa-hand-holding-hand ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Contact Us / WhatsApp Us -->
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                        <div class="appointment-item card-3d">
+                            <div class="card-glow-bg"></div>
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <h5><a {% if site_settings.whatsapp %}href="https://wa.me/{{ site_settings.whatsapp }}" {% endif %}target="_blank">Compassionate. Professional.
+                                    Personal.</a></h5>
+                            <div class="line-border-center bg-teal margin-bottom-20"></div>
+                            <p>Get in touch with our dedicated team to discuss immediate support, ask questions, or
+                                inquire about our home nursing services.</p>
+                            {% if site_settings.whatsapp %}
+                            <a href="https://wa.me/{{ site_settings.whatsapp }}" target="_blank"
+                                class="btn btn-theme btn-sm btn-glow btn-glow-chat">
+                                WhatsApp Us <i class="fa-brands fa-whatsapp ml-2"></i>
+                            {% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Make a Referral -->
+                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 center-block">
+                        <div class="appointment-item card-3d highlight-card-3d">
+                            <div class="card-glow-bg"></div>
+                            <div class="icon-wrapper">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <h5><a href="{% url 'homecare:referral' %}">Partner With Our Care Team</a></h5>
+                            <div class="line-border-center bg-teal margin-bottom-20"></div>
+                            <p>Easily refer a family member, friend, or patient in need of skilled home nursing and
+                                personalized health monitoring.</p>
+                            <a href="{% url 'homecare:referral' %}" class="btn btn-theme btn-sm btn-glow btn-glow-call">
+                                Make a Referral <i class="fa-solid fa-file-signature ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- divider end -->
+<!-- welcome start -->
+<section class="welcome-section modern-welcome-section">
+    <div class="container">
+        <div class="section-content">
+            <div class="row display-flex align-items-stretch">
+
+                <!-- Left Content Column -->
+                <div class="col-md-7 col-sm-12 display-flex-col">
+                    <div class="welcome-text-content">
+                        <span class="sub-title-badge">Why Choose Hands-On Health</span>
+                        <h2 class="main-heading">Premium Home Healthcare &amp; Private Nursing in Namibia</h2>
+
+                        <p class="lead-text">
+                            Compassionate, clinical excellence delivered directly to your home.
+                        </p>
+
+                        <p class="body-description">
+                            Hands-On Health offers comprehensive, individualized home care services designed to uphold
+                            patient dignity while supporting independent living. From skilled clinical nursing and
+                            post-operative recovery to long-term palliative and elderly care, our qualified medical
+                            professionals ensure your loved ones receive personalized support across Windhoek and
+                            nationwide.
+                        </p>
+
+                        <!-- Feature Highlight Box -->
+                        <div class="feature-media-box">
+                            <div class="media-img-wrapper">
+                                <img src="{% static 'img/nurse2.jpeg' %}" alt="Professional Nurse Assisting Patient at Home"
+                                    class="img-responsive img-rounded">
+                            </div>
+                            <div class="media-body-text">
+                                <h5>Skilled &amp; Compassionate Practitioners</h5>
+                                <p>Our registered nurses and certified caregivers provide complete clinical oversight,
+                                    from medication management and wound care to vital monitoring and mobility support.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 6 Core Value Pillars with Key Word Highlighting -->
+                        <div class="why-choose-list">
+                            <div class="row">
+                                <!-- Column 1 -->
+                                <div class="col-sm-6">
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Professional Approach:</strong>
+                                            We provide <span class="highlight-text">structured home-based support</span>
+                                            according to individual patient needs.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Care Where You Live:</strong>
+                                            Patients receive appropriate support without leaving the <span
+                                                class="highlight-text">comfort of their own home</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Individualised Care:</strong>
+                                            Care arrangements are <span class="highlight-text">tailored to the patient's
+                                                condition</span> and specific requirements.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2 -->
+                                <div class="col-sm-6">
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Family Support:</strong>
+                                            We work alongside families to make caring for a loved one <span
+                                                class="highlight-text">more manageable</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Compassionate Service:</strong>
+                                            We combine professional clinical care with <span
+                                                class="highlight-text">genuine human compassion</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Flexible Care Arrangements:</strong>
+                                            Customized schedules including <span class="highlight-text">short-term,
+                                                long-term, day, overnight, and stay-in care</span>.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Call-To-Action & Direct Call Bar -->
+                        <div class="welcome-cta-group margin-top-30">
+                            <a href="{% url 'homecare:request' %}" class="btn btn-glow-action main-req-btn">
+                                REQUEST HOME CARE <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </a>
+
+                            <a href="tel:{{ site_settings.phone }}" class="phone-call-pill">
+                                <span class="phone-icon-box">
+                                    <i class="fa-solid fa-phone-volume"></i>
+                                </span>
+                                <span class="phone-text-meta">
+                                    <small>Speak with a Nurse</small>
+                                    <strong>{{ site_settings.phone }}</strong>
+                                </span>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Media Column -->
+                <div class="col-md-5 col-sm-12 display-flex-col">
+                    <div class="welcome-main-img-card full-height-card">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80"
+                            alt="Nurse Reviewing Patient Care Plan" class="img-responsive main-img-full">
+                        <div class="experience-badge">
+                            <span class="badge-number">100%</span>
+                            <span class="badge-text">Personalized Home-Based Medical Care</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- welcome end -->
+
+
+<!-- Services section -->
+
+
+<!-- services start -->
+<!-- services start -->
+<section class="services-section modern-services-section">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-title text-center">
+            <span class="sub-title-badge">Home-Based Care Wherever You Need It</span>
+            <h2 class="main-heading">Comprehensive In-Home Healthcare &amp; Support</h2>
+            <div class="line-border-center"></div>
+            <p class="section-subtitle">Delivering structured, dignified clinical oversight, daily assistance, and
+                live-in care across Windhoek and nationwide.</p>
+        </div>
+
+        <!-- DYNAMIC SERVICE CATEGORIES -->
+        {% for category in categories %}
+        {% if category.services.all %}
+        <div class="service-category-block">
+            <h3 class="category-title">
+                <i class="{{ category.icon_class|default:'fa-solid fa-user-nurse' }}"></i> {{ category.name }}
+            </h3>
+            <div class="row display-flex">
+                {% for service in category.services.all %}
+                {% if service.is_active %}
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="service-card-3d">
+                        <div class="card-icon-glow">
+                            {% if service.image %}
+                            <img src="{{ service.image.url }}" alt="{{ service.name }}"
+                                class="img-responsive card-custom-icon">
+                            {% else %}
+                            <i class="{{ service.icon_class|default:'fa-solid fa-heart-pulse' }}"></i>
+                            {% endif %}
+                        </div>
+                        <h4>{{ service.name }}</h4>
+                        <div class="border-center-blue"></div>
+
+                        <!-- UPDATED DESCRIPTION WITH FALLBACK -->
+                        <p>
+                            {% if service.short_description %}
+                            {{ service.short_description }}
+                            {% elif service.description %}
+                            {{ service.description|truncatewords:20 }}
+                            {% else %}
+                            Professional home healthcare service tailored to patient needs.
+                            {% endif %}
+                        </p>
+
+                        {% if service.price > 0 %}
+                        <div class="service-price-badge"
+                            style="margin-bottom: 15px; font-weight: 600; color: var(--homecare-primary, #123f61);">
+                            <span>Starting at: {{ service.formatted_price }}</span>
+                        </div>
+                        {% endif %}
+
+                        <a href="{% url 'homecare:request' %}" class="btn btn-glow-card">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% empty %}
+        <div class="alert alert-info text-center">
+            <p>No services are currently listed. Please check back later or contact us directly.</p>
+        </div>
+        {% endfor %}
+
+        <!-- WHO WE CARE FOR -->
+        <div class="who-we-care-wrapper">
+            <div class="row display-flex align-items-center">
+                <div class="col-md-5 col-sm-12">
+                    <div class="care-image-box">
+                        <img src="{% static 'img/nurse1.jpeg' %}" alt="Caregiver with senior patient"
+                            class="img-responsive">
+                        <div class="care-floating-badge">
+                            <i class="fa-solid fa-shield-heart"></i>
+                            <span>Dignified Care for Every Stage</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7 col-sm-12">
+                    <div class="care-content-box">
+                        <span class="sub-title-badge">Tailored Patient Support</span>
+                        <h3 class="care-heading">Who We Care For</h3>
+                        <p class="care-description">Hands-on Health delivers compassionate home-based care customized to
+                            the specific medical condition and daily life requirements of:</p>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="care-pill-list">
+                                    <li><i class="fa-solid fa-circle-check"></i> Elderly patients</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Bedridden patients</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Surgical &amp; post-op recovery</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Hospital discharge recovery</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Chronic condition management</li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="care-pill-list">
+                                    <li><i class="fa-solid fa-circle-check"></i> Daily living activity support</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Palliative &amp; supportive care</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Short-term home assistance</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Long-term home nursing</li>
+                                    <li><i class="fa-solid fa-circle-check"></i> Families seeking caregiver relief</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUR SERVICE AREA -->
+        <div class="service-area-wrapper">
+            <div class="row display-flex align-items-center">
+                <div class="col-md-8 col-sm-12">
+                    <div class="area-content-box">
+                        <span class="sub-title-badge">Coverage &amp; Mobility</span>
+                        <h3 class="area-heading">Our Service Area</h3>
+                        <h4 class="area-subheading">Home-Based Care Wherever You Need It</h4>
+
+                        <p class="area-text">
+                            <strong>Hands-on Health</strong> is based in <strong>Windhoek</strong> and provides
+                            home-based care services according to availability and service arrangements.
+                        </p>
+
+                        <p class="area-text">
+                            Services can also be arranged <strong>outside Windhoek and in other parts of
+                                Namibia</strong>, subject to staff availability, travel requirements, and applicable
+                            fees.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-4 col-sm-12">
+                    <div class="area-highlight-card">
+                        <div class="area-icon-box">
+                            <i class="fa-solid fa-house-medical-flag"></i>
+                        </div>
+                        <h5>Direct To Your Door</h5>
+                        <p class="area-tagline">We come to the patient — the patient does not come to us.</p>
+                        <a href="tel:+264858154948" class="btn btn-glow-action">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- services end -->
+<!-- appointment start -->
+<section class="appointment-section animatedParent animateOnce padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2 text-center margin-bottom-40">
+
+                <span class="sub-title-badge sky-badge">
+                    Seamless Booking
+                </span>
+
+                <h2 class="main-service-heading">
+                    Book An Appointment
+                </h2>
+
+                <div class="border-center-blue"></div>
+
+                <p class="service-subtitle">
+                    Book your preferred appointment with our Home Care team.
+                    Once your appointment is submitted, our team will contact
+                    you to confirm the details.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="appointment-card-wrapper">
+            <div class="row">
+
+                <!-- LEFT COLUMN: STATUS SIDEBAR -->
+                <div class="col-md-3 border-right-light">
+
+                    <div class="booking-status-sidebar">
+
+                        <ul class="status-steps" id="statusSidebar">
+
+                            <li class="step-item active" data-step="1">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">1</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Fill Details</strong>
+                                    <small>Client & Contact</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="2">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">2</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Choose Services</strong>
+                                    <small>Select Services</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="3">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">3</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Date & Time</strong>
+                                    <small>Schedule Appointment</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="4">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">4</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Confirmation</strong>
+                                    <small>Submit Booking</small>
+                                </div>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT COLUMN: APPOINTMENT FORM -->
+                <div class="col-md-9">
+
+                    <!-- IMPORTANT:
+                         This is a NEW appointment endpoint.
+                         It is NOT request_home_care.
+                    -->
+
+                    <form id="multiStepBookingForm" method="post" action="{% url 'homecare:book_appointment' %}"
+                        enctype="multipart/form-data" class="booking-form-content">
+
+                        {% csrf_token %}
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 1: CLIENT DETAILS -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel active-panel" id="stepPanel1">
+
+                            <div class="form-section-title">
+                                <h4>
+                                    <i class="fa-solid fa-user-gear"></i>
+                                    1. Client Information
+                                </h4>
+                            </div>
+
+                            <div class="row margin-bottom-20">
+
+                                <!-- First Name -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        First Name *
+                                    </label>
+
+                                    <input type="text" name="first_name" class="form-control custom-input"
+                                        placeholder="First Name" required>
+
+                                </div>
+
+
+                                <!-- Last Name -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Last Name *
+                                    </label>
+
+                                    <input type="text" name="last_name" class="form-control custom-input"
+                                        placeholder="Last Name" required>
+
+                                </div>
+
+
+                                <!-- Email -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Email Address *
+                                    </label>
+
+                                    <input type="email" name="email" class="form-control custom-input"
+                                        placeholder="Email Address" required>
+
+                                </div>
+
+
+                                <!-- Phone -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Phone Number *
+                                    </label>
+
+                                    <input type="tel" name="phone" class="form-control custom-input"
+                                        placeholder="Phone Number" required>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="step-actions text-right">
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 2: CHOOSE SERVICES -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel2">
+
+                            <div class="form-section-title">
+
+                                <h4>
+                                    <i class="fa-solid fa-list-check"></i>
+                                    2. Choose Service(s)
+
+                                    <small>
+                                        (Select one or more)
+                                    </small>
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row margin-bottom-25">
+
+
+                                <!-- 1 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Post-operative care">
+
+                                        <span class="service-title">
+                                            1. Post-operative care
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 2 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Wound care & dressing">
+
+                                        <span class="service-title">
+                                            2. Wound care &amp; dressing
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 3 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Vital signs monitoring">
+
+                                        <span class="service-title">
+                                            3. Vital signs monitoring
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 4 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Medication support">
+
+                                        <span class="service-title">
+                                            4. Medication support
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 5 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Post-discharge recovery support">
+
+                                        <span class="service-title">
+                                            5. Post-discharge recovery support
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 6 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Elderly care & companionship">
+
+                                        <span class="service-title">
+                                            6. Elderly care &amp; companionship
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 7 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Mobility assistance">
+
+                                        <span class="service-title">
+                                            7. Mobility assistance
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 8 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Bathing & personal hygiene">
+
+                                        <span class="service-title">
+                                            8. Bathing &amp; personal hygiene
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 9 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Feeding & nutrition assistance">
+
+                                        <span class="service-title">
+                                            9. Feeding &amp; nutrition assistance
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 10 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Chronic illness management">
+
+                                        <span class="service-title">
+                                            10. Chronic illness management
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 11 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="Palliative & end-of-life care">
+
+                                        <span class="service-title">
+                                            11. Palliative &amp; end-of-life care
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 12 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services"
+                                            value="Stay-in caregivers & nursing services">
+
+                                        <span class="service-title">
+                                            12. Stay-in caregivers &amp; nursing
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- 13 -->
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services"
+                                            value="Home visits & ongoing care monitoring">
+
+                                        <span class="service-title">
+                                            13. Home visits &amp; care monitoring
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+
+                                </button>
+
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 3: DATE & TIME -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel3">
+
+                            <div class="form-section-title">
+
+                                <h4>
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    3. Schedule Appointment
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row margin-bottom-20">
+
+
+                                <!-- Date -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Preferred Date *
+                                    </label>
+
+                                    <input type="date" name="appointment_date" class="form-control custom-input"
+                                        required>
+
+                                </div>
+
+
+                                <!-- Time -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Preferred Time *
+                                    </label>
+
+                                    <input type="time" name="appointment_time" class="form-control custom-input"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+
+                                </button>
+
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 4: ATTACHMENTS & NOTES -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel4">
+
+                            <div class="form-section-title">
+
+                                <h4>
+                                    <i class="fa-solid fa-paperclip"></i>
+                                    4. Attachments &amp; Notes
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row margin-bottom-20">
+
+
+                                <!-- Attachments -->
+                                <div class="col-xs-12 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Attach Images or Prescription
+                                        Documents (Optional)
+                                    </label>
+
+
+                                    <div class="file-upload-box">
+
+                                        <input type="file" name="attachments" id="fileAttachment" multiple
+                                            accept="image/*,.pdf,.doc,.docx" class="file-input-hidden">
+
+
+                                        <label for="fileAttachment" class="file-upload-label">
+
+                                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                                            <span id="fileUploadText">
+                                                Click to add images or attach
+                                                documents
+                                            </span>
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Notes -->
+                                <div class="col-xs-12 margin-bottom-20">
+
+                                    <label class="field-label">
+                                        Additional Notes
+                                    </label>
+
+                                    <textarea name="message" class="form-control custom-input" rows="4"
+                                        placeholder="Additional Notes or Specific Instructions for the Appointment..."></textarea>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+
+                                </button>
+
+
+                                <!-- FINAL SUBMIT -->
+                                <button type="submit" class="btn btn-theme-sky">
+
+                                    Book Appointment
+                                    <i class="fa-solid fa-calendar-check"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- appointment end -->
+<!-- How It Works section -->
+<!-- Healthcare Professionals section -->
+<!-- Reviews section -->
+<!-- FAQ section -->
+<!-- Contact section -->
+<!-- All other homepage sections -->
+
+{% endblock %}

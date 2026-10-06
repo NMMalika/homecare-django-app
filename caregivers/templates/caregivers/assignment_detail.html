@@ -1,0 +1,544 @@
+{% extends "caregivers/base.html" %}
+
+{% block title %}Assignment Details | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <a href="{% url 'caregivers:assignments' %}" class="text-decoration-none small">
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Back to Assignments
+            </a>
+
+            <h2 class="fw-bold mt-2 mb-1">
+                Assignment Details
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ assignment_type_display }}
+            </p>
+
+        </div>
+
+        <div>
+
+            {% if assignment.status == "PENDING_ACCEPTANCE" %}
+
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                Pending Acceptance
+            </span>
+
+            {% elif assignment.status == "ACCEPTED" %}
+
+            <span class="badge bg-info fs-6 px-3 py-2">
+                Accepted
+            </span>
+
+            {% elif assignment.status == "IN_PROGRESS" %}
+
+            <span class="badge bg-primary fs-6 px-3 py-2">
+                In Progress
+            </span>
+
+            {% elif assignment.status == "COMPLETED" %}
+
+            <span class="badge bg-success fs-6 px-3 py-2">
+                Completed
+            </span>
+
+            {% elif assignment.status == "DECLINED" %}
+
+            <span class="badge bg-danger fs-6 px-3 py-2">
+                Declined
+            </span>
+
+            {% else %}
+
+            <span class="badge bg-secondary fs-6 px-3 py-2">
+                {{ status_display }}
+            </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- PATIENT INFORMATION -->
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-user-injured me-2 text-primary"></i>
+                        Patient Information
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                Patient Name
+                            </small>
+
+                            <strong>
+                                {{ assignment.homecare_request.patient_name }}
+                            </strong>
+
+                        </div>
+
+
+                        {% if assignment.homecare_request.phone %}
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                Phone
+                            </small>
+
+                            <strong>
+                                {{ assignment.homecare_request.phone }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if assignment.homecare_request.address %}
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                Address
+                            </small>
+
+                            <strong>
+                                {{ assignment.homecare_request.address }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if assignment.homecare_request.city %}
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                City
+                            </small>
+
+                            <strong>
+                                {{ assignment.homecare_request.city }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ASSIGNMENT INFORMATION -->
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
+                        Assignment Information
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                Start Date
+                            </small>
+
+                            <strong>
+                                {{ assignment_start|date:"d M Y" }}
+                            </strong>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                End Date
+                            </small>
+
+                            <strong>
+                                {{ assignment_end|date:"d M Y" }}
+                            </strong>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <small class="text-muted d-block">
+                                Assigned On
+                            </small>
+
+                            <strong>
+                                {{ assignment.assigned_at|date:"d M Y H:i" }}
+                            </strong>
+
+                        </div>
+
+                        {% if assignment.notes %}
+
+                        <div class="col-12">
+
+                            <small class="text-muted d-block">
+                                Assignment Notes
+                            </small>
+
+                            <div class="bg-light rounded p-3 mt-1">
+                                {{ assignment.notes|linebreaks }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DAILY REPORTS -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white py-3">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-file-medical me-2 text-primary"></i>
+                            Daily Reports
+                        </h5>
+
+                        {% if assignment.status == "ACCEPTED" or assignment.status == "IN_PROGRESS" %}
+
+                        <a href="{% url 'caregivers:daily_report_create' assignment.pk %}"
+                            class="btn btn-sm btn-primary">
+
+                            <i class="fa-solid fa-plus me-1"></i>
+                            Add Report
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="card-body p-0">
+
+                    {% if reports %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Condition</th>
+                                    <th>Care Provided</th>
+                                    <th>Submitted</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for report in reports %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ report.report_date|date:"d M Y" }}
+                                    </td>
+
+                                    <td>
+                                        {{ report.get_patient_condition_display }}
+                                    </td>
+
+                                    <td>
+                                        {{ report.care_provided|truncatewords:12 }}
+                                    </td>
+
+                                    <td>
+                                        {{ report.submitted_at|date:"d M Y H:i" }}
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="text-center py-5">
+
+                        <i class="fa-solid fa-file-circle-xmark fa-2x text-muted mb-3"></i>
+
+                        <p class="text-muted mb-0">
+                            No daily reports have been submitted yet.
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm sticky-lg-top" style="top: 20px;">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="fw-bold mb-0">
+                        Assignment Actions
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    {% if assignment.status == "PENDING_ACCEPTANCE" %}
+
+                    <div class="alert alert-warning small">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Please review the assignment before accepting it.
+                    </div>
+
+                    <form method="post" action="{% url 'caregivers:assignment_accept' assignment.pk %}" class="mb-2">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-success w-100">
+
+                            <i class="fa-solid fa-check me-2"></i>
+                            Accept Assignment
+
+                        </button>
+
+                    </form>
+
+
+                    <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal"
+                        data-bs-target="#declineModal">
+
+                        <i class="fa-solid fa-xmark me-2"></i>
+                        Decline Assignment
+
+                    </button>
+
+
+                    {% elif assignment.status == "ACCEPTED" %}
+
+                    <div class="alert alert-info small">
+                        Assignment accepted. Start the assignment when
+                        you begin providing care.
+                    </div>
+
+                    <form method="post" action="{% url 'caregivers:assignment_start' assignment.pk %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-primary w-100">
+
+                            <i class="fa-solid fa-play me-2"></i>
+                            Start Assignment
+
+                        </button>
+
+                    </form>
+
+
+                    {% elif assignment.status == "IN_PROGRESS" %}
+
+                    <div class="alert alert-primary small">
+                        <i class="fa-solid fa-heart-pulse me-2"></i>
+
+                        This assignment is currently in progress.
+                    </div>
+
+                    <a href="{% url 'caregivers:daily_report_create' assignment.pk %}"
+                        class="btn btn-primary w-100 mb-2">
+
+                        <i class="fa-solid fa-file-medical me-2"></i>
+                        Submit Daily Report
+
+                    </a>
+
+                    <a href="{% url 'caregivers:weekly_summary' assignment.pk %}"
+                        class="btn btn-outline-primary w-100 mb-2">
+
+                        <i class="fa-solid fa-chart-line me-2"></i>
+                        Weekly Summary
+
+                    </a>
+
+                    <form method="post" action="{% url 'caregivers:assignment_complete' assignment.pk %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-success w-100"
+                            onclick="return confirm('Are you sure you want to mark this assignment as completed?');">
+
+                            <i class="fa-solid fa-circle-check me-2"></i>
+                            Complete Assignment
+
+                        </button>
+
+                    </form>
+
+
+                    {% elif assignment.status == "COMPLETED" %}
+
+                    <div class="alert alert-success">
+                        <i class="fa-solid fa-circle-check me-2"></i>
+
+                        This assignment has been completed successfully.
+                    </div>
+
+                    <a href="{% url 'caregivers:weekly_summary' assignment.pk %}" class="btn btn-outline-primary w-100">
+
+                        <i class="fa-solid fa-chart-line me-2"></i>
+                        View Summary
+
+                    </a>
+
+
+                    {% elif assignment.status == "DECLINED" %}
+
+                    <div class="alert alert-danger">
+                        This assignment was declined.
+                    </div>
+
+
+                    {% elif assignment.status == "CANCELLED" %}
+
+                    <div class="alert alert-secondary">
+                        This assignment has been cancelled.
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- DECLINE MODAL -->
+
+<div class="modal fade" id="declineModal" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <form method="post" action="{% url 'caregivers:assignment_decline' assignment.pk %}">
+
+                {% csrf_token %}
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Decline Assignment
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>
+                        Please provide a reason for declining this assignment.
+                    </p>
+
+                    <textarea name="response_note" class="form-control" rows="4" required
+                        placeholder="Reason for declining..."></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+                        Decline Assignment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

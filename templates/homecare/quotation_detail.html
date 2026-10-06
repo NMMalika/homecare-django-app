@@ -1,0 +1,462 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-3">
+    <div class="row justify-content-center me-0 ms-0">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
+
+            <!-- Header Section -->
+            <div class="text-center mb-4">
+                <span class="badge bg-primary-soft text-primary fw-semibold px-3 py-2 rounded-pill mb-2">
+                    <i class="fa-solid fa-file-invoice me-1"></i> Official Document
+                </span>
+
+                <h1 class="h2 fw-bold text-slate-800 mb-1">
+                    Your Quotation
+                </h1>
+
+                <p class="text-muted">
+                    Hands-On Health Home-Based Care Clinic
+                </p>
+            </div>
+
+
+            <div class="card client-quotation-card border-0 shadow-sm overflow-hidden mb-4">
+                <div class="card-body p-4 p-md-5">
+
+
+                    <!-- Greeting Section -->
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+
+                        <div>
+                            <span class="text-uppercase text-muted fw-bold small">
+                                Prepared For
+                            </span>
+
+                            <h2 class="h4 fw-bold text-slate-800 mb-0 mt-1">
+
+                                {% if homecare_request %}
+                                    {{ homecare_request.full_name }}
+
+                                {% elif consultation %}
+                                    {{ consultation.patient.full_name|default:consultation }}
+
+                                {% else %}
+                                    Client
+                                {% endif %}
+
+                            </h2>
+                        </div>
+
+
+                        <div class="text-end">
+                            <span class="badge bg-light text-secondary border px-3 py-2 rounded-3">
+                                Quote #{{ quotation.id }}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Summary Grid -->
+                    <div class="summary-grid rounded-3 p-4 mb-4">
+
+                        <div class="row g-3">
+
+
+                            <!-- Requested Services -->
+                            <div class="col-sm-6">
+
+                                <span class="info-label">
+                                    Requested Services
+                                </span>
+
+                                <div class="info-value fw-semibold text-slate-800">
+
+                                    {% if homecare_request %}
+
+                                        {% if homecare_request.services.exists %}
+
+                                            {% for service in homecare_request.services.all %}
+
+                                                <div>
+                                                    <i class="fa-solid fa-check text-primary me-1"></i>
+                                                    {{ service.name }}
+                                                </div>
+
+                                            {% endfor %}
+
+                                        {% elif homecare_request.service %}
+
+                                            <div>
+                                                <i class="fa-solid fa-check text-primary me-1"></i>
+                                                {{ homecare_request.service.name }}
+                                            </div>
+
+                                        {% else %}
+
+                                            Home Care Service
+
+                                        {% endif %}
+
+                                    {% elif consultation %}
+
+                                        <div>
+                                            <i class="fa-solid fa-check text-primary me-1"></i>
+                                            Appointment / Consultation
+                                        </div>
+
+                                    {% else %}
+
+                                        Service
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Care Location -->
+                            <div class="col-sm-6">
+
+                                <span class="info-label">
+                                    Care Location
+                                </span>
+
+                                <div class="info-value fw-semibold text-slate-800">
+
+                                    {% if homecare_request %}
+                                        {{ homecare_request.location|default:"Not specified" }}
+
+                                    {% elif consultation %}
+                                        {{ consultation.location|default:"Clinic Appointment" }}
+
+                                    {% else %}
+                                        Not specified
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Preferred Date -->
+                            <div class="col-sm-6">
+
+                                <span class="info-label">
+                                    Preferred Date
+                                </span>
+
+                                <div class="info-value text-slate-700">
+
+                                    {% if homecare_request %}
+                                        {{ homecare_request.preferred_date|default:"Not specified" }}
+
+                                    {% elif consultation %}
+                                        {{ consultation.appointment_date|default:"Appointment date" }}
+
+                                    {% else %}
+                                        Not specified
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Preferred Time -->
+                            <div class="col-sm-6">
+
+                                <span class="info-label">
+                                    Preferred Time
+                                </span>
+
+                                <div class="info-value text-slate-700">
+
+                                    {% if homecare_request %}
+                                        {{ homecare_request.preferred_time|default:"Not specified" }}
+
+                                    {% elif consultation %}
+                                        {{ consultation.appointment_time|default:"Appointment time" }}
+
+                                    {% else %}
+                                        Not specified
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Scope / Details -->
+                    <div class="my-4">
+
+                        <h3 class="h6 fw-bold text-uppercase text-slate-800 mb-3">
+                            <i class="fa-solid fa-clipboard-list text-primary me-2"></i>
+                            Quotation Details & Scope
+                        </h3>
+
+                        <div class="quotation-body p-3 bg-light rounded-3 text-slate-700">
+
+                            {{ quotation.description|linebreaks }}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Pricing Banner -->
+                    <div class="total-banner p-4 rounded-3 my-4 d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <span class="text-uppercase text-primary fw-bold small d-block">
+                                Total Amount Due
+                            </span>
+
+                            <small class="text-muted">
+                                Includes all specified care services
+                            </small>
+
+                        </div>
+
+                        <span class="total-amount fs-2 fw-bold text-primary">
+                            N$ {{ quotation.amount|floatformat:2 }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Deadline Alert -->
+                    <div class="alert alert-deadline rounded-3 mb-4 p-3 d-flex align-items-center gap-3">
+
+                        <i class="fa-solid fa-clock-rotate-left fs-4 text-warning"></i>
+
+                        <div>
+
+                            <strong class="text-slate-800 d-block">
+                                Payment Deadline
+                            </strong>
+
+                            <span class="small text-muted">
+
+                                {% if quotation.payment_deadline %}
+                                    {{ quotation.payment_deadline|date:"d F Y, g:i A" }}
+
+                                {% elif payment_deadline %}
+                                    {{ payment_deadline|date:"d F Y, g:i A" }}
+
+                                {% else %}
+                                    Please contact Hands-On Health
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Payment Options -->
+                    <div class="my-4 pt-2">
+
+                        <h3 class="h6 fw-bold text-uppercase text-slate-800 mb-2">
+                            <i class="fa-solid fa-credit-card text-primary me-2"></i>
+                            Payment Instructions
+                        </h3>
+
+                        <p class="text-muted small mb-3">
+                            Please complete your payment using one of the approved channels below.
+                        </p>
+
+
+                        {% if site_settings.bank_name %}
+
+                        <div class="payment-box rounded-3 p-4 mb-3">
+
+                            <h4 class="h6 fw-bold text-slate-800 mb-3 d-flex align-items-center gap-2">
+
+                                <i class="fa-solid fa-building-columns text-primary"></i>
+                                Bank Transfer Details
+
+                            </h4>
+
+
+                            <div class="row g-2 small">
+
+                                <div class="col-sm-6">
+                                    <strong class="text-slate-600">Bank:</strong>
+                                    {{ site_settings.bank_name }}
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <strong class="text-slate-600">Account Name:</strong>
+                                    {{ site_settings.account_name }}
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <strong class="text-slate-600">Account Number:</strong>
+                                    {{ site_settings.account_number }}
+                                </div>
+
+
+                                {% if site_settings.branch_name %}
+
+                                <div class="col-sm-6">
+                                    <strong class="text-slate-600">Branch:</strong>
+                                    {{ site_settings.branch_name }}
+                                </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+
+                        {% if site_settings.mobile_money_number %}
+
+                        <div class="payment-box rounded-3 p-4 mb-3">
+
+                            <h4 class="h6 fw-bold text-slate-800 mb-3 d-flex align-items-center gap-2">
+
+                                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                                Mobile Money Details
+
+                            </h4>
+
+
+                            <div class="row g-2 small">
+
+                                {% if site_settings.mobile_money_name %}
+
+                                <div class="col-sm-6">
+
+                                    <strong class="text-slate-600">
+                                        Name:
+                                    </strong>
+
+                                    {{ site_settings.mobile_money_name }}
+
+                                </div>
+
+                                {% endif %}
+
+
+                                <div class="col-sm-6">
+
+                                    <strong class="text-slate-600">
+                                        Number:
+                                    </strong>
+
+                                    {{ site_settings.mobile_money_number }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+
+                        {% if site_settings.payment_instructions %}
+
+                        <div class="alert alert-light border rounded-3 p-3 mb-3">
+
+                            <h4 class="h6 fw-bold text-slate-800 mb-2">
+                                Additional Instructions
+                            </h4>
+
+                            <p class="mb-0 small text-slate-600">
+
+                                {{ site_settings.payment_instructions|linebreaks }}
+
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+
+
+                        <!-- Confirmation Requirement -->
+                        <div class="alert alert-warning-soft rounded-3 p-3 border-start border-4 border-warning">
+
+                            <div class="d-flex gap-2 align-items-start">
+
+                                <i class="fa-solid fa-triangle-exclamation text-warning mt-1"></i>
+
+                                <div>
+
+                                    <strong class="text-slate-800">
+                                        Confirmation Requirement
+                                    </strong>
+
+                                    <p class="mb-0 small text-muted">
+
+                                        Your service is not fully confirmed until Hands-On Health receives and verifies your payment receipt.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Call to Action -->
+                    <div class="text-center mt-5 pt-3 border-top">
+
+                        <a href="{% url 'homecare:submit_payment' quotation.access_token %}"
+                           class="btn btn-primary">
+
+                            <i class="fa-solid fa-check-circle me-2"></i>
+                            PAID
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <!-- Footer Note -->
+            <div class="text-center">
+
+                <p class="small text-muted mb-0">
+
+                    If you have questions about this quotation,
+                    please reach out to Hands-On Health support.
+
+                </p>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+

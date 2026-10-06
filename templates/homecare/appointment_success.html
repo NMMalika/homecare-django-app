@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#102A43">
+
+    <title>
+        Appointment Confirmed | Hands-On Health
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #102A43;
+            --navy-dark: #071B2E;
+
+            --teal: #16A394;
+            --teal-dark: #087F72;
+
+            --teal-soft: #E7F8F5;
+
+            --blue: #1976D2;
+            --text: #172B3A;
+            --muted: #718394;
+
+            --background: #EEF4F7;
+
+            --white: #FFFFFF;
+
+            --border: #DCE7EC;
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            padding: 25px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-family:
+                "DM Sans",
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+
+                radial-gradient(circle at 10% 10%,
+                    rgba(22, 163, 148, .12),
+                    transparent 28%),
+
+                radial-gradient(circle at 90% 90%,
+                    rgba(25, 118, 210, .10),
+                    transparent 30%),
+
+                var(--background);
+        }
+
+
+        /* =================================
+           PAGE WRAPPER
+        ================================= */
+
+        .confirmation-wrapper {
+
+            width: 100%;
+
+            max-width: 580px;
+
+            position: relative;
+        }
+
+
+        /* =================================
+           BRAND
+        ================================= */
+
+        .brand {
+
+            text-align: center;
+
+            margin-bottom: 22px;
+        }
+
+
+        .brand-name {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            color: var(--navy);
+
+            font-family:
+                "Plus Jakarta Sans",
+                sans-serif;
+
+            font-size: 17px;
+
+            font-weight: 800;
+
+            letter-spacing: -.3px;
+        }
+
+
+        .brand-icon {
+
+            width: 35px;
+
+            height: 35px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(135deg,
+                    var(--teal),
+                    #1976D2);
+
+            color: white;
+
+            font-size: 17px;
+
+            box-shadow:
+                0 7px 18px rgba(22, 163, 148, .20);
+        }
+
+
+        .brand-subtitle {
+
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.3px;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =================================
+           CARD
+        ================================= */
+
+        .card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            background: var(--white);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 24px;
+
+            padding: 45px 38px 38px;
+
+            text-align: center;
+
+            box-shadow:
+                0 25px 65px rgba(16, 42, 67, .11);
+        }
+
+
+        .card::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 5px;
+
+            background:
+                linear-gradient(90deg,
+                    var(--teal),
+                    #1976D2);
+        }
+
+
+        /* =================================
+           SUCCESS ICON
+        ================================= */
+
+        .icon-wrapper {
+
+            width: 88px;
+
+            height: 88px;
+
+            margin: 0 auto 23px;
+
+            padding: 7px;
+
+            border-radius: 50%;
+
+            background:
+                var(--teal-soft);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            box-shadow:
+                0 0 0 10px rgba(22, 163, 148, .045);
+        }
+
+
+        .icon-circle {
+
+            width: 74px;
+
+            height: 74px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(135deg,
+                    var(--teal),
+                    var(--teal-dark));
+
+            color: white;
+
+            font-size: 34px;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 10px 25px rgba(22, 163, 148, .25);
+        }
+
+
+        /* =================================
+           TEXT
+        ================================= */
+
+        .eyebrow {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 6px 11px;
+
+            margin-bottom: 13px;
+
+            border-radius: 30px;
+
+            background: var(--teal-soft);
+
+            color: var(--teal-dark);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+
+            letter-spacing: .7px;
+        }
+
+
+        .eyebrow span {
+
+            width: 5px;
+
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: var(--teal);
+        }
+
+
+        h1 {
+
+            color: var(--navy);
+
+            font-family:
+                "Plus Jakarta Sans",
+                sans-serif;
+
+            font-size: 27px;
+
+            line-height: 1.25;
+
+            font-weight: 800;
+
+            letter-spacing: -.7px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .message {
+
+            max-width: 450px;
+
+            margin: 0 auto 25px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =================================
+           INFO BOX
+        ================================= */
+
+        .info-box {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 12px;
+
+            text-align: left;
+
+            padding: 15px;
+
+            margin-bottom: 25px;
+
+            border-radius: 14px;
+
+            background: #F4F8FA;
+
+            border:
+                1px solid #E3EDF1;
+        }
+
+
+        .info-icon {
+
+            flex-shrink: 0;
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #EAF3FF;
+
+            color: var(--blue);
+
+            font-size: 16px;
+        }
+
+
+        .info-title {
+
+            color: var(--navy);
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            margin-bottom: 3px;
+        }
+
+
+        .info-text {
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =================================
+           BUTTON
+        ================================= */
+
+        .btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 9px;
+
+            min-height: 48px;
+
+            padding: 0 25px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(135deg,
+                    var(--navy),
+                    #174A70);
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 9px 22px rgba(16, 42, 67, .18);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+        }
+
+
+        .btn:hover {
+
+            color: white;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 13px 28px rgba(16, 42, 67, .23);
+        }
+
+
+        .btn i {
+
+            font-size: 14px;
+        }
+
+
+        /* =================================
+           FOOTER
+        ================================= */
+
+        .footer {
+
+            text-align: center;
+
+            margin-top: 20px;
+
+            color: #8798A4;
+
+            font-size: 9px;
+
+            line-height: 1.6;
+        }
+
+
+        .footer strong {
+
+            color: var(--navy);
+        }
+
+
+        /* =================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .card {
+
+                padding:
+                    38px 22px 28px;
+
+                border-radius: 20px;
+            }
+
+
+            h1 {
+
+                font-size: 23px;
+            }
+
+
+            .message {
+
+                font-size: 12px;
+            }
+
+
+            .icon-wrapper {
+
+                width: 78px;
+
+                height: 78px;
+            }
+
+
+            .icon-circle {
+
+                width: 65px;
+
+                height: 65px;
+
+                font-size: 29px;
+            }
+
+
+            .btn {
+
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+
+
+<body>
+
+    <div class="confirmation-wrapper">
+
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-name">
+
+                <div class="brand-icon">
+
+                    <i class="bi bi-heart-pulse-fill"></i>
+
+                </div>
+
+                Hands-On Health
+
+            </div>
+
+            <div class="brand-subtitle">
+
+                Home-Based Healthcare
+
+            </div>
+
+        </div>
+
+
+        <!-- CARD -->
+
+        <div class="card">
+
+
+            <!-- SUCCESS -->
+
+            <div class="icon-wrapper">
+
+                <div class="icon-circle">
+
+                    <i class="bi bi-check-lg"></i>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="eyebrow">
+
+                <span></span>
+
+                Booking Successful
+
+            </div>
+
+
+            <!-- TITLE -->
+
+            <h1>
+                Appointment Confirmed!
+            </h1>
+
+
+            <!-- MESSAGE -->
+
+            <p class="message">
+
+                Thank you for choosing Hands-On Health.
+                Your home-care appointment has been successfully
+                scheduled.
+
+            </p>
+
+
+            <!-- EMAIL INFORMATION -->
+
+            <div class="info-box">
+
+                <div class="info-icon">
+
+                    <i class="bi bi-envelope-check"></i>
+
+                </div>
+
+                <div>
+
+                    <div class="info-title">
+
+                        Confirmation sent
+
+                    </div>
+
+                    <div class="info-text">
+
+                        We've sent an email containing your
+                        appointment details and important
+                        information about your home-care visit.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTION -->
+
+            <a href="/" class="btn">
+
+                <span>
+                    Return to Home
+                </span>
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            <strong>Hands-On Health</strong>
+            · Compassionate care, delivered at home.
+
+        </div>
+
+
+    </div>
+
+</body>
+
+</html>

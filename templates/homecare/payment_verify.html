@@ -1,0 +1,1191 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}
+Verify Payment #{{ payment.id }} - Hands-On Health Staff
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* =========================================================
+       HANDS-ON HEALTH — PAYMENT VERIFICATION
+       Premium Verification Workspace
+       ========================================================= */
+
+    .verify-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 3rem;
+    }
+
+    /* ================= HEADER ================= */
+
+    .verify-header {
+        margin-bottom: 2rem;
+    }
+
+    .verify-kicker {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #2563eb;
+        margin-bottom: 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .verify-kicker i {
+        font-size: 0.85rem;
+    }
+
+    .verify-title {
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.3rem 0;
+        letter-spacing: -0.025em;
+    }
+
+    .verify-subtitle {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* ================= MAIN CARD ================= */
+
+    .verify-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.1rem;
+        box-shadow:
+            0 10px 30px rgba(15, 23, 42, 0.06),
+            0 2px 8px rgba(15, 23, 42, 0.03);
+        overflow: hidden;
+    }
+
+    .verify-card-header {
+        background:
+            linear-gradient(135deg,
+                #f8fafc 0%,
+                #f1f5f9 100%);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.3rem 1.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .verify-card-header h2 {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .verify-card-header h2 i {
+        color: #2563eb;
+    }
+
+    .payment-id-badge {
+        background: #ffffff;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        padding: 0.4rem 0.7rem;
+        border-radius: 0.5rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+    }
+
+    .verify-card-body {
+        padding: 1.75rem;
+    }
+
+    /* ================= INFO ROWS ================= */
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.18s ease;
+    }
+
+    .info-row:hover {
+        background: #f8fafc;
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+        margin-left: -0.65rem;
+        margin-right: -0.65rem;
+        border-radius: 0.55rem;
+    }
+
+    .info-row:last-of-type {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        color: #64748b;
+    }
+
+    .info-value {
+        font-size: 0.94rem;
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    /* ================= TRANSACTION CODE ================= */
+
+    .transaction-code {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        padding: 0.45rem 0.7rem;
+        border-radius: 0.55rem;
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+    }
+
+    /* ================= AMOUNT ================= */
+
+    .amount-value {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #15803d;
+    }
+
+    .quotation-value {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    /* ================= STATUS BADGES ================= */
+
+    .badge-match-success,
+    .badge-match-danger {
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 0.72rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        letter-spacing: 0.025em;
+    }
+
+    .badge-match-success {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+
+    .badge-match-danger {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    /* ================= WARNING ================= */
+
+    .verify-notice {
+        margin-top: 1.75rem;
+        background:
+            linear-gradient(135deg,
+                #fffbeb,
+                #fef3c7);
+        border: 1px solid #fcd34d;
+        border-radius: 0.85rem;
+        padding: 1.2rem 1.25rem;
+        display: flex;
+        gap: 0.95rem;
+        align-items: flex-start;
+    }
+
+    .verify-notice-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f59e0b;
+        color: #ffffff;
+        border-radius: 0.65rem;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+    }
+
+    .verify-notice strong {
+        color: #92400e;
+        font-size: 0.86rem;
+        display: block;
+        margin-bottom: 0.25rem;
+        font-weight: 800;
+    }
+
+    .verify-notice p {
+        color: #a16207;
+        font-size: 0.84rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    /* ================= ACTIONS ================= */
+
+    .verify-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        align-items: center;
+    }
+
+    .btn-verify-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.25rem;
+        border-radius: 0.6rem;
+        font-size: 0.86rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn-verify-action:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-verify-success {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        color: #ffffff;
+    }
+
+    .btn-verify-success:hover {
+        box-shadow: 0 7px 18px rgba(22, 163, 74, 0.22);
+    }
+
+    .btn-verify-danger {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: #ffffff;
+    }
+
+    .btn-verify-danger:hover {
+        box-shadow: 0 7px 18px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-verify-secondary {
+        background: #f8fafc;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+
+    .btn-verify-secondary:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    /* =========================================================
+       PREMIUM CONFIRMATION MODAL
+       ========================================================= */
+
+    .payment-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.25rem;
+
+        background: rgba(2, 6, 23, 0.72);
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+
+        opacity: 0;
+        transition: opacity 0.22s ease;
+    }
+
+    .payment-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .payment-modal {
+        width: min(480px, 100%);
+        background: #ffffff;
+        border-radius: 1.25rem;
+        overflow: hidden;
+
+        box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.28),
+            0 10px 30px rgba(15, 23, 42, 0.18);
+
+        transform: translateY(18px) scale(0.97);
+        transition: transform 0.25s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .payment-modal-overlay.active .payment-modal {
+        transform: translateY(0) scale(1);
+    }
+
+    /* Modal top */
+
+    .payment-modal-top {
+        position: relative;
+        padding: 1.7rem 1.7rem 1.45rem;
+
+        background:
+            radial-gradient(circle at 85% 15%,
+                rgba(59, 130, 246, 0.24),
+                transparent 35%),
+            linear-gradient(135deg,
+                #0f172a,
+                #172554);
+
+        color: #ffffff;
+    }
+
+    .payment-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+
+        width: 34px;
+        height: 34px;
+
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .payment-modal-close:hover {
+        background: rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        transform: rotate(90deg);
+    }
+
+    .payment-modal-icon {
+        width: 62px;
+        height: 62px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 18px;
+
+        background: rgba(34, 197, 94, 0.14);
+        border: 1px solid rgba(74, 222, 128, 0.35);
+
+        color: #4ade80;
+        font-size: 1.55rem;
+
+        margin-bottom: 1rem;
+
+        box-shadow:
+            0 0 0 7px rgba(34, 197, 94, 0.05),
+            0 10px 25px rgba(0, 0, 0, 0.18);
+    }
+
+    .payment-modal-kicker {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #93c5fd;
+        margin-bottom: 0.3rem;
+    }
+
+    .payment-modal-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .payment-modal-subtitle {
+        margin: 0.45rem 0 0;
+        font-size: 0.84rem;
+        line-height: 1.5;
+        color: #cbd5e1;
+        max-width: 370px;
+    }
+
+    /* Modal content */
+
+    .payment-modal-body {
+        padding: 1.45rem 1.7rem 1.6rem;
+    }
+
+    .modal-payment-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.7rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .modal-summary-item {
+        padding: 0.85rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.7rem;
+    }
+
+    .modal-summary-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        color: #64748b;
+        margin-bottom: 0.3rem;
+    }
+
+    .modal-summary-value {
+        display: block;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #0f172a;
+        word-break: break-word;
+    }
+
+    .modal-summary-value.green {
+        color: #15803d;
+    }
+
+    .modal-confirm-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+
+        padding: 0.9rem 1rem;
+
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 0.7rem;
+
+        color: #166534;
+        font-size: 0.78rem;
+        line-height: 1.45;
+    }
+
+    .modal-confirm-note i {
+        margin-top: 0.1rem;
+        color: #16a34a;
+    }
+
+    /* Modal buttons */
+
+    .payment-modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.7rem;
+        margin-top: 1.2rem;
+    }
+
+    .modal-btn {
+        min-height: 48px;
+
+        border-radius: 0.7rem;
+        border: none;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+
+        font-size: 0.84rem;
+        font-weight: 800;
+
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+
+    .modal-btn-cancel:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .modal-btn-confirm {
+        background: linear-gradient(135deg,
+                #16a34a,
+                #15803d);
+        color: #ffffff;
+
+        box-shadow:
+            0 7px 18px rgba(22, 163, 74, 0.2);
+    }
+
+    .modal-btn-confirm:hover {
+        transform: translateY(-1px);
+        box-shadow:
+            0 10px 24px rgba(22, 163, 74, 0.28);
+    }
+
+    .modal-btn-confirm:active {
+        transform: translateY(0);
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media (max-width: 700px) {
+
+        .verify-wrapper {
+            padding: 0 0.75rem 2rem;
+        }
+
+        .verify-card-body {
+            padding: 1.2rem;
+        }
+
+        .verify-card-header {
+            padding: 1.1rem 1.2rem;
+        }
+
+        .info-row {
+            grid-template-columns: 1fr;
+            gap: 0.35rem;
+        }
+
+        .verify-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .verify-actions form,
+        .verify-actions a {
+            width: 100%;
+        }
+
+        .verify-actions .btn-verify-action {
+            width: 100%;
+        }
+
+        .payment-modal-top {
+            padding: 1.4rem;
+        }
+
+        .payment-modal-body {
+            padding: 1.2rem;
+        }
+
+        .modal-payment-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .payment-modal-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div class="verify-wrapper">
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <div class="verify-header">
+
+        <div class="verify-kicker">
+            <i class="fa-solid fa-shield-halved"></i>
+            Financial Verification Workspace
+        </div>
+
+        <h1 class="verify-title">
+            Verify Payment #{{ payment.id }}
+        </h1>
+
+        <p class="verify-subtitle">
+            Review transaction details and validation metrics before confirming payment status.
+        </p>
+
+    </div>
+
+
+    <!-- ================= MAIN CARD ================= -->
+
+    <div class="verify-card">
+
+        <div class="verify-card-header">
+
+            <h2>
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Transaction Overview
+            </h2>
+
+            <span class="payment-id-badge">
+                PAYMENT #{{ payment.id }}
+            </span>
+
+        </div>
+
+
+        <div class="verify-card-body">
+
+            <!-- Client Name -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Client Name
+                </span>
+
+                <span class="info-value" style="font-size: 1rem; font-weight: 700;">
+                    {{ client_name|default:homecare_request.full_name }}
+                </span>
+
+            </div>
+
+
+            <!-- Quotation ID -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Quotation Reference
+                </span>
+
+                <span class="info-value">
+
+                    <span style="
+                        color:#2563eb;
+                        font-weight:800;
+                    ">
+                        #{{ quotation.id }}
+                    </span>
+
+                </span>
+
+            </div>
+
+
+            <!-- Transaction Code -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Transaction Code
+                </span>
+
+                <span class="info-value">
+
+                    <span class="transaction-code">
+                        <i class="fa-solid fa-receipt"></i>
+
+                        {{ payment.payment_code|default:"Not Provided" }}
+
+                    </span>
+
+                </span>
+
+            </div>
+
+
+            <!-- Amount Paid -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Amount Paid
+                </span>
+
+                <span class="amount-value">
+                    N$ {{ payment.amount|default:0|floatformat:2 }}
+                </span>
+
+            </div>
+
+
+            <!-- Quotation Total -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Quotation Total Target
+                </span>
+
+                <span class="quotation-value">
+                    N$ {{ quotation.amount|default:0|floatformat:2 }}
+                </span>
+
+            </div>
+
+
+            <!-- Validation Status -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Validation Status
+                </span>
+
+                <div>
+
+                    {% if payment.amount == quotation.amount %}
+
+                    <span class="badge-match-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        AMOUNT MATCHES
+                    </span>
+
+                    {% else %}
+
+                    <span class="badge-match-danger">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        AMOUNT MISMATCH
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Payment Method -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Payment Method
+                </span>
+
+                <span class="info-value">
+
+                    <span style="
+                        display:inline-flex;
+                        align-items:center;
+                        gap:.35rem;
+                        background:#f8fafc;
+                        border:1px solid #cbd5e1;
+                        padding:.4rem .65rem;
+                        border-radius:.5rem;
+                        font-size:.8rem;
+                        font-weight:700;
+                    ">
+
+                        <i class="fa-solid fa-wallet"></i>
+
+                        {{ payment.get_payment_method_display }}
+
+                    </span>
+
+                </span>
+
+            </div>
+
+
+            <!-- Submitted At -->
+
+            <div class="info-row">
+
+                <span class="info-label">
+                    Submission Timestamp
+                </span>
+
+                <span class="info-value">
+
+                    <i class="fa-regular fa-clock" style="color:#64748b; margin-right:.3rem;"></i>
+
+                    {{ payment.submitted_at|date:"M d, Y, g:i a" }}
+
+                </span>
+
+            </div>
+
+
+            <!-- Warning -->
+
+            <div class="verify-notice">
+
+                <div class="verify-notice-icon">
+                    <i class="fa-solid fa-exclamation"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        Pre-Verification Check
+                    </strong>
+
+                    <p>
+                        Verify that the official transaction code and paid amount
+                        match the bank or mobile money records before confirming
+                        authorization.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= ACTIONS ================= -->
+
+            <div class="verify-actions">
+
+                <!-- VERIFY FORM -->
+
+                <form method="post" id="verifyPaymentForm" style="margin:0;">
+
+                    {% csrf_token %}
+
+                    <input type="hidden" name="action" value="verify">
+
+                    <button type="button" class="btn-verify-action btn-verify-success" onclick="openVerifyModal()">
+
+                        <i class="fa-solid fa-shield-check"></i>
+
+                        <span>
+                            Verify Payment
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- REJECT -->
+
+                <form method="post" id="rejectPaymentForm" style="margin:0;">
+
+                    {% csrf_token %}
+
+                    <input type="hidden" name="action" value="reject">
+
+                    <button type="submit" class="btn-verify-action btn-verify-danger"
+                        onclick="return confirmRejectPayment();">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                        <span>
+                            Reject
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- CANCEL -->
+
+                <a href="{% url 'staff:payments' %}" class="btn-verify-action btn-verify-secondary ms-auto">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    <span>
+                        Cancel
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     PREMIUM VERIFY PAYMENT MODAL
+     ========================================================= -->
+
+<div class="payment-modal-overlay" id="verifyPaymentModal" role="dialog" aria-modal="true"
+    aria-labelledby="verifyModalTitle">
+
+    <div class="payment-modal">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="payment-modal-top">
+
+            <button type="button" class="payment-modal-close" onclick="closeVerifyModal()" aria-label="Close">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+            <div class="payment-modal-icon">
+
+                <i class="fa-solid fa-shield-check"></i>
+
+            </div>
+
+
+            <div class="payment-modal-kicker">
+                PAYMENT AUTHORIZATION
+            </div>
+
+
+            <h2 class="payment-modal-title" id="verifyModalTitle">
+
+                Confirm Payment Verification
+
+            </h2>
+
+
+            <p class="payment-modal-subtitle">
+
+                You are about to mark this payment as verified.
+                Please confirm that the transaction has been checked
+                against the official payment records.
+
+            </p>
+
+        </div>
+
+
+        <!-- MODAL BODY -->
+
+        <div class="payment-modal-body">
+
+
+            <!-- PAYMENT SUMMARY -->
+
+            <div class="modal-payment-summary">
+
+                <div class="modal-summary-item">
+
+                    <span class="modal-summary-label">
+                        Client
+                    </span>
+
+                    <span class="modal-summary-value">
+                        {{ client_name|default:homecare_request.full_name }}
+                    </span>
+
+                </div>
+
+
+                <div class="modal-summary-item">
+
+                    <span class="modal-summary-label">
+                        Payment
+                    </span>
+
+                    <span class="modal-summary-value">
+                        #{{ payment.id }}
+                    </span>
+
+                </div>
+
+
+                <div class="modal-summary-item">
+
+                    <span class="modal-summary-label">
+                        Transaction
+                    </span>
+
+                    <span class="modal-summary-value">
+                        {{ payment.payment_code|default:"Not Provided" }}
+                    </span>
+
+                </div>
+
+
+                <div class="modal-summary-item">
+
+                    <span class="modal-summary-label">
+                        Amount
+                    </span>
+
+                    <span class="modal-summary-value green">
+                        N$ {{ payment.amount|default:0|floatformat:2 }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONFIRMATION NOTE -->
+
+            <div class="modal-confirm-note">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <span>
+                    I confirm that I have checked the transaction code
+                    and payment amount against the official payment record.
+                </span>
+
+            </div>
+
+
+            <!-- MODAL ACTIONS -->
+
+            <div class="payment-modal-actions">
+
+                <button type="button" class="modal-btn modal-btn-cancel" onclick="closeVerifyModal()">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Cancel
+
+                </button>
+
+
+                <button type="button" class="modal-btn modal-btn-confirm" id="finalVerifyButton"
+                    onclick="submitVerification()">
+
+                    <i class="fa-solid fa-shield-check"></i>
+
+                    Confirm Verification
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       PREMIUM PAYMENT VERIFICATION MODAL
+       ========================================================= */
+
+    const verifyModal =
+        document.getElementById("verifyPaymentModal");
+
+    const verifyForm =
+        document.getElementById("verifyPaymentForm");
+
+    const finalVerifyButton =
+        document.getElementById("finalVerifyButton");
+
+
+    function openVerifyModal() {
+
+        verifyModal.classList.add("active");
+
+        document.body.style.overflow = "hidden";
+
+        setTimeout(function () {
+
+            finalVerifyButton.focus();
+
+        }, 120);
+    }
+
+
+    function closeVerifyModal() {
+
+        verifyModal.classList.remove("active");
+
+        document.body.style.overflow = "";
+
+    }
+
+
+    function submitVerification() {
+
+        finalVerifyButton.disabled = true;
+
+        finalVerifyButton.innerHTML = `
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            Verifying...
+        `;
+
+        /*
+         * Give the UI a tiny moment to show the
+         * verification state before submitting.
+         */
+
+        setTimeout(function () {
+
+            verifyForm.submit();
+
+        }, 350);
+
+    }
+
+
+    /* Close when clicking outside modal */
+
+    verifyModal.addEventListener("click", function (event) {
+
+        if (event.target === verifyModal) {
+
+            closeVerifyModal();
+
+        }
+
+    });
+
+
+    /* ESC closes modal */
+
+    document.addEventListener("keydown", function (event) {
+
+        if (
+            event.key === "Escape" &&
+            verifyModal.classList.contains("active")
+        ) {
+
+            closeVerifyModal();
+
+        }
+
+    });
+
+
+    /* =========================================================
+       REJECT CONFIRMATION
+       ========================================================= */
+
+    function confirmRejectPayment() {
+
+        return window.confirm(
+            "Are you sure you want to reject this payment?"
+        );
+
+    }
+
+</script>
+
+{% endblock %}

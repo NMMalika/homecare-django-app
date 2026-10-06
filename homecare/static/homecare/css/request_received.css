@@ -1,0 +1,99 @@
+/* =========================================================
+   REQUEST RECEIVED PAGE - PROFESSIONAL STYLING
+   ========================================================= */
+
+.request-success-card {
+    background: #ffffff;
+    border-radius: 1.25rem !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    transition: transform 0.2s ease;
+}
+
+/* SUCCESS ICON WRAPPER */
+.success-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: #ecfdf5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #047857;
+    font-size: 2.5rem;
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.08);
+}
+
+/* TYPOGRAPHY & COLORS */
+.text-slate-800 {
+    color: #0f172a !important;
+}
+
+.text-slate-700 {
+    color: #334155 !important;
+}
+
+.text-slate-600 {
+    color: #475569 !important;
+}
+
+.lead-sm {
+    font-size: 0.975rem;
+    line-height: 1.6;
+}
+
+/* BADGES & SOFT ACCENTS */
+.bg-success-soft {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #d1fae5;
+}
+
+.reference-badge-box {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+
+/* ALERT INFO SOFT */
+.alert-info-soft {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-info-soft .text-primary {
+    color: #047857 !important;
+}
+
+/* BUTTON ENHANCEMENTS */
+.btn-primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media (max-width: 767.98px) {
+    .request-success-card {
+        padding: 2rem 1.25rem !important;
+    }
+
+    .success-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        font-size: 2rem;
+    }
+}

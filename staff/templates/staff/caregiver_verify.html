@@ -1,0 +1,710 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+Verify {{ caregiver.name }} | Hands-On Health
+{% endblock %}
+
+
+{% block content %}
+
+<div class="verification-header">
+
+    <a href="{% url 'staff:caregivers' %}" class="back-link">
+        ← Back to caregivers
+    </a>
+
+
+    <div class="verification-title">
+
+        <div>
+
+            <span class="eyebrow">
+                CAREGIVER VERIFICATION
+            </span>
+
+            <h1>
+                {{ caregiver.name }}
+            </h1>
+
+            <p>
+                Review the complete application before
+                making a verification decision.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            {% if caregiver.verification_status == "PENDING" %}
+
+            <span class="large-status warning">
+                Pending verification
+            </span>
+
+            {% elif caregiver.verification_status == "APPROVED" %}
+
+            <span class="large-status success">
+                Approved
+            </span>
+
+            {% elif caregiver.verification_status == "REJECTED" %}
+
+            <span class="large-status danger">
+                Declined
+            </span>
+
+            {% else %}
+
+            <span class="large-status">
+                {{ caregiver.get_verification_status_display }}
+            </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="verification-layout">
+
+
+    <!-- =====================================================
+         MAIN APPLICATION
+         ===================================================== -->
+
+    <div class="verification-main">
+
+
+        <!-- PERSONAL INFORMATION -->
+
+        <section class="verification-card">
+
+            <div class="card-heading">
+
+                <span class="step-number">
+                    01
+                </span>
+
+                <div>
+
+                    <span class="eyebrow">
+                        PROFILE
+                    </span>
+
+                    <h2>
+                        Personal information
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-summary">
+
+                {% if caregiver.photo %}
+
+                <img src="{{ caregiver.photo.url }}" alt="{{ caregiver.name }}" class="verification-photo">
+
+                {% else %}
+
+                <div class="verification-photo-placeholder">
+                    {{ caregiver.name|first|upper }}
+                </div>
+
+                {% endif %}
+
+
+                <div>
+
+                    <h3>
+                        {{ caregiver.name }}
+                    </h3>
+
+                    <p>
+                        {{ caregiver.professional_title }}
+                    </p>
+
+                    {% if caregiver.specialization %}
+
+                    <span class="specialization-tag">
+                        {{ caregiver.specialization }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+                <div class="detail-item">
+
+                    <span>
+                        Full name
+                    </span>
+
+                    <strong>
+                        {{ caregiver.name }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Professional title
+                    </span>
+
+                    <strong>
+                        {{ caregiver.professional_title }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Specialization
+                    </span>
+
+                    <strong>
+                        {{ caregiver.specialization|default:"Not provided" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Phone
+                    </span>
+
+                    <strong>
+                        {{ caregiver.phone }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Email
+                    </span>
+
+                    <strong>
+                        {{ caregiver.email|default:"Not provided" }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <span>
+                        Availability
+                    </span>
+
+                    <strong>
+                        {{ caregiver.availability|default:"Not provided" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CV
+             ================================================= -->
+
+        <section class="verification-card">
+
+            <div class="card-heading">
+
+                <span class="step-number">
+                    02
+                </span>
+
+                <div>
+
+                    <span class="eyebrow">
+                        PROFESSIONAL HISTORY
+                    </span>
+
+                    <h2>
+                        Curriculum vitae
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            {% if caregiver.cv %}
+
+            <div class="document-row">
+
+                <div class="document-icon">
+                    PDF
+                </div>
+
+                <div class="document-info">
+
+                    <strong>
+                        Curriculum Vitae
+                    </strong>
+
+                    <span>
+                        Uploaded professional document
+                    </span>
+
+                </div>
+
+                <a href="{{ caregiver.cv.url }}" target="_blank" rel="noopener" class="btn btn-light">
+                    View document
+                </a>
+
+            </div>
+
+            {% else %}
+
+            <div class="document-empty">
+                No CV was uploaded.
+            </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- =================================================
+             CERTIFICATES
+             ================================================= -->
+
+        <section class="verification-card">
+
+            <div class="card-heading">
+
+                <span class="step-number">
+                    03
+                </span>
+
+                <div>
+
+                    <span class="eyebrow">
+                        CREDENTIALS
+                    </span>
+
+                    <h2>
+                        Certificates & documents
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="certificate-list">
+
+                {% for certificate in certificates %}
+
+                <div class="certificate-card">
+
+                    <div class="certificate-top">
+
+                        <div class="certificate-icon">
+                            DOC
+                        </div>
+
+
+                        <div class="certificate-heading">
+
+                            <h3>
+                                {{ certificate.certificate_name }}
+                            </h3>
+
+                            <span>
+                                {{ certificate.issuing_organization|default:"Issuing organization not provided" }}
+                            </span>
+
+                        </div>
+
+
+                        {% if certificate.is_verified %}
+
+                        <span class="status-pill success">
+                            Verified
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-pill warning">
+                            Not verified
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="certificate-details">
+
+                        <div>
+
+                            <span>
+                                Certificate number
+                            </span>
+
+                            <strong>
+                                {{ certificate.certificate_number|default:"—" }}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Issue date
+                            </span>
+
+                            <strong>
+                                {{ certificate.issue_date|default:"—" }}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Expiry date
+                            </span>
+
+                            <strong>
+                                {{ certificate.expiry_date|default:"—" }}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Uploaded
+                            </span>
+
+                            <strong>
+                                {{ certificate.uploaded_at|date:"d M Y" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    {% if certificate.verification_notes %}
+
+                    <div class="certificate-note">
+
+                        <strong>
+                            Existing verification note
+                        </strong>
+
+                        <p>
+                            {{ certificate.verification_notes }}
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div class="certificate-actions">
+
+                        {% if certificate.document %}
+
+                        <a href="{{ certificate.document.url }}" target="_blank" rel="noopener" class="btn btn-primary">
+                            View certificate
+                        </a>
+
+                        <a href="{{ certificate.document.url }}" target="_blank" rel="noopener" class="btn btn-light">
+                            Open full document
+                        </a>
+
+                        {% else %}
+
+                        <span class="document-missing">
+                            Document unavailable
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                {% empty %}
+
+                <div class="document-empty">
+
+                    <strong>
+                        No certificates uploaded.
+                    </strong>
+
+                    <span>
+                        The caregiver has not attached any
+                        certificate documents.
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             EXISTING NOTES
+             ================================================= -->
+
+        {% if caregiver.verification_notes %}
+
+        <section class="verification-card">
+
+            <div class="card-heading">
+
+                <span class="step-number">
+                    04
+                </span>
+
+                <div>
+
+                    <span class="eyebrow">
+                        PREVIOUS REVIEW
+                    </span>
+
+                    <h2>
+                        Verification notes
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="previous-note">
+
+                {{ caregiver.verification_notes }}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             DECISION
+             ================================================= -->
+
+        <section class="verification-card decision-card">
+
+            <div class="card-heading">
+
+                <span class="step-number">
+                    05
+                </span>
+
+                <div>
+
+                    <span class="eyebrow">
+                        FINAL REVIEW
+                    </span>
+
+                    <h2>
+                        Verification decision
+                    </h2>
+
+                    <p>
+                        Record the reason for your decision.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form method="post" class="verification-form">
+
+                {% csrf_token %}
+
+
+                <label for="verification_comment">
+                    Admin comment
+                </label>
+
+                <textarea id="verification_comment" name="verification_comment" rows="7"
+                    placeholder="Example: Application approved after reviewing the submitted certificates and professional documents."></textarea>
+
+
+                <div class="decision-actions">
+
+                    <button type="submit" name="decision" value="decline" class="btn btn-danger btn-large">
+                        Decline application
+                    </button>
+
+
+                    <button type="submit" name="decision" value="approve" class="btn btn-success btn-large">
+                        Approve caregiver
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDE SUMMARY
+         ===================================================== -->
+
+    <aside class="verification-sidebar">
+
+        <div class="sticky-card">
+
+            <span class="eyebrow">
+                APPLICATION SUMMARY
+            </span>
+
+            <h2>
+                Review checklist
+            </h2>
+
+
+            <div class="check-item">
+
+                <span class="check-dot"></span>
+
+                <div>
+
+                    <strong>
+                        Personal information
+                    </strong>
+
+                    <small>
+                        Profile details submitted
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="check-item">
+
+                <span class="check-dot"></span>
+
+                <div>
+
+                    <strong>
+                        Professional details
+                    </strong>
+
+                    <small>
+                        {{ caregiver.professional_title }}
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="check-item">
+
+                <span class="check-dot"></span>
+
+                <div>
+
+                    <strong>
+                        Certificates
+                    </strong>
+
+                    <small>
+                        {{ certificates|length }}
+                        document(s) submitted
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="check-item">
+
+                <span class="check-dot"></span>
+
+                <div>
+
+                    <strong>
+                        CV
+                    </strong>
+
+                    <small>
+
+                        {% if caregiver.cv %}
+                        Document available
+                        {% else %}
+                        Not submitted
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-divider"></div>
+
+
+            <div class="decision-reminder">
+
+                <strong>
+                    Before approving
+                </strong>
+
+                <p>
+                    Review the submitted professional
+                    information and open each available
+                    certificate/document.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+</div>
+
+{% endblock %}

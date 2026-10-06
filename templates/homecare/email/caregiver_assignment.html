@@ -1,0 +1,210 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Patient Assignment</title>
+</head>
+
+<body style="
+        margin:0;
+        padding:0;
+        background:#f4f7fb;
+        font-family:Arial,Helvetica,sans-serif;
+        color:#263238;
+    ">
+
+    <div style="
+            max-width:620px;
+            margin:30px auto;
+            background:#ffffff;
+            border-radius:14px;
+            overflow:hidden;
+            box-shadow:0 8px 30px rgba(0,0,0,.08);
+        ">
+
+        <!-- HEADER -->
+
+        <div style="
+                background:#0d6efd;
+                padding:30px 25px;
+                text-align:center;
+                color:#ffffff;
+            ">
+
+            <div style="
+                    font-size:28px;
+                    font-weight:700;
+                ">
+                New Patient Assignment
+            </div>
+
+            <div style="
+                    margin-top:8px;
+                    font-size:15px;
+                    opacity:.95;
+                ">
+                Hands-On Health
+            </div>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <div style="padding:30px 25px;">
+
+            <p style="font-size:16px;">
+
+                Dear
+                <strong>
+                    {{ caregiver.name }}
+                </strong>,
+
+            </p>
+
+
+            <p style="
+                    font-size:15px;
+                    line-height:1.7;
+                ">
+                You have been assigned a new patient.
+                Please review the assignment details below.
+            </p>
+
+
+            <!-- PATIENT DETAILS -->
+
+            <div style="
+                    background:#f8f9fa;
+                    border:1px solid #e9ecef;
+                    border-radius:10px;
+                    padding:20px;
+                    margin:22px 0;
+                ">
+
+                <!-- PATIENT -->
+
+                <div style="
+                        font-size:13px;
+                        color:#6c757d;
+                        text-transform:uppercase;
+                        font-weight:700;
+                        margin-bottom:6px;
+                    ">
+                    Patient
+                </div>
+
+                <div style="
+                        font-size:20px;
+                        font-weight:700;
+                        margin-bottom:18px;
+                    ">
+                    {{ homecare_request.full_name }}
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div style="
+                        font-size:13px;
+                        color:#6c757d;
+                        text-transform:uppercase;
+                        font-weight:700;
+                        margin-bottom:6px;
+                    ">
+                    Location
+                </div>
+
+                <div style="
+                        font-size:16px;
+                        font-weight:600;
+                        margin-bottom:18px;
+                    ">
+                    {{ homecare_request.location }}
+                </div>
+
+
+                <!-- DATE & TIME -->
+
+                <div style="
+                        font-size:13px;
+                        color:#6c757d;
+                        text-transform:uppercase;
+                        font-weight:700;
+                        margin-bottom:6px;
+                    ">
+                    Service Date &amp; Time
+                </div>
+
+                <div style="
+                        font-size:16px;
+                        font-weight:600;
+                    ">
+                    {{ assignment.service_date|date:"d F Y" }}
+
+                    at
+
+                    {{ assignment.service_time|time:"h:i A" }}
+                </div>
+
+            </div>
+
+
+            <!-- DASHBOARD BUTTON -->
+
+            <div style="
+                    text-align:center;
+                    margin:30px 0;
+                ">
+
+                <a href="{{ dashboard_url }}" style="
+                        display:inline-block;
+                        background:#0d6efd;
+                        color:#ffffff;
+                        text-decoration:none;
+                        padding:14px 28px;
+                        border-radius:8px;
+                        font-weight:700;
+                        font-size:15px;
+                    ">
+                    VIEW ASSIGNMENT
+                </a>
+
+            </div>
+
+
+            <p style="
+                    font-size:13px;
+                    color:#6c757d;
+                    line-height:1.6;
+                ">
+                Use the button above to view your
+                assignment details.
+                This secure link is valid for 7 days.
+            </p>
+
+
+            <p style="
+                    font-size:15px;
+                    margin-top:28px;
+                ">
+                Kind regards,<br>
+
+                <strong>
+                    {{ site_settings.business_name }}
+                </strong>
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

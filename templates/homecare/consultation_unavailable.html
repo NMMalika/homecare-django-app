@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}
+Appointment Scheduling Unavailable
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .unavailable-page {
+        max-width: 700px;
+        margin: 70px auto;
+        padding: 20px;
+    }
+
+    .unavailable-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 45px 35px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
+        border: 1px solid #e8edf2;
+    }
+
+    .unavailable-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: #fff3cd;
+        color: #856404;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 38px;
+    }
+
+    .unavailable-card h1 {
+        color: #073b67;
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+
+    .unavailable-card p {
+        color: #667085;
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    .patient-name {
+        color: #073b67;
+        font-weight: 700;
+    }
+
+    .contact-box {
+        margin-top: 25px;
+        padding: 18px;
+        background: #f7fafc;
+        border-radius: 12px;
+        color: #526273;
+    }
+
+    .back-btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 12px 24px;
+        background: #287db5;
+        color: white;
+        text-decoration: none;
+        border-radius: 7px;
+        font-weight: 600;
+    }
+
+    .back-btn:hover {
+        background: #073b67;
+        color: white;
+    }
+
+    @media (max-width: 600px) {
+
+        .unavailable-page {
+            margin: 30px auto;
+            padding: 15px;
+        }
+
+        .unavailable-card {
+            padding: 30px 20px;
+        }
+
+        .unavailable-card h1 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+
+<div class="unavailable-page">
+
+    <div class="unavailable-card">
+
+        <div class="unavailable-icon">
+            !
+        </div>
+
+        <h1>
+            Appointment Scheduling Unavailable
+        </h1>
+
+        <p>
+            Dear
+            <span class="patient-name">
+                {{ consultation.first_name }}
+                {{ consultation.last_name }}
+            </span>,
+        </p>
+
+        <p>
+            {{ message|default:"Appointment scheduling is not currently available for this consultation." }}
+        </p>
+
+        <div class="contact-box">
+
+            <strong>
+                Need assistance?
+            </strong>
+
+            <br><br>
+
+            Please contact Hands-On Health and our team
+            will assist you with your consultation.
+
+        </div>
+
+        <a href="/" class="back-btn">
+            Return to Home
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

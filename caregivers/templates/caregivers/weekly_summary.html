@@ -1,0 +1,239 @@
+{% extends "caregivers/base.html" %}
+
+{% block title %}Weekly Summary | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <a href="{% url 'caregivers:assignment_detail' assignment.pk %}" class="text-decoration-none small">
+
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Back to Assignment
+
+            </a>
+
+            <h2 class="fw-bold mt-2 mb-1">
+                Weekly Care Summary
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ assignment.homecare_request.patient_name }}
+            </p>
+
+        </div>
+
+        <a href="{% url 'caregivers:reports' %}" class="btn btn-outline-primary">
+
+            <i class="fa-solid fa-file-medical me-2"></i>
+            All Reports
+
+        </a>
+
+    </div>
+
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Assignment Period
+                    </small>
+
+                    <h5 class="fw-bold mt-2">
+                        {{ assignment_start|date:"d M Y" }}
+                        -
+                        {{ assignment_end|date:"d M Y" }}
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Reports Submitted
+                    </small>
+
+                    <h2 class="fw-bold mt-2">
+                        {{ submitted_days }}
+                        <small class="text-muted fs-6">
+                            / {{ total_days }} days
+                        </small>
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Outstanding Reports
+                    </small>
+
+                    <h2 class="fw-bold mt-2
+                        {% if outstanding_days > 0 %}
+                            text-warning
+                        {% else %}
+                            text-success
+                        {% endif %}">
+
+                        {{ outstanding_days }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REPORTS -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white py-3">
+
+            <h5 class="fw-bold mb-0">
+                Daily Care Reports
+            </h5>
+
+        </div>
+
+        <div class="card-body p-0">
+
+            {% if reports %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Date</th>
+                            <th>Condition</th>
+                            <th>Care Provided</th>
+                            <th>Progress</th>
+                            <th>Concerns</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for report in reports %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ report.report_date|date:"D, d M Y" }}
+                                </strong>
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-info">
+                                    {{ report.get_patient_condition_display }}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{ report.care_provided|truncatewords:15 }}
+                            </td>
+
+                            <td>
+                                {{ report.patient_progress|truncatewords:15 }}
+                            </td>
+
+                            <td>
+                                {% if report.concerns %}
+                                {{ report.concerns|truncatewords:12 }}
+                                {% else %}
+                                <span class="text-muted">
+                                    None reported
+                                </span>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <i class="fa-solid fa-chart-line fa-3x text-muted mb-3"></i>
+
+                <h5>No Reports Submitted</h5>
+
+                <p class="text-muted">
+                    No daily reports have been submitted for this assignment.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    {% if assignment.status == "IN_PROGRESS" %}
+
+    <div class="mt-4">
+
+        <a href="{% url 'caregivers:daily_report_create' assignment.pk %}" class="btn btn-primary">
+
+            <i class="fa-solid fa-plus me-2"></i>
+            Submit Daily Report
+
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

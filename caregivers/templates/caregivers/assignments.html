@@ -1,0 +1,220 @@
+{% extends "caregivers/base.html" %}
+
+{% block title %}My Assignments | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                My Assignments
+            </h2>
+
+            <p class="text-muted mb-0">
+                Manage your assigned home-care patients.
+            </p>
+        </div>
+
+        <a href="{% url 'caregivers:dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- FILTER -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <form method="get" class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        Filter by Status
+                    </label>
+
+                    <select name="status" class="form-select">
+
+                        <option value="">
+                            All Assignments
+                        </option>
+
+                        {% for value,label in status_choices %}
+
+                        <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
+                            {{ label }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-auto">
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-filter me-2"></i>
+                        Filter
+                    </button>
+
+                </div>
+
+                <div class="col-md-auto">
+
+                    <a href="{% url 'caregivers:assignments' %}" class="btn btn-outline-secondary">
+                        Clear
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ASSIGNMENTS -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-0">
+
+            {% if assignments %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Patient</th>
+                            <th>Assignment</th>
+                            <th>Assigned Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for assignment in assignments %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-semibold">
+                                    {{ assignment.homecare_request.patient_name }}
+                                </div>
+
+                            </td>
+
+                            <td>
+                                {{ assignment.assignment_type|default:"Home Care" }}
+                            </td>
+
+                            <td>
+                                {{ assignment.assigned_at|date:"d M Y" }}
+                            </td>
+
+                            <td>
+
+                                {% if assignment.status == "PENDING_ACCEPTANCE" %}
+
+                                <span class="badge bg-warning text-dark">
+                                    Pending Acceptance
+                                </span>
+
+                                {% elif assignment.status == "ACCEPTED" %}
+
+                                <span class="badge bg-info">
+                                    Accepted
+                                </span>
+
+                                {% elif assignment.status == "IN_PROGRESS" %}
+
+                                <span class="badge bg-primary">
+                                    In Progress
+                                </span>
+
+                                {% elif assignment.status == "COMPLETED" %}
+
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+
+                                {% elif assignment.status == "DECLINED" %}
+
+                                <span class="badge bg-danger">
+                                    Declined
+                                </span>
+
+                                {% elif assignment.status == "CANCELLED" %}
+
+                                <span class="badge bg-secondary">
+                                    Cancelled
+                                </span>
+
+                                {% else %}
+
+                                <span class="badge bg-secondary">
+                                    {{ assignment.get_status_display }}
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <a href="{% url 'caregivers:assignment_detail' assignment.pk %}"
+                                    class="btn btn-sm btn-primary">
+                                    View
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="text-center py-5">
+
+                <i class="fa-solid fa-clipboard-list fa-3x text-muted mb-3"></i>
+
+                <h5>No assignments found</h5>
+
+                <p class="text-muted">
+                    There are no assignments matching your selected filter.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

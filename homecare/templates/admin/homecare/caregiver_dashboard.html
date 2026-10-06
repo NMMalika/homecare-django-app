@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caregiver Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #263238
+        }
+
+        .wrap {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px
+        }
+
+        .header {
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 22px
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 28px
+        }
+
+        .header p {
+            margin: 0;
+            opacity: .9
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .07)
+        }
+
+        .badge {
+            display: inline-block;
+            background: #d1e7dd;
+            color: #0f5132;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 22px
+        }
+
+        .item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 16px
+        }
+
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 700;
+            margin-bottom: 7px
+        }
+
+        .value {
+            font-size: 17px;
+            font-weight: 600
+        }
+
+        .notes {
+            margin-top: 20px;
+            padding: 18px;
+            background: #fff8e1;
+            border-radius: 10px
+        }
+
+        .footer {
+            text-align: center;
+            color: #6c757d;
+            font-size: 13px;
+            margin-top: 20px
+        }
+
+        @media(max-width:600px) {
+            .wrap {
+                margin: 15px auto;
+                padding: 12px
+            }
+
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .header h1 {
+                font-size: 23px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="header">
+            <h1>Caregiver Dashboard</h1>
+            <p>Welcome, {{ assignment.caregiver.name }}. Here is your current patient assignment.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">{{ assignment.get_status_display }}</span>
+
+            <div class="grid">
+                <div class="item">
+                    <div class="label">Patient</div>
+                    <div class="value">{{ assignment.homecare_request.full_name }}</div>
+                </div>
+                <div class="item">
+                    <div class="label">Location</div>
+                    <div class="value">{{ assignment.homecare_request.location }}</div>
+                </div>
+                <div class="item">
+                    <div class="label">Service Date</div>
+                    <div class="value">{{ assignment.service_date|date:"d F Y" }}</div>
+                </div>
+                <div class="item">
+                    <div class="label">Service Time</div>
+                    <div class="value">{{ assignment.service_time|time:"h:i A" }}</div>
+                </div>
+                <div class="item">
+                    <div class="label">Patient Phone</div>
+                    <div class="value">{{ assignment.homecare_request.phone }}</div>
+                </div>
+                <div class="item">
+                    <div class="label">Patient Email</div>
+                    <div class="value">{{ assignment.homecare_request.email }}</div>
+                </div>
+            </div>
+
+            {% if assignment.notes %}<div class="notes">
+                <div class="label">Assignment Notes</div>
+                <div>{{ assignment.notes|linebreaksbr }}</div>
+            </div>{% endif %}
+
+            <div class="notes" style="background:#eef6ff;">
+                <div class="label">Care Required</div>
+                <div>{{ assignment.homecare_request.description|linebreaksbr }}</div>
+            </div>
+        </div>
+        <div class="footer">{{ assignment.caregiver.name }} &bull; Hands-On Health</div>
+    </div>
+</body>
+
+</html>

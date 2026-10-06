@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5 my-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <div class="card border-0 shadow-sm text-center">
+
+                <div class="card-body p-5">
+
+                    <div class="mb-4">
+
+                        <div class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px;">
+
+                            <i class="fa-solid fa-check text-success fs-2"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <h1 class="h3 fw-bold text-slate-800 mb-3">
+
+                        Payment Submitted
+
+                    </h1>
+
+
+                    <p class="text-muted mb-4">
+
+                        Thank you, {{ homecare_request.full_name }}.
+
+                        Your payment information has been submitted
+                        successfully.
+
+                    </p>
+
+
+                    <div class="alert alert-warning text-start">
+
+                        <strong>
+                            Awaiting Verification
+                        </strong>
+
+                        <p class="small mb-0 mt-1">
+
+                            Our team will verify your payment before
+                            confirming your home care service.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="summary-grid rounded-3 p-4 text-start mb-4">
+
+                        <div class="d-flex justify-content-between mb-2">
+
+                            <span class="text-muted">
+                                Quotation
+                            </span>
+
+                            <strong>
+                                #{{ quotation.id }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="text-muted">
+                                Amount
+                            </span>
+
+                            <strong class="text-primary">
+                                N$ {{ quotation.amount|floatformat:2 }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="small text-muted">
+
+                        Please keep your payment transaction details
+                        until the verification process is complete.
+
+                    </p>
+
+
+                    <a href="{% url 'homecare:quotation_detail' quotation.access_token %}" class="btn btn-primary mt-2">
+
+                        <i class="fa-solid fa-file-invoice me-2"></i>
+
+                        View Quotation
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

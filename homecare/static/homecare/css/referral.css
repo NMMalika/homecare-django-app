@@ -1,0 +1,233 @@
+/* ==========================================================================
+   Referral Form Page Stylesheet
+   ========================================================================== */
+
+/* --- Centering & Layout Overrides --- */
+.container {
+    margin-right: auto !important;
+    margin-left: auto !important;
+}
+
+.container.py-5 {
+    padding-bottom: 6rem !important;
+    /* Ensures generous space above the footer */
+}
+
+.row {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    justify-content: center !important;
+}
+
+/* --- Card & Container Layout --- */
+.card {
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    margin-right: auto !important;
+    margin-left: auto !important;
+    margin-bottom: 3rem !important;
+}
+
+.card h2 {
+    color: #1e293b;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Center Form Header Elements */
+.card .text-primary.text-uppercase,
+.card h2,
+.card p.text-muted {
+    text-align: center;
+    display: block;
+}
+
+/* --- Section Dividers --- */
+h5.border-bottom {
+    color: #0d6efd;
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+    border-bottom-color: #e2e8f0 !important;
+}
+
+/* --- Form Controls & Labels --- */
+.form-label {
+    color: #334155;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    outline: 0;
+}
+
+/* --- Input Group & Add Button Styling --- */
+.input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .btn-outline-primary,
+#addServiceBtn {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.925rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    border: none;
+    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.input-group .btn-outline-primary:hover,
+#addServiceBtn:hover {
+    background: linear-gradient(135deg, #1172ff 0%, #0a58ca 100%);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.input-group .btn-outline-primary:active,
+#addServiceBtn:active {
+    transform: translateY(0);
+}
+
+/* --- Dynamic Selected Services Container --- */
+.selected-services-container {
+    min-height: 54px;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* Dynamic Badge Item */
+.service-badge {
+    background: #eef2ff;
+    color: #1e40af;
+    border: 1px solid #c7d2fe;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    animation: badgePop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-badge .remove-btn {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: rgba(30, 64, 175, 0.1);
+    color: #1e40af;
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.15s ease;
+}
+
+.service-badge .remove-btn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+/* --- Submit Container & Centered Button --- */
+#referralForm .col-12.mt-4 {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 2rem !important;
+    padding-bottom: 0.5rem;
+}
+
+.btn-primary.w-100,
+#referralForm button[type="submit"] {
+    display: inline-block !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-align: center;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.28);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.btn-primary.w-100:hover,
+#referralForm button[type="submit"]:hover {
+    background: linear-gradient(135deg, #1172ff 0%, #0b5ed7 100%);
+    box-shadow: 0 8px 22px rgba(13, 110, 253, 0.38);
+    transform: translateY(-2px);
+    color: #ffffff;
+}
+
+.btn-primary.w-100:active,
+#referralForm button[type="submit"]:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+}
+
+/* --- Completely Hide Django Native Select Outputs --- */
+.d-none,
+select[multiple] {
+    display: none !important;
+}
+
+/* Keyframe Animations */
+@keyframes badgePop {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
