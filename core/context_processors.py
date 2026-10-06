@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import SiteSettings
 
@@ -13,11 +14,16 @@ def admin_dashboard(request):
     """
     Dashboard statistics for the Django administration homepage.
 
-    This only performs the database queries when the current
-    request is inside Django admin and the user is authenticated.
+    ```
+    Queries are only performed for authenticated staff users
+    accessing the Django admin.
     """
 
     context = {}
+
+    # ========================================================
+    # ONLY RUN INSIDE DJANGO ADMIN
+    # ========================================================
 
     if not request.path.startswith("/admin/"):
         return context
@@ -27,6 +33,10 @@ def admin_dashboard(request):
 
     if not request.user.is_staff:
         return context
+
+    # ========================================================
+    # IMPORT MODELS
+    # ========================================================
 
     from homecare.models import (
         HomeCareRequest,
@@ -60,6 +70,7 @@ def admin_dashboard(request):
         ).count()
     )
 
+    # HomeCareRequest DOES define ASSIGNED.
     context["dashboard_homecare_assigned"] = (
         HomeCareRequest.objects.filter(
             status=HomeCareRequest.Status.ASSIGNED
@@ -94,10 +105,7 @@ def admin_dashboard(request):
 
     context["dashboard_consultations_today"] = (
         Consultation.objects.filter(
-            consultation_date=__import__(
-                "django.utils.timezone",
-                fromlist=["localdate"],
-            ).localdate()
+            consultation_date=timezone.localdate()
         ).count()
     )
 
@@ -157,17 +165,13 @@ def admin_dashboard(request):
 
     context["dashboard_caregivers_pending"] = (
         Caregiver.objects.filter(
-            verification_status=(
-                Caregiver.VerificationStatus.PENDING
-            )
+            verification_status=Caregiver.VerificationStatus.PENDING
         ).count()
     )
 
     context["dashboard_caregivers_approved"] = (
         Caregiver.objects.filter(
-            verification_status=(
-                Caregiver.VerificationStatus.APPROVED
-            )
+            verification_status=Caregiver.VerificationStatus.APPROVED
         ).count()
     )
 
@@ -178,16 +182,41 @@ def admin_dashboard(request):
     )
 
     # ========================================================
-    # ASSIGNMENTS
+    # CAREGIVER ASSIGNMENTS
     # ========================================================
 
     context["dashboard_assignments_total"] = (
         CaregiverAssignment.objects.count()
     )
 
+    # CaregiverAssignment.Status does NOT have ASSIGNED.
+    #
+    # An assignment is considered active when it has been
+    # accepted or is currently in progress.
     context["dashboard_assignments_active"] = (
         CaregiverAssignment.objects.filter(
-            status=CaregiverAssignment.Status.ASSIGNED
+            status__in=[
+                CaregiverAssignment.Status.ACCEPTED,
+                CaregiverAssignment.Status.IN_PROGRESS,
+            ]
+        ).count()
+    )
+
+    context["dashboard_assignments_pending"] = (
+        CaregiverAssignment.objects.filter(
+            status=CaregiverAssignment.Status.PENDING
+        ).count()
+    )
+
+    context["dashboard_assignments_completed"] = (
+        CaregiverAssignment.objects.filter(
+            status=CaregiverAssignment.Status.COMPLETED
+        ).count()
+    )
+
+    context["dashboard_assignments_declined"] = (
+        CaregiverAssignment.objects.filter(
+            status=CaregiverAssignment.Status.DECLINED
         ).count()
     )
 
@@ -230,27 +259,47 @@ def admin_dashboard(request):
     )
 
     # ========================================================
-    # RECENT ITEMS
+    # RECENT HOME CARE REQUESTS
     # ========================================================
 
     context["dashboard_recent_homecare"] = (
-        HomeCareRequest.objects.order_by("-created_at")[:5]
+        HomeCareRequest.objects.order_by(
+            "-created_at"
+        )[:5]
     )
 
+    # ========================================================
+    # RECENT CONSULTATIONS
+    # ========================================================
+
     context["dashboard_recent_consultations"] = (
-        Consultation.objects.order_by("-created_at")[:5]
+        Consultation.objects.order_by(
+            "-created_at"
+        )[:5]
     )
+
+    # ========================================================
+    # RECENT PAYMENTS
+    # ========================================================
 
     context["dashboard_recent_payments"] = (
         Payment.objects.select_related(
             "quotation",
             "quotation__consultation",
             "quotation__homecare_request",
-        ).order_by("-submitted_at")[:5]
+        ).order_by(
+            "-submitted_at"
+        )[:5]
     )
 
+    # ========================================================
+    # RECENT CAREGIVERS
+    # ========================================================
+
     context["dashboard_recent_caregivers"] = (
-        Caregiver.objects.order_by("-created_at")[:5]
+        Caregiver.objects.order_by(
+            "-created_at"
+        )[:5]
     )
 
     # ========================================================
@@ -261,39 +310,51 @@ def admin_dashboard(request):
         "homecare": reverse(
             "admin:homecare_homecarerequest_changelist"
         ),
+
         "consultations": reverse(
             "admin:homecare_consultation_changelist"
         ),
+
         "quotations": reverse(
             "admin:homecare_quotation_changelist"
         ),
+
         "payments": reverse(
             "admin:homecare_payment_changelist"
         ),
+
         "caregivers": reverse(
             "admin:homecare_caregiver_changelist"
         ),
+
         "assignments": reverse(
             "admin:homecare_caregiverassignment_changelist"
         ),
+
         "reports": reverse(
             "admin:homecare_caregiverdailyreport_changelist"
         ),
+
         "caregiver_payments": reverse(
             "admin:homecare_caregiverpayment_changelist"
         ),
+
         "referrals": reverse(
             "admin:homecare_referral_changelist"
         ),
+
         "services": reverse(
             "admin:services_service_changelist"
         ),
+
         "service_categories": reverse(
             "admin:services_servicecategory_changelist"
         ),
+
         "users": reverse(
             "admin:accounts_user_changelist"
         ),
     }
 
     return context
+
