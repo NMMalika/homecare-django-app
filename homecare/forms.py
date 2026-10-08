@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django import forms
 from django.forms.models import inlineformset_factory
 
@@ -101,29 +102,89 @@ class HomeCareRequestForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+        # ----------------------------------------------------
+        # MINIMUM DATE = TODAY
+        # ----------------------------------------------------
+
+        today = timezone.localdate()
+
+        self.fields["preferred_date"].widget.attrs["min"] = (
+            today.isoformat()
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        preferred_date = cleaned_data.get("preferred_date")
+        preferred_time = cleaned_data.get("preferred_time")
+
+        if not preferred_date or not preferred_time:
+            return cleaned_data
+
+        # ----------------------------------------------------
+        # CURRENT DATE AND TIME
+        # ----------------------------------------------------
+
+        now = timezone.localtime()
+
+        current_date = now.date()
+        current_time = now.time()
+
+        # ----------------------------------------------------
+        # DO NOT ALLOW A PAST DATE
+        # ----------------------------------------------------
+
+        if preferred_date < current_date:
+
+            self.add_error(
+                "preferred_date",
+                "Please select today or a future date.",
+            )
+
+            return cleaned_data
+
+        # ----------------------------------------------------
+        # MINIMUM TIME = 1 HOUR FROM NOW
+        # ----------------------------------------------------
+
+        minimum_datetime = now + timedelta(hours=1)
+
+        selected_datetime = timezone.make_aware(
+            datetime.combine(
+                preferred_date,
+                preferred_time,
+            ),
+            timezone.get_current_timezone(),
+        )
+
+        # ----------------------------------------------------
+        # IF TODAY, TIME MUST BE AT LEAST 1 HOUR FROM NOW
+        # ----------------------------------------------------
+
+        if (
+            preferred_date == current_date
+            and selected_datetime < minimum_datetime
+        ):
+
+            minimum_time = minimum_datetime.strftime("%I:%M %p").lstrip("0")
+
+            self.add_error(
+                "preferred_time",
+                f"For today's bookings, please select a time "
+                f"at least 1 hour from now. The earliest available "
+                f"time is {minimum_time}.",
+            )
+
+        return cleaned_data
+    
 # ============================================================
 # REFERRAL FORM
 # ============================================================
 
 class ReferralForm(forms.ModelForm):
-
-    services_needed = forms.ModelMultipleChoiceField(
-        queryset=Service.objects.filter(is_active=True),
-        widget=forms.SelectMultiple(
-            attrs={
-                "class": "form-select",
-                "size": "5",
-            }
-        ),
-        required=False,
-        label="Services Needed",
-    )
-
-    custom_services = forms.CharField(
-        widget=forms.HiddenInput(),
-        required=False,
-    )
 
     class Meta:
         model = Referral
@@ -133,12 +194,6 @@ class ReferralForm(forms.ModelForm):
             "referrer_email",
             "referrer_phone",
             "referring_facility",
-            "patient_name",
-            "patient_email",
-            "patient_phone",
-            "location",  # <-- Added location here
-            "services_needed",
-            "additional_notes",
         ]
 
         widgets = {
@@ -171,48 +226,7 @@ class ReferralForm(forms.ModelForm):
                     ),
                 }
             ),
-
-            "patient_name": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Patient's Full Name",
-                }
-            ),
-
-            "patient_email": forms.EmailInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Patient's Email",
-                }
-            ),
-
-            "patient_phone": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Patient's Phone",
-                }
-            ),
-
-            "location": forms.TextInput(  # <-- Added widget styling for location
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Enter patient's home address, area, or town",
-                }
-            ),
-
-            "additional_notes": forms.Textarea(
-                attrs={
-                    "class": "form-control",
-                    "rows": 4,
-                    "placeholder": (
-                        "Provide any extra clinical notes "
-                        "or medical background..."
-                    ),
-                }
-            ),
         }
-
-
 # ============================================================
 # QUOTATION FORM
 # ============================================================

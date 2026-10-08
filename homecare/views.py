@@ -132,109 +132,113 @@ def request_success(request):
 # ============================================================
 # REFERRAL
 # ============================================================
-
 def refer_a_patient(request):
 
     if request.method == "POST":
 
-        form = ReferralForm(
+        referral_form = ReferralForm(
             request.POST,
             request.FILES,
         )
 
-        if form.is_valid():
+        homecare_form = HomeCareRequestForm(
+            request.POST,
+            request.FILES,
+        )
 
-            referral = form.save()
+        if referral_form.is_valid() and homecare_form.is_valid():
 
-            custom_services = form.cleaned_data.get(
-                "custom_services"
-            )
+            with transaction.atomic():
 
-            if custom_services:
+                # ------------------------------------------------
+                # SAVE REFERRER DETAILS
+                # ------------------------------------------------
 
-                referral.additional_notes += (
-                    f"\n\n[Custom Requested Services]: "
-                    f"{custom_services}"
+                referral = referral_form.save()
+
+                # ------------------------------------------------
+                # SAVE PATIENT USING NORMAL HOME CARE FORM
+                # ------------------------------------------------
+
+                homecare_request = homecare_form.save()
+
+                # ------------------------------------------------
+                # ADD REFERRER INFORMATION TO HOME CARE REQUEST
+                # ------------------------------------------------
+
+                facility_name = (
+                    referral.referring_facility.strip()
+                    if referral.referring_facility
+                    else ""
+                )
+
+                facility_info = (
+                    f" ({facility_name})"
+                    if facility_name
+                    else ""
+                )
+
+                referral_information = (
+                    f"\n\n"
+                    f"[REFERRAL INFORMATION]\n"
+                    f"Referred by: {referral.referrer_name}"
+                    f"{facility_info}\n"
+                    f"Referrer Email: {referral.referrer_email}\n"
+                    f"Referrer Phone: {referral.referrer_phone}"
+                )
+
+                if homecare_request.description:
+                    homecare_request.description += (
+                        referral_information
+                    )
+                else:
+                    homecare_request.description = (
+                        referral_information
+                    )
+
+                homecare_request.save(
+                    update_fields=["description"]
+                )
+
+                # ------------------------------------------------
+                # COPY ATTACHMENTS TO HOME CARE REQUEST
+                # ------------------------------------------------
+
+                files = request.FILES.getlist(
+                    "attachments"
+                )
+
+                for f in files:
+
+                    ReferralAttachment.objects.create(
+                        referral=referral,
+                        file=f,
+                    )
+
+                    HomeCareRequestAttachment.objects.create(
+                        homecare_request=homecare_request,
+                        file=f,
+                    )
+
+                # ------------------------------------------------
+                # LINK REFERRAL TO HOME CARE REQUEST
+                # ------------------------------------------------
+
+                referral.homecare_request = (
+                    homecare_request
                 )
 
                 referral.save(
-                    update_fields=["additional_notes"]
+                    update_fields=[
+                        "homecare_request"
+                    ]
                 )
-
-            files = request.FILES.getlist(
-                "attachments"
-            )
-
-            for f in files:
-
-                ReferralAttachment.objects.create(
-                    referral=referral,
-                    file=f,
-                )
-
-            facility_name = (
-                referral.referring_facility.strip()
-                if referral.referring_facility
-                else ""
-            )
-
-            facility_info = (
-                f" ({facility_name})"
-                if facility_name
-                else ""
-            )
-
-            homecare_request = (
-                HomeCareRequest.objects.create(
-                    full_name=referral.patient_name,
-                    email=referral.patient_email,
-                    phone=referral.patient_phone,
-                    location="To be confirmed",
-                    preferred_date=(
-                        timezone.now().date()
-                        + timedelta(days=1)
-                    ),
-                    preferred_time="09:00:00",
-                    description=(
-                        f"Referred by: "
-                        f"{referral.referrer_name}"
-                        f"{facility_info} "
-                        f"({referral.referrer_email}, "
-                        f"{referral.referrer_phone}).\n\n"
-                        f"Notes: "
-                        f"{referral.additional_notes}"
-                    ),
-                )
-            )
-
-            homecare_request.services.set(
-                referral.services_needed.all()
-            )
-
-            for ref_attachment in (
-                referral.attachments.all()
-            ):
-
-                HomeCareRequestAttachment.objects.create(
-                    homecare_request=homecare_request,
-                    file=ref_attachment.file,
-                )
-
-            referral.homecare_request = (
-                homecare_request
-            )
-
-            referral.save(
-                update_fields=[
-                    "homecare_request"
-                ]
-            )
 
             messages.success(
                 request,
                 "Thank you! Your referral has been submitted. "
-                "Our care team will review the details and contact "
-                "the patient with a quotation.",
+                "Our care team will review the patient details "
+                "and contact the patient with a quotation.",
             )
 
             return redirect(
@@ -243,17 +247,19 @@ def refer_a_patient(request):
 
     else:
 
-        form = ReferralForm()
+        referral_form = ReferralForm()
+
+        homecare_form = HomeCareRequestForm()
 
     return render(
         request,
         "homecare/referral_form.html",
         {
-            "form": form,
+            "referral_form": referral_form,
+            "homecare_form": homecare_form,
         },
     )
-
-
+    
 def referral_success(request):
 
     return render(

@@ -10,238 +10,649 @@
     <div class="row justify-content-center align-items-center me-0 ms-0">
         <div class="col-12 col-md-10 col-lg-8 mx-auto">
             <div class="card border-0 shadow-sm p-4 mx-auto mb-5">
-                <span class="text-primary fw-semibold small text-uppercase text-center d-block">Partner With Our Care
-                    Team</span>
-                <h2 class="mb-2 text-center">Refer a Patient in Need</h2>
-                <p class="text-muted mb-4 text-center">Easily refer a family member, friend, or patient in need of
-                    skilled home
-                    nursing and personalized health monitoring.</p>
+
+                <span class="text-primary fw-semibold small text-uppercase text-center d-block">
+                    Partner With Our Care Team
+                </span>
+
+                <h2 class="mb-2 text-center">
+                    Refer a Patient in Need
+                </h2>
+
+                <p class="text-muted mb-4 text-center">
+                    Easily refer a family member, friend, or patient in need of
+                    skilled home nursing and personalized health monitoring.
+                </p>
 
                 <form method="post" enctype="multipart/form-data" id="referralForm">
+
                     {% csrf_token %}
 
-                    {{ form.custom_services }}
+                    <!-- ================================================= -->
+                    <!-- HOME CARE CUSTOM SERVICES -->
+                    <!-- ================================================= -->
 
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {{ homecare_form.custom_services }}
+
+                    <!-- ================================================= -->
+                    <!-- FORM ERRORS -->
+                    <!-- ================================================= -->
+
+                    {% if referral_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ referral_form.non_field_errors }}
+                    </div>
                     {% endif %}
 
+                    {% if homecare_form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ homecare_form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+
+                    <!-- ================================================= -->
                     <!-- REFERRER SECTION -->
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Your Information (Referrer)</h5>
+                    <!-- ================================================= -->
+
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">
+                        Your Information (Referrer)
+                    </h5>
+
                     <div class="row g-3 mb-4">
+
+                        <!-- Referrer Name -->
                         <div class="col-md-6">
-                            <label for="{{ form.referrer_name.id_for_label }}" class="form-label fw-semibold">Your Full
-                                Name *</label>
-                            {{ form.referrer_name }}
-                            {% for error in form.referrer_name.errors %}<div class="text-danger small">{{ error }}</div>
+                            <label for="{{ referral_form.referrer_name.id_for_label }}" class="form-label fw-semibold">
+                                Your Full Name *
+                            </label>
+
+                            {{ referral_form.referrer_name }}
+
+                            {% for error in referral_form.referrer_name.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
                             {% endfor %}
                         </div>
 
+
+                        <!-- Referrer Email -->
                         <div class="col-md-6">
-                            <label for="{{ form.referrer_email.id_for_label }}" class="form-label fw-semibold">Your
-                                Email Address *</label>
-                            {{ form.referrer_email }}
-                            {% for error in form.referrer_email.errors %}<div class="text-danger small">{{ error }}
-                            </div>{% endfor %}
+                            <label for="{{ referral_form.referrer_email.id_for_label }}" class="form-label fw-semibold">
+                                Your Email Address *
+                            </label>
+
+                            {{ referral_form.referrer_email }}
+
+                            {% for error in referral_form.referrer_email.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
                         </div>
 
+
+                        <!-- Referrer Phone -->
                         <div class="col-md-6">
-                            <label for="{{ form.referrer_phone.id_for_label }}" class="form-label fw-semibold">Your
-                                Phone Number *</label>
-                            {{ form.referrer_phone }}
-                            {% for error in form.referrer_phone.errors %}<div class="text-danger small">{{ error }}
-                            </div>{% endfor %}
+                            <label for="{{ referral_form.referrer_phone.id_for_label }}" class="form-label fw-semibold">
+                                Your Phone Number *
+                            </label>
+
+                            {{ referral_form.referrer_phone }}
+
+                            {% for error in referral_form.referrer_phone.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
                         </div>
 
+
+                        <!-- Referring Facility -->
                         <div class="col-md-6">
-                            <label for="{{ form.referring_facility.id_for_label }}"
-                                class="form-label fw-semibold">Referring Hospital / Facility</label>
-                            {{ form.referring_facility }}
-                            {% for error in form.referring_facility.errors %}<div class="text-danger small">{{ error }}
-                            </div>{% endfor %}
+                            <label for="{{ referral_form.referring_facility.id_for_label }}"
+                                class="form-label fw-semibold">
+                                Referring Hospital / Facility
+                            </label>
+
+                            {{ referral_form.referring_facility }}
+
+                            {% for error in referral_form.referring_facility.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
                         </div>
+
                     </div>
 
-                    <!-- PATIENT SECTION -->
-                    <!-- PATIENT SECTION -->
-                    <h5 class="fw-bold mb-3 border-bottom pb-2">Patient Information</h5>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="{{ form.patient_name.id_for_label }}" class="form-label fw-semibold">Patient's Full Name *</label>
-                            {{ form.patient_name }}
-                            {% for error in form.patient_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    
-                        <div class="col-md-6">
-                            <label for="{{ form.patient_email.id_for_label }}" class="form-label fw-semibold">Patient's Email Address
-                                *</label>
-                            {{ form.patient_email }}
-                            {% for error in form.patient_email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    
-                        <div class="col-md-12">
-                            <label for="{{ form.patient_phone.id_for_label }}" class="form-label fw-semibold">Patient's Phone Number
-                                *</label>
-                            {{ form.patient_phone }}
-                            {% for error in form.patient_phone.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
-                        </div>
-                    
-                        <!-- FIXED LOCATION FIELD -->
-                        <div class="col-md-12">
-                            <label for="{{ form.location.id_for_label }}" class="form-label fw-semibold">Patient's Location *</label>
-                            {{ form.location }}
-                            {% for error in form.location.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                            {% endfor %}
-                            <small class="text-muted">Enter the patient's home address, area, town, or location where care will be
-                                provided.</s>
-                        </div>
-                        <!-- End Location Field -->
-                      
 
-                        <!-- Dynamic Services Selection -->
+                    <!-- ================================================= -->
+                    <!-- PATIENT / HOME CARE SECTION -->
+                    <!-- ================================================= -->
+
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">
+                        Patient Information
+                    </h5>
+
+                    <div class="row g-3">
+
+
+                        <!-- Patient Full Name -->
+                        <div class="col-md-6">
+
+                            <label for="{{ homecare_form.full_name.id_for_label }}" class="form-label fw-semibold">
+                                Patient's Full Name *
+                            </label>
+
+                            {{ homecare_form.full_name }}
+
+                            {% for error in homecare_form.full_name.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- Patient Email -->
+                        <div class="col-md-6">
+
+                            <label for="{{ homecare_form.email.id_for_label }}" class="form-label fw-semibold">
+                                Patient's Email Address *
+                            </label>
+
+                            {{ homecare_form.email }}
+
+                            {% for error in homecare_form.email.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- Patient Phone -->
+                        <div class="col-md-12">
+
+                            <label for="{{ homecare_form.phone.id_for_label }}" class="form-label fw-semibold">
+                                Patient's Phone Number *
+                            </label>
+
+                            {{ homecare_form.phone }}
+
+                            {% for error in homecare_form.phone.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- Patient Location -->
+                        <div class="col-md-12">
+
+                            <label for="{{ homecare_form.location.id_for_label }}" class="form-label fw-semibold">
+                                Patient's Location *
+                            </label>
+
+                            {{ homecare_form.location }}
+
+                            {% for error in homecare_form.location.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+
+                            <small class="text-muted">
+                                Enter the patient's home address, area,
+                                town, or location where care will be provided.
+                            </small>
+
+                        </div>
+
+
+                        <!-- ================================================= -->
+                        <!-- SERVICES -->
+                        <!-- ================================================= -->
+
                         <div class="col-12">
-                            <label for="serviceSearchInput" class="form-label fw-semibold">Services Needed</label>
+
+                            <label for="serviceSearchInput" class="form-label fw-semibold">
+                                Services Needed
+                            </label>
 
                             <div class="input-group mb-2">
+
                                 <input type="text" id="serviceSearchInput" class="form-control"
                                     list="existingServicesList" placeholder="Type to search or enter custom service...">
+
                                 <datalist id="existingServicesList">
-                                    {% for option in form.services_needed.field.queryset %}
-                                    <option data-id="{{ option.pk }}" value="{{ option.name }}"></option>
+
+                                    {% for option in homecare_form.services.field.queryset %}
+
+                                    <option data-id="{{ option.pk }}" value="{{ option.name }}">
+                                    </option>
+
                                     {% endfor %}
+
                                 </datalist>
+
                                 <button class="btn btn-outline-primary" type="button" id="addServiceBtn">
-                                    <i class="fa-solid fa-plus"></i> Add
+
+                                    <i class="fa-solid fa-plus"></i>
+                                    Add
+
                                 </button>
+
                             </div>
+
 
                             <div id="selectedServicesContainer" class="selected-services-container">
-                                <span class="text-muted small" id="noServicesNotice">No services added yet. Search or
-                                    type above to add.</span>
+
+                                <span class="text-muted small" id="noServicesNotice">
+
+                                    No services added yet.
+                                    Search or type above to add.
+
+                                </span>
+
                             </div>
 
-                            <!-- Hidden select outputting data to Django -->
+
+                            <!-- Hidden Django services select -->
+
                             <div class="d-none">
-                                {{ form.services_needed }}
+
+                                {{ homecare_form.services }}
+
                             </div>
 
-                            {% for error in form.services_needed.errors %}
-                            <div class="text-danger small">{{ error }}</div>
+
+                            {% for error in homecare_form.services.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
                             {% endfor %}
+
                         </div>
 
-                        <div class="col-12">
-                            <label for="{{ form.additional_notes.id_for_label }}"
-                                class="form-label fw-semibold">Additional Care Notes</label>
-                            {{ form.additional_notes }}
-                            {% for error in form.additional_notes.errors %}<div class="text-danger small">{{ error }}
-                            </div>{% endfor %}
+
+                        <!-- ================================================= -->
+                        <!-- PREFERRED DATE -->
+                        <!-- ================================================= -->
+
+                        <div class="col-md-6">
+
+                            <label for="{{ homecare_form.preferred_date.id_for_label }}" class="form-label fw-semibold">
+
+                                Preferred Care Date
+
+                            </label>
+
+                            {{ homecare_form.preferred_date }}
+
+                            {% for error in homecare_form.preferred_date.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
                         </div>
 
+
+                        <!-- ================================================= -->
+                        <!-- PREFERRED TIME -->
+                        <!-- ================================================= -->
+
+                        <div class="col-md-6">
+
+                            <label for="{{ homecare_form.preferred_time.id_for_label }}" class="form-label fw-semibold">
+
+                                Preferred Care Time
+
+                            </label>
+
+                            {{ homecare_form.preferred_time }}
+
+                            {% for error in homecare_form.preferred_time.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- ================================================= -->
+                        <!-- CARE DESCRIPTION -->
+                        <!-- ================================================= -->
+
                         <div class="col-12">
-                            <label for="id_attachments" class="form-label fw-semibold">Attach Patient Documents /
-                                Images</label>
+
+                            <label for="{{ homecare_form.description.id_for_label }}" class="form-label fw-semibold">
+
+                                Care / Support Required
+
+                            </label>
+
+                            {{ homecare_form.description }}
+
+                            {% for error in homecare_form.description.errors %}
+
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- ================================================= -->
+                        <!-- ATTACHMENTS -->
+                        <!-- ================================================= -->
+
+                        <div class="col-12">
+
+                            <label for="id_attachments" class="form-label fw-semibold">
+
+                                Attach Patient Documents / Images
+
+                            </label>
+
                             <input type="file" name="attachments" id="id_attachments" class="form-control" multiple
                                 accept="image/*,.pdf,.doc,.docx">
-                            <small class="text-muted">You can select and upload multiple images or medical
-                                reports.</small>
+
+                            <small class="text-muted">
+
+                                You can select and upload multiple images
+                                or medical reports.
+
+                            </small>
+
                         </div>
 
+
+                        <!-- ================================================= -->
+                        <!-- SUBMIT -->
+                        <!-- ================================================= -->
+
                         <div class="col-12 mt-4 text-center d-flex justify-content-center">
-                            <button type="submit" class="btn btn-primary py-3 px-5 fw-bold text-center">Submit
-                                Referral</button>
+
+                            <button type="submit" class="btn btn-primary py-3 px-5 fw-bold text-center">
+
+                                Submit Referral
+
+                            </button>
+
                         </div>
+
                     </div>
+
                 </form>
+
             </div>
         </div>
     </div>
 </div>
 
+
+<!-- ============================================================= -->
+<!-- SERVICE SELECTION JAVASCRIPT -->
+<!-- ============================================================= -->
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("serviceSearchInput");
-        const addBtn = document.getElementById("addServiceBtn");
-        const container = document.getElementById("selectedServicesContainer");
-        const noServicesNotice = document.getElementById("noServicesNotice");
-        const djangoSelect = document.getElementById("id_services_needed");
-        const customInput = document.getElementById("id_custom_services");
-        const datalistOptions = document.querySelectorAll("#existingServicesList option");
+
+        const searchInput =
+            document.getElementById("serviceSearchInput");
+
+        const addBtn =
+            document.getElementById("addServiceBtn");
+
+        const container =
+            document.getElementById("selectedServicesContainer");
+
+        const noServicesNotice =
+            document.getElementById("noServicesNotice");
+
+        const djangoSelect =
+            document.getElementById("id_services");
+
+        const customInput =
+            document.getElementById("id_custom_services");
+
+        const datalistOptions =
+            document.querySelectorAll(
+                "#existingServicesList option"
+            );
+
 
         let customServicesArray = [];
 
+
         function updateNotice() {
-            if (container.querySelectorAll(".service-badge").length === 0) {
-                if (noServicesNotice) noServicesNotice.style.display = "inline";
+
+            if (
+                container.querySelectorAll(".service-badge").length === 0
+            ) {
+
+                if (noServicesNotice) {
+                    noServicesNotice.style.display = "inline";
+                }
+
             } else {
-                if (noServicesNotice) noServicesNotice.style.display = "none";
+
+                if (noServicesNotice) {
+                    noServicesNotice.style.display = "none";
+                }
+
             }
+
         }
 
+
         function addService() {
-            const query = searchInput.value.trim();
-            if (!query) return;
+
+            const query =
+                searchInput.value.trim();
+
+            if (!query) {
+                return;
+            }
+
 
             let matchedId = null;
 
-            datalistOptions.forEach(opt => {
-                if (opt.value.toLowerCase() === query.toLowerCase()) {
-                    matchedId = opt.getAttribute("data-id");
+
+            datalistOptions.forEach(function (opt) {
+
+                if (
+                    opt.value.toLowerCase() ===
+                    query.toLowerCase()
+                ) {
+
+                    matchedId =
+                        opt.getAttribute("data-id");
+
                 }
+
             });
+
 
             if (matchedId) {
-                const selectOption = Array.from(djangoSelect.options).find(o => o.value == matchedId);
+
+                const selectOption =
+                    Array.from(
+                        djangoSelect.options
+                    ).find(
+                        o => o.value == matchedId
+                    );
+
+
                 if (selectOption) {
+
                     selectOption.selected = true;
-                    createBadge(selectOption.text, matchedId, false);
+
+                    createBadge(
+                        selectOption.text,
+                        matchedId,
+                        false
+                    );
+
                 }
+
             } else {
-                if (!customServicesArray.includes(query)) {
+
+                if (
+                    !customServicesArray.includes(query)
+                ) {
+
                     customServicesArray.push(query);
-                    customInput.value = customServicesArray.join(",");
-                    createBadge(query + " (Custom)", query, true);
+
+                    customInput.value =
+                        customServicesArray.join(",");
+
+                    createBadge(
+                        query + " (Custom)",
+                        query,
+                        true
+                    );
+
                 }
+
             }
+
 
             searchInput.value = "";
+
             updateNotice();
+
         }
 
-        function createBadge(label, value, isCustom) {
-            const existingBadge = Array.from(container.querySelectorAll(".service-badge")).find(b => b.dataset.value === String(value));
-            if (existingBadge) return;
 
-            const badge = document.createElement("span");
-            badge.className = "service-badge";
-            badge.dataset.value = value;
-            badge.dataset.isCustom = isCustom;
-            badge.innerHTML = `${label} <span class="remove-btn">&times;</span>`;
+        function createBadge(
+            label,
+            value,
+            isCustom
+        ) {
 
-            badge.querySelector(".remove-btn").addEventListener("click", function () {
-                if (isCustom) {
-                    customServicesArray = customServicesArray.filter(item => item !== value);
-                    customInput.value = customServicesArray.join(",");
-                } else {
-                    const selectOption = Array.from(djangoSelect.options).find(o => o.value == value);
-                    if (selectOption) selectOption.selected = false;
-                }
-                badge.remove();
-                updateNotice();
-            });
+            const existingBadge =
+                Array.from(
+                    container.querySelectorAll(
+                        ".service-badge"
+                    )
+                ).find(
+                    b =>
+                        b.dataset.value ===
+                        String(value)
+                );
+
+
+            if (existingBadge) {
+                return;
+            }
+
+
+            const badge =
+                document.createElement("span");
+
+            badge.className =
+                "service-badge";
+
+            badge.dataset.value =
+                value;
+
+            badge.dataset.isCustom =
+                isCustom;
+
+
+            badge.innerHTML =
+                `${label} <span class="remove-btn">&times;</span>`;
+
+
+            badge
+                .querySelector(".remove-btn")
+                .addEventListener(
+                    "click",
+                    function () {
+
+                        if (isCustom) {
+
+                            customServicesArray =
+                                customServicesArray.filter(
+                                    item => item !== value
+                                );
+
+                            customInput.value =
+                                customServicesArray.join(",");
+
+                        } else {
+
+                            const selectOption =
+                                Array.from(
+                                    djangoSelect.options
+                                ).find(
+                                    o =>
+                                        o.value == value
+                                );
+
+                            if (selectOption) {
+
+                                selectOption.selected =
+                                    false;
+
+                            }
+
+                        }
+
+
+                        badge.remove();
+
+                        updateNotice();
+
+                    }
+                );
+
 
             container.appendChild(badge);
+
         }
 
-        addBtn.addEventListener("click", addService);
 
-        searchInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                addService();
+        addBtn.addEventListener(
+            "click",
+            addService
+        );
+
+
+        searchInput.addEventListener(
+            "keypress",
+            function (e) {
+
+                if (e.key === "Enter") {
+
+                    e.preventDefault();
+
+                    addService();
+
+                }
+
             }
-        });
+        );
+
     });
 </script>
+
 {% endblock %}
