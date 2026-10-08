@@ -1,462 +1,1538 @@
-
 {% extends "base.html" %}
 {% load static %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+
+<style>
+    /* =========================================================
+   HANDS-ON HEALTH — PREMIUM QUOTATION PAGE
+   ========================================================= */
+
+    :root {
+        --hoh-navy: #082f49;
+        --hoh-dark: #061f35;
+        --hoh-blue: #0f4c75;
+        --hoh-teal: #0ea5a4;
+        --hoh-cyan: #06b6d4;
+        --hoh-green: #10b981;
+        --hoh-soft: #eef8f8;
+        --hoh-border: #dbe7ee;
+        --hoh-muted: #64748b;
+        --hoh-text: #102a43;
+        --hoh-warning: #f59e0b;
+        --hoh-danger: #ef4444;
+        --hoh-white: #ffffff;
+        --hoh-shadow: 0 25px 70px rgba(8, 47, 73, .12);
+    }
+
+    /* =========================================================
+   PAGE
+   ========================================================= */
+
+    .quotation-page {
+        min-height: 100vh;
+        padding: 55px 15px 80px;
+        background:
+            radial-gradient(circle at 10% 10%, rgba(14, 165, 164, .10), transparent 28%),
+            radial-gradient(circle at 90% 20%, rgba(6, 182, 212, .08), transparent 25%),
+            linear-gradient(135deg, #f5fbfc 0%, #edf5f8 45%, #f8fafc 100%);
+    }
+
+    .quotation-wrapper {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+   TOP PAGE HEADER
+   ========================================================= */
+
+    .quotation-heading {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .quotation-heading .document-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 50px;
+        background: rgba(14, 165, 164, .10);
+        color: var(--hoh-teal);
+        border: 1px solid rgba(14, 165, 164, .18);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+
+    .quotation-heading h1 {
+        color: var(--hoh-navy);
+        font-size: clamp(30px, 4vw, 46px);
+        font-weight: 900;
+        letter-spacing: -.04em;
+        margin: 0;
+    }
+
+    .quotation-heading p {
+        color: var(--hoh-muted);
+        margin: 8px 0 0;
+        font-size: 14px;
+    }
+
+    /* =========================================================
+   MAIN DOCUMENT
+   ========================================================= */
+
+    .quotation-document {
+        background: var(--hoh-white);
+        border: 1px solid rgba(219, 231, 238, .9);
+        border-radius: 26px;
+        overflow: hidden;
+        box-shadow: var(--hoh-shadow);
+        position: relative;
+    }
+
+    .quotation-document::before {
+        content: "";
+        display: block;
+        height: 7px;
+        background: linear-gradient(90deg,
+                var(--hoh-navy),
+                var(--hoh-teal),
+                var(--hoh-cyan));
+    }
+
+    /* =========================================================
+   DOCUMENT HEADER
+   ========================================================= */
+
+    .document-header {
+        padding: 38px 42px 28px;
+        background:
+            linear-gradient(135deg,
+                rgba(8, 47, 73, .035),
+                rgba(14, 165, 164, .045));
+        border-bottom: 1px solid var(--hoh-border);
+    }
+
+    .document-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 25px;
+    }
+
+    .company-mark {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .company-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg,
+                var(--hoh-navy),
+                var(--hoh-teal));
+        color: white;
+        font-size: 22px;
+        box-shadow: 0 10px 25px rgba(14, 165, 164, .20);
+    }
+
+    .company-name {
+        font-size: 15px;
+        font-weight: 900;
+        color: var(--hoh-navy);
+        margin: 0;
+    }
+
+    .company-subtitle {
+        font-size: 11px;
+        color: var(--hoh-muted);
+        margin-top: 3px;
+    }
+
+    .quote-meta {
+        text-align: right;
+    }
+
+    .quote-label {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--hoh-muted);
+    }
+
+    .quote-number {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 7px;
+        padding: 9px 13px;
+        border-radius: 10px;
+        background: white;
+        border: 1px solid var(--hoh-border);
+        color: var(--hoh-navy);
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    /* =========================================================
+   CLIENT HERO
+   ========================================================= */
+
+    .client-hero {
+        padding: 34px 42px;
+    }
+
+    .prepared-label {
+        color: var(--hoh-muted);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .client-name {
+        color: var(--hoh-navy);
+        font-size: clamp(25px, 3vw, 34px);
+        font-weight: 900;
+        letter-spacing: -.025em;
+        margin: 0;
+    }
+
+    .client-intro {
+        color: var(--hoh-muted);
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    /* =========================================================
+   SUMMARY GRID
+   ========================================================= */
+
+    .summary-card {
+        margin: 0 42px 34px;
+        padding: 22px;
+        border-radius: 18px;
+        background:
+            linear-gradient(135deg,
+                #f4fbfc,
+                #eef8f8);
+        border: 1px solid #dceeee;
+    }
+
+    .summary-item {
+        height: 100%;
+        padding: 12px 15px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, .72);
+        border: 1px solid rgba(219, 231, 238, .7);
+    }
+
+    .summary-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(14, 165, 164, .10);
+        color: var(--hoh-teal);
+        margin-bottom: 9px;
+    }
+
+    .summary-label {
+        display: block;
+        color: #78909c;
+        font-size: 9px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .09em;
+        margin-bottom: 5px;
+    }
+
+    .summary-value {
+        color: var(--hoh-text);
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    .service-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .service-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #e8f8f6;
+        color: #087f7d;
+        padding: 5px 9px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    /* =========================================================
+   SECTION
+   ========================================================= */
+
+    .document-section {
+        padding: 0 42px 34px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 15px;
+    }
+
+    .section-heading-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(14, 165, 164, .10);
+        color: var(--hoh-teal);
+    }
+
+    .section-heading h3 {
+        color: var(--hoh-navy);
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .02em;
+        margin: 0;
+    }
+
+    .section-heading span {
+        display: block;
+        color: var(--hoh-muted);
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 2px;
+    }
+
+    /* =========================================================
+   QUOTATION SCOPE
+   ========================================================= */
+
+    .scope-box {
+        padding: 22px;
+        border: 1px solid var(--hoh-border);
+        border-radius: 16px;
+        background: #fbfdfe;
+        color: #40566d;
+        font-size: 13px;
+        line-height: 1.8;
+        min-height: 75px;
+    }
+
+    .scope-box p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* =========================================================
+   TOTAL
+   ========================================================= */
+
+    .total-card {
+        margin: 0 42px 30px;
+        padding: 28px 30px;
+        border-radius: 21px;
+        position: relative;
+        overflow: hidden;
+        background:
+            linear-gradient(135deg,
+                var(--hoh-navy),
+                #0b4768 58%,
+                var(--hoh-teal));
+        color: white;
+        box-shadow: 0 18px 45px rgba(8, 47, 73, .18);
+    }
+
+    .total-card::after {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        border-radius: 50%;
+        right: -70px;
+        top: -80px;
+    }
+
+    .total-card::before {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border: 1px solid rgba(255, 255, 255, .10);
+        border-radius: 50%;
+        right: 30px;
+        bottom: -70px;
+    }
+
+    .total-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .total-label {
+        color: rgba(255, 255, 255, .72);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .total-caption {
+        color: rgba(255, 255, 255, .65);
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .total-amount {
+        font-size: clamp(30px, 5vw, 46px);
+        font-weight: 900;
+        letter-spacing: -.04em;
+        white-space: nowrap;
+    }
+
+    .currency {
+        font-size: .48em;
+        vertical-align: middle;
+        margin-right: 4px;
+        opacity: .85;
+    }
+
+    /* =========================================================
+   DEADLINE
+   ========================================================= */
+
+    .deadline-card {
+        margin: 0 42px 34px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid #fde7ad;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #fffaf0, #fff7df);
+    }
+
+    .deadline-icon {
+        width: 43px;
+        height: 43px;
+        flex: 0 0 43px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff0c7;
+        color: var(--hoh-warning);
+        font-size: 18px;
+    }
+
+    .deadline-label {
+        color: #8a5a00;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .deadline-value {
+        color: #604000;
+        font-size: 13px;
+        font-weight: 800;
+        margin-top: 3px;
+    }
+
+    /* =========================================================
+   PAYMENT OPTIONS
+   ========================================================= */
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .payment-card {
+        height: 100%;
+        padding: 21px;
+        border-radius: 17px;
+        border: 1px solid var(--hoh-border);
+        background: white;
+        transition: .25s ease;
+    }
+
+    .payment-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(14, 165, 164, .35);
+        box-shadow: 0 12px 35px rgba(8, 47, 73, .08);
+    }
+
+    .payment-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .payment-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg,
+                rgba(14, 165, 164, .13),
+                rgba(6, 182, 212, .08));
+        color: var(--hoh-teal);
+        font-size: 17px;
+    }
+
+    .payment-title {
+        color: var(--hoh-navy);
+        font-size: 13px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .payment-subtitle {
+        color: var(--hoh-muted);
+        font-size: 10px;
+        margin-top: 2px;
+    }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 10px 0;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .payment-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .payment-label {
+        color: var(--hoh-muted);
+        font-size: 11px;
+    }
+
+    .payment-value {
+        color: var(--hoh-text);
+        font-size: 12px;
+        font-weight: 800;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    /* =========================================================
+   INSTRUCTIONS
+   ========================================================= */
+
+    .instructions-card {
+        padding: 19px;
+        border-radius: 16px;
+        background: #f8fafc;
+        border: 1px solid var(--hoh-border);
+        margin-top: 16px;
+    }
+
+    .instructions-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--hoh-navy);
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .instructions-title i {
+        color: var(--hoh-teal);
+    }
+
+    .instructions-content {
+        color: var(--hoh-muted);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .instructions-content p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* =========================================================
+   CONFIRMATION
+   ========================================================= */
+
+    .confirmation-card {
+        margin-top: 17px;
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid #f8dda0;
+        background: linear-gradient(135deg, #fffaf0, #fffdf7);
+        display: flex;
+        gap: 13px;
+        align-items: flex-start;
+    }
+
+    .confirmation-icon {
+        width: 35px;
+        height: 35px;
+        flex: 0 0 35px;
+        border-radius: 10px;
+        background: #fff0c7;
+        color: var(--hoh-warning);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .confirmation-title {
+        color: #704d00;
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    .confirmation-text {
+        color: #806a3c;
+        font-size: 11px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* =========================================================
+   CTA
+   ========================================================= */
+
+    .action-area {
+        margin: 38px 42px 0;
+        padding: 30px 0 35px;
+        border-top: 1px solid var(--hoh-border);
+        text-align: center;
+    }
+
+    .action-title {
+        color: var(--hoh-navy);
+        font-size: 17px;
+        font-weight: 900;
+        margin-bottom: 5px;
+    }
+
+    .action-text {
+        color: var(--hoh-muted);
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+
+    .payment-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-width: 230px;
+        padding: 14px 25px;
+        border-radius: 13px;
+        background: linear-gradient(135deg,
+                var(--hoh-navy),
+                var(--hoh-blue));
+        color: white !important;
+        text-decoration: none !important;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: .01em;
+        box-shadow: 0 12px 30px rgba(8, 47, 73, .20);
+        transition: .25s ease;
+    }
+
+    .payment-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 17px 38px rgba(8, 47, 73, .28);
+    }
+
+    .payment-button .arrow {
+        transition: .25s ease;
+    }
+
+    .payment-button:hover .arrow {
+        transform: translateX(4px);
+    }
+
+    .secondary-actions {
+        margin-top: 15px;
+    }
+
+    .print-button {
+        border: 0;
+        background: transparent;
+        color: var(--hoh-muted);
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 7px 12px;
+    }
+
+    .print-button:hover {
+        color: var(--hoh-teal);
+    }
+
+    /* =========================================================
+   BOTTOM NOTE
+   ========================================================= */
+
+    .support-note {
+        margin-top: 20px;
+        text-align: center;
+        color: var(--hoh-muted);
+        font-size: 11px;
+    }
+
+    .support-note i {
+        color: var(--hoh-teal);
+        margin-right: 4px;
+    }
+
+    /* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .quotation-page {
+            padding: 25px 10px 45px;
+        }
+
+        .quotation-heading {
+            margin-bottom: 22px;
+        }
+
+        .quotation-heading h1 {
+            font-size: 30px;
+        }
+
+        .quotation-document {
+            border-radius: 19px;
+        }
+
+        .document-header {
+            padding: 25px 20px 20px;
+        }
+
+        .document-header-top {
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .quote-meta {
+            text-align: left;
+        }
+
+        .client-hero {
+            padding: 25px 20px;
+        }
+
+        .client-name {
+            font-size: 25px;
+        }
+
+        .summary-card {
+            margin: 0 20px 25px;
+            padding: 14px;
+        }
+
+        .document-section {
+            padding: 0 20px 25px;
+        }
+
+        .payment-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .total-card {
+            margin: 0 20px 22px;
+            padding: 22px;
+        }
+
+        .total-inner {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .total-amount {
+            font-size: 34px;
+        }
+
+        .deadline-card {
+            margin: 0 20px 25px;
+        }
+
+        .action-area {
+            margin: 20px 20px 0;
+            padding-top: 25px;
+        }
+
+        .payment-button {
+            width: 100%;
+        }
+    }
+
+    /* =========================================================
+   PRINT
+   ========================================================= */
+
+    @media print {
+
+        body {
+            background: white !important;
+        }
+
+        .quotation-page {
+            padding: 0 !important;
+            background: white !important;
+        }
+
+        .quotation-heading {
+            margin-top: 0;
+        }
+
+        .quotation-document {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+
+        .payment-button,
+        .secondary-actions {
+            display: none !important;
+        }
+
+        .quotation-document::before {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .total-card,
+        .summary-card,
+        .deadline-card,
+        .payment-card {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
-<div class="container py-5 my-3">
-    <div class="row justify-content-center me-0 ms-0">
-        <div class="col-12 col-md-10 col-lg-8 mx-auto">
 
-            <!-- Header Section -->
-            <div class="text-center mb-4">
-                <span class="badge bg-primary-soft text-primary fw-semibold px-3 py-2 rounded-pill mb-2">
-                    <i class="fa-solid fa-file-invoice me-1"></i> Official Document
-                </span>
+<div class="quotation-page">
 
-                <h1 class="h2 fw-bold text-slate-800 mb-1">
-                    Your Quotation
-                </h1>
+    <div class="quotation-wrapper">
 
-                <p class="text-muted">
-                    Hands-On Health Home-Based Care Clinic
-                </p>
+        <!-- =====================================================
+             PAGE HEADING
+        ====================================================== -->
+
+        <div class="quotation-heading">
+
+            <div class="document-badge">
+                <i class="fa-solid fa-shield-check"></i>
+                Secure Healthcare Quotation
             </div>
 
-
-            <div class="card client-quotation-card border-0 shadow-sm overflow-hidden mb-4">
-                <div class="card-body p-4 p-md-5">
-
-
-                    <!-- Greeting Section -->
-                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-
-                        <div>
-                            <span class="text-uppercase text-muted fw-bold small">
-                                Prepared For
-                            </span>
-
-                            <h2 class="h4 fw-bold text-slate-800 mb-0 mt-1">
-
-                                {% if homecare_request %}
-                                    {{ homecare_request.full_name }}
-
-                                {% elif consultation %}
-                                    {{ consultation.patient.full_name|default:consultation }}
-
-                                {% else %}
-                                    Client
-                                {% endif %}
-
-                            </h2>
-                        </div>
-
-
-                        <div class="text-end">
-                            <span class="badge bg-light text-secondary border px-3 py-2 rounded-3">
-                                Quote #{{ quotation.id }}
-                            </span>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Summary Grid -->
-                    <div class="summary-grid rounded-3 p-4 mb-4">
-
-                        <div class="row g-3">
-
-
-                            <!-- Requested Services -->
-                            <div class="col-sm-6">
-
-                                <span class="info-label">
-                                    Requested Services
-                                </span>
-
-                                <div class="info-value fw-semibold text-slate-800">
-
-                                    {% if homecare_request %}
-
-                                        {% if homecare_request.services.exists %}
-
-                                            {% for service in homecare_request.services.all %}
-
-                                                <div>
-                                                    <i class="fa-solid fa-check text-primary me-1"></i>
-                                                    {{ service.name }}
-                                                </div>
-
-                                            {% endfor %}
-
-                                        {% elif homecare_request.service %}
-
-                                            <div>
-                                                <i class="fa-solid fa-check text-primary me-1"></i>
-                                                {{ homecare_request.service.name }}
-                                            </div>
-
-                                        {% else %}
-
-                                            Home Care Service
-
-                                        {% endif %}
-
-                                    {% elif consultation %}
-
-                                        <div>
-                                            <i class="fa-solid fa-check text-primary me-1"></i>
-                                            Appointment / Consultation
-                                        </div>
-
-                                    {% else %}
-
-                                        Service
-
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- Care Location -->
-                            <div class="col-sm-6">
-
-                                <span class="info-label">
-                                    Care Location
-                                </span>
-
-                                <div class="info-value fw-semibold text-slate-800">
-
-                                    {% if homecare_request %}
-                                        {{ homecare_request.location|default:"Not specified" }}
-
-                                    {% elif consultation %}
-                                        {{ consultation.location|default:"Clinic Appointment" }}
-
-                                    {% else %}
-                                        Not specified
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- Preferred Date -->
-                            <div class="col-sm-6">
-
-                                <span class="info-label">
-                                    Preferred Date
-                                </span>
-
-                                <div class="info-value text-slate-700">
-
-                                    {% if homecare_request %}
-                                        {{ homecare_request.preferred_date|default:"Not specified" }}
-
-                                    {% elif consultation %}
-                                        {{ consultation.appointment_date|default:"Appointment date" }}
-
-                                    {% else %}
-                                        Not specified
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- Preferred Time -->
-                            <div class="col-sm-6">
-
-                                <span class="info-label">
-                                    Preferred Time
-                                </span>
-
-                                <div class="info-value text-slate-700">
-
-                                    {% if homecare_request %}
-                                        {{ homecare_request.preferred_time|default:"Not specified" }}
-
-                                    {% elif consultation %}
-                                        {{ consultation.appointment_time|default:"Appointment time" }}
-
-                                    {% else %}
-                                        Not specified
-                                    {% endif %}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Scope / Details -->
-                    <div class="my-4">
-
-                        <h3 class="h6 fw-bold text-uppercase text-slate-800 mb-3">
-                            <i class="fa-solid fa-clipboard-list text-primary me-2"></i>
-                            Quotation Details & Scope
-                        </h3>
-
-                        <div class="quotation-body p-3 bg-light rounded-3 text-slate-700">
-
-                            {{ quotation.description|linebreaks }}
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Pricing Banner -->
-                    <div class="total-banner p-4 rounded-3 my-4 d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <span class="text-uppercase text-primary fw-bold small d-block">
-                                Total Amount Due
-                            </span>
-
-                            <small class="text-muted">
-                                Includes all specified care services
-                            </small>
-
-                        </div>
-
-                        <span class="total-amount fs-2 fw-bold text-primary">
-                            N$ {{ quotation.amount|floatformat:2 }}
-                        </span>
-
-                    </div>
-
-
-                    <!-- Deadline Alert -->
-                    <div class="alert alert-deadline rounded-3 mb-4 p-3 d-flex align-items-center gap-3">
-
-                        <i class="fa-solid fa-clock-rotate-left fs-4 text-warning"></i>
-
-                        <div>
-
-                            <strong class="text-slate-800 d-block">
-                                Payment Deadline
-                            </strong>
-
-                            <span class="small text-muted">
-
-                                {% if quotation.payment_deadline %}
-                                    {{ quotation.payment_deadline|date:"d F Y, g:i A" }}
-
-                                {% elif payment_deadline %}
-                                    {{ payment_deadline|date:"d F Y, g:i A" }}
-
-                                {% else %}
-                                    Please contact Hands-On Health
-                                {% endif %}
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Payment Options -->
-                    <div class="my-4 pt-2">
-
-                        <h3 class="h6 fw-bold text-uppercase text-slate-800 mb-2">
-                            <i class="fa-solid fa-credit-card text-primary me-2"></i>
-                            Payment Instructions
-                        </h3>
-
-                        <p class="text-muted small mb-3">
-                            Please complete your payment using one of the approved channels below.
-                        </p>
-
-
-                        {% if site_settings.bank_name %}
-
-                        <div class="payment-box rounded-3 p-4 mb-3">
-
-                            <h4 class="h6 fw-bold text-slate-800 mb-3 d-flex align-items-center gap-2">
-
-                                <i class="fa-solid fa-building-columns text-primary"></i>
-                                Bank Transfer Details
-
-                            </h4>
-
-
-                            <div class="row g-2 small">
-
-                                <div class="col-sm-6">
-                                    <strong class="text-slate-600">Bank:</strong>
-                                    {{ site_settings.bank_name }}
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <strong class="text-slate-600">Account Name:</strong>
-                                    {{ site_settings.account_name }}
-                                </div>
-
-                                <div class="col-sm-6">
-                                    <strong class="text-slate-600">Account Number:</strong>
-                                    {{ site_settings.account_number }}
-                                </div>
-
-
-                                {% if site_settings.branch_name %}
-
-                                <div class="col-sm-6">
-                                    <strong class="text-slate-600">Branch:</strong>
-                                    {{ site_settings.branch_name }}
-                                </div>
-
-                                {% endif %}
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        {% if site_settings.mobile_money_number %}
-
-                        <div class="payment-box rounded-3 p-4 mb-3">
-
-                            <h4 class="h6 fw-bold text-slate-800 mb-3 d-flex align-items-center gap-2">
-
-                                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
-                                Mobile Money Details
-
-                            </h4>
-
-
-                            <div class="row g-2 small">
-
-                                {% if site_settings.mobile_money_name %}
-
-                                <div class="col-sm-6">
-
-                                    <strong class="text-slate-600">
-                                        Name:
-                                    </strong>
-
-                                    {{ site_settings.mobile_money_name }}
-
-                                </div>
-
-                                {% endif %}
-
-
-                                <div class="col-sm-6">
-
-                                    <strong class="text-slate-600">
-                                        Number:
-                                    </strong>
-
-                                    {{ site_settings.mobile_money_number }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        {% if site_settings.payment_instructions %}
-
-                        <div class="alert alert-light border rounded-3 p-3 mb-3">
-
-                            <h4 class="h6 fw-bold text-slate-800 mb-2">
-                                Additional Instructions
-                            </h4>
-
-                            <p class="mb-0 small text-slate-600">
-
-                                {{ site_settings.payment_instructions|linebreaks }}
-
-                            </p>
-
-                        </div>
-
-                        {% endif %}
-
-
-
-                        <!-- Confirmation Requirement -->
-                        <div class="alert alert-warning-soft rounded-3 p-3 border-start border-4 border-warning">
-
-                            <div class="d-flex gap-2 align-items-start">
-
-                                <i class="fa-solid fa-triangle-exclamation text-warning mt-1"></i>
-
-                                <div>
-
-                                    <strong class="text-slate-800">
-                                        Confirmation Requirement
-                                    </strong>
-
-                                    <p class="mb-0 small text-muted">
-
-                                        Your service is not fully confirmed until Hands-On Health receives and verifies your payment receipt.
-
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- Call to Action -->
-                    <div class="text-center mt-5 pt-3 border-top">
-
-                        <a href="{% url 'homecare:submit_payment' quotation.access_token %}"
-                           class="btn btn-primary">
-
-                            <i class="fa-solid fa-check-circle me-2"></i>
-                            PAID
-
-                        </a>
-
-                    </div>
-
-
-                </div>
-            </div>
-
-
-            <!-- Footer Note -->
-            <div class="text-center">
-
-                <p class="small text-muted mb-0">
-
-                    If you have questions about this quotation,
-                    please reach out to Hands-On Health support.
-
-                </p>
-
-            </div>
-
+            <h1>Your Quotation</h1>
+
+            <p>
+                Hands-On Health Home-Based Care Clinic
+            </p>
 
         </div>
-    </div>
-</div>
-{% endblock %}
 
+
+        <!-- =====================================================
+             QUOTATION DOCUMENT
+        ====================================================== -->
+
+        <div class="quotation-document">
+
+
+            <!-- =================================================
+                 DOCUMENT HEADER
+            ================================================== -->
+
+            <div class="document-header">
+
+                <div class="document-header-top">
+
+                    <div class="company-mark">
+
+                        <div class="company-icon">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+
+                        <div>
+
+                            <p class="company-name">
+                                Hands-On Health
+                            </p>
+
+                            <div class="company-subtitle">
+                                Professional Home-Based Care Clinic
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="quote-meta">
+
+                        <div class="quote-label">
+                            Quotation Reference
+                        </div>
+
+                        <div class="quote-number">
+                            <i class="fa-solid fa-file-invoice"></i>
+                            Quote #{{ quotation.id }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CLIENT
+            ================================================== -->
+
+            <div class="client-hero">
+
+                <div class="prepared-label">
+                    Prepared For
+                </div>
+
+                <h2 class="client-name">
+
+                    {% if homecare_request %}
+                    {{ homecare_request.full_name }}
+
+                    {% elif consultation %}
+                    {{ consultation.patient.full_name|default:consultation }}
+
+                    {% else %}
+                    Client
+                    {% endif %}
+
+                </h2>
+
+                <div class="client-intro">
+                    Thank you for choosing Hands-On Health.
+                    Below is your personalized care quotation.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUMMARY
+            ================================================== -->
+
+            <div class="summary-card">
+
+                <div class="row g-3">
+
+                    <!-- SERVICE -->
+
+                    <div class="col-12 col-md-6">
+
+                        <div class="summary-item">
+
+                            <div class="summary-icon">
+                                <i class="fa-solid fa-hand-holding-medical"></i>
+                            </div>
+
+                            <span class="summary-label">
+                                Requested Services
+                            </span>
+
+                            <div class="summary-value">
+
+                                <div class="service-list">
+
+                                    {% if homecare_request %}
+
+                                    {% if homecare_request.services.exists %}
+
+                                    {% for service in homecare_request.services.all %}
+
+                                    <span class="service-pill">
+                                        <i class="fa-solid fa-check"></i>
+                                        {{ service.name }}
+                                    </span>
+
+                                    {% endfor %}
+
+                                    {% elif homecare_request.service %}
+
+                                    <span class="service-pill">
+                                        <i class="fa-solid fa-check"></i>
+                                        {{ homecare_request.service.name }}
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="service-pill">
+                                        <i class="fa-solid fa-heart-pulse"></i>
+                                        Home Care Service
+                                    </span>
+
+                                    {% endif %}
+
+                                    {% elif consultation %}
+
+                                    <span class="service-pill">
+                                        <i class="fa-solid fa-user-doctor"></i>
+                                        Appointment / Consultation
+                                    </span>
+
+                                    {% else %}
+
+                                    Service
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+
+                    <div class="col-12 col-md-6">
+
+                        <div class="summary-item">
+
+                            <div class="summary-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+
+                            <span class="summary-label">
+                                Care Location
+                            </span>
+
+                            <div class="summary-value">
+
+                                {% if homecare_request %}
+                                {{ homecare_request.location|default:"Not specified" }}
+
+                                {% elif consultation %}
+                                {{ consultation.location|default:"Clinic Appointment" }}
+
+                                {% else %}
+                                Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATE -->
+
+                    <div class="col-12 col-md-6">
+
+                        <div class="summary-item">
+
+                            <div class="summary-icon">
+                                <i class="fa-regular fa-calendar-days"></i>
+                            </div>
+
+                            <span class="summary-label">
+                                Preferred Date
+                            </span>
+
+                            <div class="summary-value">
+
+                                {% if homecare_request %}
+                                {{ homecare_request.preferred_date|default:"Not specified" }}
+
+                                {% elif consultation %}
+                                {{ consultation.appointment_date|default:"Appointment date" }}
+
+                                {% else %}
+                                Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TIME -->
+
+                    <div class="col-12 col-md-6">
+
+                        <div class="summary-item">
+
+                            <div class="summary-icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+
+                            <span class="summary-label">
+                                Preferred Time
+                            </span>
+
+                            <div class="summary-value">
+
+                                {% if homecare_request %}
+                                {{ homecare_request.preferred_time|default:"Not specified" }}
+
+                                {% elif consultation %}
+                                {{ consultation.appointment_time|default:"Appointment time" }}
+
+                                {% else %}
+                                Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 SCOPE
+            ================================================== -->
+
+            <div class="document-section">
+
+                <div class="section-heading">
+
+                    <div class="section-heading-icon">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+
+                    <div>
+                        <h3>Quotation Details & Scope</h3>
+                        <span>Services and care requirements included in this quotation</span>
+                    </div>
+
+                </div>
+
+
+                <div class="scope-box">
+
+                    {% if quotation.description %}
+                    {{ quotation.description|linebreaks }}
+                    {% else %}
+                    No additional scope or service description has been provided.
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 TOTAL
+            ================================================== -->
+
+            <div class="total-card">
+
+                <div class="total-inner">
+
+                    <div>
+
+                        <div class="total-label">
+                            Total Amount Due
+                        </div>
+
+                        <div class="total-caption">
+                            Amount payable for the specified care services
+                        </div>
+
+                    </div>
+
+                    <div class="total-amount">
+                        <span class="currency">N$</span>
+                        {{ quotation.amount|floatformat:2 }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DEADLINE
+            ================================================== -->
+
+            <div class="deadline-card">
+
+                <div class="deadline-icon">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+
+                <div>
+
+                    <div class="deadline-label">
+                        Payment Deadline
+                    </div>
+
+                    <div class="deadline-value">
+
+                        {% if quotation.payment_deadline %}
+
+                        {{ quotation.payment_deadline|date:"d F Y, g:i A" }}
+
+                        {% elif payment_deadline %}
+
+                        {{ payment_deadline|date:"d F Y, g:i A" }}
+
+                        {% else %}
+
+                        Please contact Hands-On Health
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PAYMENT SECTION
+            ================================================== -->
+
+            <div class="document-section">
+
+                <div class="section-heading">
+
+                    <div class="section-heading-icon">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+
+                    <div>
+                        <h3>Payment Instructions</h3>
+                        <span>Select one of the approved payment channels below</span>
+                    </div>
+
+                </div>
+
+
+                <div class="payment-grid">
+
+
+                    <!-- =========================================
+                         BANK
+                    ========================================== -->
+
+                    {% if site_settings.bank_name %}
+
+                    <div class="payment-card">
+
+                        <div class="payment-card-header">
+
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+
+                            <div>
+
+                                <h4 class="payment-title">
+                                    Bank Transfer
+                                </h4>
+
+                                <div class="payment-subtitle">
+                                    Direct bank payment
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Bank
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.bank_name }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Account Name
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.account_name }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Account Number
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.account_number }}
+                            </span>
+
+                        </div>
+
+
+                        {% if site_settings.branch_name %}
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Branch
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.branch_name }}
+                            </span>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =========================================
+                         MOBILE MONEY
+                    ========================================== -->
+
+                    {% if site_settings.mobile_money_number %}
+
+                    <div class="payment-card">
+
+                        <div class="payment-card-header">
+
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                            </div>
+
+                            <div>
+
+                                <h4 class="payment-title">
+                                    Mobile Money
+                                </h4>
+
+                                <div class="payment-subtitle">
+                                    Fast and convenient payment
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {% if site_settings.mobile_money_name %}
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Name
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.mobile_money_name }}
+                            </span>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <div class="payment-row">
+
+                            <span class="payment-label">
+                                Number
+                            </span>
+
+                            <span class="payment-value">
+                                {{ site_settings.mobile_money_number }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =============================================
+                     ADDITIONAL INSTRUCTIONS
+                ============================================== -->
+
+                {% if site_settings.payment_instructions %}
+
+                <div class="instructions-card">
+
+                    <div class="instructions-title">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Additional Payment Instructions
+                    </div>
+
+                    <div class="instructions-content">
+                        {{ site_settings.payment_instructions|linebreaks }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- =============================================
+                     CONFIRMATION
+                ============================================== -->
+
+                <div class="confirmation-card">
+
+                    <div class="confirmation-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="confirmation-title">
+                            Payment Verification Required
+                        </div>
+
+                        <p class="confirmation-text">
+                            Your care service is not fully confirmed until
+                            Hands-On Health receives and verifies your
+                            payment receipt. Please keep your payment
+                            reference or receipt available.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTION
+            ================================================== -->
+
+            <div class="action-area">
+
+                <div class="action-title">
+                    Ready to complete your payment?
+                </div>
+
+                <div class="action-text">
+                    Submit your payment details securely for verification
+                    by the Hands-On Health team.
+                </div>
+
+
+                <a href="{% url 'homecare:submit_payment' quotation.access_token %}" class="payment-button">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    Proceed to Payment
+
+                    <i class="fa-solid fa-arrow-right arrow"></i>
+
+                </a>
+
+
+                <div class="secondary-actions">
+
+                    <button type="button" class="print-button" onclick="window.print()">
+                        <i class="fa-solid fa-print me-1"></i>
+                        Print / Save Quotation
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SUPPORT
+        ====================================================== -->
+
+        <div class="support-note">
+
+            <i class="fa-solid fa-headset"></i>
+
+            Questions about this quotation?
+            Please contact Hands-On Health support.
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

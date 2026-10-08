@@ -3,116 +3,992 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+
+<style>
+    /* =========================================================
+   HANDS-ON HEALTH — PAYMENT SUBMITTED PAGE
+   ========================================================= */
+
+    :root {
+        --success-navy: #082f49;
+        --success-blue: #0f4c75;
+        --success-teal: #0ea5a4;
+        --success-green: #10b981;
+        --success-green-dark: #047857;
+        --success-bg: #f3f9fb;
+        --success-border: #dbe7ee;
+        --success-muted: #64748b;
+        --success-text: #102a43;
+        --success-warning: #f59e0b;
+        --success-white: #ffffff;
+    }
+
+    /* =========================================================
+   PAGE
+   ========================================================= */
+
+    .payment-success-page {
+        min-height: 100vh;
+
+        padding: 55px 15px 75px;
+
+        background:
+            radial-gradient(circle at 10% 10%,
+                rgba(16, 185, 129, .10),
+                transparent 28%),
+            radial-gradient(circle at 90% 15%,
+                rgba(14, 165, 164, .08),
+                transparent 27%),
+            linear-gradient(135deg,
+                #f6fbfc 0%,
+                #eef8f7 48%,
+                #f8fafc 100%);
+    }
+
+    .success-wrapper {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+   TOP BADGE
+   ========================================================= */
+
+    .success-heading {
+        text-align: center;
+
+        margin-bottom: 28px;
+    }
+
+    .success-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 8px 15px;
+
+        border-radius: 50px;
+
+        background: rgba(16, 185, 129, .10);
+
+        border: 1px solid rgba(16, 185, 129, .20);
+
+        color: var(--success-green-dark);
+
+        font-size: 11px;
+
+        font-weight: 900;
+
+        text-transform: uppercase;
+
+        letter-spacing: .06em;
+    }
+
+    .success-heading h1 {
+        margin: 15px 0 7px;
+
+        color: var(--success-navy);
+
+        font-size: clamp(30px, 5vw, 43px);
+
+        font-weight: 900;
+
+        letter-spacing: -.04em;
+    }
+
+    .success-heading p {
+        margin: 0;
+
+        color: var(--success-muted);
+
+        font-size: 13px;
+    }
+
+    /* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+    .success-document {
+        position: relative;
+
+        overflow: hidden;
+
+        background: var(--success-white);
+
+        border: 1px solid rgba(219, 231, 238, .9);
+
+        border-radius: 26px;
+
+        box-shadow:
+            0 25px 70px rgba(8, 47, 73, .12);
+    }
+
+    .success-document::before {
+        content: "";
+
+        display: block;
+
+        height: 7px;
+
+        background:
+            linear-gradient(90deg,
+                var(--success-navy),
+                var(--success-teal),
+                var(--success-green));
+    }
+
+    /* =========================================================
+   SUCCESS ICON
+   ========================================================= */
+
+    .success-icon-area {
+        padding: 42px 35px 15px;
+
+        text-align: center;
+    }
+
+    .success-icon-ring {
+        position: relative;
+
+        width: 92px;
+        height: 92px;
+
+        margin: 0 auto;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background:
+            linear-gradient(135deg,
+                #ecfdf5,
+                #d1fae5);
+
+        border: 1px solid #a7f3d0;
+
+        box-shadow:
+            0 15px 35px rgba(16, 185, 129, .15);
+    }
+
+    .success-icon-ring::before {
+        content: "";
+
+        position: absolute;
+
+        inset: -8px;
+
+        border-radius: 50%;
+
+        border: 1px dashed rgba(16, 185, 129, .25);
+    }
+
+    .success-icon {
+        width: 58px;
+        height: 58px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background:
+            linear-gradient(135deg,
+                var(--success-green),
+                #059669);
+
+        color: white;
+
+        font-size: 25px;
+
+        box-shadow:
+            0 10px 25px rgba(16, 185, 129, .25);
+    }
+
+    /* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+    .success-message {
+        padding: 12px 35px 30px;
+
+        text-align: center;
+    }
+
+    .success-message h2 {
+        margin: 0;
+
+        color: var(--success-navy);
+
+        font-size: 27px;
+
+        font-weight: 900;
+
+        letter-spacing: -.025em;
+    }
+
+    .success-message p {
+        max-width: 520px;
+
+        margin: 10px auto 0;
+
+        color: var(--success-muted);
+
+        font-size: 13px;
+
+        line-height: 1.7;
+    }
+
+    /* =========================================================
+   STATUS
+   ========================================================= */
+
+    .status-card {
+        margin: 0 38px 25px;
+
+        padding: 20px;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 14px;
+
+        border-radius: 17px;
+
+        background:
+            linear-gradient(135deg,
+                #fffaf0,
+                #fffdf7);
+
+        border: 1px solid #f8dda0;
+    }
+
+    .status-icon {
+        width: 42px;
+        height: 42px;
+
+        flex: 0 0 42px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: #fff0c7;
+
+        color: var(--success-warning);
+
+        font-size: 17px;
+    }
+
+    .status-title {
+        margin: 0 0 4px;
+
+        color: #704d00;
+
+        font-size: 13px;
+
+        font-weight: 900;
+    }
+
+    .status-text {
+        margin: 0;
+
+        color: #806a3c;
+
+        font-size: 11px;
+
+        line-height: 1.65;
+    }
+
+    /* =========================================================
+   PAYMENT SUMMARY
+   ========================================================= */
+
+    .summary-card {
+        margin: 0 38px 25px;
+
+        padding: 22px;
+
+        border-radius: 18px;
+
+        background:
+            linear-gradient(135deg,
+                #f7fbfc,
+                #eef8f8);
+
+        border: 1px solid #dceeee;
+    }
+
+    .summary-heading {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        margin-bottom: 15px;
+    }
+
+    .summary-heading-icon {
+        width: 36px;
+        height: 36px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: rgba(14, 165, 164, .10);
+
+        color: var(--success-teal);
+    }
+
+    .summary-heading h3 {
+        margin: 0;
+
+        color: var(--success-navy);
+
+        font-size: 13px;
+
+        font-weight: 900;
+    }
+
+    .summary-row {
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 14px 0;
+
+        border-bottom: 1px dashed #d8e5e8;
+    }
+
+    .summary-row:last-child {
+        border-bottom: 0;
+
+        padding-bottom: 0;
+    }
+
+    .summary-label {
+        color: var(--success-muted);
+
+        font-size: 11px;
+    }
+
+    .summary-value {
+        color: var(--success-text);
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        text-align: right;
+    }
+
+    .summary-amount {
+        color: var(--success-teal);
+
+        font-size: 20px;
+
+        font-weight: 900;
+    }
+
+    /* =========================================================
+   NEXT STEPS
+   ========================================================= */
+
+    .next-steps {
+        margin: 0 38px 27px;
+
+        padding: 21px;
+
+        border-radius: 17px;
+
+        background: white;
+
+        border: 1px solid var(--success-border);
+    }
+
+    .next-title {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        margin-bottom: 16px;
+
+        color: var(--success-navy);
+
+        font-size: 13px;
+
+        font-weight: 900;
+    }
+
+    .next-title i {
+        color: var(--success-teal);
+    }
+
+    .step {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 12px;
+
+        margin-bottom: 14px;
+    }
+
+    .step:last-child {
+        margin-bottom: 0;
+    }
+
+    .step-number {
+        width: 27px;
+        height: 27px;
+
+        flex: 0 0 27px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #e8f8f6;
+
+        color: var(--success-teal);
+
+        font-size: 10px;
+
+        font-weight: 900;
+    }
+
+    .step-text strong {
+        display: block;
+
+        color: var(--success-text);
+
+        font-size: 11px;
+
+        margin-bottom: 2px;
+    }
+
+    .step-text span {
+        color: var(--success-muted);
+
+        font-size: 10px;
+
+        line-height: 1.5;
+    }
+
+    /* =========================================================
+   NOTE
+   ========================================================= */
+
+    .keep-note {
+        margin: 0 38px 28px;
+
+        padding: 15px 17px;
+
+        border-radius: 13px;
+
+        background: #f8fafc;
+
+        border: 1px solid var(--success-border);
+
+        color: var(--success-muted);
+
+        font-size: 11px;
+
+        line-height: 1.65;
+
+        text-align: center;
+    }
+
+    .keep-note i {
+        color: var(--success-teal);
+
+        margin-right: 4px;
+    }
+
+    /* =========================================================
+   ACTION
+   ========================================================= */
+
+    .action-area {
+        padding: 27px 38px 34px;
+
+        border-top: 1px solid var(--success-border);
+
+        text-align: center;
+    }
+
+    .view-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 9px;
+
+        min-width: 230px;
+
+        padding: 14px 23px;
+
+        border-radius: 13px;
+
+        background:
+            linear-gradient(135deg,
+                var(--success-navy),
+                var(--success-blue));
+
+        color: white !important;
+
+        text-decoration: none !important;
+
+        font-size: 12px;
+
+        font-weight: 900;
+
+        box-shadow:
+            0 12px 28px rgba(8, 47, 73, .20);
+
+        transition: .25s ease;
+    }
+
+    .view-button:hover {
+        transform: translateY(-3px);
+
+        color: white !important;
+
+        box-shadow:
+            0 17px 36px rgba(8, 47, 73, .28);
+    }
+
+    .view-button i:last-child {
+        transition: transform .2s ease;
+    }
+
+    .view-button:hover i:last-child {
+        transform: translateX(4px);
+    }
+
+    /* =========================================================
+   FOOTER NOTE
+   ========================================================= */
+
+    .security-note {
+        margin-top: 18px;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        gap: 7px;
+
+        color: var(--success-muted);
+
+        font-size: 10px;
+
+        text-align: center;
+    }
+
+    .security-note i {
+        color: var(--success-green);
+    }
+
+    /* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .payment-success-page {
+            padding: 25px 10px 45px;
+        }
+
+        .success-heading {
+            margin-bottom: 22px;
+        }
+
+        .success-heading h1 {
+            font-size: 30px;
+        }
+
+        .success-document {
+            border-radius: 19px;
+        }
+
+        .success-icon-area {
+            padding-top: 35px;
+        }
+
+        .success-message {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .success-message h2 {
+            font-size: 24px;
+        }
+
+        .status-card,
+        .summary-card,
+        .next-steps,
+        .keep-note {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .action-area {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .view-button {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
 
-<div class="container py-5 my-5">
+<div class="payment-success-page">
 
-    <div class="row justify-content-center">
-
-        <div class="col-12 col-md-8 col-lg-6">
-
-            <div class="card border-0 shadow-sm text-center">
-
-                <div class="card-body p-5">
-
-                    <div class="mb-4">
-
-                        <div class="rounded-circle bg-success-subtle d-inline-flex align-items-center justify-content-center"
-                            style="width: 80px; height: 80px;">
-
-                            <i class="fa-solid fa-check text-success fs-2"></i>
-
-                        </div>
-
-                    </div>
+    <div class="success-wrapper">
 
 
-                    <h1 class="h3 fw-bold text-slate-800 mb-3">
+        <!-- =====================================================
+             PAGE HEADING
+        ====================================================== -->
 
-                        Payment Submitted
+        <div class="success-heading">
 
-                    </h1>
+            <div class="success-badge">
 
+                <i class="fa-solid fa-circle-check"></i>
 
-                    <p class="text-muted mb-4">
+                Payment Submission Received
 
-                        Thank you, {{ homecare_request.full_name }}.
-
-                        Your payment information has been submitted
-                        successfully.
-
-                    </p>
+            </div>
 
 
-                    <div class="alert alert-warning text-start">
-
-                        <strong>
-                            Awaiting Verification
-                        </strong>
-
-                        <p class="small mb-0 mt-1">
-
-                            Our team will verify your payment before
-                            confirming your home care service.
-
-                        </p>
-
-                    </div>
+            <h1>
+                Payment Submitted
+            </h1>
 
 
-                    <div class="summary-grid rounded-3 p-4 text-start mb-4">
+            <p>
+                Hands-On Health Home-Based Care Clinic
+            </p>
 
-                        <div class="d-flex justify-content-between mb-2">
-
-                            <span class="text-muted">
-                                Quotation
-                            </span>
-
-                            <strong>
-                                #{{ quotation.id }}
-                            </strong>
-
-                        </div>
+        </div>
 
 
-                        <div class="d-flex justify-content-between">
+        <!-- =====================================================
+             MAIN DOCUMENT
+        ====================================================== -->
 
-                            <span class="text-muted">
-                                Amount
-                            </span>
+        <div class="success-document">
 
-                            <strong class="text-primary">
-                                N$ {{ quotation.amount|floatformat:2 }}
-                            </strong>
 
-                        </div>
+            <!-- =================================================
+                 SUCCESS ICON
+            ================================================== -->
+
+            <div class="success-icon-area">
+
+                <div class="success-icon-ring">
+
+                    <div class="success-icon">
+
+                        <i class="fa-solid fa-check"></i>
 
                     </div>
-
-
-                    <p class="small text-muted">
-
-                        Please keep your payment transaction details
-                        until the verification process is complete.
-
-                    </p>
-
-
-                    <a href="{% url 'homecare:quotation_detail' quotation.access_token %}" class="btn btn-primary mt-2">
-
-                        <i class="fa-solid fa-file-invoice me-2"></i>
-
-                        View Quotation
-
-                    </a>
 
                 </div>
 
             </div>
 
+
+            <!-- =================================================
+                 SUCCESS MESSAGE
+            ================================================== -->
+
+            <div class="success-message">
+
+                <h2>
+                    Thank You, {{ homecare_request.full_name }}
+                </h2>
+
+
+                <p>
+
+                    Your payment information has been successfully
+                    submitted to Hands-On Health.
+
+                    Our team will review the transaction and update
+                    your payment status once verification is complete.
+
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 STATUS
+            ================================================== -->
+
+            <div class="status-card">
+
+
+                <div class="status-icon">
+
+                    <i class="fa-solid fa-hourglass-half"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3 class="status-title">
+                        Awaiting Payment Verification
+                    </h3>
+
+
+                    <p class="status-text">
+
+                        Your payment has been received for review.
+
+                        Please note that your home care service is
+                        not fully confirmed until Hands-On Health
+                        verifies the transaction.
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 PAYMENT SUMMARY
+            ================================================== -->
+
+            <div class="summary-card">
+
+
+                <div class="summary-heading">
+
+                    <div class="summary-heading-icon">
+
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+
+                    </div>
+
+
+                    <h3>
+                        Payment Summary
+                    </h3>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Quotation
+                    </span>
+
+
+                    <span class="summary-value">
+                        #{{ quotation.id }}
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Amount Submitted
+                    </span>
+
+
+                    <span class="summary-value summary-amount">
+
+                        N$
+                        {{ quotation.amount|floatformat:2 }}
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 NEXT STEPS
+            ================================================== -->
+
+            <div class="next-steps">
+
+
+                <div class="next-title">
+
+                    <i class="fa-solid fa-route"></i>
+
+                    What happens next?
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        1
+                    </div>
+
+
+                    <div class="step-text">
+
+                        <strong>
+                            Payment Review
+                        </strong>
+
+                        <span>
+                            Our team will review the transaction
+                            details you submitted.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        2
+                    </div>
+
+
+                    <div class="step-text">
+
+                        <strong>
+                            Payment Verification
+                        </strong>
+
+                        <span>
+                            The payment reference will be checked
+                            against the payment received.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">
+                        3
+                    </div>
+
+
+                    <div class="step-text">
+
+                        <strong>
+                            Service Confirmation
+                        </strong>
+
+                        <span>
+                            Once verified, your home care service
+                            can proceed to confirmation.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 KEEP TRANSACTION NOTE
+            ================================================== -->
+
+            <div class="keep-note">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Please keep your payment transaction details
+                until the verification process is complete.
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTION
+            ================================================== -->
+
+            <div class="action-area">
+
+                <a href="{% url 'homecare:quotation_detail' quotation.access_token %}" class="view-button">
+
+                    <i class="fa-solid fa-file-invoice"></i>
+
+                    View My Quotation
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
         </div>
+
+
+        <!-- =====================================================
+             SECURITY NOTE
+        ====================================================== -->
+
+        <div class="security-note">
+
+            <i class="fa-solid fa-lock"></i>
+
+            Your payment information has been securely submitted
+            for verification by Hands-On Health.
+
+        </div>
+
 
     </div>
 

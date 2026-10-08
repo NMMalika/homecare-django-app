@@ -3,73 +3,1016 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'homecare/css/client_quotation.css' %}">
+
+<style>
+    /* =========================================================
+   HANDS-ON HEALTH — PREMIUM PAYMENT PAGE
+   ========================================================= */
+
+    :root {
+        --pay-navy: #082f49;
+        --pay-dark: #061f35;
+        --pay-blue: #0f4c75;
+        --pay-teal: #0ea5a4;
+        --pay-cyan: #06b6d4;
+        --pay-green: #10b981;
+        --pay-bg: #f3f9fb;
+        --pay-border: #dbe7ee;
+        --pay-muted: #64748b;
+        --pay-text: #102a43;
+        --pay-warning: #f59e0b;
+        --pay-danger: #ef4444;
+        --pay-white: #ffffff;
+        --pay-shadow: 0 25px 70px rgba(8, 47, 73, .12);
+    }
+
+    /* =========================================================
+   PAGE BACKGROUND
+   ========================================================= */
+
+    .payment-page {
+        min-height: 100vh;
+        padding: 55px 15px 75px;
+
+        background:
+            radial-gradient(circle at 8% 10%,
+                rgba(14, 165, 164, .10),
+                transparent 27%),
+            radial-gradient(circle at 92% 15%,
+                rgba(6, 182, 212, .08),
+                transparent 25%),
+            linear-gradient(135deg,
+                #f6fbfc 0%,
+                #edf6f8 48%,
+                #f8fafc 100%);
+    }
+
+    .payment-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+    .payment-heading {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .payment-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        padding: 8px 15px;
+
+        border-radius: 50px;
+
+        background: rgba(14, 165, 164, .10);
+        border: 1px solid rgba(14, 165, 164, .18);
+
+        color: var(--pay-teal);
+
+        font-size: 11px;
+        font-weight: 900;
+
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .payment-heading h1 {
+        margin: 15px 0 7px;
+
+        color: var(--pay-navy);
+
+        font-size: clamp(30px, 5vw, 43px);
+        font-weight: 900;
+
+        letter-spacing: -.04em;
+    }
+
+    .payment-heading p {
+        margin: 0;
+
+        color: var(--pay-muted);
+
+        font-size: 13px;
+    }
+
+    /* =========================================================
+   MAIN PAYMENT CARD
+   ========================================================= */
+
+    .payment-document {
+        position: relative;
+
+        overflow: hidden;
+
+        background: var(--pay-white);
+
+        border: 1px solid rgba(219, 231, 238, .9);
+
+        border-radius: 25px;
+
+        box-shadow: var(--pay-shadow);
+    }
+
+    .payment-document::before {
+        content: "";
+
+        display: block;
+
+        height: 7px;
+
+        background:
+            linear-gradient(90deg,
+                var(--pay-navy),
+                var(--pay-teal),
+                var(--pay-cyan));
+    }
+
+    /* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+    .payment-card-header {
+        padding: 30px 38px 25px;
+
+        border-bottom: 1px solid var(--pay-border);
+
+        background:
+            linear-gradient(135deg,
+                rgba(8, 47, 73, .025),
+                rgba(14, 165, 164, .05));
+    }
+
+    .header-flex {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 20px;
+    }
+
+    .brand-area {
+        display: flex;
+        align-items: center;
+
+        gap: 13px;
+    }
+
+    .brand-icon {
+        width: 50px;
+        height: 50px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background:
+            linear-gradient(135deg,
+                var(--pay-navy),
+                var(--pay-teal));
+
+        color: white;
+
+        font-size: 21px;
+
+        box-shadow:
+            0 10px 25px rgba(14, 165, 164, .20);
+    }
+
+    .brand-name {
+        margin: 0;
+
+        color: var(--pay-navy);
+
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .brand-subtitle {
+        margin-top: 3px;
+
+        color: var(--pay-muted);
+
+        font-size: 10px;
+    }
+
+    .secure-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        padding: 8px 11px;
+
+        border-radius: 10px;
+
+        background: #ecfdf5;
+
+        color: #047857;
+
+        border: 1px solid #bbf7d0;
+
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    /* =========================================================
+   CLIENT SECTION
+   ========================================================= */
+
+    .client-section {
+        padding: 30px 38px 20px;
+    }
+
+    .client-label {
+        color: var(--pay-muted);
+
+        font-size: 10px;
+        font-weight: 900;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .client-name {
+        margin: 7px 0 0;
+
+        color: var(--pay-navy);
+
+        font-size: 26px;
+        font-weight: 900;
+
+        letter-spacing: -.025em;
+    }
+
+    .client-subtitle {
+        margin-top: 5px;
+
+        color: var(--pay-muted);
+
+        font-size: 12px;
+    }
+
+    /* =========================================================
+   PAYMENT SUMMARY
+   ========================================================= */
+
+    .amount-card {
+        position: relative;
+
+        overflow: hidden;
+
+        margin: 5px 38px 27px;
+
+        padding: 27px 29px;
+
+        border-radius: 20px;
+
+        background:
+            linear-gradient(135deg,
+                var(--pay-navy),
+                #0b4768 58%,
+                var(--pay-teal));
+
+        color: white;
+
+        box-shadow:
+            0 18px 42px rgba(8, 47, 73, .18);
+    }
+
+    .amount-card::before {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        right: -70px;
+        top: -90px;
+
+        border-radius: 50%;
+
+        border: 1px solid rgba(255, 255, 255, .13);
+    }
+
+    .amount-card::after {
+        content: "";
+
+        position: absolute;
+
+        width: 100px;
+        height: 100px;
+
+        right: 55px;
+        bottom: -75px;
+
+        border-radius: 50%;
+
+        border: 1px solid rgba(255, 255, 255, .10);
+    }
+
+    .amount-content {
+        position: relative;
+
+        z-index: 2;
+
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+
+        gap: 20px;
+    }
+
+    .amount-label {
+        color: rgba(255, 255, 255, .70);
+
+        font-size: 10px;
+        font-weight: 900;
+
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .quote-reference {
+        margin-top: 7px;
+
+        color: rgba(255, 255, 255, .90);
+
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .amount-value {
+        white-space: nowrap;
+
+        font-size: clamp(29px, 5vw, 43px);
+
+        font-weight: 900;
+
+        letter-spacing: -.04em;
+    }
+
+    .amount-currency {
+        font-size: .47em;
+
+        vertical-align: middle;
+
+        margin-right: 4px;
+
+        opacity: .85;
+    }
+
+    /* =========================================================
+   INSTRUCTION BOX
+   ========================================================= */
+
+    .instructions {
+        margin: 0 38px 27px;
+
+        padding: 18px 19px;
+
+        border-radius: 16px;
+
+        border: 1px solid #dbeafe;
+
+        background:
+            linear-gradient(135deg,
+                #f7fbff,
+                #f0f9ff);
+    }
+
+    .instructions-inner {
+        display: flex;
+
+        gap: 13px;
+
+        align-items: flex-start;
+    }
+
+    .instructions-icon {
+        width: 38px;
+        height: 38px;
+
+        flex: 0 0 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: #e0f2fe;
+
+        color: #0284c7;
+    }
+
+    .instructions-title {
+        margin: 0 0 4px;
+
+        color: var(--pay-navy);
+
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .instructions-text {
+        margin: 0;
+
+        color: var(--pay-muted);
+
+        font-size: 11px;
+
+        line-height: 1.7;
+    }
+
+    /* =========================================================
+   FORM AREA
+   ========================================================= */
+
+    .form-section {
+        padding: 0 38px 30px;
+    }
+
+    .form-section-title {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        margin-bottom: 19px;
+    }
+
+    .form-section-icon {
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: rgba(14, 165, 164, .10);
+
+        color: var(--pay-teal);
+    }
+
+    .form-section-title h3 {
+        margin: 0;
+
+        color: var(--pay-navy);
+
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .form-section-title span {
+        display: block;
+
+        margin-top: 2px;
+
+        color: var(--pay-muted);
+
+        font-size: 10px;
+    }
+
+    /* =========================================================
+   FORM FIELDS
+   ========================================================= */
+
+    .payment-form-group {
+        margin-bottom: 22px;
+    }
+
+    .payment-form-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: var(--pay-text);
+
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .required-star {
+        color: var(--pay-danger);
+    }
+
+    .payment-form-help {
+        margin-top: 7px;
+
+        color: var(--pay-muted);
+
+        font-size: 10px;
+
+        line-height: 1.6;
+    }
+
+    /*
+   Django widgets usually render as select/input.
+   These rules style both automatically.
+*/
+
+    .payment-form-group input,
+    .payment-form-group select,
+    .payment-form-group textarea {
+
+        width: 100%;
+
+        min-height: 51px;
+
+        padding: 13px 15px;
+
+        border: 1px solid #d7e2e9;
+
+        border-radius: 13px;
+
+        background: #fbfdfe;
+
+        color: var(--pay-text);
+
+        font-size: 13px;
+
+        outline: none;
+
+        transition:
+            border-color .2s ease,
+            box-shadow .2s ease,
+            background .2s ease;
+    }
+
+    .payment-form-group textarea {
+        min-height: 110px;
+
+        resize: vertical;
+    }
+
+    .payment-form-group input:focus,
+    .payment-form-group select:focus,
+    .payment-form-group textarea:focus {
+
+        background: white;
+
+        border-color: var(--pay-teal);
+
+        box-shadow:
+            0 0 0 4px rgba(14, 165, 164, .10);
+    }
+
+    .payment-form-group input::placeholder {
+        color: #9aa9b5;
+    }
+
+    /* =========================================================
+   PAYMENT METHOD
+   ========================================================= */
+
+    .payment-method-box {
+        position: relative;
+    }
+
+    .payment-method-box::after {
+        content: "\f107";
+
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+
+        position: absolute;
+
+        right: 17px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: var(--pay-teal);
+
+        pointer-events: none;
+    }
+
+    /* =========================================================
+   TRANSACTION CODE
+   ========================================================= */
+
+    .transaction-box {
+        position: relative;
+    }
+
+    .transaction-box input {
+        font-weight: 700;
+
+        letter-spacing: .04em;
+    }
+
+    /* =========================================================
+   ERRORS
+   ========================================================= */
+
+    .field-error {
+        margin-top: 7px;
+
+        color: var(--pay-danger);
+
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .form-error-box {
+        margin-bottom: 22px;
+
+        padding: 15px 17px;
+
+        border-radius: 14px;
+
+        background: #fef2f2;
+
+        border: 1px solid #fecaca;
+
+        color: #991b1b;
+
+        font-size: 12px;
+    }
+
+    /* =========================================================
+   WARNING
+   ========================================================= */
+
+    .verification-warning {
+        display: flex;
+
+        gap: 13px;
+
+        align-items: flex-start;
+
+        margin: 8px 0 25px;
+
+        padding: 17px;
+
+        border-radius: 15px;
+
+        background:
+            linear-gradient(135deg,
+                #fffaf0,
+                #fffdf7);
+
+        border: 1px solid #f8dda0;
+    }
+
+    .warning-icon {
+        width: 38px;
+        height: 38px;
+
+        flex: 0 0 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: #fff0c7;
+
+        color: var(--pay-warning);
+    }
+
+    .warning-title {
+        margin: 0 0 4px;
+
+        color: #704d00;
+
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .warning-text {
+        margin: 0;
+
+        color: #806a3c;
+
+        font-size: 11px;
+
+        line-height: 1.65;
+    }
+
+    /* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+    .submit-area {
+        padding-top: 5px;
+    }
+
+    .submit-button {
+
+        width: 100%;
+
+        min-height: 56px;
+
+        border: 0;
+
+        border-radius: 14px;
+
+        background:
+            linear-gradient(135deg,
+                var(--pay-navy),
+                var(--pay-blue));
+
+        color: white;
+
+        font-size: 13px;
+        font-weight: 900;
+
+        letter-spacing: .01em;
+
+        box-shadow:
+            0 13px 30px rgba(8, 47, 73, .20);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .submit-button:hover {
+
+        transform: translateY(-3px);
+
+        box-shadow:
+            0 18px 38px rgba(8, 47, 73, .28);
+
+        color: white;
+    }
+
+    .submit-button:active {
+        transform: translateY(-1px);
+    }
+
+    .submit-button .arrow {
+        margin-left: 6px;
+
+        transition: transform .2s ease;
+    }
+
+    .submit-button:hover .arrow {
+        transform: translateX(4px);
+    }
+
+    /* =========================================================
+   BACK LINK
+   ========================================================= */
+
+    .back-area {
+
+        padding: 22px 38px 31px;
+
+        border-top: 1px solid var(--pay-border);
+
+        text-align: center;
+    }
+
+    .back-link {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 7px;
+
+        color: var(--pay-muted);
+
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        transition: .2s ease;
+    }
+
+    .back-link:hover {
+
+        color: var(--pay-teal);
+
+        text-decoration: none;
+    }
+
+    .back-link i {
+        transition: transform .2s ease;
+    }
+
+    .back-link:hover i {
+        transform: translateX(-4px);
+    }
+
+    /* =========================================================
+   SECURITY NOTE
+   ========================================================= */
+
+    .security-note {
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        gap: 7px;
+
+        margin-top: 18px;
+
+        color: var(--pay-muted);
+
+        font-size: 10px;
+
+        text-align: center;
+    }
+
+    .security-note i {
+        color: var(--pay-green);
+    }
+
+    /* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+    @media (max-width: 767.98px) {
+
+        .payment-page {
+            padding: 25px 10px 45px;
+        }
+
+        .payment-heading {
+            margin-bottom: 22px;
+        }
+
+        .payment-heading h1 {
+            font-size: 30px;
+        }
+
+        .payment-document {
+            border-radius: 19px;
+        }
+
+        .payment-card-header {
+            padding: 23px 20px;
+        }
+
+        .header-flex {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+        .secure-badge {
+            align-self: flex-start;
+        }
+
+        .client-section {
+            padding: 25px 20px 18px;
+        }
+
+        .client-name {
+            font-size: 24px;
+        }
+
+        .amount-card {
+            margin: 5px 20px 22px;
+
+            padding: 22px;
+        }
+
+        .amount-content {
+            align-items: flex-start;
+
+            flex-direction: column;
+
+            gap: 13px;
+        }
+
+        .amount-value {
+            font-size: 34px;
+        }
+
+        .instructions {
+            margin: 0 20px 24px;
+        }
+
+        .form-section {
+            padding: 0 20px 25px;
+        }
+
+        .back-area {
+            padding: 20px;
+        }
+    }
+
+    /* =========================================================
+   PRINT
+   ========================================================= */
+
+    @media print {
+
+        body {
+            background: white !important;
+        }
+
+        .payment-page {
+            padding: 0 !important;
+
+            background: white !important;
+        }
+
+        .payment-document {
+            box-shadow: none !important;
+
+            border: 1px solid #ddd !important;
+        }
+
+        .submit-area,
+        .back-area {
+            display: none !important;
+        }
+
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
 
-<div class="container py-5 my-3">
+<div class="payment-page">
 
-    <div class="row justify-content-center">
+    <div class="payment-wrapper">
 
-        <div class="col-12 col-md-10 col-lg-7">
 
-            <div class="text-center mb-4">
+        <!-- =====================================================
+             PAGE HEADING
+        ====================================================== -->
 
-                <span class="badge bg-primary-soft text-primary fw-semibold px-3 py-2 rounded-pill mb-2">
-                    <i class="fa-solid fa-credit-card me-1"></i>
-                    Payment Confirmation
-                </span>
+        <div class="payment-heading">
 
-                <h1 class="h2 fw-bold text-slate-800 mb-1">
-                    Confirm Your Payment
-                </h1>
+            <div class="payment-badge">
 
-                <p class="text-muted">
-                    Hands-On Health Home-Based Care Clinic
-                </p>
+                <i class="fa-solid fa-shield-halved"></i>
+
+                Secure Payment Submission
 
             </div>
 
 
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body p-4 p-md-5">
-
-                    <div class="mb-4">
-
-                        <span class="text-uppercase text-muted fw-bold small">
-                            Client
-                        </span>
-
-                        <h2 class="h4 fw-bold text-slate-800 mb-0 mt-1">
-                            {{ homecare_request.full_name }}
-                        </h2>
-
-                    </div>
+            <h1>
+                Confirm Your Payment
+            </h1>
 
 
-                    <!-- AMOUNT -->
+            <p>
+                Hands-On Health Home-Based Care Clinic
+            </p>
 
-                    <div class="summary-grid rounded-3 p-4 mb-4">
+        </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
 
-                            <div>
-                                <span class="info-label">
-                                    Amount Due
-                                </span>
+        <!-- =====================================================
+             PAYMENT DOCUMENT
+        ====================================================== -->
 
-                                <div class="fw-semibold text-slate-800">
-                                    Quotation #{{ quotation.id }}
-                                </div>
-                            </div>
+        <div class="payment-document">
 
-                            <div class="text-end">
 
-                                <span class="fs-3 fw-bold text-primary">
-                                    N$ {{ quotation.amount|floatformat:2 }}
-                                </span>
+            <!-- =================================================
+                 HEADER
+            ================================================== -->
 
+            <div class="payment-card-header">
+
+                <div class="header-flex">
+
+
+                    <div class="brand-area">
+
+                        <div class="brand-icon">
+
+                            <i class="fa-solid fa-heart-pulse"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="brand-name">
+                                Hands-On Health
+                            </p>
+
+                            <div class="brand-subtitle">
+                                Professional Home-Based Care Clinic
                             </div>
 
                         </div>
@@ -77,162 +1020,11 @@
                     </div>
 
 
-                    <!-- INSTRUCTIONS -->
+                    <div class="secure-badge">
 
-                    <div class="alert alert-light border rounded-3 mb-4">
+                        <i class="fa-solid fa-lock"></i>
 
-                        <div class="d-flex gap-3">
-
-                            <i class="fa-solid fa-circle-info text-primary mt-1"></i>
-
-                            <div>
-
-                                <strong class="text-slate-800">
-                                    Before submitting
-                                </strong>
-
-                                <p class="small text-muted mb-0 mt-1">
-
-                                    Please make your payment using one of
-                                    the payment methods provided on your
-                                    quotation.
-
-                                    After completing the payment, enter the
-                                    transaction code below.
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PAYMENT FORM -->
-
-                <form method="post" action="{% url 'homecare:submit_payment' token=quotation.access_token %}">
-
-                        {% csrf_token %}
-
-
-                        {% if form.non_field_errors %}
-
-                        <div class="alert alert-danger">
-
-                            {{ form.non_field_errors }}
-
-                        </div>
-
-                        {% endif %}
-
-
-                        <!-- PAYMENT METHOD -->
-
-                        <div class="mb-4">
-
-                            <label for="{{ form.payment_method.id_for_label }}" class="form-label fw-semibold">
-                                Payment Method
-                            </label>
-
-                            {{ form.payment_method }}
-
-                            {% for error in form.payment_method.errors %}
-
-                            <div class="text-danger small mt-1">
-                                {{ error }}
-                            </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- PAYMENT CODE -->
-
-                        <div class="mb-4">
-
-                            <label for="{{ form.payment_code.id_for_label }}" class="form-label fw-semibold">
-                                Payment / Transaction Code
-                            </label>
-
-                            {{ form.payment_code }}
-
-                            {% if form.payment_code.help_text %}
-
-                            <div class="form-text">
-                                {{ form.payment_code.help_text }}
-                            </div>
-
-                            {% endif %}
-
-                            {% for error in form.payment_code.errors %}
-
-                            <div class="text-danger small mt-1">
-                                {{ error }}
-                            </div>
-
-                            {% endfor %}
-
-                        </div>
-
-
-                        <!-- WARNING -->
-
-                        <div class="alert alert-warning rounded-3 mb-4">
-
-                            <div class="d-flex gap-2 align-items-start">
-
-                                <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-
-                                <div>
-
-                                    <strong>
-                                        Important
-                                    </strong>
-
-                                    <p class="small mb-0 mt-1">
-
-                                        Submitting this form does not
-                                        immediately confirm your service.
-
-                                        Hands-On Health will verify the
-                                        transaction before your payment is
-                                        marked as paid.
-
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- SUBMIT -->
-
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-
-                            <i class="fa-solid fa-check-circle me-2"></i>
-
-                            I HAVE PAID
-
-                        </button>
-
-
-                    </form>
-
-
-                    <div class="text-center mt-4">
-
-                        <a href="{% url 'homecare:quotation_detail' quotation.access_token %}"
-                            class="text-decoration-none">
-
-                            <i class="fa-solid fa-arrow-left me-1"></i>
-
-                            Back to quotation
-
-                        </a>
+                        Secure Submission
 
                     </div>
 
@@ -241,18 +1033,378 @@
             </div>
 
 
-            <div class="text-center mt-4">
+            <!-- =================================================
+                 CLIENT
+            ================================================== -->
 
-                <p class="small text-muted mb-0">
+            <div class="client-section">
 
-                    Your payment information is submitted securely
-                    for verification by Hands-On Health.
+                <div class="client-label">
+                    Payment For
+                </div>
 
-                </p>
+
+                <h2 class="client-name">
+
+                    {{ homecare_request.full_name }}
+
+                </h2>
+
+
+                <div class="client-subtitle">
+
+                    Please verify your payment details before submitting.
+
+                </div>
 
             </div>
 
+
+            <!-- =================================================
+                 AMOUNT
+            ================================================== -->
+
+            <div class="amount-card">
+
+                <div class="amount-content">
+
+
+                    <div>
+
+                        <div class="amount-label">
+                            Amount Due
+                        </div>
+
+
+                        <div class="quote-reference">
+
+                            Quotation #{{ quotation.id }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="amount-value">
+
+                        <span class="amount-currency">
+                            N$
+                        </span>
+
+                        {{ quotation.amount|floatformat:2 }}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 INSTRUCTIONS
+            ================================================== -->
+
+            <div class="instructions">
+
+                <div class="instructions-inner">
+
+
+                    <div class="instructions-icon">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3 class="instructions-title">
+                            Before submitting your payment
+                        </h3>
+
+
+                        <p class="instructions-text">
+
+                            Please make your payment using one of the
+                            approved payment methods provided on your
+                            quotation.
+
+                            After completing the payment, enter the
+                            transaction code below exactly as it appears
+                            on your payment receipt or confirmation.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FORM
+            ================================================== -->
+
+            <div class="form-section">
+
+
+                <div class="form-section-title">
+
+                    <div class="form-section-icon">
+
+                        <i class="fa-solid fa-receipt"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h3>
+                            Payment Details
+                        </h3>
+
+                        <span>
+                            Enter the details of the payment you have made
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <form method="post" action="{% url 'homecare:submit_payment' token=quotation.access_token %}">
+
+                    {% csrf_token %}
+
+
+                    <!-- =========================================
+                         GENERAL ERRORS
+                    ========================================== -->
+
+                    {% if form.non_field_errors %}
+
+                    <div class="form-error-box">
+
+                        <div class="d-flex gap-2">
+
+                            <i class="fa-solid fa-circle-exclamation mt-1"></i>
+
+                            <div>
+
+                                {{ form.non_field_errors }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =========================================
+                         PAYMENT METHOD
+                    ========================================== -->
+
+                    <div class="payment-form-group">
+
+                        <label for="{{ form.payment_method.id_for_label }}" class="payment-form-label">
+
+                            <i class="fa-solid fa-wallet me-1"></i>
+
+                            Payment Method
+
+                            <span class="required-star">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <div class="payment-method-box">
+
+                            {{ form.payment_method }}
+
+                        </div>
+
+
+                        {% for error in form.payment_method.errors %}
+
+                        <div class="field-error">
+
+                            <i class="fa-solid fa-circle-exclamation me-1"></i>
+
+                            {{ error }}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =========================================
+                         TRANSACTION CODE
+                    ========================================== -->
+
+                    <div class="payment-form-group">
+
+                        <label for="{{ form.payment_code.id_for_label }}" class="payment-form-label">
+
+                            <i class="fa-solid fa-hashtag me-1"></i>
+
+                            Payment / Transaction Code
+
+                            <span class="required-star">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <div class="transaction-box">
+
+                            {{ form.payment_code }}
+
+                        </div>
+
+
+                        {% if form.payment_code.help_text %}
+
+                        <div class="payment-form-help">
+
+                            <i class="fa-solid fa-lightbulb me-1"></i>
+
+                            {{ form.payment_code.help_text }}
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="payment-form-help">
+
+                            <i class="fa-solid fa-lightbulb me-1"></i>
+
+                            Enter the transaction/reference code shown
+                            on your payment confirmation.
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% for error in form.payment_code.errors %}
+
+                        <div class="field-error">
+
+                            <i class="fa-solid fa-circle-exclamation me-1"></i>
+
+                            {{ error }}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =========================================
+                         VERIFICATION WARNING
+                    ========================================== -->
+
+                    <div class="verification-warning">
+
+
+                        <div class="warning-icon">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4 class="warning-title">
+                                Payment verification required
+                            </h4>
+
+
+                            <p class="warning-text">
+
+                                Submitting this form does not immediately
+                                confirm your service.
+
+                                Hands-On Health will review and verify the
+                                transaction before your payment is marked
+                                as paid.
+
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- =========================================
+                         SUBMIT
+                    ========================================== -->
+
+                    <div class="submit-area">
+
+                        <button type="submit" class="submit-button">
+
+                            <i class="fa-solid fa-lock"></i>
+
+                            Submit Payment for Verification
+
+                            <i class="fa-solid fa-arrow-right arrow"></i>
+
+                        </button>
+
+                    </div>
+
+
+                </form>
+
+            </div>
+
+
+            <!-- =================================================
+                 BACK TO QUOTATION
+            ================================================== -->
+
+            <div class="back-area">
+
+                <a href="{% url 'homecare:quotation_detail' quotation.access_token %}" class="back-link">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to quotation
+
+                </a>
+
+            </div>
+
+
         </div>
+
+
+        <!-- =====================================================
+             SECURITY NOTE
+        ====================================================== -->
+
+        <div class="security-note">
+
+            <i class="fa-solid fa-shield-check"></i>
+
+            Your payment information is submitted securely for
+            verification by Hands-On Health.
+
+        </div>
+
 
     </div>
 

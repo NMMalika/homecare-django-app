@@ -4,9 +4,7 @@
 
 <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Your Home Care Quotation</title>
 </head>
 
@@ -31,560 +29,217 @@
                 ">
 
                     <!-- HEADER -->
-
                     <tr>
                         <td style="
-                            padding: 30px;
+                            padding: 25px;
                             text-align: center;
                             background: #0b3d5c;
                             color: #ffffff;
                         ">
-
                             {% if site_settings.logo %}
                             <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }}" style="
-                                    max-width: 160px;
-                                    max-height: 70px;
-                                    margin-bottom: 15px;
+                                    max-width: 140px;
+                                    max-height: 60px;
+                                    margin-bottom: 10px;
                                 ">
                             {% else %}
-                            <img src="{% static 'img/logo.png' %}" alt="Hands-On Health Logo" class="navbar-logo">
+                            <img src="{% static 'img/logo.png' %}" alt="Logo"
+                                style="max-width: 140px; max-height: 60px; margin-bottom: 10px;">
                             {% endif %}
 
-                            <h1 style="
-                                margin: 0;
-                                font-size: 24px;
-                            ">
+                            <h1 style="margin: 0; font-size: 22px;">
                                 {{ site_settings.business_name }}
                             </h1>
-
-                            <p style="
-                                margin: 8px 0 0;
-                                font-size: 14px;
-                            ">
+                            <p style="margin: 5px 0 0; font-size: 13px;">
                                 {{ site_settings.tagline|default:"Home-Based Healthcare Services" }}
                             </p>
-
                         </td>
                     </tr>
 
-
                     <!-- MAIN CONTENT -->
-
                     <tr>
-                        <td style="padding: 35px;">
+                        <td style="padding: 30px;">
 
-                            <h2 style="
-                                margin-top: 0;
-                                color: #0b3d5c;
-                            ">
-                                Your Home Care Quotation
+                            <h2 style="margin-top: 0; color: #0b3d5c; font-size: 20px;">
+                                Home Care Quotation
                             </h2>
 
+                            <p>Dear {{ homecare_request.full_name }},</p>
 
                             <p>
-                                Dear {{ homecare_request.full_name }},
+                                Thank you for choosing {{ site_settings.business_name }}. Below is the breakdown of your
+                                quotation and payment details.
                             </p>
 
-
-                            <p>
-                                Thank you for contacting
-                                {{ site_settings.business_name }}.
-                                We have reviewed your home care request
-                                and prepared your quotation.
-                            </p>
-
-
-                            <!-- REQUEST SUMMARY -->
-
-                            <table width="100%" cellpadding="10" cellspacing="0" style="
-                                margin: 25px 0;
-                                background: #f7f9fb;
-                                border-radius: 6px;
-                            ">
-
-                                <tr>
-                                    <td>
-                                        <strong>Service</strong>
-                                    </td>
-
-                                    <td align="right">
-
-                                        {% if homecare_request.services.exists %}
-                                           {% for service in homecare_request.services.all %}
-                                                {{ service.name }}{% if not forloop.last %}<br>{% endif %}
-                                           {% endfor %}
-                                        {% else %}
-                                           Home Care Service
-                                        {% endif %}
-
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <strong>Location</strong>
-                                    </td>
-
-                                    <td align="right">
-                                        {{ homecare_request.location }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <strong>Preferred Date</strong>
-                                    </td>
-
-                                    <td align="right">
-                                        {{ homecare_request.preferred_date }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <strong>Preferred Time</strong>
-                                    </td>
-
-                                    <td align="right">
-                                        {{ homecare_request.preferred_time }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <strong>Total Amount</strong>
-                                    </td>
-
-                                    <td align="right" style="
-                                        font-size: 20px;
-                                        font-weight: bold;
-                                        color: #0b3d5c;
-                                    ">
-                                        N$ {{ quotation.amount|floatformat:2 }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <strong>Payment Deadline</strong>
-                                    </td>
-
-                                    <td align="right">
-                                        {{ payment_deadline|date:"d F Y" }}
-                                        at
-                                        {{ payment_deadline|date:"h:i A" }}
-                                    </td>
-                                </tr>
-
-                            </table>
-
-
-                            <!-- QUOTATION DETAILS -->
-
-                            <h3 style="
-                                color: #0b3d5c;
-                                margin-top: 30px;
-                            ">
-                                Quotation Details
+                            <!-- PAGE 1: QUOTATION SUMMARY & BREAKDOWN -->
+                            <h3
+                                style="color: #0b3d5c; border-bottom: 2px solid #0b3d5c; padding-bottom: 5px; margin-top: 25px;">
+                                1. Quotation Summary
                             </h3>
 
-
-                        <div style="
-                            background: #f7f9fb;
-                            padding: 18px;
-                            border-radius: 6px;
-                            line-height: 1.6;
-                        ">
-                        
-                            <strong>Services Requested:</strong>
-                        
-                            <table width="100%" cellpadding="8" cellspacing="0" style="margin-top: 12px;">
-                        
+                            <table width="100%" cellpadding="8" cellspacing="0" style="
+                                background: #f7f9fb;
+                                border-radius: 6px;
+                                margin-top: 10px;
+                            ">
                                 {% for service in homecare_request.services.all %}
                                 <tr>
-                                    <td style="border-bottom: 1px solid #e5e5e5;">
+                                    <td style="border-bottom: 1px solid #e5e5e5; font-size: 14px;">
                                         {{ service.name }}
                                     </td>
-                        
-                                    <td align="right" style="
-                                            border-bottom: 1px solid #e5e5e5;
-                                            font-weight: bold;
-                                        ">
+                                    <td align="right"
+                                        style="border-bottom: 1px solid #e5e5e5; font-weight: bold; font-size: 14px;">
                                         N$ {{ service.price|floatformat:2 }}
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="2">
-                                        No specific services listed.
-                                    </td>
+                                    <td colspan="2" style="font-size: 14px;">Home Care Service</td>
                                 </tr>
                                 {% endfor %}
-                        
+
                                 <tr>
-                                    <td style="
-                                        padding-top: 15px;
-                                        font-weight: bold;
-                                    ">
-                                        Services Total
+                                    <td style="padding-top: 10px; font-weight: bold; font-size: 14px;">Services Total
                                     </td>
-                        
-                                    <td align="right" style="
-                                        padding-top: 15px;
-                                        font-weight: bold;
-                                        color: #0b3d5c;
-                                    ">
+                                    <td align="right"
+                                        style="padding-top: 10px; font-weight: bold; color: #0b3d5c; font-size: 14px;">
                                         N$ {{ quotation.base_amount|floatformat:2 }}
                                     </td>
                                 </tr>
-                        
+
                                 {% if quotation.transportation_fee %}
                                 <tr>
-                                    <td>
-                                        Transportation Fee
-                                    </td>
-                        
-                                    <td align="right">
-                                        N$ {{ quotation.transportation_fee|floatformat:2 }}
-                                    </td>
+                                    <td style="font-size: 14px;">Transportation Fee</td>
+                                    <td align="right" style="font-size: 14px;">N$ {{quotation.transportation_fee|floatformat:2 }}</td>
                                 </tr>
                                 {% endif %}
-                        
+
                                 {% if quotation.discount_amount %}
                                 <tr>
-                                    <td>
-                                        Discount
-                                    </td>
-                        
-                                    <td align="right">
-                                        - N$ {{ quotation.discount_amount|floatformat:2 }}
-                                    </td>
+                                    <td style="font-size: 14px;">Discount</td>
+                                    <td align="right" style="font-size: 14px;">- N$ {{quotation.discount_amount|floatformat:2 }}</td>
                                 </tr>
                                 {% endif %}
-                        
+
                                 <tr>
-                                    <td style="
-                                        padding-top: 12px;
-                                        font-size: 17px;
-                                        font-weight: bold;
-                                        color: #0b3d5c;
-                                    ">
-                                        Calculated Total Amount
+                                    <td style="padding-top: 12px; font-size: 16px; font-weight: bold; color: #0b3d5c;">
+                                        Total Amount Due
                                     </td>
-                        
-                                    <td align="right" style="
-                                        padding-top: 12px;
-                                        font-size: 17px;
-                                        font-weight: bold;
-                                        color: #0b3d5c;
-                                    ">
+                                    <td align="right"
+                                        style="padding-top: 12px; font-size: 16px; font-weight: bold; color: #0b3d5c;">
                                         N$ {{ quotation.amount|floatformat:2 }}
                                     </td>
                                 </tr>
-                        
                             </table>
-                        
-                        </div>
+
+                            <p style="font-size: 13px; color: #666; margin-top: 10px;">
+                                <strong>Location:</strong> {{ homecare_request.location }}<br>
+                                <strong>Date / Time:</strong> {{ homecare_request.preferred_date }} at {{ homecare_request.preferred_time }}<br>
+                                <strong>Payment Deadline:</strong> {{ payment_deadline|date:"d F Y" }} at {{ payment_deadline|date:"h:i A" }}
+                            </p>
 
 
-                            <!-- PAYMENT -->
-
-                            <h3 style="
-                                color: #0b3d5c;
-                                margin-top: 30px;
-                            ">
-                                Payment Information
+                            <!-- PAGE 2: PAYMENT METHODS & CODE SUBMISSION -->
+                            <h3
+                                style="color: #0b3d5c; border-bottom: 2px solid #0b3d5c; padding-bottom: 5px; margin-top: 35px;">
+                                2. Payment Details &amp; Confirmation
                             </h3>
 
-
-                            <p>
-                                Please use one of the payment methods below
-                                to complete your payment.
-                            </p>
-
+                            <p style="font-size: 14px;">Please use one of the channels below to remit payment:</p>
 
                             {% if site_settings.bank_name %}
-
-                            <table width="100%" cellpadding="8" cellspacing="0" style="
-                                background: #f7f9fb;
-                                border-radius: 6px;
-                                margin-top: 15px;
-                            ">
-
+                            <table width="100%" cellpadding="6" cellspacing="0"
+                                style="background: #f7f9fb; border-radius: 6px; margin-top: 10px; font-size: 14px;">
                                 <tr>
-                                    <td colspan="2">
-                                        <strong style="color: #0b3d5c;">
-                                            Bank Payment
-                                        </strong>
-                                    </td>
+                                    <td colspan="2"><strong style="color: #0b3d5c;">Bank Transfer</strong></td>
                                 </tr>
-
-
                                 <tr>
-                                    <td>
-                                        Bank
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.bank_name }}
-                                    </td>
+                                    <td>Bank</td>
+                                    <td align="right">{{ site_settings.bank_name }}</td>
                                 </tr>
-
-
-                                {% if site_settings.account_name %}
-
-                                <tr>
-                                    <td>
-                                        Account Name
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.account_name }}
-                                    </td>
-                                </tr>
-
-                                {% endif %}
-
-
-                                {% if site_settings.account_number %}
-
-                                <tr>
-                                    <td>
-                                        Account Number
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.account_number }}
-                                    </td>
-                                </tr>
-
-                                {% endif %}
-
-
-                                {% if site_settings.branch_name %}
-
-                                <tr>
-                                    <td>
-                                        Branch
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.branch_name }}
-                                    </td>
-                                </tr>
-
-                                {% endif %}
-
+                                {% if site_settings.account_name %}<tr>
+                                    <td>Account Name</td>
+                                    <td align="right">{{ site_settings.account_name }}</td>
+                                </tr>{% endif %}
+                                {% if site_settings.account_number %}<tr>
+                                    <td>Account Number</td>
+                                    <td align="right">{{ site_settings.account_number }}</td>
+                                </tr>{% endif %}
                             </table>
-
                             {% endif %}
-
 
                             {% if site_settings.mobile_money_name %}
-
-                            <table width="100%" cellpadding="8" cellspacing="0" style="
-                                background: #f7f9fb;
-                                border-radius: 6px;
-                                margin-top: 15px;
-                            ">
-
+                            <table width="100%" cellpadding="6" cellspacing="0"
+                                style="background: #f7f9fb; border-radius: 6px; margin-top: 10px; font-size: 14px;">
                                 <tr>
-                                    <td colspan="2">
-                                        <strong style="color: #0b3d5c;">
-                                            Mobile Money
-                                        </strong>
-                                    </td>
+                                    <td colspan="2"><strong style="color: #0b3d5c;">Mobile Money</strong></td>
                                 </tr>
-
-
                                 <tr>
-                                    <td>
-                                        Provider
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.mobile_money_name }}
-                                    </td>
+                                    <td>Provider</td>
+                                    <td align="right">{{ site_settings.mobile_money_name }}</td>
                                 </tr>
-
-
-                                {% if site_settings.mobile_money_number %}
-
-                                <tr>
-                                    <td>
-                                        Number
-                                    </td>
-
-                                    <td align="right">
-                                        {{ site_settings.mobile_money_number }}
-                                    </td>
-                                </tr>
-
-                                {% endif %}
-
+                                {% if site_settings.mobile_money_number %}<tr>
+                                    <td>Number</td>
+                                    <td align="right">{{ site_settings.mobile_money_number }}</td>
+                                </tr>{% endif %}
                             </table>
-
                             {% endif %}
 
-
-                            
-
-                            <!-- PAYMENT REFERENCE & PAYMENT CODE -->
-
-                        <!-- PAYMENT REFERENCE & NEXT STEP -->
-                        
-                        <div style="
-                            margin-top: 25px;
-                            padding: 20px;
-                            background: #eef6fa;
-                            border: 1px solid #d5e7ef;
-                            border-radius: 6px;
-                        ">
-                        
-                            <p style="
-                                margin: 0 0 12px;
-                                color: #0b3d5c;
-                                font-weight: bold;
-                            ">
-                                Payment Instructions
-                            </p>
-                        
-                            <p style="
-                                margin: 0 0 12px;
-                                line-height: 1.6;
-                            ">
-                                Once you have completed your payment, click the button below
-                                to open your secure quotation page and submit your payment
-                                transaction code.
-                            </p>
-                        
-                            <p style="
-                                margin: 0;
-                                line-height: 1.6;
-                            ">
-                                Your service will only be confirmed after
-                                <strong>{{ site_settings.business_name }}</strong>
-                                verifies your payment.
-                            </p>
-                        
-                        </div>
-                        
-                        
-                        <!-- PAYMENT BUTTON -->
-                        
-                        <div style="
-                            text-align: center;
-                            margin: 35px 0;
-                        ">
-                        
-                            <a href="{{ quotation_url }}" style="
-                                display: inline-block;
-                                padding: 14px 30px;
-                                background: #0b3d5c;
-                                color: #ffffff;
-                                text-decoration: none;
-                                border-radius: 5px;
-                                font-weight: bold;
-                                font-size: 15px;
-                            ">
-                                VIEW QUOTATION &amp; SUBMIT PAYMENT
-                            </a>
-                        
-                        </div>
-
-
-                            <!-- PAYMENT BUTTON -->
-
+                            <!-- ACTION INSTRUCTION & SINGLE BUTTON -->
                             <div style="
+                                margin-top: 25px;
+                                padding: 15px;
+                                background: #eef6fa;
+                                border: 1px solid #d5e7ef;
+                                border-radius: 6px;
                                 text-align: center;
-                                margin: 35px 0;
                             ">
+                                <p style="margin: 0 0 10px; font-size: 14px; line-height: 1.5;">
+                                    After making your payment, click below to open your secure portal page, select your
+                                    payment method, and submit your transaction/reference code.
+                                </p>
 
                                 <a href="{{ quotation_url }}" style="
                                     display: inline-block;
-                                    padding: 14px 30px;
+                                    padding: 12px 25px;
                                     background: #0b3d5c;
                                     color: #ffffff;
                                     text-decoration: none;
                                     border-radius: 5px;
                                     font-weight: bold;
-                                    font-size: 15px;
+                                    font-size: 14px;
+                                    margin-top: 5px;
                                 ">
-                                    PAID
+                                    PROCEED TO PAYMENT CONFIRMATION
                                 </a>
-
                             </div>
 
-
-                           
-
-
-                            <!-- CONTACT -->
-
-                            <p style="margin-top: 30px;">
-
-                                If you have any questions, please contact us:
-
-                                {% if site_settings.phone %}
-                                <br>
-                                <strong>Phone:</strong>
-                                {{ site_settings.phone }}
-                                {% endif %}
-
-                                {% if site_settings.whatsapp %}
-                                <br>
-                                <strong>WhatsApp:</strong>
-                                {{ site_settings.whatsapp }}
-                                {% endif %}
-
-                                {% if site_settings.email %}
-                                <br>
-                                <strong>Email:</strong>
-                                {{ site_settings.email }}
-                                {% endif %}
-
+                            <!-- CONTACT INFO -->
+                            <p style="margin-top: 30px; font-size: 13px; color: #555;">
+                                Questions? Contact us at
+                                {% if site_settings.phone %}{{ site_settings.phone }}{% endif %}
+                                {% if site_settings.email %} or {{ site_settings.email }}{% endif %}
                             </p>
 
-
-                            <p>
+                            <p style="font-size: 13px;">
                                 Kind regards,<br>
-
-                                <strong>
-                                    {{ site_settings.business_name }}
-                                </strong>
+                                <strong>{{ site_settings.business_name }}</strong>
                             </p>
 
                         </td>
                     </tr>
 
-
                     <!-- FOOTER -->
-
                     <tr>
                         <td style="
-                            padding: 20px 35px;
+                            padding: 15px 30px;
                             background: #f7f9fb;
                             text-align: center;
-                            font-size: 12px;
+                            font-size: 11px;
                             color: #777777;
                         ">
-
-                            {{ site_settings.business_name }}
-
-                            <br>
-
-                            {{ site_settings.tagline|default:"Home-Based Healthcare Services" }}
-
-                            {% if site_settings.city %}
-                            <br>
-                            {{ site_settings.city }}, {{ site_settings.country }}
-                            {% endif %}
-
+                            {{ site_settings.business_name }} &bull; {{ site_settings.tagline|default:"Home-Based
+                            Healthcare Services" }}
                         </td>
                     </tr>
 

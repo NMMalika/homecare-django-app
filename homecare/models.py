@@ -191,7 +191,9 @@ class Referral(models.Model):
     patient_phone = models.CharField(
         max_length=50
     )
-
+    
+    location = models.CharField(max_length=255, help_text="Patient's location or address")
+    
     services_needed = models.ManyToManyField(
         "services.Service",
         related_name="referrals",

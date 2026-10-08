@@ -7,67 +7,192 @@ Request Received | Hands-On Health
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'homecare/css/request_received.css' %}">
+<style>
+    /* Request Success Page Styling */
+    .request-success-section {
+        background-color: #f8fafc;
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        padding: 3rem 1rem;
+    }
+
+    .request-success-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 1.25rem !important;
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05) !important;
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem !important;
+    }
+
+    @media (min-width: 768px) {
+        .request-success-card {
+            padding: 3.5rem 3rem !important;
+        }
+    }
+
+    /* Animated Checkmark Badge */
+    .success-icon-badge {
+        width: 80px;
+        height: 80px;
+        background-color: #ecfdf5;
+        color: #059669;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.25rem;
+        box-shadow: 0 0 0 10px #f0fdf4;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Submission Pill */
+    .submission-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    /* Reference Tracking Badge Box */
+    .reference-badge-box {
+        background-color: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 0.875rem;
+        padding: 1.25rem;
+        margin: 1.5rem auto;
+        max-width: 320px;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.05em;
+    }
+
+    /* Notice Box */
+    .notice-box {
+        background-color: #eff6ff;
+        border-left: 4px solid #2563eb;
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        text-align: left;
+        margin-bottom: 2.25rem !important;
+    }
+
+    /* Button Styling */
+    .btn-custom-primary {
+        background-color: #2563eb;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.875rem 1.75rem;
+        border-radius: 0.625rem;
+        border: none;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-custom-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .text-slate-800 {
+        color: #0f172a !important;
+    }
+
+    .text-slate-700 {
+        color: #334155 !important;
+    }
+
+    .text-slate-600 {
+        color: #475569 !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5 my-4">
-    <div class="row justify-content-center me-0 ms-0">
-        <div class="col-12 col-md-10 col-lg-7 mx-auto text-center">
+<section class="request-success-section">
+    <div class="container">
+        <div class="row justify-content-center me-0 ms-0">
+            <div class="col-12 mx-auto text-center px-0">
 
-            <div class="card request-success-card border-0 shadow-sm p-4 p-md-5">
+                <div class="card request-success-card">
 
-                <!-- Animated Icon Wrapper -->
-                <div class="success-icon-wrapper mb-4 mx-auto">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-
-                <!-- Header Info -->
-                <span class="badge bg-success-soft text-success fw-semibold px-3 py-2 rounded-pill mb-3">
-                    Submission Successful
-                </span>
-
-                <h1 class="h2 fw-bold text-slate-800 mb-3">
-                    Request Received
-                </h1>
-
-                <p class="text-slate-600 lead-sm mb-4">
-                    Thank you for reaching out to <strong>Hands-On Health</strong>. We have received your home care
-                    request, and our clinical care coordination team will review your details and contact you shortly to
-                    confirm arrangements.
-                </p>
-
-                <!-- Reference Badge Box -->
-                {% if reference %}
-                <div class="reference-badge-box p-3 rounded-3 mb-4 mx-auto">
-                    <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tracking Code</span>
-                    <span class="fs-5 fw-bold text-slate-800 tracking-wider">
-                        #{{ reference }}
-                    </span>
-                </div>
-                {% endif %}
-
-                <!-- Information Note -->
-                <div class="alert alert-info-soft rounded-3 p-3 text-start mb-4">
-                    <div class="d-flex gap-3 align-items-center">
-                        <i class="fa-solid fa-bell text-primary fs-5"></i>
-                        <p class="mb-0 small text-slate-700">
-                            Please keep an eye on your email inbox or mobile phone. We usually respond within a few
-                            hours.
-                        </p>
+                    <!-- Checkmark Icon -->
+                    <div class="success-icon-badge">
+                        <i class="fa-solid fa-check"></i>
                     </div>
+
+                    <!-- Submission Pill -->
+                    <div class="mb-3">
+                        <span class="submission-pill">
+                            <i class="fa-solid fa-circle-check"></i> Submission Successful
+                        </span>
+                    </div>
+
+                    <h1 class="h3 fw-bold text-slate-800 mb-2">
+                        Request Received!
+                    </h1>
+
+                    <p class="text-slate-600 fs-6 mb-4 px-md-3">
+                        Thank you for trusting <strong>Hands-On Health</strong>. We have securely logged your home care
+                        request, and our clinical care coordination team is reviewing your details to reach out shortly.
+                    </p>
+
+                    <!-- Reference Badge Box -->
+                    {% if reference %}
+                    <div class="reference-badge-box text-center">
+                        <span class="text-uppercase text-muted fw-bold small d-block mb-1">Your Tracking
+                            Reference</span>
+                        <span class="fs-5 fw-bold text-primary tracking-wider font-monospace">
+                            #{{ reference }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Information Note -->
+                    <div class="notice-box">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fa-solid fa-bell text-primary fs-5 flex-shrink-0"></i>
+                            <div class="small text-slate-700">
+                                Please keep an eye on your email inbox or phone. Our team typically responds within a
+                                few hours to coordinate arrangements.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div>
+                        <a href="{% url 'home' %}" class="btn-custom-primary">
+                            <i class="fa-solid fa-house"></i> Return to Homepage
+                        </a>
+                    </div>
+
                 </div>
 
-                <!-- Action Button -->
-                <div class="pt-2">
-                    <a href="{% url 'home' %}"
-                        class="btn btn-primary px-4 py-3 rounded-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
-                        <i class="fa-solid fa-house"></i> Return to Homepage
-                    </a>
+                <!-- Footer Support Link -->
+                <div class="mt-4 text-center">
+                    <p class="small text-muted mb-0">
+                        Have an urgent query? <a href="#" class="text-primary text-decoration-none fw-semibold">Contact
+                            Our Care Desk</a>
+                    </p>
                 </div>
 
             </div>
-
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -136,6 +136,7 @@ class ReferralForm(forms.ModelForm):
             "patient_name",
             "patient_email",
             "patient_phone",
+            "location",  # <-- Added location here
             "services_needed",
             "additional_notes",
         ]
@@ -189,6 +190,13 @@ class ReferralForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Patient's Phone",
+                }
+            ),
+
+            "location": forms.TextInput(  # <-- Added widget styling for location
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter patient's home address, area, or town",
                 }
             ),
 
