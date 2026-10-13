@@ -1,2567 +1,793 @@
-
 {% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-        Caregiver Registration |
-        {{ site_settings.business_name|default:"Hands-On Health" }}
+        Caregiver Registration | {{ site_settings.business_name|default:"Hands-On Health" }}
     </title>
-
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
-        rel="stylesheet">
-
-
+        href="https://fonts.googleapis.com/css2?family=Inter:wght\@400;500;600;700&family=Plus+Jakarta+Sans:wght\@600;700;800&display=swap"
+        rel="stylesheet" />
     <style>
         :root {
-
-            --primary: #123c69;
-            --primary-dark: #0b2d4f;
-            --primary-soft: #edf5fb;
-
-            --accent: #2d8c82;
-            --accent-soft: #eaf7f4;
-
-            --text: #1d2b36;
+            --blue: #123c69;
+            --blue-dark: #0b2d4f;
+            --teal: #2d8c82;
+            --ink: #1d2b36;
             --muted: #72808a;
-
-            --border: #e3e9ed;
-            --background: #f6f9fb;
-
-            --white: #ffffff;
-
-            --danger: #c0392b;
-            --danger-soft: #fff5f4;
-
-            --success: #257a5c;
-            --success-soft: #eef9f4;
-
-            --shadow:
-                0 25px 70px rgba(18, 60, 105, .10);
-
-            --radius: 22px;
-
+            --line: #e3e9ed;
+            --bg: #f4f8fb;
+            --red: #b42318;
+            --red-bg: #fff3f2;
         }
 
-
-        * {
+        \* {
             box-sizing: border-box;
         }
 
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-
         body {
-
             margin: 0;
-
-            min-height: 100vh;
-
-            font-family:
-                "Inter",
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            color: var(--text);
-
             background:
-
-                radial-gradient(circle at 5% 5%,
-                    rgba(18, 60, 105, .07),
-                    transparent 27%),
-
-                radial-gradient(circle at 95% 90%,
-                    rgba(45, 140, 130, .05),
-                    transparent 25%),
-
-                var(--background);
-
+                radial-gradient(circle at 5% 5%, #e7f0f8, transparent 30%), var(--bg);
+            font-family: Inter, Arial, sans-serif;
+            color: var(--ink);
             -webkit-font-smoothing: antialiased;
-
         }
 
-
-        /* =====================================================
-           MAIN LAYOUT
-        ===================================================== */
-
-        .page {
-
-            min-height: 100vh;
-
-            padding: 35px 22px 55px;
-
+        .wrap {
+            max-width: 1120px;
+            margin: 34px auto;
+            padding: 0 18px;
         }
 
-
-        .registration-container {
-
-            width: 100%;
-
-            max-width: 1180px;
-
-            margin: 0 auto;
-
+        .shell {
             display: grid;
-
-            grid-template-columns: 330px 1fr;
-
-            background: var(--white);
-
-            border-radius: 26px;
-
+            grid-template-columns: 300px minmax(0, 1fr);
+            background: #fff;
+            border-radius: 24px;
             overflow: hidden;
-
-            box-shadow: var(--shadow);
-
-            animation:
-                pageEnter .65s ease both;
-
+            box-shadow: 0 24px 70px #123c6917;
         }
 
-
-        @keyframes pageEnter {
-
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-        }
-
-
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
-
-        .sidebar {
-
+        .side {
+            padding: 34px 27px;
+            color: #fff;
+            background: linear-gradient(150deg, #092b49, #164d7e);
             position: relative;
-
-            padding: 38px 30px;
-
-            color: white;
-
-            background:
-
-                linear-gradient(145deg,
-                    rgba(10, 45, 77, .97),
-                    rgba(18, 60, 105, .94));
-
             overflow: hidden;
-
         }
 
-
-        .sidebar::before {
-
+        .side:after {
             content: "";
-
             position: absolute;
-
-            inset: 0;
-
-            background: linear-gradient(145deg,
-                rgba(9, 43, 73, .95),
-                rgba(18, 60, 105, .78)),
-
-            url("{% static 'img/caregiver-login.jpg' %}") center / cover no-repeat;
-
-            opacity: .5;
-
-            z-index: 0;
-
+            width: 240px;
+            height: 240px;
+            border: 1px solid #ffffff20;
+            border-radius: 50%;
+            right: -120px;
+            bottom: -80px;
+            box-shadow:
+                0 0 0 28px #ffffff08,
+                0 0 0 58px #ffffff06;
         }
-
-
-        .sidebar-content {
-
-            position: relative;
-
-            z-index: 1;
-
-            min-height: 100%;
-
-            display: flex;
-
-            flex-direction: column;
-
-        }
-
-
-        /* =====================================================
-           LOGO
-        ===================================================== */
 
         .brand {
-
             display: flex;
-
             align-items: center;
-
-            gap: 12px;
-
-            margin-bottom: 45px;
-
+            gap: 11px;
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 1;
         }
 
-
-        .brand-logo {
-
-            width: 48px;
-
-            height: 48px;
-
-            padding: 6px;
-
+        .logo {
+            width: 46px;
+            height: 46px;
             object-fit: contain;
-
-            background: white;
-
+            background: #fff;
             border-radius: 12px;
-
+            padding: 5px;
         }
 
-
-        .brand-fallback {
-
-            width: 48px;
-
-            height: 48px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 12px;
-
-            background: white;
-
-            color: var(--primary);
-
-            font-family:
-                "Plus Jakarta Sans",
-                sans-serif;
-
-            font-weight: 800;
-
-            font-size: 20px;
-
-        }
-
-
-        .brand-name {
-
-            font-family:
-                "Plus Jakarta Sans",
-                sans-serif;
-
+        .brandname {
             font-weight: 700;
-
-            font-size: 16px;
-
-            line-height: 1.2;
-
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 14px;
         }
 
-
-        /* =====================================================
-           SIDEBAR CONTENT
-        ===================================================== */
-
-        .portal-label {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            width: fit-content;
-
-            padding: 7px 11px;
-
-            border-radius: 50px;
-
-            background: rgba(255, 255, 255, .10);
-
-            border:
-                1px solid rgba(255, 255, 255, .15);
-
+        .eyebrow {
+            display: inline-block;
+            background: #ffffff15;
+            border: 1px solid #ffffff25;
+            padding: 7px 10px;
+            border-radius: 99px;
             font-size: 10px;
-
             font-weight: 700;
-
-            letter-spacing: .7px;
-
-            margin-bottom: 20px;
-
+            letter-spacing: 1px;
+            margin-bottom: 18px;
         }
 
-
-        .portal-dot {
-
-            width: 6px;
-
-            height: 6px;
-
-            border-radius: 50%;
-
-            background: #74d7a9;
-
-            box-shadow:
-                0 0 0 4px rgba(116, 215, 169, .12);
-
-        }
-
-
-        .sidebar h1 {
-
-            margin: 0 0 16px;
-
-            font-family:
-                "Plus Jakarta Sans",
+        .side h1 {
+            font:
+                800 30px/1.17 "Plus Jakarta Sans",
                 sans-serif;
-
-            font-size: 32px;
-
-            line-height: 1.14;
-
-            letter-spacing: -1px;
-
+            letter-spacing: -0.8px;
+            margin: 0 0 14px;
         }
 
-
-        .sidebar-intro {
-
-            margin: 0;
-
-            color: rgba(255, 255, 255, .72);
-
-            font-size: 13px;
-
+        .side p {
+            font-size: 12px;
             line-height: 1.8;
-
+            color: #ffffffb8;
+            margin: 0;
         }
-
-
-        /* =====================================================
-           STEPS
-        ===================================================== */
 
         .steps {
-
-            margin-top: 38px;
-
-            display: flex;
-
-            flex-direction: column;
-
+            margin-top: 34px;
         }
-
 
         .step {
-
-            position: relative;
-
             display: flex;
-
-            gap: 13px;
-
-            padding-bottom: 25px;
-
+            gap: 12px;
+            margin: 0 0 22px;
+            position: relative;
         }
 
-
-        .step:not(:last-child)::before {
-
-            content: "";
-
-            position: absolute;
-
-            left: 14px;
-
-            top: 31px;
-
-            width: 1px;
-
-            height: calc(100% - 17px);
-
-            background: rgba(255, 255, 255, .16);
-
-        }
-
-
-        .step-number {
-
-            position: relative;
-
-            z-index: 2;
-
-            flex-shrink: 0;
-
-            width: 29px;
-
-            height: 29px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
+        .num {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 28px;
+            border: 1px solid #ffffff55;
             border-radius: 50%;
-
-            border:
-                1px solid rgba(255, 255, 255, .22);
-
-            background: rgba(255, 255, 255, .08);
-
+            display: grid;
+            place-items: center;
             font-size: 11px;
-
             font-weight: 700;
-
         }
 
-
-        .step.active .step-number {
-
-            background: white;
-
-            color: var(--primary);
-
-            border-color: white;
-
-        }
-
-
-        .step-title {
-
-            margin: 2px 0 4px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-        }
-
-
-        .step-description {
-
-            margin: 0;
-
-            color: rgba(255, 255, 255, .52);
-
-            font-size: 10px;
-
-            line-height: 1.5;
-
-        }
-
-
-        .sidebar-footer {
-
-            margin-top: auto;
-
-            padding-top: 35px;
-
-            color: rgba(255, 255, 255, .43);
-
-            font-size: 10px;
-
-            line-height: 1.6;
-
-        }
-
-
-        /* =====================================================
-           MAIN FORM AREA
-        ===================================================== */
-
-        .content {
-
-            padding: 45px 50px 50px;
-
-            min-width: 0;
-
-        }
-
-
-        .mobile-brand {
-
-            display: none;
-
-        }
-
-
-        .page-heading {
-
-            margin-bottom: 32px;
-
-        }
-
-
-        .page-heading h2 {
-
-            margin: 0 0 8px;
-
-            font-family:
-                "Plus Jakarta Sans",
-                sans-serif;
-
-            font-size: 28px;
-
-            line-height: 1.2;
-
-            letter-spacing: -.7px;
-
-        }
-
-
-        .page-heading p {
-
-            margin: 0;
-
-            max-width: 600px;
-
-            color: var(--muted);
-
-            font-size: 13px;
-
-            line-height: 1.7;
-
-        }
-
-
-        /* =====================================================
-           MESSAGES
-        ===================================================== */
-
-        .message {
-
-            margin-bottom: 15px;
-
-            padding: 13px 15px;
-
-            border-radius: 10px;
-
-            border: 1px solid var(--border);
-
-            background: #f7f9fa;
-
-            color: var(--text);
-
-            font-size: 12px;
-
-            line-height: 1.5;
-
-        }
-
-
-        .error-box {
-
-            margin-bottom: 25px;
-
-            padding: 15px 17px;
-
-            border-radius: 12px;
-
-            border: 1px solid #f1d0cc;
-
-            background: var(--danger-soft);
-
-            color: var(--danger);
-
-            font-size: 12px;
-
-            line-height: 1.6;
-
-        }
-
-
-        .error-box strong {
-
+        .step strong {
             display: block;
-
-            margin-bottom: 6px;
-
+            font-size: 11px;
+            margin: 2px 0 5px;
         }
 
+        .step small {
+            display: block;
+            color: #ffffff8a;
+            font-size: 10px;
+            line-height: 1.6;
+        }
 
-        .error-box ul {
+        .sidefoot {
+            position: relative;
+            z-index: 1;
+            margin-top: 42px;
+            font-size: 10px;
+            line-height: 1.7;
+            color: #ffffff80;
+        }
 
+        .main {
+            padding: 42px 48px 38px;
+            min-width: 0;
+        }
+
+        .mobilebrand {
+            display: none;
+        }
+
+        .heading {
+            margin-bottom: 28px;
+        }
+
+        .heading h2 {
+            font:
+                800 27px/1.2 "Plus Jakarta Sans",
+                sans-serif;
+            letter-spacing: -0.7px;
+            margin: 0 0 9px;
+        }
+
+        .heading p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.7;
             margin: 0;
-
-            padding-left: 18px;
-
         }
 
+        .notice {
+            padding: 13px 15px;
+            border-radius: 11px;
+            background: #eff8f5;
+            border: 1px solid #cce9dd;
+            color: #21694e;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 0 0 18px;
+        }
 
-        /* =====================================================
-           FORM SECTION
-        ===================================================== */
+        .error-summary {
+            padding: 14px 16px;
+            background: var(--red-bg);
+            border: 1px solid #f2c9c5;
+            color: var(--red);
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .error-summary strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .error-summary ul {
+            margin: 0;
+            padding-left: 19px;
+        }
 
         .section {
-
-            margin-top: 34px;
-
-            padding-top: 30px;
-
             border-top: 1px solid #edf0f2;
-
+            padding-top: 25px;
+            margin-top: 27px;
         }
-
 
         .section:first-of-type {
-
-            margin-top: 0;
-
-            padding-top: 0;
-
             border-top: 0;
-
+            padding-top: 0;
+            margin-top: 0;
         }
 
-
-        .section-heading {
-
-            display: flex;
-
-            align-items: flex-start;
-
-            gap: 12px;
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .section-icon {
-
-            width: 38px;
-
-            height: 38px;
-
-            flex-shrink: 0;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 11px;
-
-            background: var(--primary-soft);
-
-            color: var(--primary);
-
-        }
-
-
-        .section-icon svg {
-
-            width: 18px;
-
-            height: 18px;
-
-        }
-
-
-        .section-title {
-
-            margin: 0 0 4px;
-
-            font-family:
-                "Plus Jakarta Sans",
+        .section h3 {
+            font:
+                700 15px "Plus Jakarta Sans",
                 sans-serif;
-
-            font-size: 16px;
-
-            font-weight: 700;
-
+            margin: 0 0 5px;
         }
 
-
-        .section-description {
-
-            margin: 0;
-
+        .section .desc {
+            font-size: 11px;
             color: var(--muted);
-
-            font-size: 11px;
-
+            margin: 0 0 17px;
             line-height: 1.6;
-
         }
 
-
-        /* =====================================================
-           FORM GRID
-        ===================================================== */
-
-        .form-grid {
-
+        .grid {
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
-            gap: 18px;
-
+            gap: 16px;
         }
 
-
-        .full-width {
-
-            grid-column: 1 / -1;
-
-        }
-
-
-        .form-group {
-
+        .field {
             min-width: 0;
-
-            margin-bottom: 0;
-
         }
 
+        .wide {
+            grid-column: 1/-1;
+        }
 
-        .form-group label {
-
+        label {
             display: block;
-
-            margin-bottom: 7px;
-
-            color: #35434d;
-
             font-size: 11px;
-
             font-weight: 700;
-
+            margin-bottom: 7px;
+            color: #35434d;
         }
-
 
         .required {
-
-            color: var(--danger);
-
+            color: var(--red);
         }
 
-
-        /* =====================================================
-           INPUTS
-        ===================================================== */
-
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="tel"],
-        .form-group input[type="password"] {
-
+        input,
+        select {
             width: 100%;
-
-            height: 48px;
-
-            padding: 0 13px;
-
-            border: 1px solid var(--border);
-
-            border-radius: 10px;
-
+            min-height: 45px;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            background: #fbfcfd;
+            padding: 11px 12px;
+            font:
+                12px Inter,
+                Arial,
+                sans-serif;
+            color: var(--ink);
             outline: none;
-
-            background: #fbfcfd;
-
-            color: var(--text);
-
-            font-family: inherit;
-
-            font-size: 13px;
-
-            transition:
-                border-color .2s ease,
-                background .2s ease,
-                box-shadow .2s ease;
-
         }
 
-
-        .form-group input:focus {
-
-            background: white;
-
-            border-color: var(--primary);
-
-            box-shadow:
-                0 0 0 4px rgba(18, 60, 105, .07);
-
+        input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px #123c6912;
+            background: #fff;
         }
-
-
-        .form-group input::placeholder {
-
-            color: #a5afb6;
-
-        }
-
-
-        /* =====================================================
-           UPLOAD CARD
-        ===================================================== */
-
-        .upload-card {
-
-            position: relative;
-
-            padding: 17px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 13px;
-
-            background: #fbfcfd;
-
-            transition:
-                border-color .2s ease,
-                background .2s ease,
-                transform .2s ease;
-
-        }
-
-
-        .upload-card:hover {
-
-            background: white;
-
-            border-color: #cbd7df;
-
-            transform: translateY(-1px);
-
-        }
-
-
-        .upload-top {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            margin-bottom: 13px;
-
-        }
-
-
-        .upload-icon {
-
-            width: 37px;
-
-            height: 37px;
-
-            flex-shrink: 0;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background: var(--accent-soft);
-
-            color: var(--accent);
-
-        }
-
-
-        .upload-icon svg {
-
-            width: 17px;
-
-            height: 17px;
-
-        }
-
-
-        .upload-title {
-
-            margin: 0 0 3px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-        }
-
-
-        .upload-description {
-
-            margin: 0;
-
-            color: var(--muted);
-
-            font-size: 10px;
-
-        }
-
 
         input[type="file"] {
-
-            width: 100%;
-
-            padding: 10px;
-
-            border: 1px dashed #cbd5dc;
-
-            border-radius: 9px;
-
-            background: white;
-
-            color: var(--muted);
-
-            font-family: inherit;
-
+            background: #fff;
+            padding: 9px;
             font-size: 11px;
-
-            cursor: pointer;
-
         }
-
 
         input[type="file"]::file-selector-button {
-
-            margin-right: 10px;
-
-            padding: 7px 10px;
-
             border: 0;
-
-            border-radius: 7px;
-
-            background: var(--primary-soft);
-
-            color: var(--primary);
-
-            font-family: inherit;
-
-            font-size: 10px;
-
+            background: #edf5fb;
+            color: var(--blue);
+            padding: 7px 9px;
+            border-radius: 6px;
+            margin-right: 9px;
             font-weight: 700;
-
             cursor: pointer;
-
         }
 
-
-        .hint {
-
-            margin-top: 7px;
-
-            color: #8a969e;
-
-            font-size: 9px;
-
+        .help {
+            font-size: 10px;
+            color: #89959d;
             line-height: 1.5;
-
+            margin-top: 6px;
         }
 
+        .field-error {
+            font-size: 11px;
+            color: var(--red);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
 
-        /* =====================================================
-           CERTIFICATE CARDS
-        ===================================================== */
+        .invalid {
+            border-color: #d92d20 !important;
+            background: #fffafa !important;
+        }
 
-        .certificate-item {
-
-            position: relative;
-
-            padding: 18px;
-
-            margin-bottom: 13px;
-
-            border: 1px solid var(--border);
-
-            border-radius: 14px;
-
+        .upload {
+            border: 1px solid var(--line);
             background: #fbfcfd;
-
-            animation:
-                certificateEnter .3s ease both;
-
+            padding: 14px;
+            border-radius: 12px;
         }
 
-
-        @keyframes certificateEnter {
-
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-        }
-
-
-        .document-header {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 10px;
-
-            margin-bottom: 16px;
-
-        }
-
-
-        .certificate-number {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            color: var(--primary);
-
-        }
-
-
-        .certificate-number span {
-
-            width: 24px;
-
-            height: 24px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 7px;
-
-            background: var(--primary-soft);
-
-            font-size: 10px;
-
-        }
-
-
-        .remove-button {
-
-            border: 0;
-
-            background: transparent;
-
-            color: #a34b45;
-
-            padding: 5px 7px;
-
-            border-radius: 7px;
-
-            cursor: pointer;
-
-            font-family: inherit;
-
-            font-size: 9px;
-
-            font-weight: 700;
-
-        }
-
-
-        .remove-button:hover {
-
-            background: var(--danger-soft);
-
-        }
-
-
-        /* =====================================================
-           ADD CERTIFICATE
-        ===================================================== */
-
-        .add-button {
-
-            width: 100%;
-
-            height: 46px;
-
-            border:
-                1px dashed #afc3d3;
-
-            border-radius: 10px;
-
-            background: var(--primary-soft);
-
-            color: var(--primary);
-
-            font-family: inherit;
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-            transition:
-                background .2s ease,
-                border-color .2s ease;
-
-        }
-
-
-        .add-button:hover {
-
-            background: #e4f0f8;
-
-            border-color: #8faabd;
-
-        }
-
-
-        /* =====================================================
-           SUBMIT
-        ===================================================== */
-
-        .submit-area {
-
-            margin-top: 35px;
-
-            padding-top: 28px;
-
-            border-top: 1px solid #edf0f2;
-
-        }
-
-
-        .submit-button {
-
-            width: 100%;
-
-            height: 54px;
-
-            border: 0;
-
-            border-radius: 11px;
-
-            background: var(--primary);
-
-            color: white;
-
-            font-family: inherit;
-
+        .upload label {
             font-size: 12px;
+        }
 
+        .upload .help {
+            margin-bottom: 8px;
+        }
+
+        .submit {
+            width: 100%;
+            min-height: 51px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--blue);
+            color: #fff;
             font-weight: 700;
-
-            letter-spacing: .15px;
-
+            font-size: 12px;
+            letter-spacing: 0.2px;
             cursor: pointer;
-
-            box-shadow:
-                0 9px 22px rgba(18, 60, 105, .17);
-
-            transition:
-                transform .2s ease,
-                background .2s ease,
-                box-shadow .2s ease;
-
+            box-shadow: 0 9px 20px #123c6926;
         }
 
-
-        .submit-button:hover {
-
-            background: var(--primary-dark);
-
-            transform: translateY(-1px);
-
-            box-shadow:
-                0 13px 28px rgba(18, 60, 105, .22);
-
+        .submit:hover {
+            background: var(--blue-dark);
         }
 
-
-        .submit-button:active {
-
-            transform: translateY(0);
-
+        .submit:disabled {
+            opacity: 0.7;
+            cursor: wait;
         }
 
-
-        /* =====================================================
-           LOGIN
-        ===================================================== */
-
-        .login-link {
-
-            margin-top: 24px;
-
-            padding-top: 23px;
-
+        .actions {
+            margin-top: 28px;
+            padding-top: 24px;
             border-top: 1px solid #edf0f2;
+        }
 
+        .login {
             text-align: center;
-
-        }
-
-
-        .login-link p {
-
-            margin: 0;
-
-            color: var(--muted);
-
+            margin: 20px 0 0;
             font-size: 11px;
-
+            color: var(--muted);
         }
 
-
-        .login-link a {
-
-            color: var(--primary);
-
+        .login a {
+            color: var(--blue);
             font-weight: 700;
-
             text-decoration: none;
-
         }
 
-
-        .login-link a:hover {
-
+        .login a:hover {
             text-decoration: underline;
-
         }
 
-
-        /* =====================================================
-           SECURITY
-        ===================================================== */
-
-        .security {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 6px;
-
-            margin-top: 17px;
-
+        .secure {
+            text-align: center;
             color: #9aa4aa;
-
-            font-size: 9px;
-
+            font-size: 10px;
+            margin-top: 16px;
         }
 
-
-        .security svg {
-
-            width: 13px;
-
-            height: 13px;
-
+        .message {
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f4f7f9;
+            border: 1px solid var(--line);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 12px;
         }
 
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media (max-width: 950px) {
-
-            .registration-container {
-
-                grid-template-columns: 270px 1fr;
-
-            }
-
-
-            .content {
-
-                padding: 40px 35px;
-
-            }
-
-
-            .sidebar {
-
-                padding: 32px 24px;
-
-            }
-
-
-            .sidebar h1 {
-
-                font-size: 27px;
-
-            }
-
+        .message.error {
+            background: var(--red-bg);
+            border-color: #f2c9c5;
+            color: var(--red);
         }
 
-
-        @media (max-width: 780px) {
-
-            .page {
-
-                padding: 15px;
-
+        @media (max-width: 850px) {
+            .shell {
+                grid-template-columns: 250px minmax(0, 1fr);
             }
 
+            .side {
+                padding: 30px 22px;
+            }
 
-            .registration-container {
+            .main {
+                padding: 34px 28px;
+            }
 
+            .side h1 {
+                font-size: 26px;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .wrap {
+                margin: 10px auto;
+                padding: 0 8px;
+            }
+
+            .shell {
                 display: block;
-
-                max-width: 650px;
-
-                border-radius: 20px;
-
+                border-radius: 17px;
             }
 
-
-            .sidebar {
-
+            .side {
                 display: none;
-
             }
 
-
-            .content {
-
-                padding: 30px 25px 35px;
-
+            .main {
+                padding: 27px 19px;
             }
 
-
-            .mobile-brand {
-
+            .mobilebrand {
                 display: flex;
-
                 align-items: center;
-
                 justify-content: center;
-
                 gap: 10px;
-
-                margin-bottom: 30px;
-
+                margin-bottom: 24px;
             }
 
-
-            .mobile-brand img {
-
-                width: 43px;
-
-                height: 43px;
-
-                padding: 5px;
-
+            .mobilebrand img {
+                width: 39px;
+                height: 39px;
                 object-fit: contain;
-
-                border-radius: 10px;
-
-                background: white;
-
-                box-shadow:
-                    0 4px 15px rgba(0, 0, 0, .08);
-
+                padding: 4px;
+                border-radius: 9px;
+                background: #fff;
             }
 
-
-            .mobile-brand-name {
-
-                color: var(--primary);
-
-                font-family:
-                    "Plus Jakarta Sans",
+            .mobilebrand strong {
+                font:
+                    700 14px "Plus Jakarta Sans",
                     sans-serif;
-
-                font-size: 16px;
-
-                font-weight: 700;
-
+                color: var(--blue);
             }
 
-
-            .page-heading {
-
+            .heading {
                 text-align: center;
-
             }
 
+            .heading h2 {
+                font-size: 24px;
+            }
         }
 
-
-        @media (max-width: 560px) {
-
-            .page {
-
-                padding: 8px;
-
-            }
-
-
-            .content {
-
-                padding: 27px 18px 30px;
-
-            }
-
-
-            .form-grid {
-
+        @media (max-width: 470px) {
+            .grid {
                 grid-template-columns: 1fr;
-
-                gap: 17px;
-
+                gap: 14px;
             }
 
-
-            .full-width {
-
+            .wide {
                 grid-column: auto;
-
             }
 
-
-            .page-heading h2 {
-
-                font-size: 25px;
-
+            .main {
+                padding: 24px 15px;
             }
 
-
-            .section-heading {
-
-                margin-bottom: 17px;
-
+            .heading h2 {
+                font-size: 22px;
             }
-
-
-            .upload-card {
-
-                padding: 14px;
-
-            }
-
-
-            .certificate-item {
-
-                padding: 14px;
-
-            }
-
         }
     </style>
-
 </head>
 
-
 <body>
-
-
-    <div class="page">
-
-
-        <div class="registration-container">
-
-
-            <!-- =================================================
-             SIDEBAR
-        ================================================== -->
-
-            <aside class="sidebar">
-
-
-                <div class="sidebar-content">
-
-
-                    <!-- BRAND -->
-
-                    <div class="brand">
-
-                        {% if site_settings.logo %}
-
-                        <img class="brand-logo" src="{{ site_settings.logo.url }}"
-                            alt="{{ site_settings.business_name }}">
-
-                        {% else %}
-
-                        <div class="brand-fallback">
-                            H
-                        </div>
-
-                        {% endif %}
-
-
-                        <div class="brand-name">
-
-                            {{ site_settings.business_name|default:"Hands-On Health" }}
-
-                        </div>
-
+    <div class="wrap">
+        <div class="shell">
+            <aside class="side">
+                <div class="brand">
+                    {% if site_settings.logo %}<img class="logo" src="{{ site_settings.logo.url }}"
+                        alt="{{ site_settings.business_name|default:'Hands-On Health' }} logo" />{% else %}
+                    <div class="logo" style="
+                display: grid;
+                place-items: center;
+                color: #123c69;
+                font-weight: 800;
+              ">
+                        H
                     </div>
-
-
-
-                    <div class="portal-label">
-
-                        <span class="portal-dot"></span>
-
-                        CAREGIVER PORTAL
-
-                    </div>
-
-
-
-                    <h1>
-
-                        Join our
-                        care team.
-
-                    </h1>
-
-
-                    <p class="sidebar-intro">
-
-                        Create your caregiver profile and submit
-                        your professional documents for review.
-
-                        Once approved, you can access your caregiver
-                        portal and patient assignments.
-
-                    </p>
-
-
-
-                    <!-- STEPS -->
-
-                    <div class="steps">
-
-
-                        <div class="step active">
-
-                            <div class="step-number">
-                                1
-                            </div>
-
-                            <div>
-
-                                <div class="step-title">
-                                    Create your account
-                                </div>
-
-                                <p class="step-description">
-                                    Provide your personal and login details.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="step">
-
-                            <div class="step-number">
-                                2
-                            </div>
-
-                            <div>
-
-                                <div class="step-title">
-                                    Submit documents
-                                </div>
-
-                                <p class="step-description">
-                                    Upload your CV, certificates and licence.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="step">
-
-                            <div class="step-number">
-                                3
-                            </div>
-
-                            <div>
-
-                                <div class="step-title">
-                                    Verification
-                                </div>
-
-                                <p class="step-description">
-                                    Your application is reviewed by our team.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="step">
-
-                            <div class="step-number">
-                                4
-                            </div>
-
-                            <div>
-
-                                <div class="step-title">
-                                    Start caring
-                                </div>
-
-                                <p class="step-description">
-                                    Access your portal after approval.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <div class="sidebar-footer">
-
-                        Your professional information is submitted
-                        securely for verification.
-
-                        <br><br>
-
-                        © {% now "Y" %}
+                    {% endif %}
+                    <div class="brandname">
                         {{ site_settings.business_name|default:"Hands-On Health" }}
-
                     </div>
-
-
                 </div>
-
+                <div class="eyebrow">CAREGIVER PORTAL</div>
+                <h1>Let's build a healthier community together.</h1>
+                <p>
+                    Complete your profile and submit your professional documents for
+                    verification. Your account stays inactive until the team approves
+                    your application.
+                </p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="num">1</div>
+                        <div>
+                            <strong>Complete your details</strong><small>Confirm your personal and professional
+                                information.</small>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="num">2</div>
+                        <div>
+                            <strong>Upload your documents</strong><small>Your CV is required. Other documents help with
+                                verification.</small>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="num">3</div>
+                        <div>
+                            <strong>Application review</strong><small>Our administration team checks your
+                                submission.</small>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="num">4</div>
+                        <div>
+                            <strong>Receive your login link</strong><small>We will email you after your application is
+                                approved.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidefoot">
+                    Your information is submitted securely for review.<br /><br />© {% now "Y" %} {{
+                    site_settings.business_name|default:"Hands-On Health" }}
+                </div>
             </aside>
-
-
-
-            <!-- =================================================
-             MAIN CONTENT
-        ================================================== -->
-
-            <main class="content">
-
-
-                <!-- MOBILE BRAND -->
-
-                <div class="mobile-brand">
-
-                    {% if site_settings.logo %}
-
-                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }}">
-
-                    {% endif %}
-
-
-                    <div class="mobile-brand-name">
-
-                        {{ site_settings.business_name|default:"Hands-On Health" }}
-
-                    </div>
-
+            <main class="main">
+                <div class="mobilebrand">
+                    {% if site_settings.logo %}<img src="{{ site_settings.logo.url }}" alt="Logo" />{% else %}<span
+                        style="font-size: 24px; color: #123c69; font-weight: 800">H</span>{% endif %}
+                    <strong>{{ site_settings.business_name|default:"Hands-On Health" }}</strong>
                 </div>
-
-
-
-                <!-- HEADING -->
-
-                <div class="page-heading">
-
-                    <h2>
-                        Create your caregiver account
-                    </h2>
-
+                {% if invitation_invalid %}
+                <div class="heading">
+                    <h2>{{ invalid_title|default:"Registration link unavailable" }}</h2>
                     <p>
-
-                        Tell us about yourself and provide your
-                        professional documents. Your application
-                        will be reviewed before your account is approved.
-
+                        {{ invalid_message|default:"Please contact Hands-On Health for assistance." }}
                     </p>
-
                 </div>
-
-
-
-                <!-- MESSAGES -->
-
-                {% if messages %}
-
-                {% for message in messages %}
-
-                <div class="message">
-
+                <div class="notice">
+                    If you believe this is a mistake, contact the Hands-On Health
+                    administration team and ask them to check your registration
+                    invitation.
+                </div>
+                <p class="login">
+                    <a href="{% url 'caregivers:login' %}">Go to caregiver login</a>
+                </p>
+                {% else %}
+                <div class="heading">
+                    <h2>Complete your caregiver registration</h2>
+                    <p>
+                        Please complete the required fields below. If anything needs
+                        correcting, we will explain what to fix and keep you on this page.
+                    </p>
+                </div>
+                {% if messages %}{% for message in messages %}
+                <div class="message {% if message.tags == 'error' %}error{% endif %}" role="status">
                     {{ message }}
-
                 </div>
-
                 {% endfor %}
-
                 {% endif %}
-
-
-
-                <!-- ERRORS -->
-
-                {% if errors %}
-
-                <div class="error-box">
-
-                    <strong>
-                        Please review the following:
-                    </strong>
-
+                {% if form.non_field_errors or form.errors %}
+                <div class="error-summary" role="alert" aria-live="polite">
+                    <strong>Please check the highlighted fields.</strong>
+                    Correct the items below, then submit your application again. {% if form.non_field_errors %}
                     <ul>
-
-                        {% for error in errors %}
-
-                        <li>
-                            {{ error }}
-                        </li>
-
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
                         {% endfor %}
-
                     </ul>
-
-                </div>
-
-                {% endif %}
-
-
-
-                <!-- =================================================
-                 FORM
-            ================================================== -->
-
-                <form method="post" enctype="multipart/form-data">
-
-                    {% csrf_token %}
-
-
-                    {% if next %}
-
-                    <input type="hidden" name="next" value="{{ next }}">
-
+                    {% endif %} {% if form.errors %}
+                    <ul>
+                        {% for field in form %}{% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
                     {% endif %}
-
-
-
-                    <!-- =================================================
-                     PERSONAL INFORMATION
-                ================================================== -->
-
+                </div>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data" novalidate id="caregiver-registration-form">
+                    {% csrf_token %}
                     <section class="section">
-
-
-                        <div class="section-heading">
-
-
-                            <div class="section-icon">
-
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                    <circle cx="12" cy="8" r="4" />
-
-                                    <path d="M4 21c.7-4 3.3-6 8-6s7.3 2 8 6" />
-
-                                </svg>
-
+                        <h3>Personal information</h3>
+                        <p class="desc">
+                            Use your correct contact details so we can reach you about your
+                            application.
+                        </p>
+                        <div class="grid">
+                            {% for field in form %}
+                              {% if field.name == "first_name" or field.name == "last_name" or field.name == "email" or field.name == "phone" %}
+                            <div class="field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}
+                                    <span class="required">\*</span>{% endif %}</label>
+                                {{ field }} {% for error in field.errors %}
+                                <div class="field-error">{{ error }}</div>
+                                {% endfor %}
                             </div>
-
-
-                            <div>
-
-                                <h3 class="section-title">
-                                    Personal information
-                                </h3>
-
-                                <p class="section-description">
-                                    Enter your basic contact and account information.
-                                </p>
-
-                            </div>
-
-
+                            {% endif %}
+                            {% endfor %}
                         </div>
-
-
-
-                        <div class="form-grid">
-
-
-                            <div class="form-group">
-
-                                <label for="first_name">
-
-                                    First Name
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="text" id="first_name" name="first_name"
-                                    value="{{ form_data.first_name|default:'' }}" required autocomplete="given-name"
-                                    placeholder="Your first name">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="last_name">
-
-                                    Last Name
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="text" id="last_name" name="last_name"
-                                    value="{{ form_data.last_name|default:'' }}" required autocomplete="family-name"
-                                    placeholder="Your last name">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="username">
-
-                                    Username
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="text" id="username" name="username"
-                                    value="{{ form_data.username|default:'' }}" required autocomplete="username"
-                                    placeholder="Choose a username">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="email">
-
-                                    Email Address
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="email" id="email" name="email" value="{{ form_data.email|default:'' }}"
-                                    required autocomplete="email" placeholder="you@example.com">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="phone">
-                                    Phone Number
-                                </label>
-
-                                <input type="tel" id="phone" name="phone" value="{{ form_data.phone|default:'' }}"
-                                    autocomplete="tel" placeholder="Your phone number">
-
-                            </div>
-
-
-
-                            <div></div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="password">
-
-                                    Password
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="password" id="password" name="password" required
-                                    autocomplete="new-password" placeholder="Create a password">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="password_confirm">
-
-                                    Confirm Password
-
-                                    <span class="required">*</span>
-
-                                </label>
-
-                                <input type="password" id="password_confirm" name="password_confirm" required
-                                    autocomplete="new-password" placeholder="Repeat your password">
-
-                            </div>
-
-
-                        </div>
-
                     </section>
-
-
-
-                    <!-- =================================================
-                     PROFESSIONAL DOCUMENTS
-                ================================================== -->
-
                     <section class="section">
-
-
-                        <div class="section-heading">
-
-
-                            <div class="section-icon">
-
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-
-                                    <path d="M14 2v6h6" />
-
-                                    <path d="M8 13h8" />
-
-                                    <path d="M8 17h6" />
-
-                                </svg>
-
+                        <h3>Professional information</h3>
+                        <p class="desc">
+                            Tell us about your role and any applicable professional licence.
+                        </p>
+                        <div class="grid">
+                            {% for field in form %}
+                            {% if field.name == "professional_title" or field.name == "specialization" or field.name == "licence_number" or field.name == "licence_issuing_authority" or field.name == "licence_expiry_date" %}
+                            <div class="field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}
+                                    <span class="required">\*</span>{% endif %}</label>
+                                {{ field }} {% for error in field.errors %}
+                                <div class="field-error">{{ error }}</div>
+                                {% endfor %}
                             </div>
-
-
-                            <div>
-
-                                <h3 class="section-title">
-                                    Professional documents
-                                </h3>
-
-                                <p class="section-description">
-
-                                    Upload the documents required
-                                    for your caregiver application.
-
-                                </p>
-
-                            </div>
-
-
+                            {% endif %}
+                            {% endfor %}
                         </div>
-
-
-
-                        <div class="form-grid">
-
-
-                            <!-- CV -->
-
-                            <div class="upload-card">
-
-
-                                <div class="upload-top">
-
-                                    <div class="upload-icon">
-
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-
-                                            <path d="M14 2v6h6" />
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <p class="upload-title">
-                                            CV / Resume
-                                        </p>
-
-                                        <p class="upload-description">
-                                            Your professional CV.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
-
-
-                                <div class="hint">
-                                    PDF, DOC or DOCX.
-                                </div>
-
-                            </div>
-
-
-
-                            <!-- COVER LETTER -->
-
-                            <div class="upload-card">
-
-
-                                <div class="upload-top">
-
-                                    <div class="upload-icon">
-
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                            <path d="M4 4h16v16H4z" />
-
-                                            <path d="M7 8h10M7 12h10M7 16h6" />
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <p class="upload-title">
-                                            Cover Letter
-                                        </p>
-
-                                        <p class="upload-description">
-                                            Introduce yourself professionally.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <input type="file" id="cover_letter" name="cover_letter" accept=".pdf,.doc,.docx"
-                                    required>
-
-
-                                <div class="hint">
-                                    PDF, DOC or DOCX.
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
                     </section>
-
-
-
-                    <!-- =================================================
-                     CERTIFICATES
-                ================================================== -->
-
                     <section class="section">
-
-
-                        <div class="section-heading">
-
-
-                            <div class="section-icon">
-
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                    <path d="M12 15l-3 6 3-1.5L15 21l-3-6" />
-
-                                    <circle cx="12" cy="9" r="6" />
-
-                                    <path d="M9.5 9l1.7 1.7L14.5 7.5" />
-
-                                </svg>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="section-title">
-                                    Professional certificates
-                                </h3>
-
-                                <p class="section-description">
-
-                                    Add the certificates relevant to your
-                                    professional healthcare experience.
-
-                                </p>
-
-                            </div>
-
-
-                        </div>
-
-
-
-                        <div id="certificates-container">
-
-
-                            <!-- CERTIFICATE 1 -->
-
-                            <div class="certificate-item">
-
-
-                                <div class="document-header">
-
-
-                                    <div class="certificate-number">
-
-                                        <span>
-                                            1
-                                        </span>
-
-                                        Certificate
-
-                                    </div>
-
-
+                        <h3>Professional documents</h3>
+                        <p class="desc">
+                            Your CV is required. Upload PDF, DOC or DOCX files; each file
+                            must be 5 MB or smaller.
+                        </p>
+                        <div class="grid">
+                            {% for field in form %}
+                            {% if field.name == "cv" or field.name == "cover_letter" or field.name == "licence_document" or field.name == "certificates" %}
+                            <div class="field upload {% if field.name == 'certificates' %}wide{% endif %}">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}
+                                    <span class="required">\*</span>{% endif %}</label>
+                                {{ field }} {% if field.name == "cv" %}
+                                <div class="help">Required to submit your application.</div>
+                                {% elif field.name == "certificates" %}
+                                <div class="help">
+                                    You may select multiple certificate files at once.
                                 </div>
-
-
-
-                                <div class="form-grid">
-
-
-                                    <div class="form-group">
-
-                                        <label>
-                                            Certificate Name
-                                        </label>
-
-                                        <input type="text" name="certificate_name"
-                                            placeholder="e.g. Nursing Certificate">
-
-                                    </div>
-
-
-
-                                    <div class="form-group">
-
-                                        <label>
-                                            Certificate File
-                                        </label>
-
-                                        <input type="file" name="certificate_file"
-                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-
-                                        <div class="hint">
-                                            PDF, DOC, DOCX, JPG, JPEG or PNG.
-                                        </div>
-
-                                    </div>
-
-
+                                {% else %}
+                                <div class="help">
+                                    Optional, but helpful for verification.
                                 </div>
-
+                                {% endif %} {% for error in field.errors %}
+                                <div class="field-error">{{ error }}</div>
+                                {% endfor %}
                             </div>
-
-
+                            {% endif %}
+                            {% endfor %}
                         </div>
-
-
-
-                        <button type="button" class="add-button" onclick="addCertificate()">
-
-                            + &nbsp; ADD ANOTHER CERTIFICATE
-
+                    </section>
+                    <section class="section">
+                        <h3>Create your password</h3>
+                        <p class="desc">
+                            Choose a strong password and enter it exactly the same way
+                            twice.
+                        </p>
+                        <div class="grid">
+                            {% for field in form %}
+                            {% if field.name == "password" or field.name == "password_confirm" %}
+                            <div class="field">
+                                <label for="{{ field.id_for_label }}">{{ field.label }} <span
+                                        class="required">\*</span></label>
+                                {{ field }} {% for error in field.errors %}
+                                <div class="field-error">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="help">
+                            For security, passwords are not retained if the form needs to be
+                            corrected. Please re-enter them after an error.
+                        </div>
+                    </section>
+                    <div class="actions">
+                        <button class="submit" type="submit" id="submit-registration">
+                            SUBMIT REGISTRATION
                         </button>
-
-
-                    </section>
-
-
-
-                    <!-- =================================================
-                     PROFESSIONAL LICENCE
-                ================================================== -->
-
-                    <section class="section">
-
-
-                        <div class="section-heading">
-
-
-                            <div class="section-icon">
-
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                    <rect x="3" y="5" width="18" height="14" rx="2" />
-
-                                    <path d="M8 9h8" />
-
-                                    <path d="M8 13h5" />
-
-                                </svg>
-
-                            </div>
-
-
-                            <div>
-
-                                <h3 class="section-title">
-                                    Professional licence
-                                </h3>
-
-                                <p class="section-description">
-
-                                    Provide your professional licence
-                                    information for verification.
-
-                                </p>
-
-                            </div>
-
-
+                        <p class="login">
+                            Already completed registration?
+                            <a href="{% url 'caregivers:login' %}">Go to caregiver login</a>
+                        </p>
+                        <div class="secure">
+                            🔒 Your details are submitted securely and reviewed by our team.
                         </div>
-
-
-
-                        <div class="form-grid">
-
-
-                            <div class="form-group">
-
-                                <label for="licence_number">
-                                    Licence Number
-                                </label>
-
-                                <input type="text" id="licence_number" name="licence_number"
-                                    placeholder="Enter licence number">
-
-                            </div>
-
-
-
-                            <div class="form-group">
-
-                                <label for="licence_name">
-                                    Licence Name / Type
-                                </label>
-
-                                <input type="text" id="licence_name" name="licence_name"
-                                    placeholder="e.g. Nursing Practice Licence">
-
-                            </div>
-
-
-
-                            <div class="upload-card full-width">
-
-
-                                <div class="upload-top">
-
-                                    <div class="upload-icon">
-
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                            <path d="M12 3v12" />
-
-                                            <path d="M8 11l4 4 4-4" />
-
-                                            <path d="M5 21h14" />
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <p class="upload-title">
-                                            Licence document
-                                        </p>
-
-                                        <p class="upload-description">
-                                            Upload a clear copy of your professional licence.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <input type="file" id="licence_file" name="licence_file"
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-
-
-                                <div class="hint">
-                                    PDF, DOC, DOCX, JPG, JPEG or PNG.
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =================================================
-                     SUBMIT
-                ================================================== -->
-
-                    <div class="submit-area">
-
-
-                        <button type="submit" class="submit-button">
-
-                            SUBMIT CAREGIVER APPLICATION
-
-                        </button>
-
-
-                        <div class="login-link">
-
-                            <p>
-
-                                Already have a caregiver account?
-
-                                <a
-                                    href="{% url 'caregivers:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">
-                                    Login here
-                                </a>
-
-                            </p>
-
-                        </div>
-
-
-                        <div class="security">
-
-
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                                <rect x="5" y="10" width="14" height="10" rx="2" />
-
-                                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-
-                            </svg>
-
-
-                            Your application information is securely submitted for review.
-
-
-                        </div>
-
-
                     </div>
-
-
                 </form>
-
-
+                {% endif %}
             </main>
-
-
         </div>
-
-
     </div>
-
-
-
     <script>
-
-
-        let certificateCount = 1;
-
-
-        function addCertificate() {
-
-
-            certificateCount++;
-
-
-            const container =
-                document.getElementById(
-                    "certificates-container"
-                );
-
-
-            const certificate =
-                document.createElement("div");
-
-
-            certificate.className =
-                "certificate-item";
-
-
-            certificate.innerHTML = `
-
-            <div class="document-header">
-
-                <div class="certificate-number">
-
-                    <span>
-                        ${certificateCount}
-                    </span>
-
-                    Certificate
-
-                </div>
-
-
-                <button
-                    type="button"
-                    class="remove-button"
-                    onclick="removeCertificate(this)"
-                >
-
-                    REMOVE
-
-                </button>
-
-            </div>
-
-
-            <div class="form-grid">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Certificate Name
-                    </label>
-
-                    <input
-                        type="text"
-                        name="certificate_name"
-                        placeholder="e.g. First Aid Certificate"
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Certificate File
-                    </label>
-
-                    <input
-                        type="file"
-                        name="certificate_file"
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    >
-
-                    <div class="hint">
-                        PDF, DOC, DOCX, JPG, JPEG or PNG.
-                    </div>
-
-                </div>
-
-
-            </div>
-
-        `;
-
-
-            container.appendChild(certificate);
-
-
-            certificate.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
+        (function () {
+            const form = document.getElementById("caregiver-registration-form");
+            if (!form) return;
+            // Add a clear browser-level prompt for missing required uploads/fields.
+            form.addEventListener("submit", function (event) {
+                const password = form.querySelector('[name="password"]');
+                const confirm = form.querySelector('[name="password_confirm"]');
+                if (
+                    password &&
+                    confirm &&
+                    password.value &&
+                    confirm.value &&
+                    password.value !== confirm.value
+                ) {
+                    event.preventDefault();
+                    let error = confirm.parentElement.querySelector(".client-error");
+                    if (!error) {
+                        error = document.createElement("div");
+                        error.className = "field-error client-error";
+                        confirm.insertAdjacentElement("afterend", error);
+                    }
+                    error.textContent =
+                        "Passwords do not match. Please enter the same password in both fields.";
+                    confirm.focus();
+                    return;
+                }
+                const button = document.getElementById("submit-registration");
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = "SUBMITTING YOUR APPLICATION…";
+                }
             });
-
-        }
-
-
-
-        function removeCertificate(button) {
-
-
-            const certificate =
-                button.closest(
-                    ".certificate-item"
-                );
-
-
-            if (certificate) {
-
-                certificate.remove();
-
+            const password = form.querySelector('[name="password"]');
+            const confirm = form.querySelector('[name="password_confirm"]');
+            if (password && confirm) {
+                confirm.addEventListener("input", function () {
+                    const error = confirm.parentElement.querySelector(".client-error");
+                    if (error && password.value === confirm.value) error.remove();
+                });
             }
-
-        }
-
-
+        })();
     </script>
-
-
 </body>
 
 </html>

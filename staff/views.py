@@ -1,5 +1,9 @@
-from functools import wraps
 
+from functools import wraps
+import secrets
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,11 +11,14 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_http_methods
 
 from accounts.models import User
 
@@ -40,6 +47,7 @@ from homecare.models import (
     CaregiverCertificate,
     CaregiverDailyReport,
     CaregiverPayment,
+    CaregiverInvitation,
     HomeCareRequest,
     Consultation,
     Payment,
@@ -51,6 +59,8 @@ from homecare.views import (
     verify_payment as homecare_verify_payment,
     send_caregiver_assignment_email,
 )
+
+from .forms import StaffCaregiverInviteForm
 
 
 # ============================================================
@@ -75,6 +85,106 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapper
+
+
+# ============================================================
+# CAREGIVER REGISTRATION INVITATION HELPER
+# ============================================================
+
+def send_caregiver_registration_invitation(request, caregiver):
+    """
+    Create or reuse a valid invitation and email the caregiver
+    a secure registration link.
+    """
+
+    email = (
+        getattr(caregiver, "email", None)
+        or getattr(getattr(caregiver, "user", None), "email", None)
+        or ""
+    ).strip().lower()
+
+    if not email:
+        raise ValueError(
+            "The caregiver does not have an email address."
+        )
+
+    user = caregiver.user
+
+    if user is None:
+        raise ValueError(
+            "This caregiver has no linked user account. "
+            "Create the caregiver account before sending an invitation."
+        )
+
+    if user.has_usable_password():
+        return False
+
+    now = timezone.now()
+
+    # Reuse an existing valid invitation to avoid sending
+    # multiple different links unnecessarily.
+    invitation = (
+        CaregiverInvitation.objects
+        .filter(
+            caregiver=caregiver,
+            used_at__isnull=True,
+            expires_at__gt=now,
+        )
+        .order_by("-expires_at")
+        .first()
+    )
+
+    if invitation is None:
+        # Invalidate expired or superseded invitations.
+        CaregiverInvitation.objects.filter(
+            caregiver=caregiver,
+            used_at__isnull=True,
+        ).update(used_at=now)
+
+        invitation = CaregiverInvitation.objects.create(
+            caregiver=caregiver,
+            email=email,
+            token=secrets.token_urlsafe(48),
+            expires_at=now + timedelta(days=3),
+            created_by=request.user,
+        )
+
+    registration_url = request.build_absolute_uri(
+        reverse(
+            "caregivers:register_invitation",
+            kwargs={"token": invitation.token},
+        )
+    )
+
+    send_mail(
+        subject="Complete Your Hands-On Health Caregiver Registration",
+        message=f"""
+Hello {caregiver.name},
+
+You have been invited to join Hands-On Health as a caregiver.
+
+Complete your registration using this secure link:
+
+{registration_url}
+
+This invitation expires in 3 days.
+
+Your account will remain inactive until an administrator
+reviews and approves your caregiver profile.
+
+Kind regards,
+Hands-On Health
+""",
+        from_email=getattr(
+            settings,
+            "DEFAULT_FROM_EMAIL",
+            None,
+        ),
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+    return True
 
 
 # ============================================================
@@ -338,50 +448,111 @@ def dashboard(request):
 
 
 # ============================================================
-# CAREGIVERS
+# CAREGIVER DIRECTORY AND AUTOMATIC REGISTRATION STATUS
 # ============================================================
 
 @admin_required
 def caregivers(request):
-
-    current_status = request.GET.get(
-        "status",
-        "",
-    )
-
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
 
     caregivers_queryset = (
         Caregiver.objects
-        .select_related("user")
+        .select_related("user", "approved_by")
         .prefetch_related("certificates")
         .order_by("name")
     )
 
-    if current_status:
+    # Filter by the caregiver's actual verification status.
+    valid_statuses = {
+        value
+        for value, label in Caregiver.VerificationStatus.choices
+    }
 
+    if current_status in valid_statuses:
         caregivers_queryset = caregivers_queryset.filter(
             verification_status=current_status
         )
+    else:
+        current_status = ""
 
+    # Search caregivers.
     if search:
-
         caregivers_queryset = caregivers_queryset.filter(
             Q(name__icontains=search)
-            |
-            Q(user__first_name__icontains=search)
-            |
-            Q(user__last_name__icontains=search)
-            |
-            Q(user__email__icontains=search)
+            | Q(email__icontains=search)
+            | Q(phone__icontains=search)
+            | Q(user__first_name__icontains=search)
+            | Q(user__last_name__icontains=search)
+            | Q(user__email__icontains=search)
         )
 
-    verification_choices = (
-        Caregiver.VerificationStatus.choices
-    )
+    now = timezone.now()
+
+    # Automatically determine the status displayed in the directory.
+    for caregiver in caregivers_queryset:
+        user = caregiver.user
+
+        # A usable password indicates that registration was completed.
+        caregiver.registration_complete = bool(
+            user and user.has_usable_password()
+        )
+
+        caregiver.latest_invitation = (
+            CaregiverInvitation.objects
+            .filter(caregiver=caregiver)
+            .order_by("-created_at")
+            .first()
+        )
+
+        invitation = caregiver.latest_invitation
+
+        caregiver.invitation_is_valid = bool(
+            invitation
+            and invitation.used_at is None
+            and invitation.expires_at > now
+        )
+
+        caregiver.invitation_expired = bool(
+            invitation
+            and invitation.used_at is None
+            and invitation.expires_at <= now
+        )
+
+        # Determine the label to display in the staff directory.
+        if (
+            caregiver.verification_status
+            == Caregiver.VerificationStatus.APPROVED
+        ):
+            caregiver.workflow_status = "approved"
+
+        elif (
+            caregiver.verification_status
+            == Caregiver.VerificationStatus.REJECTED
+        ):
+            caregiver.workflow_status = "rejected"
+
+        elif caregiver.registration_complete:
+            # Registration submitted: ready for staff verification.
+            caregiver.workflow_status = "verify"
+
+        elif caregiver.invitation_is_valid:
+            caregiver.workflow_status = "invitation_sent"
+
+        elif caregiver.invitation_expired:
+            caregiver.workflow_status = "invitation_expired"
+
+        else:
+            caregiver.workflow_status = "invitation_needed"
+
+        # Only show the resend option if registration is incomplete
+        # and there is no currently valid invitation.
+        caregiver.can_resend_invitation = bool(
+            caregiver.verification_status
+            == Caregiver.VerificationStatus.PENDING
+            and not caregiver.registration_complete
+            and not caregiver.invitation_is_valid
+        )
 
     pending_caregivers = Caregiver.objects.filter(
         verification_status=Caregiver.VerificationStatus.PENDING
@@ -392,120 +563,220 @@ def caregivers(request):
         "staff/caregivers.html",
         {
             "caregivers": caregivers_queryset,
-
             "current_status": current_status,
-
-            "verification_choices": verification_choices,
-
+            "verification_choices": (
+                Caregiver.VerificationStatus.choices
+            ),
             "pending_caregivers": pending_caregivers,
-
             "search": search,
-
             "site_settings": SiteSettings.load(),
         },
     )
-
-
 # ============================================================
-# CAREGIVER VERIFICATION
+# CAREGIVER VERIFICATION AND ACTIVATION EMAIL
 # ============================================================
 
 @admin_required
+@require_http_methods(["GET", "POST"])
 def caregiver_verify(request, pk):
 
     caregiver = get_object_or_404(
-        Caregiver.objects
-        .select_related(
+        Caregiver.objects.select_related(
             "user",
             "approved_by",
-        )
-        .prefetch_related("certificates"),
+        ).prefetch_related("certificates"),
         pk=pk,
     )
 
     if request.method == "POST":
 
-        action = request.POST.get(
-            "action"
-        )
-
-        comment = request.POST.get(
-            "comment",
-            "",
-        ).strip()
+        action = request.POST.get("action", "").strip().lower()
+        comment = request.POST.get("comment", "").strip()
 
         # ----------------------------------------------------
-        # APPROVE
+        # APPROVE CAREGIVER
         # ----------------------------------------------------
 
         if action == "approve":
 
-            caregiver.verification_status = (
-                Caregiver.VerificationStatus.APPROVED
-            )
+            # Do not approve a caregiver who has not completed
+            # the invitation registration process.
+            if (
+                not caregiver.user
+                or not caregiver.user.has_usable_password()
+            ):
+                messages.error(
+                    request,
+                    (
+                        "This caregiver has not completed registration. "
+                        "They must submit their registration form before "
+                        "you can verify and approve the application."
+                    ),
+                )
+                return redirect("staff:caregivers")
 
-            caregiver.is_active = True
+            with transaction.atomic():
 
-            caregiver.verification_notes = comment
+                caregiver.verification_status = (
+                    Caregiver.VerificationStatus.APPROVED
+                )
+                caregiver.is_active = True
+                caregiver.verification_notes = comment
+                caregiver.approved_by = request.user
+                caregiver.approved_at = timezone.now()
+                caregiver.save()
 
-            caregiver.approved_by = request.user
+                if caregiver.user:
+                    caregiver.user.is_active = True
+                    caregiver.user.save(
+                        update_fields=["is_active"]
+                    )
 
-            caregiver.approved_at = timezone.now()
+            recipient_email = (
+                getattr(caregiver.user, "email", None)
+                or getattr(caregiver, "email", None)
+                or ""
+            ).strip()
 
-            caregiver.save()
+            if recipient_email:
 
-            if caregiver.user:
+                try:
+                    login_url = request.build_absolute_uri(
+                        reverse("caregivers:login")
+                    )
 
-                caregiver.user.is_active = True
+                    send_mail(
+                        subject=(
+                            "Your Hands-On Health Caregiver "
+                            "Account Has Been Approved"
+                        ),
+                        message=f"""
+Hello {caregiver.name},
 
-                caregiver.user.save(
-                    update_fields=[
-                        "is_active",
-                    ]
+Your caregiver registration with Hands-On Health has been
+reviewed and approved.
+
+Your caregiver account is now active. You can sign in using
+the email address you registered with and the password you
+created during registration.
+
+Caregiver login:
+{login_url}
+
+If you have trouble accessing your account, please contact
+Hands-On Health.
+
+Kind regards,
+Hands-On Health
+""",
+                        from_email=getattr(
+                            settings,
+                            "DEFAULT_FROM_EMAIL",
+                            None,
+                        ),
+                        recipient_list=[recipient_email],
+                        fail_silently=False,
+                    )
+
+                    messages.success(
+                        request,
+                        (
+                            f"{caregiver.name} has been approved "
+                            "and activated. An activation email "
+                            f"was sent to {recipient_email}."
+                        ),
+                    )
+
+                except Exception as email_error:
+                    messages.warning(
+                        request,
+                        (
+                            f"{caregiver.name} has been approved "
+                            "and activated, but the activation email "
+                            f"could not be sent: {email_error}"
+                        ),
+                    )
+
+            else:
+                messages.warning(
+                    request,
+                    (
+                        f"{caregiver.name} has been approved, "
+                        "but no email address was found."
+                    ),
                 )
 
-            messages.success(
-                request,
-                f"{caregiver.name} has been approved.",
-            )
-
-            return redirect(
-                "staff:caregivers"
-            )
+            return redirect("staff:caregivers")
 
         # ----------------------------------------------------
-        # DECLINE
+        # DECLINE CAREGIVER
         # ----------------------------------------------------
 
         elif action == "decline":
 
-            caregiver.verification_status = (
-                Caregiver.VerificationStatus.REJECTED
-            )
+            with transaction.atomic():
 
-            caregiver.is_active = False
-
-            caregiver.verification_notes = comment
-
-            caregiver.save()
-
-            if caregiver.user:
-
-                caregiver.user.is_active = False
-
-                caregiver.user.save(
-                    update_fields=[
-                        "is_active",
-                    ]
+                caregiver.verification_status = (
+                    Caregiver.VerificationStatus.REJECTED
                 )
+                caregiver.is_active = False
+                caregiver.verification_notes = comment
+                caregiver.save()
+
+                if caregiver.user:
+                    caregiver.user.is_active = False
+                    caregiver.user.save(
+                        update_fields=["is_active"]
+                    )
+
+            recipient_email = (
+                getattr(caregiver.user, "email", None)
+                or getattr(caregiver, "email", None)
+                or ""
+            ).strip()
+
+            if recipient_email:
+                try:
+                    send_mail(
+                        subject=(
+                            "Update on Your Hands-On Health "
+                            "Caregiver Application"
+                        ),
+                        message=f"""
+Hello {caregiver.name},
+
+Your caregiver application with Hands-On Health has not
+been approved at this time.
+
+If you need clarification or would like to discuss your
+application, please contact Hands-On Health.
+
+Kind regards,
+Hands-On Health
+""",
+                        from_email=getattr(
+                            settings,
+                            "DEFAULT_FROM_EMAIL",
+                            None,
+                        ),
+                        recipient_list=[recipient_email],
+                        fail_silently=False,
+                    )
+                except Exception:
+                    # The decision remains saved even if email fails.
+                    pass
 
             messages.warning(
                 request,
                 f"{caregiver.name} has been declined.",
             )
 
-            return redirect(
-                "staff:caregivers"
+            return redirect("staff:caregivers")
+
+        else:
+            messages.error(
+                request,
+                "Please select a valid verification action.",
             )
 
     return render(
@@ -513,11 +784,10 @@ def caregiver_verify(request, pk):
         "staff/caregiver_verify.html",
         {
             "caregiver": caregiver,
-
             "site_settings": SiteSettings.load(),
         },
     )
-
+         
 
 # ============================================================
 # CAREGIVER ASSIGNMENTS
@@ -751,94 +1021,101 @@ def caregiver_assignment_add(request):
                         )
 
                 # ====================================================
-                # SEND CAREGIVER EMAIL
-                # ====================================================
-                #
-                # IMPORTANT:
-                # The database transaction has completed successfully
-                # before we attempt the email.
-                #
-                # Pass the assignment first and the Django request
-                # second.
+                # CAREGIVER REGISTRATION OR ASSIGNMENT EMAIL
                 # ====================================================
 
                 try:
-
-                    # Make sure we have the caregiver.
                     caregiver = assignment.caregiver
 
                     if caregiver is None:
-
                         raise ValueError(
-                            "No caregiver was selected for this assignment."
+                            "No caregiver was selected."
                         )
 
-                    # Make sure caregiver has an email.
                     caregiver_email = (
-                        getattr(
-                            caregiver,
-                            "email",
-                            None,
-                        )
+                        getattr(caregiver, "email", None)
                         or getattr(
-                            getattr(
-                                caregiver,
-                                "user",
-                                None,
-                            ),
+                            getattr(caregiver, "user", None),
                             "email",
                             None,
                         )
-                    )
+                        or ""
+                    ).strip()
 
                     if not caregiver_email:
-
                         raise ValueError(
-                            "The assigned caregiver does not have "
-                            "an email address."
+                            "The caregiver has no email address."
                         )
 
-                    # ------------------------------------------------
-                    # SEND
-                    # ------------------------------------------------
+                    user = caregiver.user
 
-                    send_caregiver_assignment_email(
-                        
-                        request,
-                        assignment,
-                    )
+                    # -----------------------------------------------
+                    # CAREGIVER HAS NOT COMPLETED REGISTRATION
+                    # -----------------------------------------------
+                    if user is None or not user.has_usable_password():
+                        send_caregiver_registration_invitation(
+                            request,
+                            caregiver,
+                        )
 
-                    messages.success(
-                        request,
-                        (
-                            "Caregiver assignment created successfully "
-                            f"and the notification email was sent to "
-                            f"{caregiver_email}."
-                        ),
-                    )
+                        messages.success(
+                            request,
+                            (
+                                "The assignment was saved. A caregiver "
+                                "registration invitation was sent to "
+                                f"{caregiver_email}. The caregiver must "
+                                "complete registration and await approval."
+                            ),
+                        )
+
+                    # -----------------------------------------------
+                    # REGISTRATION COMPLETE, BUT NOT APPROVED
+                    # -----------------------------------------------
+                    elif (
+                        caregiver.verification_status
+                        != Caregiver.VerificationStatus.APPROVED
+                        or not caregiver.is_active
+                        or not user.is_active
+                    ):
+                        messages.warning(
+                            request,
+                            (
+                                "The assignment was saved, but this "
+                                "caregiver is not yet approved and active. "
+                                "They must be approved before accessing "
+                                "the caregiver portal."
+                            ),
+                        )
+
+                    # -----------------------------------------------
+                    # APPROVED AND ACTIVE
+                    # -----------------------------------------------
+                    else:
+                        send_caregiver_assignment_email(
+                            request,
+                            assignment,
+                        )
+
+                        messages.success(
+                            request,
+                            (
+                                "Assignment created successfully and "
+                                "the assignment notification was sent "
+                                f"to {caregiver_email}."
+                            ),
+                        )
 
                 except Exception as email_error:
-
-                    # ------------------------------------------------
-                    # EMAIL FAILED
-                    # ------------------------------------------------
-                    #
-                    # The assignment remains saved.
-                    # Show the REAL error instead of hiding it.
-                    # ------------------------------------------------
-
                     messages.error(
                         request,
                         (
-                            "The caregiver assignment was created, "
-                            "BUT the caregiver email could not be sent. "
-                            f"Email error: {email_error}"
+                            "The assignment was saved, but the caregiver "
+                            "email could not be sent. Error: "
+                            f"{email_error}"
                         ),
                     )
 
-                return redirect(
-                    "staff:assignments"
-                )
+                return redirect("staff:assignments")
 
             except Exception as e:
 
@@ -2537,3 +2814,392 @@ def settings(request):
             "site_settings": site_settings,
         },
     )
+# ============================================================
+# ADD CAREGIVER
+# ============================================================
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def caregiver_add(request):
+
+    form = StaffCaregiverInviteForm(
+        request.POST or None
+    )
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            email = form.cleaned_data[
+                "email"
+            ].strip().lower()
+
+            # -------------------------------------------------
+            # CHECK EXISTING USER
+            # -------------------------------------------------
+
+            existing_user = User.objects.filter(
+                email__iexact=email
+            ).first()
+
+            if existing_user:
+
+                messages.error(
+                    request,
+                    (
+                        "A user account already exists with "
+                        f"the email address {email}."
+                    ),
+                )
+
+                return render(
+                    request,
+                    "staff/caregiver_add.html",
+                    {
+                        "form": form,
+                    },
+                )
+
+            # -------------------------------------------------
+            # CHECK EXISTING CAREGIVER
+            # -------------------------------------------------
+
+            existing_caregiver = Caregiver.objects.filter(
+                email__iexact=email
+            ).first()
+
+            if existing_caregiver:
+
+                messages.error(
+                    request,
+                    (
+                        "A caregiver profile already exists "
+                        f"for {email}."
+                    ),
+                )
+
+                return render(
+                    request,
+                    "staff/caregiver_add.html",
+                    {
+                        "form": form,
+                    },
+                )
+
+            with transaction.atomic():
+
+                # -------------------------------------------------
+                # CREATE USER WITHOUT PASSWORD
+                # -------------------------------------------------
+
+                user = User(
+                    email=email,
+                    first_name="",
+                    last_name="",
+                    role=User.Role.CAREGIVER,
+                    is_active=False,
+                )
+
+                # The caregiver will create their own password.
+                user.set_unusable_password()
+
+                # If your custom User still requires username,
+                # generate a unique internal username.
+                if hasattr(user, "username"):
+
+                    username_base = (
+                        email.split("@")[0]
+                    )
+
+                    username = username_base
+                    counter = 1
+
+                    while User.objects.filter(
+                        username=username
+                    ).exists():
+
+                        username = (
+                            f"{username_base}"
+                            f"{counter}"
+                        )
+
+                        counter += 1
+
+                    user.username = username
+
+                user.save()
+
+                # -------------------------------------------------
+                # CREATE CAREGIVER PROFILE
+                # -------------------------------------------------
+
+                caregiver = form.save(
+                    commit=False
+                )
+
+                caregiver.user = user
+
+                caregiver.name = (
+                    form.cleaned_data["name"]
+                )
+
+                caregiver.email = email
+
+                caregiver.is_active = False
+
+                caregiver.verification_status = (
+                    Caregiver.VerificationStatus.PENDING
+                )
+
+                caregiver.save()
+
+                # -------------------------------------------------
+                # INVALIDATE PREVIOUS INVITATIONS
+                # -------------------------------------------------
+
+                CaregiverInvitation.objects.filter(
+                    caregiver=caregiver,
+                    used_at__isnull=True,
+                ).update(
+                    used_at=timezone.now()
+                )
+
+                # -------------------------------------------------
+                # GENERATE SECURE TOKEN
+                # -------------------------------------------------
+
+                token = secrets.token_urlsafe(48)
+
+                invitation = CaregiverInvitation.objects.create(
+                    caregiver=caregiver,
+                    email=email,
+                    token=token,
+                    expires_at=(
+                        timezone.now()
+                        + timedelta(days=3)
+                    ),
+                    created_by=request.user,
+                )
+
+            # -------------------------------------------------
+            # BUILD REGISTRATION URL
+            # -------------------------------------------------
+
+            registration_url = request.build_absolute_uri(
+                reverse(
+                    "caregivers:register_invitation",
+                    kwargs={
+                        "token": invitation.token,
+                    },
+                )
+            )
+
+            # -------------------------------------------------
+            # SEND INVITATION EMAIL
+            # -------------------------------------------------
+
+            business_name = "Hands-On Health"
+
+            subject = (
+                f"{business_name} Caregiver Registration Invitation"
+            )
+
+            message = f"""
+Hello {caregiver.name},
+
+You have been invited to complete your caregiver registration
+with {business_name}.
+
+Please use the secure link below to complete your profile:
+
+{registration_url}
+
+This invitation expires in 3 days.
+
+You will be asked to:
+
+- Confirm your personal information
+- Create your own password
+- Provide your professional information
+- Upload your CV
+- Upload your licence document
+- Upload professional certificates
+
+Your caregiver account will remain inactive until your profile
+has been reviewed and approved by {business_name}.
+
+If you did not expect this invitation, please contact
+{business_name}.
+
+Kind regards,
+
+{business_name}
+"""
+
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=getattr(
+                    settings,
+                    "DEFAULT_FROM_EMAIL",
+                    None,
+                ),
+                recipient_list=[
+                    email
+                ],
+                fail_silently=False,
+            )
+
+            messages.success(
+                request,
+                (
+                    f"Caregiver profile created and "
+                    f"registration invitation sent to {email}."
+                ),
+            )
+
+            return redirect(
+                "staff:caregivers"
+            )
+
+    return render(
+        request,
+        "staff/caregiver_add.html",
+        {
+            "form": form,
+        },
+    )
+    
+ 
+# ============================================================
+# RESEND CAREGIVER REGISTRATION INVITATION
+# ============================================================
+
+@admin_required
+@require_http_methods(["POST"])
+def caregiver_send_invitation(request, pk):
+    caregiver = get_object_or_404(
+        Caregiver.objects.select_related("user"),
+        pk=pk,
+    )
+
+    if (
+        caregiver.verification_status
+        != Caregiver.VerificationStatus.PENDING
+    ):
+        messages.warning(
+            request,
+            "Invitations can only be resent to pending caregivers.",
+        )
+        return redirect("staff:caregivers")
+
+    if caregiver.user and caregiver.user.has_usable_password():
+        messages.info(
+            request,
+            "This caregiver has completed registration. Please review the application.",
+        )
+        return redirect("staff:caregiver_verify", pk=caregiver.pk)
+
+    email = (
+        getattr(caregiver, "email", None)
+        or getattr(caregiver.user, "email", None)
+        or ""
+    ).strip().lower()
+
+    if not email:
+        messages.error(
+            request,
+            "This caregiver has no email address.",
+        )
+        return redirect("staff:caregivers")
+
+    if not caregiver.user:
+        messages.error(
+            request,
+            "This caregiver has no linked user account. Create or repair the account before sending an invitation.",
+        )
+        return redirect("staff:caregivers")
+
+    now = timezone.now()
+
+    active_invitation = (
+        CaregiverInvitation.objects
+        .filter(
+            caregiver=caregiver,
+            used_at__isnull=True,
+            expires_at__gt=now,
+        )
+        .order_by("-expires_at")
+        .first()
+    )
+
+    # Do not resend before the current invitation expires.
+    if active_invitation:
+        messages.info(
+            request,
+            "The invitation is still valid. You can resend it after its three-day expiry.",
+        )
+        return redirect("staff:caregivers")
+
+    try:
+        with transaction.atomic():
+            # Mark old, unused invitations as no longer usable.
+            CaregiverInvitation.objects.filter(
+                caregiver=caregiver,
+                used_at__isnull=True,
+            ).update(used_at=now)
+
+            invitation = CaregiverInvitation.objects.create(
+                caregiver=caregiver,
+                email=email,
+                token=secrets.token_urlsafe(48),
+                expires_at=now + timedelta(days=3),
+                created_by=request.user,
+            )
+
+            registration_url = request.build_absolute_uri(
+                reverse(
+                    "caregivers:register_invitation",
+                    kwargs={"token": invitation.token},
+                )
+            )
+
+            send_mail(
+                subject="Hands-On Health Caregiver Registration Invitation",
+                message=f"""
+Hello {caregiver.name},
+
+Please complete your caregiver registration with Hands-On Health
+using the secure link below:
+
+{registration_url}
+
+This invitation expires in 3 days.
+
+After completing registration, your application will be reviewed
+by an administrator before your account is activated.
+
+Kind regards,
+Hands-On Health
+""",
+                from_email=getattr(
+                    settings,
+                    "DEFAULT_FROM_EMAIL",
+                    None,
+                ),
+                recipient_list=[email],
+                fail_silently=False,
+            )
+
+    except Exception as exc:
+        messages.error(
+            request,
+            f"The invitation could not be sent: {exc}",
+        )
+        return redirect("staff:caregivers")
+
+    messages.success(
+        request,
+        f"A new three-day registration invitation was sent to {email}.",
+    )
+    return redirect("staff:caregivers")

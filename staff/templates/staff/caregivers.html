@@ -1,263 +1,216 @@
 {% extends "staff/base.html" %}
 
-{% block title %}
-Caregivers | Hands-On Health
-{% endblock %}
-
+{% block title %}Caregivers | Hands-On Health{% endblock %}
 
 {% block content %}
 
 <div class="page-header">
+  <div>
+    <span class="eyebrow">CAREGIVER MANAGEMENT</span>
+    <h1>Caregivers</h1>
+    <p>Review caregiver profiles, documents and verification status.</p>
+  </div>
 
-    <div>
-
-        <span class="eyebrow">
-            CAREGIVER MANAGEMENT
-        </span>
-
-        <h1>
-            Caregivers
-        </h1>
-
-        <p>
-            Review caregiver profiles, documents
-            and verification status.
-        </p>
-
-    </div>
-
+  <div>
+    <a href="{% url 'staff:caregiver_add' %}" class="btn btn-primary">
+      <i class="fa-solid fa-user-plus"></i>
+      Add Caregiver
+    </a>
+  </div>
 </div>
 
-
-<!-- =========================================================
-     FILTER BAR
-     ========================================================= -->
-
+<!-- FILTERS -->
 <section class="filter-card">
+  <form method="get">
+    <div class="filter-search">
+      <input type="search" name="q" value="{{ search }}" placeholder="Search name, email or phone...">
+    </div>
 
-    <form method="get">
+    <div class="filter-select">
+      <select name="status">
+        <option value="">All verification statuses</option>
 
-        <div class="filter-search">
+        {% for value, label in verification_choices %}
+        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
 
-            <input type="search" name="q" value="{{ search }}"
-                placeholder="Search caregiver name, phone or specialization...">
+    <button type="submit" class="btn btn-primary">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      Search
+    </button>
 
-        </div>
-
-
-        <div class="filter-select">
-
-            <select name="status">
-
-                <option value="">
-                    All verification statuses
-                </option>
-
-                {% for value, label in verification_choices %}
-
-                <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
-                    {{ label }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <button type="submit" class="btn btn-primary">
-            Search
-        </button>
-
-
-        <a href="{% url 'staff:caregivers' %}" class="btn btn-light">
-            Reset
-        </a>
-
-    </form>
-
+    <a href="{% url 'staff:caregivers' %}" class="btn btn-light">
+      Reset
+    </a>
+  </form>
 </section>
 
-
-<!-- =========================================================
-     CAREGIVER TABLE
-     ========================================================= -->
-
+<!-- CAREGIVER DIRECTORY -->
 <section class="panel">
-
-    <div class="panel-header">
-
-        <div>
-
-            <span class="eyebrow">
-                CAREGIVER DIRECTORY
-            </span>
-
-            <h2>
-                Applications
-            </h2>
-
-        </div>
-
-        <div class="result-count">
-            {{ caregivers|length }} shown
-        </div>
-
+  <div class="panel-header">
+    <div>
+      <span class="eyebrow">CAREGIVER DIRECTORY</span>
+      <h2>Caregiver Applications</h2>
     </div>
 
-
-    <div class="table-wrap">
-
-        <table class="caregiver-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Caregiver
-                    </th>
-
-                    <th>
-                        Professional title
-                    </th>
-
-                    <th>
-                        Specialization
-                    </th>
-
-                    <th>
-                        Phone
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for caregiver in caregivers %}
-
-                <tr>
-
-                    <td>
-
-                        <div class="person-cell">
-
-                            {% if caregiver.photo %}
-
-                            <img src="{{ caregiver.photo.url }}" alt="{{ caregiver.name }}" class="person-photo">
-
-                            {% else %}
-
-                            <div class="person-placeholder">
-                                {{ caregiver.name|first|upper }}
-                            </div>
-
-                            {% endif %}
-
-
-                            <div>
-
-                                <strong>
-                                    {{ caregiver.name }}
-                                </strong>
-
-                                <span>
-                                    {{ caregiver.email|default:"No email provided" }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </td>
-
-
-                    <td>
-                        {{ caregiver.professional_title }}
-                    </td>
-
-
-                    <td>
-                        {{ caregiver.specialization|default:"—" }}
-                    </td>
-
-
-                    <td>
-                        {{ caregiver.phone }}
-                    </td>
-
-
-                    <td>
-
-                        {% if caregiver.verification_status == "PENDING" %}
-
-                        <span class="status-pill warning">
-                            Pending verification
-                        </span>
-
-                        {% elif caregiver.verification_status == "APPROVED" %}
-
-                        <span class="status-pill success">
-                            Approved
-                        </span>
-
-                        {% elif caregiver.verification_status == "REJECTED" %}
-
-                        <span class="status-pill danger">
-                            Declined
-                        </span>
-
-                        {% elif caregiver.verification_status == "SUSPENDED" %}
-
-                        <span class="status-pill danger">
-                            Suspended
-                        </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-small btn-primary">
-                            Review
-                        </a>
-
-                    </td>
-
-                </tr>
-
-                {% empty %}
-
-                <tr>
-
-                    <td colspan="6" class="empty-state">
-                        No caregivers match your search.
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
+    <div class="result-count">
+      {{ caregivers|length }} shown
     </div>
+  </div>
 
+  <div class="table-wrap">
+    <table class="caregiver-table">
+      <thead>
+        <tr>
+          <th>Caregiver</th>
+          <th>Professional Title</th>
+          <th>Specialization</th>
+          <th>Phone</th>
+          <th>Verification Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for caregiver in caregivers %}
+        <tr>
+          <!-- CAREGIVER DETAILS -->
+          <td>
+            <div class="person-cell">
+              {% if caregiver.photo %}
+              <img src="{{ caregiver.photo.url }}" alt="{{ caregiver.name }}" class="person-photo">
+              {% else %}
+              <div class="person-placeholder">
+                {{ caregiver.name|first|upper }}
+              </div>
+              {% endif %}
+
+              <div>
+                <strong>{{ caregiver.name }}</strong>
+                <span>
+                  {{ caregiver.email|default:"No email provided" }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            {{ caregiver.professional_title|default:"—" }}
+          </td>
+
+          <td>
+            {{ caregiver.specialization|default:"—" }}
+          </td>
+
+          <td>
+            {{ caregiver.phone|default:"—" }}
+          </td>
+
+          <!-- STATUS -->
+          <td>
+            {% if caregiver.workflow_status == "invitation_sent" %}
+            <span class="badge bg-info text-dark">Invitation Sent</span>
+          
+            {% elif caregiver.workflow_status == "invitation_expired" %}
+            <span class="badge bg-warning text-dark">Invitation Expired</span>
+          
+            {% elif caregiver.workflow_status == "invitation_needed" %}
+            <span class="badge bg-secondary">Invitation Needed</span>
+          
+            {% elif caregiver.workflow_status == "verify" %}
+            <span class="badge bg-warning text-dark">Verify</span>
+          
+            {% elif caregiver.workflow_status == "approved" %}
+            <span class="badge bg-success">Approved</span>
+          
+            {% elif caregiver.workflow_status == "rejected" %}
+            <span class="badge bg-danger">Rejected</span>
+            {% endif %}
+          </td>
+          
+          <td>
+            {% if caregiver.workflow_status == "verify" %}
+            <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-sm btn-primary">
+              Verify
+            </a>
+          
+            {% elif caregiver.workflow_status == "approved" %}
+            <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-sm btn-success">
+              View
+            </a>
+            {% endif %}
+          
+            {% if caregiver.can_resend_invitation %}
+            <form method="post" action="{% url 'staff:caregiver_send_invitation' caregiver.pk %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-primary">
+                Resend Invitation
+              </button>
+            </form>
+            {% endif %}
+          </td>
+
+          <!-- ACTIONS -->
+          <td>
+            {% if caregiver.verification_status == "PENDING" %}
+
+            {% if caregiver.registration_complete %}
+
+            <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-small btn-primary">
+              <i class="fa-solid fa-clipboard-check"></i>
+              Verify
+            </a>
+
+            {% elif caregiver.invitation_is_valid %}
+
+            <button type="button" class="btn btn-small btn-light" disabled
+              title="You can resend the invitation after it expires.">
+              <i class="fa-solid fa-envelope-circle-check"></i>
+              Invitation Sent
+            </button>
+
+            {% else %}
+
+            <form method="post" action="{% url 'staff:caregiver_send_invitation' caregiver.pk %}">
+              {% csrf_token %}
+
+              <button type="submit" class="btn btn-small btn-primary">
+                <i class="fa-solid fa-envelope"></i>
+                Resend Invitation
+              </button>
+            </form>
+
+            {% endif %}
+
+            {% else %}
+
+            <a href="{% url 'staff:caregiver_verify' caregiver.pk %}" class="btn btn-small btn-light">
+              <i class="fa-solid fa-eye"></i>
+              View
+            </a>
+
+            {% endif %}
+          </td>
+        </tr>
+
+        {% empty %}
+        <tr>
+          <td colspan="6" class="empty-state">
+            <i class="fa-solid fa-user-nurse"></i>
+            <p>No caregivers match your search.</p>
+            <a href="{% url 'staff:caregiver_add' %}">
+              Add a caregiver
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 
 {% endblock %}

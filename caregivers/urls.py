@@ -18,11 +18,13 @@ urlpatterns = [
         name="login",
     ),
 
+   
+    
     path(
-        "register/",
-        views.caregiver_register,
-        name="register",
-    ),
+    "register/<str:token>/",
+    views.caregiver_register_invitation,
+    name="register_invitation",
+),
 
     path(
         "logout/",

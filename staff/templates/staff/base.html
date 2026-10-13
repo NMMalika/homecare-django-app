@@ -1,688 +1,349 @@
 {% load static %}
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="theme-color" content="#102A43">
 
-    <title>
-        {% block title %}
-        Hands-On Health
-        {% endblock %}
-    </title>
+    ```
+    <title>{% block title %}Hands-On Health{% endblock %}</title>
 
-
-    <!-- =====================================================
-         FONT AWESOME
-         ===================================================== -->
-
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-
-    <!-- =====================================================
-         STAFF DASHBOARD CSS
-         ===================================================== -->
-
+    <!-- Staff Dashboard CSS -->
     <link rel="stylesheet" href="{% static 'staff/css/dashboard.css' %}">
 
-    {% block extra_css %}
-    {% endblock %}
+    {% block extra_css %}{% endblock %}
+    ```
 
 </head>
 
-
 <body>
-
 
     <div class="app-shell">
 
+        ```
+        <!-- Mobile Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- =====================================================
-         MOBILE OVERLAY
-         ===================================================== -->
-
-        <div class="sidebar-overlay" id="sidebarOverlay">
-        </div>
-
-
-
-        <!-- =====================================================
-         SIDEBAR
-         ===================================================== -->
-
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
 
-
-            <!-- =================================================
-             BRAND
-             ================================================= -->
-
+            <!-- Brand -->
             <div class="brand">
-
-                <div class="brand-mark">
-                    H
-                </div>
+                <div class="brand-mark">H</div>
 
                 <div>
-
-                    <div class="brand-name">
-                        Hands-On
-                    </div>
-
-                    <div class="brand-subtitle">
-                        HEALTH
-                    </div>
-
+                    <div class="brand-name">Hands-On</div>
+                    <div class="brand-subtitle">HEALTH</div>
                 </div>
-
             </div>
 
-
-
-            <!-- =================================================
-             NAVIGATION
-             ================================================= -->
-
+            <!-- Navigation -->
             <nav class="sidebar-nav">
 
+                <div class="nav-label">OVERVIEW</div>
 
-                <!-- =================================================
-                 OVERVIEW
-                 ================================================= -->
-
-                <div class="nav-label">
-                    OVERVIEW
-                </div>
-
-
-                <!-- DASHBOARD -->
-
+                <!-- Dashboard -->
                 <a href="{% url 'staff:dashboard' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
                     title="Dashboard">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-gauge-high"></i>
                     </span>
-
-                    <span>
-                        Dashboard
-                    </span>
-
+                    <span>Dashboard</span>
                 </a>
 
+                <div class="nav-label">OPERATIONS</div>
 
-
-                <!-- =================================================
-                 OPERATIONS
-                 ================================================= -->
-
-                <div class="nav-label">
-                    OPERATIONS
-                </div>
-
-
-
-                <!-- =================================================
-                 CAREGIVERS
-                 ================================================= -->
-
+                <!-- Caregivers -->
                 <a href="{% url 'staff:caregivers' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'caregivers' or request.resolver_match.url_name == 'caregiver_verify' %}active{% endif %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'caregivers' or request.resolver_match.url_name == 'caregiver_add' or request.resolver_match.url_name == 'caregiver_verify' or request.resolver_match.url_name == 'caregiver_send_invitation' %}active{% endif %}"
                     title="Caregiver Management">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-user-nurse"></i>
                     </span>
 
-                    <span>
-                        Caregivers
-                    </span>
+                    <span>Caregivers</span>
 
                     {% if pending_caregivers %}
-
-                    <span class="nav-badge">
-                        {{ pending_caregivers }}
-                    </span>
-
+                    <span class="nav-badge">{{ pending_caregivers }}</span>
                     {% endif %}
-
                 </a>
 
-
-
-                <!-- =================================================
-                 HOME CARE
-                 ================================================= -->
-
+                <!-- Home Care -->
                 <a href="{% url 'staff:homecare_requests' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'homecare_requests' or request.resolver_match.url_name == 'homecare_request_add' or request.resolver_match.url_name == 'homecare_request_edit' %}active{% endif %}"
+                    class="nav-item {% if 'homecare' in request.resolver_match.url_name %}active{% endif %}"
                     title="Home Care Requests">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-house-medical"></i>
                     </span>
-
-                    <span>
-                        Home Care
-                    </span>
-
+                    <span>Home Care</span>
                 </a>
 
-
-
-                <!-- =================================================
-                 APPOINTMENTS
-                 ================================================= -->
-
+                <!-- Appointments -->
                 <a href="{% url 'staff:appointments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}"
                     title="Appointments">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-calendar-check"></i>
                     </span>
-
-                    <span>
-                        Appointments
-                    </span>
-
+                    <span>Appointments</span>
                 </a>
-                <!-- =================================================
-                     REFERRALS
-                     ================================================= -->
-                
+
+                <!-- Referrals -->
                 <a href="{% url 'staff:referrals' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}"
                     title="Referral Management">
-                
                     <span class="nav-icon">
                         <i class="fa-solid fa-user-plus"></i>
                     </span>
-                
-                    <span>
-                        Referrals
-                    </span>
-                
+                    <span>Referrals</span>
                 </a>
 
-
-
-
-                <!-- =================================================
-                 QUOTATIONS
-                 ================================================= -->
-
+                <!-- Quotations -->
                 <a href="{% url 'staff:quotations' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'quotations' %}active{% endif %}"
                     title="Quotations">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-file-invoice-dollar"></i>
                     </span>
-
-                    <span>
-                        Quotations
-                    </span>
-
+                    <span>Quotations</span>
                 </a>
 
-
-
-                <!-- =================================================
-                 PAYMENTS
-                 ================================================= -->
-
+                <!-- Payments -->
                 <a href="{% url 'staff:payments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'payments' or request.resolver_match.url_name == 'payment_verify' %}active{% endif %}"
                     title="Payments">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-credit-card"></i>
                     </span>
-
-                    <span>
-                        Payments
-                    </span>
-
+                    <span>Payments</span>
                 </a>
 
-
-
-                <!-- =================================================
-                 CAREGIVER ASSIGNMENTS
-                 ================================================= -->
-
+                <!-- Assignments -->
                 <a href="{% url 'staff:assignments' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'assignments' or request.resolver_match.url_name == 'assignment_add' or request.resolver_match.url_name == 'assignment_edit' %}active{% endif %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'assignments' or request.resolver_match.url_name == 'caregiver_assignments' or request.resolver_match.url_name == 'caregiver_assignment_add' or request.resolver_match.url_name == 'assignment_add' or request.resolver_match.url_name == 'caregiver_assignment_edit' or request.resolver_match.url_name == 'assignment_edit' or request.resolver_match.url_name == 'caregiver_assignment_delete' or request.resolver_match.url_name == 'assignment_delete' %}active{% endif %}"
                     title="Caregiver Assignments">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-people-arrows"></i>
                     </span>
-
-                    <span>
-                        Assignments
-                    </span>
-
+                    <span>Assignments</span>
                 </a>
 
+                <div class="nav-label">MANAGEMENT</div>
 
-
-                <!-- =================================================
-                 MANAGEMENT
-                 ================================================= -->
-
-                <div class="nav-label">
-                    MANAGEMENT
-                </div>
-
-
-
-                <!-- =================================================
-                 REPORTS
-                 ================================================= -->
-
+                <!-- Daily Reports -->
                 <a href="{% url 'staff:reports' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'report_add' or request.resolver_match.url_name == 'report_edit' %}active{% endif %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'report_add' or request.resolver_match.url_name == 'report_edit' or request.resolver_match.url_name == 'report_delete' %}active{% endif %}"
                     title="Caregiver Daily Reports">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-file-medical"></i>
                     </span>
-
-                    <span>
-                        Daily Reports
-                    </span>
-
+                    <span>Daily Reports</span>
                 </a>
 
-
-
-                <!-- =================================================
-                 SERVICES
-                 ================================================= -->
-
+                <!-- Services -->
                 <a href="{% url 'staff:services' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'services' or request.resolver_match.url_name == 'service_add' or request.resolver_match.url_name == 'service_edit' %}active{% endif %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'services' or request.resolver_match.url_name == 'service_add' or request.resolver_match.url_name == 'service_edit' or request.resolver_match.url_name == 'service_delete' %}active{% endif %}"
                     title="Healthcare Services">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-hand-holding-medical"></i>
                     </span>
-
-                    <span>
-                        Services
-                    </span>
-
+                    <span>Services</span>
                 </a>
 
-
-
-                <!-- =================================================
-                 CAREGIVER PAYMENTS
-                 ================================================= -->
-
+                <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' %}active{% endif %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' or request.resolver_match.url_name == 'caregiver_payment_delete' %}active{% endif %}"
                     title="Caregiver Payments">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-money-bill-transfer"></i>
                     </span>
-
-                    <span>
-                        Caregiver Payments
-                    </span>
-
+                    <span>Caregiver Payments</span>
                 </a>
 
+                <div class="nav-label">SYSTEM</div>
 
-
-                <!-- =================================================
-                 SYSTEM
-                 ================================================= -->
-
-                <div class="nav-label">
-                    SYSTEM
-                </div>
-
-
-
-                <!-- SETTINGS -->
-
+                <!-- Settings -->
                 <a href="{% url 'staff:settings' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
                     title="System Settings">
-
                     <span class="nav-icon">
                         <i class="fa-solid fa-sliders"></i>
                     </span>
-
-                    <span>
-                        Settings
-                    </span>
-
+                    <span>Settings</span>
                 </a>
-
 
             </nav>
 
-
-
-            <!-- =====================================================
-             SIDEBAR FOOTER
-             ===================================================== -->
-
+            <!-- Sidebar Footer -->
             <div class="sidebar-footer">
-
-
-                <!-- ADMIN PROFILE -->
 
                 <div class="admin-mini-profile">
 
                     <div class="avatar">
-
                         {{ request.user.get_full_name|default:request.user.username|first|upper }}
-
                     </div>
 
-
                     <div class="admin-mini-info">
-
                         <strong>
-
                             {{ request.user.get_full_name|default:request.user.username }}
-
                         </strong>
 
-                        <span>
-                            Health Admin
-                        </span>
-
+                        <span>Health Admin</span>
                     </div>
 
                 </div>
 
-
-
-                <!-- LOGOUT -->
-
                 <a href="{% url 'staff:logout' %}" class="logout-link" title="Sign out">
-
                     <i class="fa-solid fa-right-from-bracket"></i>
-
-                    <span>
-                        Sign out
-                    </span>
-
+                    <span>Sign out</span>
                 </a>
 
-
             </div>
-
 
         </aside>
 
-
-
-        <!-- =====================================================
-         MAIN AREA
-         ===================================================== -->
-
+        <!-- Main Area -->
         <main class="main-area">
 
-
-            <!-- =================================================
-             TOP BAR
-             ================================================= -->
-
+            <!-- Top Bar -->
             <header class="topbar">
 
-
-                <!-- MOBILE MENU -->
-
                 <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation"
-                    title="Open navigation">
-
+                    aria-controls="sidebar" aria-expanded="false" title="Open navigation">
                     <i class="fa-solid fa-bars"></i>
-
                 </button>
 
-
-
-                <!-- TOPBAR HEADING -->
-
                 <div class="topbar-heading">
-
-                    <span class="topbar-kicker">
-                        ADMINISTRATION
-                    </span>
-
-                    <span class="topbar-title">
-                        Hands-On Health
-                    </span>
-
+                    <span class="topbar-kicker">ADMINISTRATION</span>
+                    <span class="topbar-title">Hands-On Health</span>
                 </div>
-
-
-
-                <!-- TOPBAR ACTIONS -->
 
                 <div class="topbar-actions">
 
-
-                    <!-- SYSTEM STATUS -->
-
                     <div class="status-indicator">
-
                         <span></span>
-
-                        <span>
-                            System operational
-                        </span>
-
+                        <span>System operational</span>
                     </div>
-
-
-
-                    <!-- USER -->
 
                     <div class="topbar-user">
-
                         <i class="fa-solid fa-user-shield"></i>
-
-                        {{ request.user.get_full_name|default:request.user.username }}
-
+                        <span>
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </span>
                     </div>
 
-
                 </div>
-
 
             </header>
 
-
-
-            <!-- =================================================
-             MESSAGES
-             ================================================= -->
-
+            <!-- Django Messages -->
             {% if messages %}
-
-            <div class="messages-container">
+            <div class="messages-container" role="status" aria-live="polite">
 
                 {% for message in messages %}
-
                 <div class="alert alert-{{ message.tags }}">
 
-                    {% if message.tags == "success" %}
-
+                    {% if 'success' in message.tags %}
                     <i class="fa-solid fa-circle-check"></i>
-
-                    {% elif message.tags == "error" %}
-
+                    {% elif 'error' in message.tags %}
                     <i class="fa-solid fa-circle-exclamation"></i>
-
-                    {% elif message.tags == "warning" %}
-
+                    {% elif 'warning' in message.tags %}
                     <i class="fa-solid fa-triangle-exclamation"></i>
-
                     {% else %}
-
                     <i class="fa-solid fa-circle-info"></i>
-
                     {% endif %}
 
-                    {{ message }}
+                    <span>{{ message }}</span>
 
                 </div>
-
                 {% endfor %}
 
             </div>
-
             {% endif %}
 
-
-
-            <!-- =================================================
-             PAGE CONTENT
-             ================================================= -->
-
+            <!-- Page Content -->
             <section class="page-content">
-
-                {% block content %}
-                {% endblock %}
-
+                {% block content %}{% endblock %}
             </section>
 
-
         </main>
-
+        ```
 
     </div>
 
-
-
-    <!-- =========================================================
-     MOBILE SIDEBAR JAVASCRIPT
-     ========================================================= -->
+    <!-- Mobile Sidebar JavaScript -->
 
     <script>
+        (function () {
+            "use strict";
 
-        const mobileMenu =
-            document.getElementById("mobileMenu");
+            const mobileMenu = document.getElementById("mobileMenu");
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("sidebarOverlay");
 
-        const sidebar =
-            document.getElementById("sidebar");
+            if (!mobileMenu || !sidebar || !overlay) {
+                return;
+            }
 
-        const overlay =
-            document.getElementById("sidebarOverlay");
+            function openSidebar() {
+                sidebar.classList.add("open");
+                overlay.classList.add("active");
+                mobileMenu.setAttribute("aria-expanded", "true");
+                document.body.classList.add("sidebar-open");
+            }
 
-
-        function closeSidebar() {
-
-            if (sidebar) {
+            function closeSidebar() {
                 sidebar.classList.remove("open");
-            }
-
-            if (overlay) {
                 overlay.classList.remove("active");
+                mobileMenu.setAttribute("aria-expanded", "false");
+                document.body.classList.remove("sidebar-open");
             }
 
-        }
-
-
-        if (mobileMenu) {
-
-            mobileMenu.addEventListener(
-                "click",
-                function () {
-
-                    if (sidebar) {
-                        sidebar.classList.toggle("open");
-                    }
-
-                    if (overlay) {
-                        overlay.classList.toggle("active");
-                    }
-
-                }
-            );
-
-        }
-
-
-        if (overlay) {
-
-            overlay.addEventListener(
-                "click",
-                closeSidebar
-            );
-
-        }
-
-
-        /*
-         * CLOSE MOBILE SIDEBAR AFTER CLICKING A LINK
-         */
-
-        document.querySelectorAll(
-            ".sidebar .nav-item, .logout-link"
-        ).forEach(function (link) {
-
-            link.addEventListener(
-                "click",
-                function () {
-
-                    if (window.innerWidth <= 768) {
-
-                        closeSidebar();
-
-                    }
-
-                }
-            );
-
-        });
-
-
-        /*
-         * ESCAPE KEY CLOSES MOBILE SIDEBAR
-         */
-
-        document.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (event.key === "Escape") {
-
+            function toggleSidebar() {
+                if (sidebar.classList.contains("open")) {
                     closeSidebar();
-
+                } else {
+                    openSidebar();
                 }
-
             }
-        );
 
+            mobileMenu.addEventListener("click", toggleSidebar);
+            overlay.addEventListener("click", closeSidebar);
 
+            document.querySelectorAll(".sidebar .nav-item, .sidebar .logout-link")
+                .forEach(function (link) {
+                    link.addEventListener("click", function () {
+                        if (window.innerWidth <= 768) {
+                            closeSidebar();
+                        }
+                    });
+                });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeSidebar();
+                }
+            });
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+        })();
     </script>
 
+    <!-- Page-Specific JavaScript -->
 
-
-    <!-- =========================================================
-     PAGE-SPECIFIC JAVASCRIPT
-     ========================================================= -->
-
-    {% block extra_js %}
-    {% endblock %}
-
+    {% block extra_js %}{% endblock %}
 
 </body>
 

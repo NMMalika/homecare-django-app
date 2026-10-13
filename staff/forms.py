@@ -419,3 +419,60 @@ class CaregiverPaymentForm(forms.ModelForm):
                 }
             ),
         }
+    from django import forms
+
+from homecare.models import Caregiver
+
+
+class StaffCaregiverInviteForm(forms.ModelForm):
+
+    class Meta:
+        model = Caregiver
+
+        fields = [
+            "name",
+            "professional_title",
+            "specialization",
+            "phone",
+            "email",
+        ]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Caregiver full name",
+                }
+            ),
+            "professional_title": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "e.g. Registered Nurse",
+                }
+            ),
+            "specialization": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": (
+                        "e.g. Elderly Care, Palliative Care"
+                    ),
+                }
+            ),
+            "phone": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Phone number",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "caregiver@example.com",
+                }
+            ),
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+
+        return email

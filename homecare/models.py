@@ -1906,3 +1906,71 @@ class CaregiverPayment(models.Model):
             f"{self.amount} - "
             f"{self.get_status_display()}"
         )
+    # ============================================================
+# CAREGIVER INVITATION
+# ============================================================
+
+class CaregiverInvitation(models.Model):
+    """
+    Secure one-time invitation allowing a staff member to invite
+    a caregiver to complete their account registration.
+
+    The caregiver does not receive a password from staff.
+    They create their own password through the invitation link.
+    """
+
+    caregiver = models.ForeignKey(
+        Caregiver,
+        on_delete=models.CASCADE,
+        related_name="invitations",
+    )
+
+    email = models.EmailField()
+
+    token = models.CharField(
+        max_length=128,
+        unique=True,
+        editable=False,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    expires_at = models.DateTimeField()
+
+    used_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="caregiver_invitations_created",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @property
+    def is_used(self):
+        return self.used_at is not None
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_valid(self):
+        return not self.is_used and not self.is_expired
+
+    def __str__(self):
+        return (
+            f"Caregiver invitation - "
+            f"{self.email}"
+        )

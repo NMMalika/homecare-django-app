@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registration Received | {{ site_settings.business_name|default:"Hands-On Health" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: radial-gradient(circle at 8% 8%, #e4f0f8, transparent 30%), #f4f8fb;
+            font-family: Inter, Arial, sans-serif;
+            color: #1d2b36
+        }
+
+        .card {
+            width: 100%;
+            max-width: 650px;
+            background: #fff;
+            border-radius: 24px;
+            padding: 44px 46px;
+            box-shadow: 0 25px 70px #123c6915;
+            text-align: center
+        }
+
+        .check {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 23px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #e8f7ef;
+            color: #18845d;
+            font-size: 38px;
+            font-weight: 700
+        }
+
+        .brand {
+            font: 700 13px "Plus Jakarta Sans", sans-serif;
+            color: #123c69;
+            margin-bottom: 28px
+        }
+
+        .brand img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            vertical-align: middle;
+            margin-right: 9px
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            letter-spacing: 1.4px;
+            font-weight: 700;
+            color: #258267
+        }
+
+        .card h1 {
+            font: 800 30px/1.2 "Plus Jakarta Sans", sans-serif;
+            letter-spacing: -.8px;
+            margin: 10px 0 12px
+        }
+
+        .intro {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #72808a;
+            max-width: 480px;
+            margin: 0 auto 28px
+        }
+
+        .timeline {
+            text-align: left;
+            background: #f8fbfc;
+            border: 1px solid #e7eef1;
+            border-radius: 15px;
+            padding: 21px 22px;
+            margin: 0 0 24px
+        }
+
+        .item {
+            display: flex;
+            gap: 13px;
+            margin: 0 0 19px
+        }
+
+        .item:last-child {
+            margin-bottom: 0
+        }
+
+        .dot {
+            flex: 0 0 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #e4f4ec;
+            color: #16815a;
+            font-weight: 700;
+            font-size: 13px
+        }
+
+        .item strong {
+            font-size: 12px;
+            display: block;
+            margin: 2px 0 5px
+        }
+
+        .item p {
+            font-size: 11px;
+            color: #72808a;
+            line-height: 1.65;
+            margin: 0
+        }
+
+        .note {
+            font-size: 11px;
+            line-height: 1.7;
+            color: #667780;
+            background: #f1f7fa;
+            border-radius: 10px;
+            padding: 13px 15px
+        }
+
+        .button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 22px;
+            min-height: 46px;
+            padding: 0 24px;
+            background: #123c69;
+            border-radius: 9px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700
+        }
+
+        .footer {
+            margin-top: 23px;
+            color: #a0a9af;
+            font-size: 10px
+        }
+
+        @media(max-width:520px) {
+            .card {
+                padding: 32px 20px;
+                border-radius: 18px
+            }
+
+            .card h1 {
+                font-size: 25px
+            }
+
+            .timeline {
+                text-align: left;
+                padding: 17px 14px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card">
+        <div class="brand">
+            {% if site_settings.logo %}<img src="{{ site_settings.logo.url }}" alt="">{% endif %}
+            {{ site_settings.business_name|default:"Hands-On Health" }}
+        </div>
+        <div class="check" aria-hidden="true">✓</div>
+        <div class="eyebrow">APPLICATION RECEIVED</div>
+        <h1>Thank you for registering!</h1>
+        <p class="intro">Your caregiver registration and supporting documents have been submitted successfully. We
+            appreciate your interest in joining our care team.</p>
+        <div class="timeline">
+            <div class="item">
+                <div class="dot">✓</div>
+                <div><strong>Your application has been received</strong>
+                    <p>Your information and CV have been saved for the verification process.</p>
+                </div>
+            </div>
+            <div class="item">
+                <div class="dot">2</div>
+                <div><strong>Our team will review your details</strong>
+                    <p>The Hands-On Health administration team will verify your application and documents.</p>
+                </div>
+            </div>
+            <div class="item">
+                <div class="dot">3</div>
+                <div><strong>We will email your login link after approval</strong>
+                    <p>Once your application is approved, check your email for confirmation and instructions to access
+                        the caregiver portal.</p>
+                </div>
+            </div>
+        </div>
+        <div class="note">Your account remains inactive while verification is pending. You do not need to register
+            again. If you need help, please contact Hands-On Health.</div>
+        <a class="button" href="{% url 'caregivers:login' %}">Go to caregiver login</a>
+        <div class="footer">© {% now "Y" %} {{ site_settings.business_name|default:"Hands-On Health" }} · Thank you for
+            choosing to care.</div>
+    </main>
+</body>
+
+</html>
