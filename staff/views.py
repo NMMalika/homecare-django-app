@@ -2687,16 +2687,31 @@ def service_edit(request, pk):
 
         if form.is_valid():
 
-            service = form.save()
+         service = form.save()
+  
+          messages.success(
+           request,
+          f'"{service.name}" has been added successfully.',
+       )
 
-            messages.success(
-                request,
-                f'"{service.name}" has been updated successfully.',
-            )
+    return redirect("staff:services")
 
-            return redirect(
-                "staff:services"
-            )
+    else:
+
+      for field_name, errors in form.errors.items():
+
+        for error in errors:
+
+            if field_name == "__all__":
+                messages.error(
+                    request,
+                    f"Service error: {error}"
+                )
+            else:
+                messages.error(
+                    request,
+                    f"{field_name}: {error}"
+                )
 
         if created_category:
 
