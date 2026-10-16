@@ -354,6 +354,12 @@ def dashboard(request):
         HomeCareRequest.objects
         .order_by("-created_at")[:5]
     )
+    recent_referrals = (
+    Referral.objects
+    .select_related("homecare_request")
+    .prefetch_related("services_needed")
+    .order_by("-created_at")[:5]
+    )
 
     recent_appointments = (
         Consultation.objects
@@ -438,6 +444,13 @@ def dashboard(request):
         "recent_quotations": recent_quotations,
 
         "recent_assignments": recent_assignments,
+        "referral_count": Referral.objects.count(),
+
+        "pending_referrals": Referral.objects.filter(
+        status="PENDING"
+        ).count(),
+
+       "recent_referrals": recent_referrals,
     }
 
     return render(

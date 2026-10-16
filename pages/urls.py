@@ -14,6 +14,15 @@ urlpatterns = [
         name="about"
     ),
 
+    # ====================================================
+    # SERVICES
+    # ====================================================
+    path(
+        "services/",
+        views.services,
+        name="services"
+    ),
+
     path(
         "how-it-works/",
         views.how_it_works,

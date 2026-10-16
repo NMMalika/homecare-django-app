@@ -676,61 +676,59 @@ Referral Management | Hands-On Health
                         </td>
 
 
-                        <!-- PATIENT -->
-                        <td>
+                        
+                    <!-- PATIENT -->
+                    <td>
+                        <div class="person-name">
+                            {{ referral.patient_name|default:"Patient name not provided" }}
+                        </div>
+                    
+                        {% if referral.patient_email %}
+                        <div class="person-detail">
+                            <i class="fa-solid fa-envelope"></i>
+                            {{ referral.patient_email }}
+                        </div>
+                        {% endif %}
+                    
+                        {% if referral.patient_phone %}
+                        <div class="person-detail">
+                            <i class="fa-solid fa-phone"></i>
+                            {{ referral.patient_phone }}
+                        </div>
+                        {% endif %}
+                    
+                        {% if referral.homecare_request %}
+                        {% if referral.homecare_request.location %}
+                        <div class="person-detail">
+                            <i class="fa-solid fa-location-dot"></i>
+                            {{ referral.homecare_request.location }}
+                        </div>
+                        {% endif %}
+                    
+                        {% if referral.homecare_request.description %}
+                        <div class="person-detail">
+                            <i class="fa-solid fa-notes-medical"></i>
+                            {{ referral.homecare_request.description|truncatechars:100|linebreaksbr }}
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                    </td>
 
-                            <div class="person-name">
-                                {{ referral.patient_name }}
-                            </div>
 
-                            {% if referral.patient_email %}
-                            <div class="person-detail">
-                                <i class="fa-solid fa-envelope"></i>
-                                {{ referral.patient_email }}
-                            </div>
-                            {% endif %}
-
-                            {% if referral.patient_phone %}
-                            <div class="person-detail">
-                                <i class="fa-solid fa-phone"></i>
-                                {{ referral.patient_phone }}
-                            </div>
-                            {% endif %}
-
-                        </td>
-
-
+                      
                         <!-- SERVICES -->
                         <td>
-
-                            {% if referral.services_needed.all %}
-
                             <div class="services-list">
-
                                 {% for service in referral.services_needed.all %}
-
                                 <span class="service-tag">
-                                    {{ service }}
+                                    {{ service.name|default:service }}
                                 </span>
-
                                 {% empty %}
-
                                 <span class="no-service">
                                     No services selected
                                 </span>
-
                                 {% endfor %}
-
                             </div>
-
-                            {% else %}
-
-                            <span class="no-service">
-                                No services selected
-                            </span>
-
-                            {% endif %}
-
                         </td>
 
 
@@ -763,25 +761,28 @@ Referral Management | Hands-On Health
 
 
                         <!-- HOME CARE -->
+                        <!-- HOME CARE -->
                         <td>
-
                             {% if referral.homecare_request %}
-
                             <span class="homecare-linked">
                                 <i class="fa-solid fa-link"></i>
                                 Linked
                             </span>
-
+                        
+                            <div class="person-detail">
+                                Ref: {{ referral.homecare_request.pk }}
+                            </div>
+                        
+                            <div class="person-detail">
+                                Status:
+                                {{ referral.homecare_request.get_status_display|default:referral.homecare_request.status|default:"Not set" }}
+                            </div>
                             {% else %}
-
                             <span class="homecare-not-linked">
                                 Not linked
                             </span>
-
                             {% endif %}
-
                         </td>
-
 
                         <!-- LOYALTY POINTS -->
                         <td>

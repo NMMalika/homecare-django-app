@@ -43,7 +43,7 @@
                             </li>
 
                             <li class="{% if request.resolver_match.url_name == 'services' %}active{% endif %}">
-                                <a href="#">Our Services</a>
+                                <a href="{% url 'pages:services' %}">Our Services</a>
                             </li>
 
                             <li class="{% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">
