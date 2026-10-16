@@ -242,3 +242,7 @@ DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
     "Hands-On Health <jodhuntnimrodmulinya@gmail.com>"
 )
+
+
+# Password reset links expire after 30 minutes.
+PASSWORD_RESET_TIMEOUT = 1800

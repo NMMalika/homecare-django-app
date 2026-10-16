@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -39,34 +38,26 @@
             --radius: 18px;
         }
 
-
         * {
             box-sizing: border-box;
         }
-
 
         html {
             scroll-behavior: smooth;
         }
 
-
         body {
             margin: 0;
             min-height: 100vh;
-
             font-family: "Inter", Arial, sans-serif;
-
             color: var(--text);
-
             background:
                 radial-gradient(circle at 10% 10%,
                     rgba(18, 60, 105, .06),
                     transparent 30%),
                 var(--background);
-
             -webkit-font-smoothing: antialiased;
         }
-
 
         /* =========================================
            PAGE
@@ -74,37 +65,25 @@
 
         .login-page {
             min-height: 100vh;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             padding: 40px 24px;
         }
-
 
         .login-container {
             width: 100%;
             max-width: 1080px;
-
             display: grid;
             grid-template-columns: 1fr 1fr;
-
             background: var(--white);
-
             border-radius: 26px;
-
             overflow: hidden;
-
-            box-shadow:
-                0 25px 70px rgba(18, 60, 105, .10);
-
+            box-shadow: 0 25px 70px rgba(18, 60, 105, .10);
             animation: cardEnter .7s ease both;
         }
 
-
         @keyframes cardEnter {
-
             from {
                 opacity: 0;
                 transform: translateY(18px);
@@ -114,9 +93,7 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-
         }
-
 
         /* =========================================
            LEFT BRAND PANEL
@@ -124,59 +101,35 @@
 
         .brand-panel {
             position: relative;
-
             min-height: 650px;
-
             padding: 55px;
-
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-
             color: white;
-
             overflow: hidden;
-
-            background:
-                linear-gradient(145deg,
+            background: linear-gradient(145deg,
                     rgba(10, 48, 82, .94),
                     rgba(18, 60, 105, .88));
         }
 
-
-        /*
-            Optional healthcare background image.
-
-            Replace this URL with your own local image if desired:
-
-            {% static 'img/caregiver-login.jpg' %}
-        */
-
         .brand-panel::before {
-
             content: "";
-
             position: absolute;
-
             inset: 0;
-
             background: linear-gradient(145deg,
                 rgba(9, 43, 73, .92),
                 rgba(18, 60, 105, .72)),
             url("{% static 'img/caregiver-login.jpg' %}") center / cover no-repeat;
-
             opacity: .85;
-
             z-index: 0;
         }
-
 
         .brand-content,
         .brand-bottom {
             position: relative;
             z-index: 1;
         }
-
 
         /* =========================================
            LOGO
@@ -186,705 +139,419 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-
             margin-bottom: 45px;
         }
 
-
         .logo-wrapper img {
-
             width: 52px;
             height: 52px;
-
             object-fit: contain;
-
             border-radius: 12px;
-
             background: white;
-
             padding: 7px;
         }
 
-
         .logo-name {
-
             font-family: "Plus Jakarta Sans", sans-serif;
-
             font-size: 18px;
             font-weight: 700;
-
             letter-spacing: -.3px;
         }
 
-
         .brand-label {
-
             display: inline-flex;
-
             align-items: center;
-
             gap: 8px;
-
             width: fit-content;
-
             padding: 8px 12px;
-
             margin-bottom: 22px;
-
             border-radius: 100px;
-
             background: rgba(255, 255, 255, .12);
-
             border: 1px solid rgba(255, 255, 255, .15);
-
             font-size: 12px;
-
             font-weight: 600;
-
             letter-spacing: .4px;
         }
 
-
         .brand-label span {
-
             width: 7px;
             height: 7px;
-
             border-radius: 50%;
-
             background: #70d4a8;
         }
 
-
         .brand-title {
-
             max-width: 420px;
-
             margin: 0 0 18px;
-
             font-family: "Plus Jakarta Sans", sans-serif;
-
             font-size: clamp(34px, 4vw, 48px);
-
             line-height: 1.1;
-
             letter-spacing: -1.5px;
-
             font-weight: 800;
         }
 
-
         .brand-description {
-
             max-width: 390px;
-
             margin: 0;
-
             color: rgba(255, 255, 255, .78);
-
             font-size: 15px;
-
             line-height: 1.8;
         }
-
 
         /* =========================================
            TRUST ITEMS
         ========================================= */
 
         .trust-items {
-
             display: flex;
-
             flex-direction: column;
-
             gap: 14px;
-
             margin-top: 35px;
         }
 
-
         .trust-item {
-
             display: flex;
-
             align-items: center;
-
             gap: 12px;
-
             font-size: 13px;
-
             color: rgba(255, 255, 255, .88);
         }
 
-
         .trust-icon {
-
             width: 34px;
             height: 34px;
-
             display: flex;
-
             align-items: center;
             justify-content: center;
-
             border-radius: 10px;
-
             background: rgba(255, 255, 255, .10);
         }
 
-
         .trust-icon svg {
-
             width: 17px;
             height: 17px;
         }
 
-
         .brand-bottom {
-
             color: rgba(255, 255, 255, .55);
-
             font-size: 12px;
-
             line-height: 1.6;
         }
-
 
         /* =========================================
            LOGIN PANEL
         ========================================= */
 
         .login-panel {
-
             padding: 65px 65px;
-
             display: flex;
-
             align-items: center;
-
             background: #fff;
         }
 
-
         .login-content {
-
             width: 100%;
-
             max-width: 390px;
-
             margin: auto;
         }
 
-
         .mobile-logo {
-
             display: none;
         }
 
-
         .login-heading {
-
             margin-bottom: 35px;
         }
 
-
         .login-heading h1 {
-
             margin: 0 0 10px;
-
             font-family: "Plus Jakarta Sans", sans-serif;
-
             font-size: 30px;
-
             line-height: 1.2;
-
             letter-spacing: -.8px;
-
             color: var(--text);
         }
 
-
         .login-heading p {
-
             margin: 0;
-
             color: var(--muted);
-
             font-size: 14px;
-
             line-height: 1.7;
         }
-
 
         /* =========================================
            MESSAGES
         ========================================= */
 
         .messages {
-
             margin-bottom: 22px;
         }
 
-
         .message {
-
             padding: 13px 15px;
-
             border-radius: 10px;
-
             background: #f4f7f9;
-
             border: 1px solid var(--border);
-
             color: var(--text);
-
             font-size: 13px;
-
             line-height: 1.5;
         }
-
 
         /* =========================================
            FORM
         ========================================= */
 
         .form-group {
-
             margin-bottom: 21px;
         }
 
-
         .form-group label {
-
             display: block;
-
             margin-bottom: 8px;
-
             color: #35434d;
-
             font-size: 13px;
-
             font-weight: 600;
         }
 
-
         .input-wrapper {
-
             position: relative;
         }
 
-
         .input-icon {
-
             position: absolute;
-
             left: 15px;
-
             top: 50%;
-
             transform: translateY(-50%);
-
             color: #8a98a3;
-
             pointer-events: none;
         }
 
-
         .input-icon svg {
-
             width: 18px;
             height: 18px;
         }
 
-
         .input-wrapper input {
-
             width: 100%;
-
             height: 52px;
-
             padding: 0 15px 0 45px;
-
             border: 1px solid var(--border);
-
             border-radius: 11px;
-
             background: #fbfcfd;
-
             color: var(--text);
-
             font-family: inherit;
-
             font-size: 14px;
-
             outline: none;
-
             transition:
                 border-color .2s ease,
                 box-shadow .2s ease,
                 background .2s ease;
         }
 
-
         .input-wrapper input:hover {
-
             background: #fff;
-
             border-color: #cfd8df;
         }
 
-
         .input-wrapper input:focus {
-
             background: #fff;
-
             border-color: var(--primary);
-
-            box-shadow:
-                0 0 0 4px rgba(18, 60, 105, .08);
+            box-shadow: 0 0 0 4px rgba(18, 60, 105, .08);
         }
-
 
         .input-wrapper input::placeholder {
-
             color: #a1acb4;
         }
-
 
         /* =========================================
            ERRORS
         ========================================= */
 
         .error-list {
-
             margin-top: 7px;
-
             color: var(--danger);
-
             font-size: 12px;
         }
 
-
         .error-list ul {
-
             margin: 0;
             padding-left: 17px;
         }
 
-
         .non-field-errors {
-
             padding: 12px 14px;
-
             margin-bottom: 20px;
-
             border-radius: 10px;
-
             background: #fff5f4;
-
             border: 1px solid #f1d2cf;
-
             color: var(--danger);
-
             font-size: 13px;
         }
 
-
         /* =========================================
-           LOGIN BUTTON
+           LOGIN BUTTON & FORGOT PASSWORD
         ========================================= */
 
         .login-button {
-
             width: 100%;
-
             height: 53px;
-
             border: 0;
-
             border-radius: 11px;
-
             background: var(--primary);
-
             color: white;
-
             font-family: inherit;
-
             font-size: 14px;
-
             font-weight: 700;
-
             letter-spacing: .2px;
-
             cursor: pointer;
-
-            box-shadow:
-                0 8px 20px rgba(18, 60, 105, .18);
-
+            box-shadow: 0 8px 20px rgba(18, 60, 105, .18);
             transition:
                 transform .2s ease,
                 background .2s ease,
                 box-shadow .2s ease;
         }
 
-
         .login-button:hover {
-
             background: var(--primary-dark);
-
             transform: translateY(-1px);
-
-            box-shadow:
-                0 12px 25px rgba(18, 60, 105, .22);
+            box-shadow: 0 12px 25px rgba(18, 60, 105, .22);
         }
 
-
         .login-button:active {
-
             transform: translateY(0);
         }
 
+        .forgot-password-wrap {
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .forgot-password-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+        .forgot-password-link svg {
+            width: 15px;
+            height: 15px;
+            color: #8a98a3;
+            transition: color .2s ease;
+        }
+
+        .forgot-password-link:hover {
+            color: var(--primary);
+        }
+
+        .forgot-password-link:hover svg {
+            color: var(--primary);
+        }
 
         /* =========================================
            REGISTER
         ========================================= */
 
         .register-section {
-
             margin-top: 28px;
-
             padding-top: 25px;
-
             border-top: 1px solid #edf0f2;
-
             text-align: center;
         }
 
-
         .register-section p {
-
             margin: 0 0 13px;
-
             color: var(--muted);
-
             font-size: 13px;
+            line-height: 1.6;
         }
-
-
-        .register-link {
-
-            display: inline-flex;
-
-            align-items: center;
-            justify-content: center;
-
-            gap: 7px;
-
-            width: 100%;
-
-            height: 49px;
-
-            border: 1px solid #d8e0e6;
-
-            border-radius: 10px;
-
-            color: var(--primary);
-
-            background: white;
-
-            text-decoration: none;
-
-            font-size: 13px;
-
-            font-weight: 700;
-
-            transition:
-                background .2s ease,
-                border-color .2s ease,
-                transform .2s ease;
-        }
-
-
-        .register-link:hover {
-
-            background: var(--primary-light);
-
-            border-color: #bfd0df;
-
-            transform: translateY(-1px);
-        }
-
-
-        .register-link svg {
-
-            width: 16px;
-            height: 16px;
-        }
-
-
-        /* =========================================
-           SECURITY NOTE
-        ========================================= */
-
-        .security-note {
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            gap: 7px;
-
-            margin-top: 22px;
-
-            color: #8b969e;
-
-            font-size: 11px;
-        }
-
-
-        .security-note svg {
-
-            width: 14px;
-            height: 14px;
-        }
-
 
         /* =========================================
            MOBILE
         ========================================= */
 
         @media (max-width: 850px) {
-
             .login-container {
-
                 max-width: 520px;
-
                 grid-template-columns: 1fr;
-
                 border-radius: 20px;
             }
 
-
             .brand-panel {
-
                 display: none;
             }
 
-
             .login-panel {
-
                 padding: 45px 30px;
             }
 
-
             .mobile-logo {
-
                 display: flex;
-
                 align-items: center;
                 justify-content: center;
-
                 gap: 10px;
-
                 margin-bottom: 35px;
             }
 
-
             .mobile-logo img {
-
                 width: 45px;
                 height: 45px;
-
                 object-fit: contain;
-
                 border-radius: 10px;
-
                 background: white;
             }
 
-
             .mobile-logo span {
-
                 font-family: "Plus Jakarta Sans", sans-serif;
-
                 font-size: 17px;
-
                 font-weight: 700;
-
                 color: var(--primary);
             }
 
-
             .login-heading {
-
                 text-align: center;
             }
-
         }
 
-
         @media (max-width: 480px) {
-
             .login-page {
-
                 padding: 20px 14px;
             }
 
-
             .login-container {
-
                 border-radius: 17px;
-
-                box-shadow:
-                    0 15px 45px rgba(18, 60, 105, .08);
+                box-shadow: 0 15px 45px rgba(18, 60, 105, .08);
             }
 
-
             .login-panel {
-
                 padding: 35px 22px;
             }
 
-
             .login-heading h1 {
-
                 font-size: 27px;
             }
-
         }
     </style>
-
 </head>
-
 
 <body>
 
-
     <div class="login-page">
-
 
         <div class="login-container">
 
-
-            <!-- =========================================
-             BRAND PANEL
-        ========================================== -->
-
+            <!-- BRAND PANEL -->
             <section class="brand-panel">
-
                 <div class="brand-content">
 
-
                     <div class="logo-wrapper">
-
                         {% if site_settings.logo %}
-
                         <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }}">
-
                         {% else %}
-
                         <div style="
                             width:52px;
                             height:52px;
@@ -899,372 +566,191 @@
                         ">
                             H
                         </div>
-
                         {% endif %}
-
 
                         <div class="logo-name">
                             {{ site_settings.business_name|default:"Hands-On Health" }}
                         </div>
-
                     </div>
-
 
                     <div class="brand-label">
-
                         <span></span>
-
                         CAREGIVER PORTAL
-
                     </div>
 
-
                     <h2 class="brand-title">
-
                         Caring for people starts with being connected.
-
                     </h2>
 
-
                     <p class="brand-description">
-
                         Access your caregiver assignments, patient information,
                         schedules and important updates from one secure place.
-
                     </p>
 
-
                     <div class="trust-items">
-
-
                         <div class="trust-item">
-
                             <div class="trust-icon">
-
-                                <!-- Shield -->
-
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
                                     <path d="M12 3l7 3v5c0 4.7-3 8.3-7 10-4-1.7-7-5.3-7-10V6l7-3z" />
-
                                     <path d="M9 12l2 2 4-4" />
-
                                 </svg>
-
                             </div>
-
                             Secure caregiver access
-
                         </div>
 
-
                         <div class="trust-item">
-
                             <div class="trust-icon">
-
-                                <!-- Heart -->
-
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
                                     <path
                                         d="M20.8 8.7c0 5.5-8.8 10.3-8.8 10.3S3.2 14.2 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4z" />
-
                                 </svg>
-
                             </div>
-
                             Patient-centred home care
-
                         </div>
-
 
                         <div class="trust-item">
-
                             <div class="trust-icon">
-
-                                <!-- Check -->
-
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
                                     <circle cx="12" cy="12" r="9" />
-
                                     <path d="M8 12l2.5 2.5L16 9" />
-
                                 </svg>
-
                             </div>
-
                             Simple and professional workflow
-
                         </div>
-
-
                     </div>
 
                 </div>
 
-
                 <div class="brand-bottom">
-
                     © {% now "Y" %}
                     {{ site_settings.business_name|default:"Hands-On Health" }}.
                     Care with professionalism and compassion.
-
                 </div>
-
             </section>
 
-
-
-            <!-- =========================================
-             LOGIN PANEL
-        ========================================== -->
-
+            <!-- LOGIN PANEL -->
             <section class="login-panel">
-
-
                 <div class="login-content">
 
-
                     <!-- MOBILE LOGO -->
-
                     <div class="mobile-logo">
-
                         {% if site_settings.logo %}
-
                         <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.business_name }}">
-
                         {% endif %}
-
-
                         <span>
                             {{ site_settings.business_name|default:"Hands-On Health" }}
                         </span>
-
                     </div>
-
-
 
                     <!-- HEADING -->
-
                     <div class="login-heading">
-
-                        <h1>
-                            Welcome back
-                        </h1>
-
-                        <p>
-                            Sign in to your caregiver account to continue.
-                        </p>
-
+                        <h1>Welcome back</h1>
+                        <p>Sign in to your caregiver account to continue.</p>
                     </div>
-
-
 
                     <!-- MESSAGES -->
-
                     {% if messages %}
-
                     <div class="messages">
-
                         {% for message in messages %}
-
                         <div class="message">
-
                             {{ message }}
-
                         </div>
-
                         {% endfor %}
-
                     </div>
-
                     {% endif %}
 
-
-
                     <!-- FORM -->
-
                     <form method="post">
-
                         {% csrf_token %}
 
-
                         {% if next %}
-
                         <input type="hidden" name="next" value="{{ next }}">
-
                         {% endif %}
-
-
 
                         <!-- NON FIELD ERRORS -->
-
                         {% if form.non_field_errors %}
-
                         <div class="non-field-errors">
-
                             {{ form.non_field_errors }}
-
                         </div>
-
                         {% endif %}
 
-
-
                         <!-- USERNAME -->
-
                         <div class="form-group">
-
                             <label for="{{ form.username.id_for_label }}">
-
                                 Username
-
                             </label>
 
-
                             <div class="input-wrapper">
-
-
                                 <div class="input-icon">
-
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
                                         <circle cx="12" cy="8" r="4" />
-
                                         <path d="M4 21c.7-4 3.3-6 8-6s7.3 2 8 6" />
-
                                     </svg>
-
                                 </div>
-
-
                                 {{ form.username }}
-
                             </div>
-
 
                             {% if form.username.errors %}
-
                             <div class="error-list">
-
                                 {{ form.username.errors }}
-
                             </div>
-
                             {% endif %}
-
                         </div>
-
-
 
                         <!-- PASSWORD -->
-
                         <div class="form-group">
-
                             <label for="{{ form.password.id_for_label }}">
-
                                 Password
-
                             </label>
 
-
                             <div class="input-wrapper">
-
-
                                 <div class="input-icon">
-
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
                                         <rect x="5" y="10" width="14" height="10" rx="2" />
-
                                         <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-
                                     </svg>
-
                                 </div>
-
-
                                 {{ form.password }}
-
                             </div>
-
 
                             {% if form.password.errors %}
-
                             <div class="error-list">
-
                                 {{ form.password.errors }}
-
                             </div>
-
                             {% endif %}
-
                         </div>
 
-
-
-                        <!-- LOGIN -->
-
+                        <!-- LOGIN BUTTON -->
                         <button type="submit" class="login-button">
-
                             Sign in to caregiver portal
-
                         </button>
 
-
+                        <!-- FORGOT PASSWORD LINK -->
+                        <div class="forgot-password-wrap">
+                            <a href="{% url 'caregivers:password_reset' %}" class="forgot-password-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path
+                                        d="M12 17v-1m0-4a2 2 0 1 0-2-2m-3 8h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z" />
+                                </svg>
+                                Forgot your password?
+                            </a>
+                        </div>
                     </form>
 
-
-
-                    <!-- REGISTER -->
-
+                    <!-- REGISTER SECTION -->
                     <div class="register-section">
-
                         <p>
-                            Don't have a caregiver account yet?
-                        </p>
-
-
-                   
-                    
-                        <p>
-                            Caregiver registration is available by invitation.
+                            Caregiver registration is available by invitation.<br>
                             Please contact the administrator to receive your registration link.
                         </p>
                     </div>
-                   
-
-                    </div>
-
-
-
-                    <!-- SECURITY -->
-
-                    <div class="security-note">
-
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-
-                            <rect x="5" y="10" width="14" height="10" rx="2" />
-
-                            <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-
-                        </svg>
-
-                        Secure caregiver portal
-
-                    </div>
-
 
                 </div>
-
             </section>
-
 
         </div>
 
     </div>
-
 
 </body>
 

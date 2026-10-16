@@ -707,7 +707,145 @@ Hands-On Health
                 )
 
             return redirect("staff:caregivers")
+        
+        
+                # ----------------------------------------------------
+        # SUSPEND APPROVED CAREGIVER
+        # ----------------------------------------------------
 
+        elif action == "suspend":
+
+            if caregiver.verification_status != Caregiver.VerificationStatus.APPROVED:
+                messages.error(
+                    request,
+                    "Only approved caregivers can be suspended."
+                )
+                return redirect("staff:caregivers")
+
+            if not comment:
+                messages.error(
+                    request,
+                    "Please provide a reason for suspending this caregiver."
+                )
+                return redirect("staff:caregiver_verify", pk=caregiver.pk)
+
+            with transaction.atomic():
+
+                caregiver.verification_status = Caregiver.VerificationStatus.SUSPENDED
+                caregiver.is_active = False
+                caregiver.verification_notes = comment
+                caregiver.save()
+
+                if caregiver.user:
+                    caregiver.user.is_active = False
+                    caregiver.user.save(update_fields=["is_active"])
+
+            recipient_email = (
+                getattr(caregiver.user, "email", None)
+                or getattr(caregiver, "email", None)
+                or ""
+            ).strip()
+
+            if recipient_email:
+                try:
+                    send_mail(
+                        subject="Hands-On Health Caregiver Account Suspended",
+                        message=(
+                            f"Hello {caregiver.name},\n\n"
+                            "Your Hands-On Health caregiver account has "
+                            "been temporarily suspended.\n\n"
+                            f"Reason: {comment}\n\n"
+                            "You will not be able to access your caregiver "
+                            "account until an administrator reactivates it.\n\n"
+                            "Please contact Hands-On Health for assistance.\n\n"
+                            "Kind regards,\nHands-On Health"
+                        ),
+                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                        recipient_list=[recipient_email],
+                        fail_silently=False,
+                    )
+                except Exception as error:
+                    messages.warning(
+                        request,
+                        f"Caregiver suspended, but email failed: {error}"
+                    )
+
+            messages.success(
+                request,
+                f"{caregiver.name} has been suspended successfully."
+            )
+
+            return redirect("staff:caregivers")
+
+        # ----------------------------------------------------
+        # REACTIVATE SUSPENDED CAREGIVER
+        # ----------------------------------------------------
+
+        elif action == "reactivate":
+
+            if caregiver.verification_status != Caregiver.VerificationStatus.SUSPENDED:
+                messages.error(
+                    request,
+                    "Only suspended caregivers can be reactivated."
+                )
+                return redirect("staff:caregivers")
+
+            if not caregiver.user or not caregiver.user.has_usable_password():
+                messages.error(
+                    request,
+                    "This caregiver must have a completed registration before reactivation."
+                )
+                return redirect("staff:caregivers")
+
+            with transaction.atomic():
+
+                caregiver.verification_status = Caregiver.VerificationStatus.APPROVED
+                caregiver.is_active = True
+                caregiver.verification_notes = comment
+                caregiver.save()
+
+                caregiver.user.is_active = True
+                caregiver.user.save(update_fields=["is_active"])
+
+            recipient_email = (
+                caregiver.user.email
+                or caregiver.email
+                or ""
+            ).strip()
+
+            if recipient_email:
+                try:
+                    login_url = request.build_absolute_uri(
+                        reverse("caregivers:login")
+                    )
+
+                    send_mail(
+                        subject="Your Hands-On Health Caregiver Account Has Been Reactivated",
+                        message=(
+                            f"Hello {caregiver.name},\n\n"
+                            "Your Hands-On Health caregiver account has "
+                            "been reactivated.\n\n"
+                            "You can now log in using your existing credentials.\n\n"
+                            f"Login: {login_url}\n\n"
+                            "Kind regards,\nHands-On Health"
+                        ),
+                        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                        recipient_list=[recipient_email],
+                        fail_silently=False,
+                    )
+                except Exception as error:
+                    messages.warning(
+                        request,
+                        f"Caregiver reactivated, but email failed: {error}"
+                    )
+
+            messages.success(
+                request,
+                f"{caregiver.name} has been reactivated successfully."
+            )
+
+            return redirect("staff:caregivers")
+        
         # ----------------------------------------------------
         # DECLINE CAREGIVER
         # ----------------------------------------------------
@@ -2523,25 +2661,22 @@ def services(request):
 # ADD SERVICE
 # ============================================================
 
+# ============================================================
+# ADD SERVICE
+# ============================================================
+
 @admin_required
 def service_add(request):
 
-    categories = (
-        ServiceCategory.objects
-        .all()
-        .order_by(
-            "order",
-            "name",
-        )
+    categories = ServiceCategory.objects.all().order_by(
+        "order", "name"
     )
 
     if request.method == "POST":
 
         post_data = request.POST.copy()
-
         new_category_name = post_data.get(
-            "new_category",
-            "",
+            "new_category", ""
         ).strip()
 
         created_category = None
@@ -2550,29 +2685,17 @@ def service_add(request):
 
             new_category_name = new_category_name[:150]
 
-            existing_category = (
-                ServiceCategory.objects
-                .filter(
-                    name__iexact=new_category_name
-                )
-                .first()
-            )
+            category = ServiceCategory.objects.filter(
+                name__iexact=new_category_name
+            ).first()
 
-            if existing_category:
-
-                category = existing_category
-
-            else:
-
+            if category is None:
                 category = ServiceCategory.objects.create(
                     name=new_category_name
                 )
-
                 created_category = category
 
-            post_data["category"] = str(
-                category.pk
-            )
+            post_data["category"] = str(category.pk)
 
         form = ServiceForm(
             post_data,
@@ -2581,16 +2704,39 @@ def service_add(request):
 
         if form.is_valid():
 
-            service = form.save()
+            try:
+                service = form.save()
 
-            messages.success(
-                request,
-                f'"{service.name}" has been added successfully.',
-            )
+                messages.success(
+                    request,
+                    f'"{service.name}" has been added successfully.',
+                )
 
-            return redirect(
-                "staff:services"
-            )
+                return redirect("staff:services")
+
+            except Exception as error:
+
+                messages.error(
+                    request,
+                    f"Service could not be saved: {error}",
+                )
+
+        else:
+
+            for field_name, errors in form.errors.items():
+
+                for error in errors:
+
+                    if field_name == "__all__":
+                        messages.error(
+                            request,
+                            f"Service error: {error}",
+                        )
+                    else:
+                        messages.error(
+                            request,
+                            f"{field_name}: {error}",
+                        )
 
         if created_category:
 
@@ -2599,6 +2745,10 @@ def service_add(request):
             ).exists():
 
                 created_category.delete()
+
+        categories = ServiceCategory.objects.all().order_by(
+            "order", "name"
+        )
 
     else:
 
@@ -2609,75 +2759,41 @@ def service_add(request):
         "staff/service_form.html",
         {
             "form": form,
-
             "title": "Add Service",
-
             "categories": categories,
-
             "site_settings": SiteSettings.load(),
         },
     )
-
-
 # ============================================================
 # EDIT SERVICE
 # ============================================================
 
 @admin_required
 def service_edit(request, pk):
+    service = get_object_or_404(Service, pk=pk)
 
-    service = get_object_or_404(
-        Service,
-        pk=pk,
-    )
-
-    categories = (
-        ServiceCategory.objects
-        .all()
-        .order_by(
-            "order",
-            "name",
-        )
-    )
+    categories = ServiceCategory.objects.all().order_by("order", "name")
 
     if request.method == "POST":
-
         post_data = request.POST.copy()
-
-        new_category_name = post_data.get(
-            "new_category",
-            "",
-        ).strip()
-
+        new_category_name = post_data.get("new_category", "").strip()
         created_category = None
 
         if new_category_name:
-
             new_category_name = new_category_name[:150]
-
-            existing_category = (
+            category = (
                 ServiceCategory.objects
-                .filter(
-                    name__iexact=new_category_name
-                )
+                .filter(name__iexact=new_category_name)
                 .first()
             )
 
-            if existing_category:
-
-                category = existing_category
-
-            else:
-
+            if category is None:
                 category = ServiceCategory.objects.create(
                     name=new_category_name
                 )
-
                 created_category = category
 
-            post_data["category"] = str(
-                category.pk
-            )
+            post_data["category"] = str(category.pk)
 
         form = ServiceForm(
             post_data,
@@ -2686,59 +2802,42 @@ def service_edit(request, pk):
         )
 
         if form.is_valid():
+            service = form.save()
+            messages.success(
+                request,
+                f'"{service.name}" has been updated successfully.',
+            )
+            return redirect("staff:services")
 
-         service = form.save()
-  
-          messages.success(
-           request,
-          f'"{service.name}" has been added successfully.',
-       )
+        for field_name, errors in form.errors.items():
+            for error in errors:
+                if field_name == "__all__":
+                    messages.error(request, f"Service error: {error}")
+                else:
+                    messages.error(request, f"{field_name}: {error}")
 
-    return redirect("staff:services")
+        # Remove a newly created category if validation failed and
+        # no service uses it.
+        if created_category and not Service.objects.filter(
+            category=created_category
+        ).exists():
+            created_category.delete()
 
-    else:
-
-      for field_name, errors in form.errors.items():
-
-        for error in errors:
-
-            if field_name == "__all__":
-                messages.error(
-                    request,
-                    f"Service error: {error}"
-                )
-            else:
-                messages.error(
-                    request,
-                    f"{field_name}: {error}"
-                )
-
-        if created_category:
-
-            if not Service.objects.filter(
-                category=created_category
-            ).exists():
-
-                created_category.delete()
+        # Refresh the category list so a newly created category that
+        # remains in use is included in the form.
+        categories = ServiceCategory.objects.all().order_by("order", "name")
 
     else:
-
-        form = ServiceForm(
-            instance=service,
-        )
+        form = ServiceForm(instance=service)
 
     return render(
         request,
         "staff/service_form.html",
         {
             "form": form,
-
             "service": service,
-
             "title": f"Edit Service - {service.name}",
-
             "categories": categories,
-
             "site_settings": SiteSettings.load(),
         },
     )

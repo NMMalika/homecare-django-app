@@ -7,6 +7,7 @@ from homecare.models import (
     CaregiverAssignment,
     CaregiverDailyReport,
     CaregiverPayment,
+    Caregiver,
 )
 
 
@@ -15,6 +16,23 @@ from homecare.models import (
 # ============================================================
 
 class ServiceForm(forms.ModelForm):
+
+    DEFAULT_ICON = "fa-solid fa-heart-pulse"
+
+    icon_class = forms.CharField(
+        required=False,
+        label="Icon Class",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "fa-solid fa-heart-pulse",
+                "autocomplete": "off",
+            }
+        ),
+        help_text=(
+            "Optional. Leave blank to use the default heart icon."
+        ),
+    )
 
     class Meta:
         model = Service
@@ -78,13 +96,6 @@ class ServiceForm(forms.ModelForm):
                 }
             ),
 
-            "icon_class": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "fa-solid fa-heart-pulse",
-                }
-            ),
-
             "image": forms.ClearableFileInput(
                 attrs={
                     "class": "form-control",
@@ -105,6 +116,14 @@ class ServiceForm(forms.ModelForm):
             ),
         }
 
+    def clean_icon_class(self):
+
+        icon = (
+            self.cleaned_data.get("icon_class") or ""
+        ).strip()
+
+        return icon or self.DEFAULT_ICON
+
 
 # ============================================================
 # HOME CARE REQUEST FORM
@@ -113,6 +132,7 @@ class ServiceForm(forms.ModelForm):
 class HomeCareRequestForm(forms.ModelForm):
 
     class Meta:
+
         model = HomeCareRequest
 
         fields = [
@@ -128,10 +148,6 @@ class HomeCareRequestForm(forms.ModelForm):
         ]
 
         widgets = {
-
-            # ------------------------------------------------
-            # PATIENT DETAILS
-            # ------------------------------------------------
 
             "full_name": forms.TextInput(
                 attrs={
@@ -154,20 +170,12 @@ class HomeCareRequestForm(forms.ModelForm):
                 }
             ),
 
-            # ------------------------------------------------
-            # SERVICES
-            # ------------------------------------------------
-
             "services": forms.SelectMultiple(
                 attrs={
                     "class": "form-select",
                     "size": "6",
                 }
             ),
-
-            # ------------------------------------------------
-            # PREFERRED DATE
-            # ------------------------------------------------
 
             "preferred_date": forms.DateInput(
                 attrs={
@@ -176,20 +184,12 @@ class HomeCareRequestForm(forms.ModelForm):
                 }
             ),
 
-            # ------------------------------------------------
-            # PREFERRED TIME
-            # ------------------------------------------------
-
             "preferred_time": forms.TimeInput(
                 attrs={
                     "type": "time",
                     "class": "form-control",
                 }
             ),
-
-            # ------------------------------------------------
-            # DESCRIPTION
-            # ------------------------------------------------
 
             "description": forms.Textarea(
                 attrs={
@@ -202,23 +202,13 @@ class HomeCareRequestForm(forms.ModelForm):
                 }
             ),
 
-            # ------------------------------------------------
-            # ADMIN NOTES
-            # ------------------------------------------------
-
             "admin_notes": forms.Textarea(
                 attrs={
                     "class": "form-control",
                     "rows": 4,
-                    "placeholder": (
-                        "Internal notes for Hands-On Health staff..."
-                    ),
+                    "placeholder": "Internal notes for Hands-On Health staff...",
                 }
             ),
-
-            # ------------------------------------------------
-            # STATUS
-            # ------------------------------------------------
 
             "status": forms.Select(
                 attrs={
@@ -231,8 +221,8 @@ class HomeCareRequestForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        # Only display active services
         if "services" in self.fields:
+
             self.fields["services"].queryset = (
                 Service.objects
                 .filter(is_active=True)
@@ -249,6 +239,7 @@ class HomeCareRequestForm(forms.ModelForm):
 class CaregiverAssignmentForm(forms.ModelForm):
 
     class Meta:
+
         model = CaregiverAssignment
 
         fields = "__all__"
@@ -286,6 +277,7 @@ class CaregiverAssignmentForm(forms.ModelForm):
 class CaregiverDailyReportForm(forms.ModelForm):
 
     class Meta:
+
         model = CaregiverDailyReport
 
         fields = "__all__"
@@ -362,6 +354,7 @@ class CaregiverDailyReportForm(forms.ModelForm):
 class CaregiverPaymentForm(forms.ModelForm):
 
     class Meta:
+
         model = CaregiverPayment
 
         fields = "__all__"
@@ -419,14 +412,16 @@ class CaregiverPaymentForm(forms.ModelForm):
                 }
             ),
         }
-    from django import forms
 
-from homecare.models import Caregiver
 
+# ============================================================
+# STAFF CAREGIVER INVITATION FORM
+# ============================================================
 
 class StaffCaregiverInviteForm(forms.ModelForm):
 
     class Meta:
+
         model = Caregiver
 
         fields = [
@@ -438,18 +433,21 @@ class StaffCaregiverInviteForm(forms.ModelForm):
         ]
 
         widgets = {
+
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Caregiver full name",
                 }
             ),
+
             "professional_title": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "e.g. Registered Nurse",
                 }
             ),
+
             "specialization": forms.TextInput(
                 attrs={
                     "class": "form-control",
@@ -458,12 +456,14 @@ class StaffCaregiverInviteForm(forms.ModelForm):
                     ),
                 }
             ),
+
             "phone": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Phone number",
                 }
             ),
+
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
@@ -473,6 +473,5 @@ class StaffCaregiverInviteForm(forms.ModelForm):
         }
 
     def clean_email(self):
-        email = self.cleaned_data["email"].strip().lower()
 
-        return email
+        return self.cleaned_data["email"].strip().lower()

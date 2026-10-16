@@ -1,9 +1,10 @@
 from django import forms
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-
+from accounts.models import User
 from homecare.models import Caregiver
 
 
@@ -303,3 +304,26 @@ class CaregiverInvitationRegistrationForm(forms.Form):
                 )
 
         return cleaned_data
+# ============================================================
+# CAREGIVER PASSWORD RESET FORM
+# ============================================================
+
+class CaregiverPasswordResetForm(PasswordResetForm):
+
+    def get_users(self, email):
+
+        users = super().get_users(email)
+
+        for user in users:
+
+            if user.role != User.Role.CAREGIVER:
+                continue
+
+            if not Caregiver.objects.filter(
+                user=user,
+                verification_status=Caregiver.VerificationStatus.APPROVED,
+                is_active=True,
+            ).exists():
+                continue
+
+            yield user

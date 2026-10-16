@@ -852,14 +852,24 @@
 
         {% csrf_token %}
 
+{% if form.errors %}
+<div
+    style="padding: 15px; margin-bottom: 20px; background: #fff1f2; color: #991b1b; border: 1px solid #fecdd3; border-radius: 8px;">
+    <strong>Please correct the following errors:</strong>
 
-        <!-- DISPLAY NON-FIELD ERRORS -->
-        {% if form.non_field_errors %}
-        <div class="django-errors">
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
+    <ul>
+        {% for field in form %}
+        {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
 
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 
         <!-- SECTION 1 -->
         <section class="form-section">
@@ -1085,35 +1095,89 @@
 
             <div class="row g-4">
 
+           
                 <!-- ICON -->
                 <div class="col-md-8">
-
-                    <label class="form-label" for="id_icon">
+                
+                    <label class="form-label" for="id_icon_class">
                         Icon Class
+                        <span style="color:#7b8b9c;font-weight:400;">
+                            (Optional)
+                        </span>
                     </label>
-
+                
                     <div class="input-icon">
-
+                
                         <i class="fas fa-icons"></i>
-
-                        {{ form.icon }}
-
+                
+                        {{ form.icon_class }}
+                
                     </div>
-
+                
                     <div class="form-help">
-                        Example:
-                        <strong>fas fa-heart-pulse</strong>
+                        Enter a Font Awesome icon class.
+                        Leave empty to use the default heart icon.
                     </div>
-
-                    {% for error in form.icon.errors %}
+                
+                    <!-- LIVE ICON PREVIEW -->
+                    <div style="
+                        display:flex;
+                        align-items:center;
+                        gap:14px;
+                        margin-top:14px;
+                        padding:14px;
+                        background:#f4faff;
+                        border:1px solid #dcebf4;
+                        border-radius:12px;
+                    ">
+                
+                        <div style="
+                            width:52px;
+                            height:52px;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            border-radius:12px;
+                            background:#eaf6fd;
+                            color:#0879bd;
+                            font-size:24px;
+                        ">
+                
+                            <i id="serviceIconPreview" class="fa-solid fa-heart-pulse">
+                            </i>
+                
+                        </div>
+                
+                        <div>
+                
+                            <div style="
+                                font-size:13px;
+                                font-weight:700;
+                                color:#102a43;
+                            ">
+                                Icon Preview
+                            </div>
+                
+                            <div id="serviceIconClassText" style="
+                                    font-size:12px;
+                                    color:#7b8b9c;
+                                    margin-top:3px;
+                                ">
+                                fa-solid fa-heart-pulse
+                            </div>
+                
+                        </div>
+                
+                    </div>
+                
+                    {% for error in form.icon_class.errors %}
                     <div class="field-error">
                         <i class="fas fa-circle-exclamation"></i>
                         {{ error }}
                     </div>
                     {% endfor %}
-
+                
                 </div>
-
 
                 <!-- ORDER -->
                 <div class="col-md-4">
@@ -1602,6 +1666,53 @@
 
         }
 
+    /* ============================================================
+       LIVE SERVICE ICON PREVIEW
+    ============================================================ */
+
+        const iconClassInput =
+            document.getElementById("id_icon_class");
+
+        const serviceIconPreview =
+            document.getElementById("serviceIconPreview");
+
+        const serviceIconClassText =
+            document.getElementById("serviceIconClassText");
+
+        const defaultServiceIcon =
+            "fa-solid fa-heart-pulse";
+
+        function updateServiceIconPreview() {
+
+            if (
+                !iconClassInput ||
+                !serviceIconPreview ||
+                !serviceIconClassText
+            ) {
+                return;
+            }
+
+            const enteredIcon =
+                iconClassInput.value.trim();
+
+            const selectedIcon =
+                enteredIcon || defaultServiceIcon;
+
+            serviceIconPreview.className = selectedIcon;
+
+            serviceIconClassText.textContent = selectedIcon;
+        }
+
+        if (iconClassInput) {
+
+            iconClassInput.addEventListener(
+                "input",
+                updateServiceIconPreview
+            );
+
+            updateServiceIconPreview();
+        }
+    
     });
 </script>
 

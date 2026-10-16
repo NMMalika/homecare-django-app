@@ -1,6 +1,10 @@
-from django.urls import path
+
+from django.urls import path, reverse_lazy
+from django.contrib.auth import views as auth_views
 
 from . import views
+from .forms import CaregiverPasswordResetForm
+
 from homecare import views as homecare_views
 
 
@@ -8,6 +12,7 @@ app_name = "caregivers"
 
 
 urlpatterns = [
+
     # =========================================================
     # AUTHENTICATION
     # =========================================================
@@ -18,18 +23,65 @@ urlpatterns = [
         name="login",
     ),
 
-   
-    
     path(
-    "register/<str:token>/",
-    views.caregiver_register_invitation,
-    name="register_invitation",
-),
+        "register/<str:token>/",
+        views.caregiver_register_invitation,
+        name="register_invitation",
+    ),
 
     path(
         "logout/",
         views.caregiver_logout,
         name="logout",
+    ),
+
+    # =========================================================
+    # CAREGIVER PASSWORD RESET
+    # =========================================================
+
+    # STEP 1: Enter email address
+    path(
+        "password-reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="caregivers/password_reset.html",
+            email_template_name="caregivers/emails/password_reset_email.txt",
+            subject_template_name="caregivers/emails/password_reset_subject.txt",
+            form_class=CaregiverPasswordResetForm,
+            success_url=reverse_lazy(
+                "caregivers:password_reset_done"
+            ),
+        ),
+        name="password_reset",
+    ),
+
+    # STEP 2: Email sent confirmation
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="caregivers/password_reset_done.html",
+        ),
+        name="password_reset_done",
+    ),
+
+    # STEP 3: Open secure link and enter new password
+    path(
+        "password-reset/confirm/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="caregivers/password_reset_confirm.html",
+            success_url=reverse_lazy(
+                "caregivers:password_reset_complete"
+            ),
+        ),
+        name="password_reset_confirm",
+    ),
+
+    # STEP 4: Password successfully changed
+    path(
+        "password-reset/complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="caregivers/password_reset_complete.html",
+        ),
+        name="password_reset_complete",
     ),
 
     # =========================================================
@@ -114,4 +166,5 @@ urlpatterns = [
         homecare_views.caregiver_weekly_summary,
         name="weekly_summary",
     ),
+
 ]
