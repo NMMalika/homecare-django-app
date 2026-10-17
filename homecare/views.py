@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
 
 from core.models import SiteSettings
 
@@ -40,7 +41,9 @@ from .models import (
     Consultation,
     ConsultationAttachment,
     ConsultationSlot,
+  
 )
+from services.models import Service
 
 logger = logging.getLogger(__name__)
 
@@ -833,11 +836,13 @@ Kind regards,
 # CONSULTATION QUOTATION
 # ============================================================
 
+# ============================================================
+# CONSULTATION / BOOK APPOINTMENT QUOTATION
+# ============================================================
+
 @login_required
-def create_consultation_quotation(
-    request,
-    consultation_id,
-):
+@require_http_methods(["GET", "POST"])
+def create_consultation_quotation(request, consultation_id):
 
     if not _user_is_admin_or_superuser(request.user):
         raise Http404
@@ -847,86 +852,279 @@ def create_consultation_quotation(
         pk=consultation_id,
     )
 
+    # ========================================================
+    # PREVENT DUPLICATE QUOTATIONS
+    # ========================================================
+
     if hasattr(consultation, "quotation"):
+
         messages.warning(
             request,
-            "A quotation already exists for this consultation.",
+            "A quotation already exists for this appointment.",
         )
+
         return redirect(
             "admin:homecare_consultation_change",
-            consultation.id,
+            consultation.pk,
         )
 
-    quotation_instance = Quotation(consultation=consultation)
+    # ========================================================
+    # PREPARE QUOTATION
+    # ========================================================
+
+    quotation_instance = Quotation(
+        consultation=consultation,
+    )
+
+    # ========================================================
+    # GET SERVICES SELECTED DURING APPOINTMENT BOOKING
+    # ========================================================
+
+    selected_services = consultation.services or []
+
+    if isinstance(selected_services, str):
+        selected_services = [
+            value.strip()
+            for value in selected_services.split(",")
+            if value.strip()
+        ]
+
+    if not isinstance(selected_services, (list, tuple)):
+        selected_services = []
+
+    # The appointment form submits Service primary keys.
+    service_ids = []
+
+    for value in selected_services:
+
+        try:
+            service_ids.append(int(value))
+        except (TypeError, ValueError):
+            continue
+
+    services_by_id = Service.objects.in_bulk(service_ids)
+
+    # ========================================================
+    # POST: SAVE QUOTATION AND LINE ITEMS
+    # ========================================================
 
     if request.method == "POST":
+
         form = QuotationForm(
             request.POST,
             instance=quotation_instance,
         )
 
-        if form.is_valid():
-            quotation = form.save(commit=False)
-            now = timezone.now()
+        item_formset = QuotationItemFormSet(
+            request.POST,
+            instance=quotation_instance,
+        )
 
-            quotation.sent_at = now
-            quotation.payment_deadline = now + timedelta(hours=24)
-            quotation.payment_status = Quotation.PaymentStatus.PENDING
-            quotation.save()
-
-            consultation.status = Consultation.Status.PAYMENT_PENDING
-            consultation.save(update_fields=["status", "updated_at"])
-
-            quotation_url = request.build_absolute_uri(
-                reverse(
-                    "homecare:quotation_detail",
-                    kwargs={"token": quotation.access_token},
-                )
-            )
+        if form.is_valid() and item_formset.is_valid():
 
             try:
-                send_consultation_quotation_email(quotation, quotation_url)
-                messages.success(
-                    request,
-                    "Consultation quotation created and sent to the patient.",
-                )
-            except Exception as e:
-                logger.exception("Consultation quotation email failed.")
-                messages.warning(
-                    request,
-                    f"Quotation was created, but email failed: {e}",
+
+                with transaction.atomic():
+
+                    quotation = form.save(commit=False)
+
+                    quotation.consultation = consultation
+
+                    quotation.payment_status = (
+                        Quotation.PaymentStatus.PENDING
+                    )
+
+                    now = timezone.now()
+
+                    quotation.sent_at = now
+
+                    quotation.payment_deadline = (
+                        now + timedelta(hours=24)
+                    )
+
+                    quotation.base_amount = Decimal("0.00")
+                    quotation.amount = Decimal("0.00")
+
+                    quotation.save()
+
+                    # ----------------------------------------
+                    # SAVE QUOTATION SERVICES
+                    # ----------------------------------------
+
+                    items = item_formset.save(commit=False)
+
+                    for item in items:
+
+                        item.quotation = quotation
+
+                        if item.service:
+
+                            if not (item.name or "").strip():
+                                item.name = item.service.name
+
+                        else:
+
+                            item.name = (
+                                item.name or ""
+                            ).strip()
+
+                            if not item.name:
+                                raise ValueError(
+                                    "Every custom service must have a name."
+                                )
+
+                        item.line_total = item.calculate_total()
+
+                        item.save()
+
+                    # ----------------------------------------
+                    # CALCULATE TOTALS ON SERVER
+                    # ----------------------------------------
+
+                    quotation.base_amount = (
+                        quotation.calculate_items_total()
+                    )
+
+                    quotation.amount = (
+                        quotation.calculate_total()
+                    )
+
+                    quotation.save(
+                        update_fields=[
+                            "base_amount",
+                            "amount",
+                            "updated_at",
+                        ]
+                    )
+
+                    # ----------------------------------------
+                    # UPDATE APPOINTMENT STATUS
+                    # ----------------------------------------
+
+                    consultation.status = (
+                        Consultation.Status.PAYMENT_PENDING
+                    )
+
+                    consultation.save(
+                        update_fields=[
+                            "status",
+                            "updated_at",
+                        ]
+                    )
+
+                # ============================================
+                # CREATE SECURE QUOTATION LINK
+                # ============================================
+
+                quotation_url = request.build_absolute_uri(
+                    reverse(
+                        "homecare:quotation_detail",
+                        kwargs={
+                            "token": quotation.access_token,
+                        },
+                    )
                 )
 
-            return redirect(
-                "admin:homecare_consultation_change",
-                consultation.id,
+                # ============================================
+                # SEND EMAIL
+                # ============================================
+
+                try:
+
+                    send_consultation_quotation_email(
+                        quotation,
+                        quotation_url,
+                    )
+
+                    messages.success(
+                        request,
+                        "Appointment quotation saved and sent "
+                        "successfully to the patient.",
+                    )
+
+                except Exception as email_error:
+
+                    logger.exception(
+                        "Failed to send appointment quotation email."
+                    )
+
+                    messages.warning(
+                        request,
+                        "The appointment quotation was saved "
+                        "successfully, but the email could not "
+                        f"be sent: {email_error}",
+                    )
+
+                return redirect(
+                    "admin:homecare_consultation_change",
+                    consultation.pk,
+                )
+
+            except ValueError as error:
+
+                messages.error(
+                    request,
+                    str(error),
+                )
+
+        else:
+
+            messages.error(
+                request,
+                "Please correct the quotation form errors below.",
             )
 
+    # ========================================================
+    # GET: AUTOMATICALLY POPULATE SELECTED SERVICES
+    # ========================================================
+
     else:
+
         form = QuotationForm(
             instance=quotation_instance,
             initial={
-                "base_amount": 0,
-                "transportation_fee": 0,
-                "discount_amount": 0,
-                "amount": 0,
-                "description": (
-                    "Consultation Services:\n"
-                    f"{consultation.services or 'Consultation'}"
-                ),
+                "transportation_fee": Decimal("0.00"),
+                "discount_amount": Decimal("0.00"),
+                "description": "",
             },
         )
+
+        initial_items = []
+
+        for service_id in service_ids:
+
+            service = services_by_id.get(service_id)
+
+            if service is None:
+                continue
+
+            initial_items.append({
+                "service": service.pk,
+                "name": service.name,
+                "description": "",
+                "quantity": Decimal("1.00"),
+                "unit_price": service.price,
+            })
+
+        item_formset = QuotationItemFormSet(
+            instance=quotation_instance,
+            initial=initial_items,
+        )
+
+    # ========================================================
+    # DISPLAY QUOTATION FORM
+    # ========================================================
 
     return render(
         request,
         "homecare/quotation_form.html",
         {
             "form": form,
+            "item_formset": item_formset,
             "consultation": consultation,
             "is_consultation": True,
         },
     )
-
 
 def send_consultation_quotation_email(
     quotation,
@@ -2437,6 +2635,24 @@ def patient_telemedicine(
             "room_name": consultation.room_name,
         },
     )
+
+def patient_telemedicine_status(request, token):
+    consultation = get_object_or_404(
+        Consultation,
+        patient_access_token=token,
+    )
+
+    if consultation.status == Consultation.Status.SCHEDULED:
+        status = "waiting"
+    elif consultation.status == Consultation.Status.IN_PROGRESS:
+        status = "active"
+    else:
+        status = "ended"
+
+    return JsonResponse({
+        "status": status,
+    })
+
 
 
 # ============================================================

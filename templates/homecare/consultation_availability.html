@@ -1,283 +1,309 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Select Consultation Time | Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .slot-selection-wrapper {
+        min-height: 85vh;
+        background-color: #f8fafc;
+        padding: 3rem 1rem;
+    }
+
+    .slot-selection-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        padding: 2.5rem 2rem;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    @media (min-width: 768px) {
+        .slot-selection-card {
+            padding: 3.5rem 3rem;
+        }
+    }
+
+    /* Hero Icon & Badges */
+    .hero-icon-badge {
+        width: 72px;
+        height: 72px;
+        background-color: #eff6ff;
+        color: #2563eb;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        box-shadow: 0 0 0 8px #f0f9ff;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Patient Info Card */
+    .patient-info-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .patient-metric-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .patient-metric-value {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: block;
+        word-break: break-word;
+    }
+
+    /* Date Group Headers */
+    .date-group-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Slot Card Modern Interactive Styling */
+    .slot-card {
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .slot-card:hover {
+        border-color: #2563eb;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px -8px rgba(37, 99, 235, 0.15);
+    }
+
+    .slot-time-badge {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.25rem;
+    }
+
+    .slot-duration {
+        font-size: 0.8125rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-select-slot {
+        width: 100%;
+        height: 42px;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s;
+    }
+
+    .btn-select-slot:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+    }
+
+    /* Notice Alert */
+    .notice-box {
+        background-color: #eff6ff;
+        border-left: 4px solid #2563eb;
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        text-align: left;
+        margin-top: 2rem;
+    }
+
+    /* Empty State */
+    .empty-state-box {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .text-slate-800 {
+        color: #0f172a !important;
+    }
+
+    .text-slate-600 {
+        color: #475569 !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<div class="container py-5">
-
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-
-    <div class="text-center mb-4">
-
-        <h2 class="fw-bold">
-            Choose Your Consultation Time
-        </h2>
-
-        <p class="text-muted">
-            Please select one of the available consultation
-            times below.
-        </p>
-
-    </div>
-
-
-    <!-- =====================================================
-         PATIENT INFORMATION
-    ====================================================== -->
-
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body p-4">
-
-            <h5 class="fw-bold mb-3">
-                Patient Information
-            </h5>
-
-            <div class="row">
-
-                <div class="col-md-6 mb-2">
-
-                    <strong>Name:</strong>
-
-                    {{ consultation.first_name }}
-                    {{ consultation.last_name }}
-
-                </div>
-
-
-                <div class="col-md-6 mb-2">
-
-                    <strong>Phone:</strong>
-
-                    {{ consultation.phone }}
-
-                </div>
-
-
-                <div class="col-md-6 mb-2">
-
-                    <strong>Email:</strong>
-
-                    {{ consultation.email }}
-
-                </div>
-
-
-                <div class="col-md-6 mb-2">
-
-                    <strong>Consultation:</strong>
-
-                    Telemedicine
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         AVAILABLE SLOTS
-    ====================================================== -->
-
-    <div class="card shadow-sm border-0">
-
-        <div class="card-body p-4">
-
-            <h4 class="fw-bold mb-2">
-                Available Consultation Slots
-            </h4>
-
-            <p class="text-muted mb-4">
-
-                Select one available date and time below.
-                Your consultation will be confirmed after
-                you select a slot.
-
-            </p>
-
-
-            {% if slots %}
-
-            {% regroup slots by date as slots_by_date %}
-
-
-            {% for date_group in slots_by_date %}
-
-            <!-- =================================================
-                         DATE
-                    ================================================== -->
-
-            <div class="mb-4">
-
-                <div class="border-bottom pb-2 mb-3">
-
-                    <h5 class="fw-bold mb-0">
-
-                        {{ date_group.grouper|date:"l, d F Y" }}
-
-                    </h5>
-
-                </div>
-
-
-                <!-- =============================================
-                             TIMES
-                        ============================================== -->
-
-                <div class="row g-3">
-
-
-                    {% for slot in date_group.list %}
-
-
-                    {% if slot.is_available and not slot.is_selected %}
-
-
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-
-                        <div class="card h-100 border shadow-sm">
-
-                            <div class="card-body text-center">
-
-
-                                <!-- CLOCK -->
-
-                                <div class="mb-2">
-
-                                    <span style="
-                                                            font-size: 32px;
-                                                            color: #0d4f7c;
-                                                        ">
-                                        🕐
-                                    </span>
-
-                                </div>
-
-
-                                <!-- TIME -->
-
-                                <h5 class="fw-bold mb-1">
-
-                                    {{ slot.time|time:"h:i A" }}
-
-                                </h5>
-
-
-                                <!-- DURATION -->
-
-                                <p class="text-muted mb-3">
-
-                                    {{ slot.duration_minutes }}
-                                    minutes
-
-                                </p>
-
-
-                                <!-- SELECT -->
-
-                                <form method="post"
-                                    action="{% url 'homecare:select_consultation_slot' consultation.booking_token slot.id %}">
-
-                                    {% csrf_token %}
-
-
-                                    <button type="submit" class="btn btn-primary w-100">
-
-                                        Select Slot
-
-                                    </button>
-
-                                </form>
-
-
+<section class="slot-selection-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+
+                <div class="slot-selection-card text-center">
+
+                    <!-- Hero Header -->
+                    <div class="hero-icon-badge mx-auto">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+
+                    <h1 class="h3 fw-bold text-slate-800 mb-2">
+                        Choose Your Consultation Time
+                    </h1>
+
+                    <p class="text-slate-600 fs-6 mb-4 px-md-3">
+                        Please review the patient profile below and select a preferred appointment time.
+                    </p>
+
+                    <!-- Patient Summary Card -->
+                    <div class="patient-info-box text-start">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <span class="patient-metric-label">Patient Name</span>
+                                <span class="patient-metric-value">
+                                    {{ consultation.first_name }} {{ consultation.last_name }}
+                                </span>
                             </div>
+                            <div class="col-6 col-md-3">
+                                <span class="patient-metric-label">Phone</span>
+                                <span class="patient-metric-value">
+                                    {{ consultation.phone|default:"—" }}
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <span class="patient-metric-label">Email</span>
+                                <span class="patient-metric-value">
+                                    {{ consultation.email|default:"—" }}
+                                </span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <span class="patient-metric-label">Type</span>
+                                <span class="patient-metric-value text-primary">
+                                    <i class="fa-solid fa-laptop-medical"></i> Telemedicine
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Available Slots Section -->
+                    {% if slots %}
+
+                    {% regroup slots by date as slots_by_date %}
+
+                    {% for date_group in slots_by_date %}
+                    <div class="mb-4 text-start">
+
+                        <!-- Date Header -->
+                        <div class="date-group-header">
+                            <i class="fa-regular fa-calendar-days text-primary"></i>
+                            <span>{{ date_group.grouper|date:"l, d F Y" }}</span>
+                        </div>
+
+                        <!-- Time Grid -->
+                        <div class="row g-3">
+                            {% for slot in date_group.list %}
+                            {% if slot.is_available and not slot.is_selected %}
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="slot-card">
+                                    <div class="slot-time-badge">
+                                        {{ slot.time|time:"h:i A" }}
+                                    </div>
+                                    <div class="slot-duration">
+                                        <i class="fa-regular fa-clock"></i> {{ slot.duration_minutes }} Minutes
+                                    </div>
+
+                                    <form method="post"
+                                        action="{% url 'homecare:select_consultation_slot' consultation.booking_token slot.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-select-slot">
+                                            <i class="fa-solid fa-check"></i> Select Slot
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
                         </div>
 
                     </div>
+                    {% endfor %}
 
+                    <!-- Important Notice -->
+                    <div class="notice-box">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fa-solid fa-circle-info text-primary fs-5 flex-shrink-0"></i>
+                            <div class="small text-slate-600">
+                                <strong>Important:</strong> Please select only one consultation time. Once confirmed,
+                                all other pending slots for this consultation will automatically be released.
+                            </div>
+                        </div>
+                    </div>
+
+                    {% else %}
+
+                    <!-- Empty State -->
+                    <div class="empty-state-box">
+                        <div class="empty-icon mx-auto">
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                        </div>
+                        <h4 class="h5 fw-bold text-slate-800 mb-2">No Slots Available</h4>
+                        <p class="text-slate-600 small mb-0">
+                            There are currently no open consultation times. Please contact Hands-On Health support for
+                            assistance with scheduling.
+                        </p>
+                    </div>
 
                     {% endif %}
 
-
-                    {% endfor %}
-
-
                 </div>
 
             </div>
-
-
-            {% endfor %}
-
-
-            {% else %}
-
-            <!-- =================================================
-                     NO SLOTS
-                ================================================== -->
-
-            <div class="text-center py-5">
-
-                <div style="
-                            font-size: 50px;
-                            margin-bottom: 15px;
-                        ">
-                    📅
-                </div>
-
-
-                <h5 class="fw-bold">
-
-                    No Consultation Slots Available
-
-                </h5>
-
-
-                <p class="text-muted">
-
-                    There are currently no available
-                    consultation times.
-
-                    Please contact Hands-On Health
-                    for assistance.
-
-                </p>
-
-            </div>
-
-            {% endif %}
-
         </div>
-
     </div>
-
-
-    <!-- =====================================================
-         IMPORTANT INFORMATION
-    ====================================================== -->
-
-    {% if slots %}
-
-    <div class="alert alert-info mt-4">
-
-        <strong>Important:</strong>
-
-        Please select only one consultation time.
-
-        Once you select a slot, the other available
-        slots will no longer be available for this
-        consultation.
-
-    </div>
-
-    {% endif %}
-
-
-</div>
-
+</section>
 {% endblock %}

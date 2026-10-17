@@ -668,7 +668,14 @@ Verify Payment #{{ payment.id }} - Hands-On Health Staff
                 </span>
 
                 <span class="info-value" style="font-size: 1rem; font-weight: 700;">
-                    {{ client_name|default:homecare_request.full_name }}
+                    {% if payment.quotation.homecare_request %}
+                    {{ payment.quotation.homecare_request.full_name }}
+                    {% elif payment.quotation.consultation %}
+                    {{ payment.quotation.consultation.first_name }}
+                    {{ payment.quotation.consultation.last_name }}
+                    {% else %}
+                    Customer details unavailable
+                    {% endif %}
                 </span>
 
             </div>
@@ -991,7 +998,14 @@ Verify Payment #{{ payment.id }} - Hands-On Health Staff
                     </span>
 
                     <span class="modal-summary-value">
-                        {{ client_name|default:homecare_request.full_name }}
+                    {% if payment.quotation.homecare_request %}
+                    {{ payment.quotation.homecare_request.full_name }}
+                    {% elif payment.quotation.consultation %}
+                    {{ payment.quotation.consultation.first_name }}
+                    {{ payment.quotation.consultation.last_name }}
+                    {% else %}
+                    Customer details unavailable
+                    {% endif %}
                     </span>
 
                 </div>

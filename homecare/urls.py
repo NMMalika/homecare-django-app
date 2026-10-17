@@ -191,6 +191,12 @@ urlpatterns = [
     ),
 
     path(
+        "telemedicine/patient/<str:token>/status/",
+        views.patient_telemedicine_status,
+        name="patient_telemedicine_status",
+    ),
+
+    path(
         "telemedicine/doctor/<str:token>/",
         views.doctor_telemedicine,
         name="doctor_telemedicine",

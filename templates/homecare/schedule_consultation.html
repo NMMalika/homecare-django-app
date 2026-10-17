@@ -1,91 +1,475 @@
-{% extends "base.html" %}
+{% extends "staff/base.html" %}
+
+{% block title %}Manage Consultation Availability | Hands-On Health{% endblock %}
 
 {% block content %}
 
-<div class="container py-5">
+<style>
+    .availability-page {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+    }
 
-    <h2 class="fw-bold mb-2">Manage Consultation Availability</h2>
+    .availability-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 2rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
 
-    <p class="text-muted mb-4">
-        Create the available consultation times for the patient.
-        Add all available slots first, then send the availability to the patient.
-    </p>
+    .availability-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
 
+    .availability-header h1 {
+        margin: 0 0 0.375rem;
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+    }
 
-    <!-- PATIENT INFORMATION -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    .availability-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.9375rem;
+    }
 
-            <h5 class="fw-bold mb-3">Patient Information</h5>
+    .panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        margin-bottom: 1.75rem;
+    }
 
-            <div class="row">
+    .panel-header {
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-                <div class="col-md-6 mb-2">
-                    <strong>Name:</strong>
-                    {{ consultation.first_name }}
-                    {{ consultation.last_name }}
-                </div>
+    .panel-header h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-                <div class="col-md-6 mb-2">
-                    <strong>Phone:</strong>
-                    {{ consultation.phone }}
-                </div>
+    .panel-body {
+        padding: 1.75rem;
+    }
 
-                <div class="col-md-6 mb-2">
-                    <strong>Email:</strong>
-                    {{ consultation.email }}
-                </div>
+    /* PATIENT METRICS GRID */
+    .patient-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+    }
 
-                <div class="col-md-6 mb-2">
-                    <strong>Status:</strong>
-                    <span class="badge bg-success">
-                        {{ consultation.get_status_display }}
-                    </span>
-                </div>
+    .patient-metric {
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+    }
 
+    .patient-metric-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .patient-metric-value {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: block;
+        word-break: break-word;
+    }
+
+    /* FORM STYLING */
+    .slot-form-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr 160px;
+        gap: 1.25rem;
+        align-items: end;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control-custom,
+    .form-select-custom {
+        width: 100%;
+        height: 44px;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #ffffff;
+        color: #0f172a;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control-custom:focus,
+    .form-select-custom:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-add-slot {
+        height: 44px;
+        background: #2563eb;
+        color: #ffffff;
+        border: 0;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-add-slot:hover {
+        background: #1d4ed8;
+    }
+
+    /* TABLE STYLING */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .table-custom th {
+        padding: 0.875rem 1.25rem;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .table-custom td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.875rem;
+        color: #1e293b;
+        vertical-align: middle;
+    }
+
+    .table-custom tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .table-custom tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    /* STATUS PILLS */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-badge.selected {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #d1fae5;
+    }
+
+    .status-badge.available {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #dbeafe;
+    }
+
+    .status-badge.unavailable {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-remove {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fee2e2;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-remove:hover {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* NOTIFY CARD */
+    .notify-banner {
+        background: linear-gradient(to right, #eff6ff, #f8fafc);
+        border: 1px solid #dbeafe;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .btn-send-availability {
+        background: #059669;
+        color: #ffffff;
+        border: 0;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+        transition: background-color 0.2s, transform 0.1s;
+        white-space: nowrap;
+    }
+
+    .btn-send-availability:hover {
+        background: #047857;
+    }
+
+    /* WORKFLOW ALERT */
+    .workflow-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #2563eb;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .workflow-card h6 {
+        margin: 0 0 1rem;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .workflow-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .workflow-step-item {
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 0.5rem;
+        padding: 0.875rem;
+        font-size: 0.8125rem;
+        color: #334155;
+        position: relative;
+    }
+
+    .workflow-step-num {
+        font-weight: 800;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        text-align: center;
+        padding: 3.5rem 1.5rem;
+    }
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    @media (max-width: 900px) {
+        .slot-form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .notify-banner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-send-availability {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .slot-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="availability-page">
+
+    <!-- PAGE HEADER -->
+    <div class="availability-header">
+        <div>
+            <div class="availability-kicker">
+                <i class="fa-solid fa-calendar-check"></i> Consultation Management
             </div>
-
+            <h1>Manage Consultation Availability</h1>
+            <p>
+                Configure available consultation times for the patient. Add all target slots first, then dispatch
+                availability for patient selection.
+            </p>
         </div>
     </div>
 
 
-    <!-- ADD SLOT -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    <!-- PATIENT INFORMATION PANEL -->
+    <div class="panel">
+        <div class="panel-header">
+            <h2>
+                <i class="fa-solid fa-user-circle text-primary"></i> Patient Information
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="patient-grid">
+                <div class="patient-metric">
+                    <span class="patient-metric-label">Full Name</span>
+                    <span class="patient-metric-value">
+                        {{ consultation.first_name }} {{ consultation.last_name }}
+                    </span>
+                </div>
 
-            <h5 class="fw-bold mb-3">
-                Add Available Consultation Slot
-            </h5>
+                <div class="patient-metric">
+                    <span class="patient-metric-label">Phone Contact</span>
+                    <span class="patient-metric-value">
+                        {{ consultation.phone|default:"—" }}
+                    </span>
+                </div>
 
+                <div class="patient-metric">
+                    <span class="patient-metric-label">Email Address</span>
+                    <span class="patient-metric-value">
+                        {{ consultation.email|default:"—" }}
+                    </span>
+                </div>
+
+                <div class="patient-metric">
+                    <span class="patient-metric-label">Current Status</span>
+                    <span class="patient-metric-value">
+                        <span class="status-badge selected">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ consultation.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ADD SLOT PANEL -->
+    <div class="panel">
+        <div class="panel-header">
+            <h2>
+                <i class="fa-solid fa-plus-circle text-primary"></i> Add Available Consultation Slot
+            </h2>
+        </div>
+        <div class="panel-body">
             <form method="post">
                 {% csrf_token %}
-
-                <div class="row g-3">
-
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">
-                            Date
-                        </label>
-
-                        <input type="date" name="date" class="form-control" required>
+                <div class="slot-form-grid">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" class="form-control-custom" min="{% now 'Y-m-d' %}" required>
                     </div>
 
-
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            Time
-                        </label>
-
-                        <input type="time" name="time" class="form-control" required>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" name="time" class="form-control-custom" required>
                     </div>
 
-
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">
-                            Duration
-                        </label>
-
-                        <select name="duration_minutes" class="form-select" required>
+                    <div class="form-group">
+                        <label>Duration</label>
+                        <select name="duration_minutes" class="form-select-custom" required>
                             <option value="15">15 minutes</option>
                             <option value="30" selected>30 minutes</option>
                             <option value="45">45 minutes</option>
@@ -94,230 +478,152 @@
                         </select>
                     </div>
 
-
-                    <div class="col-md-2 d-flex align-items-end">
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            Add Slot
-                        </button>
-
-                    </div>
-
+                    <button type="submit" class="btn-add-slot">
+                        <i class="fa-solid fa-plus"></i> Add Slot
+                    </button>
                 </div>
-
             </form>
-
         </div>
     </div>
 
 
-    <!-- CONSULTATION SLOTS -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
+    <!-- CONSULTATION SLOTS LIST PANEL -->
+    <div class="panel">
+        <div class="panel-header">
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left text-primary"></i> Consultation Slots
+            </h2>
+            <span class="status-badge available" style="font-size: 0.8125rem;">
+                {{ slots|length }} slot{{ slots|length|pluralize }} configured
+            </span>
+        </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-
-                <h5 class="fw-bold mb-0">
-                    Consultation Slots
-                </h5>
-
-                <span class="badge bg-primary">
-                    {{ slots|length }} slot{{ slots|length|pluralize }}
-                </span>
-
-            </div>
-
-
+        <div class="panel-body" style="padding: 0;">
             {% if slots %}
-
             <div class="table-responsive">
-
-                <table class="table table-bordered align-middle">
-
-                    <thead class="table-light">
-
+                <table class="table-custom">
+                    <thead>
                         <tr>
                             <th>Date</th>
                             <th>Time</th>
                             <th>Duration</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
-
                     </thead>
-
                     <tbody>
-
                         {% for slot in slots %}
-
                         <tr>
-
                             <td>
-                                {{ slot.date|date:"l, d F Y" }}
+                                <strong>{{ slot.date|date:"l, d F Y" }}</strong>
                             </td>
-
                             <td>
                                 {{ slot.time|time:"h:i A" }}
                             </td>
-
                             <td>
-                                {{ slot.duration_minutes }} minutes
+                                {{ slot.duration_minutes }} mins
                             </td>
-
                             <td>
-
                                 {% if slot.is_selected %}
-
-                                <span class="badge bg-success">
-                                    Selected
+                                <span class="status-badge selected">
+                                    <i class="fa-solid fa-lock"></i> Selected
                                 </span>
-
                                 {% elif slot.is_available %}
-
-                                <span class="badge bg-primary">
-                                    Available
+                                <span class="status-badge available">
+                                    <i class="fa-solid fa-circle-dot"></i> Available
                                 </span>
-
                                 {% else %}
-
-                                <span class="badge bg-secondary">
-                                    Unavailable
+                                <span class="status-badge unavailable">
+                                    <i class="fa-solid fa-ban"></i> Unavailable
                                 </span>
-
                                 {% endif %}
-
                             </td>
-
-                            <td>
-
+                            <td style="text-align: right;">
                                 {% if slot.is_selected %}
-
-                                <span class="text-muted">
-                                    Locked
-                                </span>
-
+                                <span class="text-muted small fw-semibold">Locked</span>
                                 {% else %}
-
                                 <form method="post" action="{% url 'homecare:delete_consultation_slot' slot.id %}"
-                                    onsubmit="return confirm('Remove this consultation slot?');">
-
+                                    onsubmit="return confirm('Remove this consultation slot?');"
+                                    style="display: inline-block;">
                                     {% csrf_token %}
-
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        Remove
+                                    <button type="submit" class="btn-remove">
+                                        <i class="fa-solid fa-trash-can"></i> Remove
                                     </button>
-
                                 </form>
-
                                 {% endif %}
-
                             </td>
-
                         </tr>
-
                         {% endfor %}
-
                     </tbody>
-
                 </table>
-
             </div>
 
-
-            <!-- SEND AVAILABILITY -->
-
-            <div class="mt-4 p-3 bg-light border rounded">
-
-                <div class="d-flex justify-content-between align-items-center">
-
+            <!-- SEND AVAILABILITY BANNER -->
+            <div style="padding: 1.5rem;">
+                <div class="notify-banner">
                     <div>
-
-                        <h6 class="fw-bold mb-1">
+                        <h4 style="margin: 0 0 0.25rem; font-size: 0.9375rem; font-weight: 700; color: #0f172a;">
                             Ready to notify the patient?
-                        </h6>
-
-                        <p class="text-muted mb-0">
-                            The patient will receive a secure link
-                            to choose one of these available slots.
+                        </h4>
+                        <p style="margin: 0; font-size: 0.8125rem; color: #475569;">
+                            The patient will receive an automated email notification containing a secure link to pick
+                            their preferred time slot.
                         </p>
-
                     </div>
 
-
                     <form method="post" action="{% url 'homecare:send_consultation_availability' consultation.id %}">
-
                         {% csrf_token %}
-
-                        <button type="submit" class="btn btn-success">
-                            Send Availability
+                        <button type="submit" class="btn-send-availability">
+                            <i class="fa-solid fa-paper-plane"></i> Send Availability
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
-
 
             {% else %}
-
-            <div class="text-center py-5">
-
-                <div style="font-size: 48px;">
-                    📅
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-calendar-plus"></i>
                 </div>
-
-                <h5 class="mt-3">
+                <h3 style="margin: 0 0 0.375rem; font-size: 1rem; font-weight: 700; color: #0f172a;">
                     No consultation slots created yet
-                </h5>
-
-                <p class="text-muted">
-                    Add the available consultation dates and times
-                    above before sending availability.
+                </h3>
+                <p style="margin: 0; font-size: 0.8125rem; color: #64748b;">
+                    Add available consultation dates and times above before dispatching availability to the patient.
                 </p>
-
             </div>
-
             {% endif %}
-
         </div>
     </div>
 
 
-    <!-- WORKFLOW -->
-
-    <div class="alert alert-info">
-
-        <strong>Appointment Workflow</strong>
-
-        <ol class="mb-0 mt-2">
-
-            <li>
-                Add the available consultation dates and times.
+    <!-- WORKFLOW INFORMATIONAL BOX -->
+    <div class="workflow-card">
+        <h6>
+            <i class="fa-solid fa-circle-info text-primary"></i> Appointment Scheduling Workflow
+        </h6>
+        <ul class="workflow-steps">
+            <li class="workflow-step-item">
+                <span class="workflow-step-num">STEP 1</span>
+                Define available consultation dates and times.
             </li>
-
-            <li>
-                Review the slots.
+            <li class="workflow-step-item">
+                <span class="workflow-step-num">STEP 2</span>
+                Verify all listed time slots.
             </li>
-
-            <li>
+            <li class="workflow-step-item">
+                <span class="workflow-step-num">STEP 3</span>
                 Click <strong>Send Availability</strong>.
             </li>
-
-            <li>
-                The patient receives an email with the available slots.
+            <li class="workflow-step-item">
+                <span class="workflow-step-num">STEP 4</span>
+                Patient receives invitation via email.
             </li>
-
-            <li>
-                The patient selects one slot.
+            <li class="workflow-step-item">
+                <span class="workflow-step-num">STEP 5</span>
+                Patient selects their preferred slot.
             </li>
-
-            <li>
-                The selected slot becomes the confirmed consultation time.
-            </li>
-
-        </ol>
-
+        </ul>
     </div>
 
 </div>

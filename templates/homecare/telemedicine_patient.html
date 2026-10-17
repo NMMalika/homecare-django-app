@@ -1,206 +1,691 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}
-Telemedicine Consultation | Hands-On Health
-{% endblock %}
+{% block title %}Patient Telemedicine | Hands-On Health{% endblock %}
 
-{% block content %}
-
+{% block extra_css %}
 <style>
     .telemedicine-wrapper {
-        max-width: 1250px;
-        margin: 30px auto;
-        padding: 0 15px;
+        max-width: 1400px;
+        margin: 24px auto 48px;
+        padding: 0 16px;
+        color: #0f172a;
+    }
+
+    .telemedicine-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(15, 23, 42, .08);
     }
 
     .telemedicine-header {
-        background: linear-gradient(135deg, #073b67, #287db5);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 24px;
         color: #fff;
-        padding: 22px 25px;
-        border-radius: 16px 16px 0 0;
+        background: linear-gradient(135deg, #0f172a, #1d4ed8);
     }
 
     .telemedicine-header h1 {
-        margin: 0 0 6px;
-        font-size: 25px;
+        margin: 0 0 8px;
+        color: #fff;
+        font-size: clamp(1.3rem, 3vw, 1.8rem);
+        font-weight: 800;
     }
 
     .telemedicine-header p {
         margin: 0;
-        opacity: .92;
+        color: #dbeafe;
+        font-size: .92rem;
     }
 
-    .consultation-info {
-        display: flex;
+    .security-badge {
+        padding: 9px 14px;
+        border: 1px solid rgba(255, 255, 255, .25);
+        border-radius: 30px;
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        font-size: .83rem;
+        font-weight: 700;
+    }
+
+    .consultation-info-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 20px;
+        padding: 22px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-item {
+        min-width: 0;
+    }
+
+    .info-item-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #64748b;
+        font-size: .74rem;
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+
+    .info-item-value {
+        color: #0f172a;
+        font-size: .95rem;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .waiting-panel {
+        padding: 60px 24px;
+        text-align: center;
+        background: #fff;
+    }
+
+    .waiting-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 82px;
+        height: 82px;
+        margin-bottom: 24px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 2rem;
+        box-shadow: 0 0 0 10px #f8fafc;
+    }
+
+    .waiting-panel h2 {
+        margin: 0 0 12px;
+        color: #0f172a;
+        font-size: 1.55rem;
+        font-weight: 800;
+    }
+
+    .waiting-panel p {
+        max-width: 620px;
+        margin: 0 auto 20px;
+        color: #475569;
+        font-size: .95rem;
+        line-height: 1.7;
+    }
+
+    .waiting-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        border: 1px solid #fde68a;
+        border-radius: 30px;
+        background: #fffbeb;
+        color: #92400e;
+        font-size: .84rem;
+        font-weight: 700;
+    }
+
+    .waiting-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #d97706;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        50% {
+            opacity: .35;
+            transform: scale(.8);
+        }
+    }
+
+    .telemedicine-status-bar {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
         flex-wrap: wrap;
-        gap: 10px 25px;
-        padding: 15px 20px;
-        background: #f5f8fb;
-        border-left: 1px solid #e5eaf0;
-        border-right: 1px solid #e5eaf0;
+        gap: 12px;
+        padding: 14px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #334155;
+        font-size: .88rem;
+        font-weight: 700;
     }
 
-    .consultation-info span {
-        color: #526273;
-        font-size: 14px;
-    }
-
-    .consultation-info strong {
-        color: #073b67;
+    .jitsi-frame-wrapper {
+        width: 100%;
+        height: min(75vh, 760px);
+        min-height: 480px;
+        background: #0f172a;
     }
 
     #jitsi-container {
+        display: none;
         width: 100%;
-        height: 700px;
-        background: #111;
-        overflow: hidden;
-        border-radius: 0 0 16px 16px;
+        height: 100%;
+    }
+
+    #jitsi-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: 0 !important;
+    }
+
+    .patient-error {
+        display: none;
+        margin: 20px 24px;
+        padding: 16px;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        background: #fef2f2;
+        color: #991b1b;
+        font-size: .9rem;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+    }
+
+    .patient-error button {
+        margin-top: 12px;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 8px;
+        background: #991b1b;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
     }
 
     .privacy-notice {
-        margin-top: 15px;
-        padding: 14px 18px;
-        background: #eef8ff;
-        border: 1px solid #cfe8f7;
-        border-radius: 10px;
-        color: #526273;
-        font-size: 13px;
-        line-height: 1.6;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 24px;
+        padding: 18px;
+        border: 1px solid #bae6fd;
+        border-radius: 12px;
+        background: #f0f9ff;
+        color: #075985;
+        font-size: .9rem;
+        line-height: 1.7;
     }
 
-    @media (max-width: 700px) {
+    .privacy-notice i {
+        margin-top: 3px;
+        font-size: 1.2rem;
+    }
+
+    @media (max-width: 640px) {
         .telemedicine-wrapper {
-            margin: 15px auto;
+            margin: 12px auto 24px;
+            padding: 0 8px;
         }
 
-        .telemedicine-header {
-            padding: 18px;
+        .telemedicine-header,
+        .consultation-info-bar,
+        .telemedicine-status-bar {
+            padding: 16px;
         }
 
-        .telemedicine-header h1 {
-            font-size: 21px;
+        .waiting-panel {
+            padding: 42px 16px;
         }
 
-        #jitsi-container {
-            height: 600px;
+        .jitsi-frame-wrapper {
+            height: 65vh;
+            min-height: 420px;
         }
 
-        .consultation-info {
-            display: block;
-        }
-
-        .consultation-info span {
-            display: block;
-            margin-bottom: 6px;
+        .privacy-notice,
+        .patient-error {
+            margin: 16px;
         }
     }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="telemedicine-wrapper">
+    <main class="telemedicine-card">
 
-    ```
-    <div class="telemedicine-header">
-        <h1>Telemedicine Consultation</h1>
-        <p>Hands-On Health</p>
-    </div>
+        <header class="telemedicine-header">
+            <div>
+                <h1>
+                    <i class="fa-solid fa-user-doctor"></i>
+                    Patient Telemedicine Suite
+                </h1>
+                <p>Hands-On Health — Patient Consultation Portal</p>
+            </div>
 
-    <div class="consultation-info">
+            <div class="security-badge">
+                <i class="fa-solid fa-shield-halved"></i>
+                Confidential Consultation
+            </div>
+        </header>
 
-        <span>
-            <strong>Patient:</strong>
-            {{ consultation.first_name }}
-            {{ consultation.last_name }}
-        </span>
+        <section class="consultation-info-bar">
+            <div class="info-item">
+                <span class="info-item-label">Patient Name</span>
+                <div class="info-item-value">
+                    {{ consultation.first_name }} {{ consultation.last_name }}
+                </div>
+            </div>
 
-        <span>
-            <strong>Date:</strong>
-            {{ consultation.consultation_date|date:"d F Y" }}
-        </span>
+            <div class="info-item">
+                <span class="info-item-label">Scheduled Date</span>
+                <div class="info-item-value">
+                    {{ consultation.consultation_date|date:"d F Y" }}
+                </div>
+            </div>
 
-        <span>
-            <strong>Time:</strong>
-            {{ consultation.consultation_time|time:"h:i A" }}
-        </span>
+            <div class="info-item">
+                <span class="info-item-label">Scheduled Time</span>
+                <div class="info-item-value">
+                    {{ consultation.consultation_time|time:"h:i A" }}
+                </div>
+            </div>
 
-        <span>
-            <strong>Duration:</strong>
-            {{ consultation.duration_minutes }} minutes
-        </span>
+            <div class="info-item">
+                <span class="info-item-label">Duration</span>
+                <div class="info-item-value">
+                    {{ consultation.duration_minutes }} minutes
+                </div>
+            </div>
+        </section>
 
-    </div>
+        <section id="patient-waiting-panel" class="waiting-panel">
+            <div class="waiting-icon">
+                <i class="fa-solid fa-user-clock"></i>
+            </div>
 
-    <div id="jitsi-container"></div>
+            <h2 id="patient-waiting-heading">Waiting for Your Doctor</h2>
 
-    <div class="privacy-notice">
-        <strong>Privacy:</strong>
-        This consultation is private. Please do not share your
-        consultation link with other people.
-    </div>
-    ```
+            <p id="patient-waiting-message">
+                Your consultation is scheduled. Keep this page open.
+                We will check automatically and connect you when your doctor
+                starts the consultation.
+            </p>
 
+            <div id="patient-waiting-status" class="waiting-status">
+                <span class="waiting-dot"></span>
+                Waiting for doctor activation...
+            </div>
+        </section>
+
+        <section id="patient-video-status" class="telemedicine-status-bar" role="status" aria-live="polite">
+            <span>
+                <i class="fa-solid fa-video"></i>
+                <span id="patient-video-status-text">
+                    Connecting to your doctor...
+                </span>
+            </span>
+            <span>Video consultation</span>
+        </section>
+
+        <div class="jitsi-frame-wrapper">
+            <div id="jitsi-container"></div>
+        </div>
+
+        <div id="patient-error" class="patient-error" role="alert">
+            <strong>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Connection notice
+            </strong>
+
+            <div id="patient-error-text">
+                We are having trouble checking your consultation.
+            </div>
+
+            <button id="patient-retry-button" type="button">
+                Try Again
+            </button>
+        </div>
+
+        <aside class="privacy-notice">
+            <i class="fa-solid fa-user-shield"></i>
+            <div>
+                <strong>Privacy and access</strong><br>
+                Please join from a quiet, private location. Allow your
+                browser to access your camera and microphone when prompted.
+                Keep your personal consultation link private.
+                If Jitsi requires a moderator to start the room, this must
+                be addressed through the Jitsi server configuration.
+            </div>
+        </aside>
+
+    </main>
 </div>
 
-<script src="https://meet.jit.si/external_api.js"></script>
+{{ room_name|json_script:"patient-jitsi-room-name" }}
+{{ consultation.first_name|add:" "|add:consultation.last_name|json_script:"patient-jitsi-display-name" }}
 
 <script>
-    const domain = "meet.jit.si";
+    (function () {
+        "use strict";
 
-    const options = {
-        roomName: "{{ room_name|escapejs }}",
+        const waitingPanel = document.getElementById("patient-waiting-panel");
+        const waitingHeading = document.getElementById("patient-waiting-heading");
+        const waitingMessage = document.getElementById("patient-waiting-message");
+        const waitingStatus = document.getElementById("patient-waiting-status");
+        const jitsiContainer = document.getElementById("jitsi-container");
+        const videoStatus = document.getElementById("patient-video-status");
+        const videoStatusText = document.getElementById("patient-video-status-text");
+        const errorBox = document.getElementById("patient-error");
+        const errorText = document.getElementById("patient-error-text");
+        const retryButton = document.getElementById("patient-retry-button");
 
-        width: "100%",
-        height: "100%",
+        const roomElement = document.getElementById("patient-jitsi-room-name");
+        const nameElement = document.getElementById("patient-jitsi-display-name");
 
-        parentNode: document.querySelector("#jitsi-container"),
+        const statusUrl =
+            "{% url 'homecare:patient_telemedicine_status' token=consultation.patient_access_token %}";
 
-        userInfo: {
-            displayName:
-                "{{ consultation.first_name|escapejs }} {{ consultation.last_name|escapejs }}",
+        let pollTimer = null;
+        let checking = false;
+        let jitsiStarted = false;
+        let consultationEnded = false;
+        let jitsiApi = null;
+        let apiLoading = false;
 
-            email:
-                "{{ consultation.email|escapejs }}"
-        },
+        let roomName = "";
+        let displayName = "Hands-On Health Patient";
 
-        configOverwrite: {
-            prejoinPageEnabled: true,
-            disableDeepLinking: true
-        },
+        try {
+            roomName = roomElement
+                ? JSON.parse(roomElement.textContent)
+                : "";
 
-        interfaceConfigOverwrite: {
-            TOOLBAR_BUTTONS: [
-                "microphone",
-                "camera",
-                "chat",
-                "desktop",
-                "fullscreen",
-                "hangup"
-            ]
+            displayName = nameElement
+                ? JSON.parse(nameElement.textContent)
+                : "Hands-On Health Patient";
+        } catch (error) {
+            console.error("Could not read patient consultation details:", error);
         }
-    };
 
-    const api = new JitsiMeetExternalAPI(
-        domain,
-        options
-    );
-
-    api.addListener(
-        "videoConferenceJoined",
-        function (event) {
-            console.log(
-                "Patient joined telemedicine room:",
-                event
-            );
+        function showError(message) {
+            errorText.textContent = message;
+            errorBox.style.display = "block";
         }
-    );
 
-    api.addListener(
-        "readyToClose",
-        function () {
-            console.log(
-                "Patient left telemedicine room."
-            );
+        function hideError() {
+            errorBox.style.display = "none";
         }
-    );
+
+        function stopPolling() {
+            if (pollTimer !== null) {
+                window.clearInterval(pollTimer);
+                pollTimer = null;
+            }
+        }
+
+        function setWaiting() {
+            waitingPanel.style.display = "block";
+            jitsiContainer.style.display = "none";
+            videoStatus.style.display = "none";
+
+            waitingHeading.textContent = "Waiting for Your Doctor";
+            waitingMessage.textContent =
+                "Your consultation is scheduled. Keep this page open. " +
+                "We will connect you automatically when your doctor starts.";
+
+            waitingStatus.innerHTML =
+                '<span class="waiting-dot"></span> Waiting for doctor activation...';
+        }
+
+        function loadJitsiApi() {
+            return new Promise(function (resolve, reject) {
+                if (typeof window.JitsiMeetExternalAPI === "function") {
+                    resolve();
+                    return;
+                }
+
+                if (apiLoading) {
+                    const waitForApi = window.setInterval(function () {
+                        if (typeof window.JitsiMeetExternalAPI === "function") {
+                            window.clearInterval(waitForApi);
+                            resolve();
+                        }
+                    }, 250);
+
+                    window.setTimeout(function () {
+                        window.clearInterval(waitForApi);
+
+                        if (typeof window.JitsiMeetExternalAPI !== "function") {
+                            reject(new Error("Jitsi API did not load."));
+                        }
+                    }, 15000);
+
+                    return;
+                }
+
+                apiLoading = true;
+
+                const script = document.createElement("script");
+                script.src = "https://meet.jit.si/external_api.js";
+                script.async = true;
+
+                script.onload = function () {
+                    apiLoading = false;
+
+                    if (typeof window.JitsiMeetExternalAPI === "function") {
+                        resolve();
+                    } else {
+                        reject(new Error("Jitsi API is unavailable."));
+                    }
+                };
+
+                script.onerror = function () {
+                    apiLoading = false;
+                    reject(new Error("Unable to download Jitsi API."));
+                };
+
+                document.head.appendChild(script);
+            });
+        }
+
+        async function startJitsi() {
+            if (jitsiStarted || consultationEnded) {
+                return;
+            }
+
+            if (!roomName) {
+                showError(
+                    "The consultation room is missing. Please contact Hands-On Health."
+                );
+                return;
+            }
+
+            jitsiStarted = true;
+            stopPolling();
+            hideError();
+
+            waitingPanel.style.display = "none";
+            jitsiContainer.style.display = "block";
+            videoStatus.style.display = "flex";
+            videoStatusText.textContent = "Loading video consultation...";
+
+            try {
+                await loadJitsiApi();
+
+                if (consultationEnded) {
+                    return;
+                }
+
+                jitsiApi = new window.JitsiMeetExternalAPI("meet.jit.si", {
+                    roomName: roomName,
+                    parentNode: jitsiContainer,
+                    width: "100%",
+                    height: "100%",
+
+                    userInfo: {
+                        displayName: displayName || "Hands-On Health Patient"
+                    },
+
+                    configOverwrite: {
+                        prejoinConfig: {
+                            enabled: false
+                        },
+                        disableDeepLinking: true
+                    },
+
+                    interfaceConfigOverwrite: {
+                        TOOLBAR_BUTTONS: [
+                            "microphone",
+                            "camera",
+                            "chat",
+                            "fullscreen",
+                            "hangup"
+                        ]
+                    }
+                });
+
+                window.handsOnHealthPatientJitsi = jitsiApi;
+
+                jitsiApi.addListener("videoConferenceJoined", function () {
+                    hideError();
+                    videoStatusText.textContent =
+                        "Connected — consultation in progress";
+                });
+
+                jitsiApi.addListener("videoConferenceLeft", function () {
+                    videoStatusText.textContent =
+                        "You have left the video consultation.";
+                });
+
+                jitsiApi.addListener("readyToClose", function () {
+                    videoStatusText.textContent =
+                        "The video consultation room has closed.";
+                });
+
+                jitsiApi.addListener("errorOccurred", function (event) {
+                    console.error("Patient Jitsi error:", event);
+
+                    showError(
+                        "Jitsi reported a connection problem. Check your internet " +
+                        "connection. If the room is waiting for a moderator, the " +
+                        "Jitsi server's authentication settings must be addressed."
+                    );
+
+                    videoStatusText.textContent = "Connection problem";
+                });
+
+            } catch (error) {
+                console.error("Unable to start patient video:", error);
+
+                jitsiStarted = false;
+                jitsiContainer.style.display = "none";
+                videoStatus.style.display = "none";
+                waitingPanel.style.display = "block";
+
+                showError(
+                    "The video service could not load. Check your internet " +
+                    "connection and select Try Again."
+                );
+            }
+        }
+
+        async function checkConsultationStatus() {
+            if (checking || jitsiStarted || consultationEnded) {
+                return;
+            }
+
+            checking = true;
+
+            try {
+                const response = await fetch(statusUrl, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store",
+                    credentials: "same-origin"
+                });
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Status request failed with HTTP " + response.status
+                    );
+                }
+
+                const data = await response.json();
+
+                if (data.status === "active") {
+                    hideError();
+                    await startJitsi();
+
+                } else if (data.status === "waiting") {
+                    hideError();
+                    setWaiting();
+
+                } else if (data.status === "ended") {
+                    consultationEnded = true;
+                    stopPolling();
+
+                    waitingPanel.style.display = "block";
+                    jitsiContainer.style.display = "none";
+                    videoStatus.style.display = "none";
+
+                    waitingHeading.textContent = "Consultation Concluded";
+                    waitingMessage.textContent =
+                        "This consultation has ended. Please contact Hands-On " +
+                        "Health if you require follow-up assistance.";
+
+                    waitingStatus.textContent = "Session complete";
+
+                } else {
+                    throw new Error("Unexpected consultation status.");
+                }
+
+            } catch (error) {
+                console.error("Could not check consultation status:", error);
+
+                showError(
+                    "We could not check the doctor's availability. " +
+                    "We will try again automatically."
+                );
+
+            } finally {
+                checking = false;
+            }
+        }
+
+        retryButton.addEventListener("click", function () {
+            hideError();
+
+            if (jitsiStarted && !jitsiApi) {
+                jitsiStarted = false;
+            }
+
+            if (jitsiStarted) {
+                showError(
+                    "If the video room is already open, refresh the page to " +
+                    "reconnect. If Jitsi requests a moderator, retrying cannot " +
+                    "override the server's authentication requirement."
+                );
+                return;
+            }
+
+            checkConsultationStatus();
+        });
+
+        setWaiting();
+        checkConsultationStatus();
+
+        pollTimer = window.setInterval(
+            checkConsultationStatus,
+            5000
+        );
+
+        window.addEventListener("beforeunload", function () {
+            stopPolling();
+        });
+    })();
 </script>
-
 {% endblock %}

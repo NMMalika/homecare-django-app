@@ -743,67 +743,65 @@
                             {% endif %}
                         </td>
 
+                        
                         <!-- NEXT STEP -->
                         <td class="sh-action-cell">
-
+                        
                             {% if appointment.status == "PENDING" %}
-
-                            <a class="sh-btn sh-btn-next"
-                                href="{% url 'staff:consultation_quotation' appointment.pk %}">
+                        
+                            <a class="sh-btn sh-btn-next" href="{% url 'staff:consultation_quotation' appointment.pk %}">
                                 <i class="fas fa-file-invoice"></i>
                                 Create Quotation
                             </a>
-
+                        
                             {% elif appointment.status == "QUOTED" or appointment.status == "PAYMENT_PENDING" %}
-
+                        
                             <span class="sh-action-text" style="color:#1d4ed8;">
                                 <i class="fas fa-hourglass-half"></i>
                                 Awaiting Payment
                             </span>
-
+                        
                             {% elif appointment.status == "PAID" %}
-
-                            <span class="sh-action-text" style="color:#6d28d9;">
+                        
+                            <a class="sh-btn sh-btn-next" href="{% url 'homecare:schedule_consultation' appointment.pk %}">
                                 <i class="fas fa-calendar-plus"></i>
-                                Ready for Scheduling
-                            </span>
-
+                                Add Consultation Slots
+                            </a>
+                        
                             {% elif appointment.status == "SCHEDULED" %}
-
+                        
                             <span class="sh-action-text">
                                 <i class="fas fa-video"></i>
                                 Ready for Telemedicine
                             </span>
-
+                        
                             {% elif appointment.status == "IN_PROGRESS" %}
-
+                        
                             <span class="sh-action-text" style="color:#0369a1;">
                                 <i class="fas fa-stethoscope"></i>
                                 In Progress
                             </span>
-
+                        
                             {% elif appointment.status == "COMPLETED" %}
-
+                        
                             <span class="sh-action-text">
                                 <i class="fas fa-check-circle"></i>
                                 Completed
                             </span>
-
+                        
                             {% elif appointment.status == "CANCELLED" %}
-
+                        
                             <span class="sh-action-text" style="color:#b91c1c;">
                                 <i class="fas fa-times-circle"></i>
                                 Cancelled
                             </span>
-
+                        
                             {% else %}
-
-                            <span class="sh-muted">
-                                Review consultation
-                            </span>
-
+                        
+                            <span class="sh-muted">Review consultation</span>
+                        
                             {% endif %}
-
+                        
                         </td>
 
                         <!-- TELEMEDICINE -->
