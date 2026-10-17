@@ -58,6 +58,7 @@ from homecare.models import (
 from homecare.views import (
     verify_payment as homecare_verify_payment,
     send_caregiver_assignment_email,
+    create_consultation_quotation as homecare_create_consultation_quotation,
 )
 
 from .forms import StaffCaregiverInviteForm
@@ -85,6 +86,13 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapper
+
+@admin_required
+def consultation_quotation(request, consultation_id):
+    return homecare_create_consultation_quotation(
+        request,
+        consultation_id=consultation_id,
+    )
 
 
 # ============================================================

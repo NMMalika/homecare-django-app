@@ -1,0 +1,629 @@
+<style>
+    #multiStepBookingForm .booking-field-error {
+        display: block;
+        color: #b42318;
+        font-size: 12px;
+        margin-top: 6px;
+        font-weight: 600
+    }
+
+    #multiStepBookingForm .booking-invalid {
+        border-color: #dc3545 !important;
+        background: #fff8f8
+    }
+
+    #multiStepBookingForm .booking-step-error {
+        padding: 12px 15px;
+        margin: 12px 0;
+        border-radius: 8px;
+        background: #fff0f0;
+        color: #b42318
+    }
+
+    #multiStepBookingForm .booking-valid {
+        border-color: #28a745 !important
+    }
+
+    #bookingServerFeedback {
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        border-radius: 9px;
+        background: #fff0f0;
+        color: #a42620
+    }
+</style>
+<!-- appointment start -->
+<section class="appointment-section animatedParent animateOnce padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2 text-center margin-bottom-40">
+
+                <span class="sub-title-badge sky-badge">
+                    Seamless Booking
+                </span>
+
+                <h2 class="main-service-heading">
+                    Book An Appointment
+                </h2>
+
+                <div class="border-center-blue"></div>
+
+                <p class="service-subtitle">
+                    Book your preferred appointment with our Home Care team.
+                    Once your appointment is submitted, our team will contact
+                    you to confirm the details.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="appointment-card-wrapper">
+            <div class="row">
+
+                <!-- LEFT COLUMN: STATUS SIDEBAR -->
+                <div class="col-md-3 border-right-light">
+
+                    <div class="booking-status-sidebar">
+
+                        <ul class="status-steps" id="statusSidebar">
+
+                            <li class="step-item active" data-step="1">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">1</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Fill Details</strong>
+                                    <small>Client & Contact</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="2">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">2</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Choose Services</strong>
+                                    <small>Select Services</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="3">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">3</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Date & Time</strong>
+                                    <small>Schedule Appointment</small>
+                                </div>
+                            </li>
+
+                            <li class="step-item" data-step="4">
+                                <span class="step-num">
+                                    <i class="fa-solid fa-check step-check-icon"></i>
+                                    <span class="step-digit">4</span>
+                                </span>
+
+                                <div class="step-info">
+                                    <strong>Confirmation</strong>
+                                    <small>Submit Booking</small>
+                                </div>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT COLUMN: APPOINTMENT FORM -->
+                <div class="col-md-9">
+
+                    <!-- IMPORTANT:
+                         This is a NEW appointment endpoint.
+                         It is NOT request_home_care.
+                    -->
+
+                    <form id="multiStepBookingForm" method="post" action="{% url 'homecare:book_appointment' %}"
+                        enctype="multipart/form-data" class="booking-form-content" novalidate>
+
+                        {% csrf_token %}
+                        {% if messages %}
+                        <div id="bookingServerFeedback" role="alert">
+                            {% for message in messages %}<div>{{ message }}</div>{% endfor %}
+                        </div>
+                        {% endif %}
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 1: CLIENT DETAILS -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel active-panel" id="stepPanel1">
+
+                            <div class="form-section-title">
+                                <h4>
+                                    <i class="fa-solid fa-user-gear"></i>
+                                    1. Client Information
+                                </h4>
+                            </div>
+
+                            <div class="row margin-bottom-20">
+
+                                <!-- First Name -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        First Name *
+                                    </label>
+
+                                    <input type="text" name="first_name" class="form-control custom-input"
+                                        placeholder="First Name" required>
+
+                                </div>
+
+
+                                <!-- Last Name -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Last Name *
+                                    </label>
+
+                                    <input type="text" name="last_name" class="form-control custom-input"
+                                        placeholder="Last Name" required>
+
+                                </div>
+
+
+                                <!-- Email -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Email Address *
+                                    </label>
+
+                                    <input type="email" name="email" class="form-control custom-input"
+                                        placeholder="Email Address" required>
+
+                                </div>
+
+
+                                <!-- Phone -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Phone Number *
+                                    </label>
+
+                                    <input type="tel" name="phone" class="form-control custom-input"
+                                        placeholder="Phone Number" required>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="step-actions text-right">
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 2: CHOOSE SERVICES -->
+                        <!-- ========================================= -->
+                        <!-- ========================================= -->
+                        <!-- STEP 2: CHOOSE SERVICES -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel2">
+
+                            <div class="form-section-title">
+                                <h4>
+                                    <i class="fa-solid fa-list-check"></i>
+                                    2. Choose Service(s)
+                                    <small>(Select one or more)</small>
+                                </h4>
+                            </div>
+
+                            <div class="row margin-bottom-25">
+
+                                {% for category in categories %}
+                                {% for service in category.services.all %}
+                                {% if service.is_active %}
+
+                                <div class="col-sm-6 col-md-4 margin-bottom-10">
+                                    <label class="service-checkbox-card">
+
+                                        <input type="checkbox" name="services" value="{{ service.pk }}">
+
+                                        <span class="service-title">
+                                            {{ service.name }}
+                                        </span>
+
+
+
+                                        {% if service.price > 0 %}
+
+                                        <!-- Added style="color: #28a745;" for green text -->
+                                        <span class="service-price-badge" style="color: #28a745; font-weight: 600;">
+
+                                            Starting at: {{ service.formatted_price }}
+                                        </span>
+                                        {% endif %}
+
+                                    </label>
+                                </div>
+
+                                {% endif %}
+                                {% endfor %}
+                                {% empty %}
+                                <div class="col-xs-12">
+                                    <p>No service categories are currently available.</p>
+                                </div>
+                                {% endfor %}
+
+                            </div>
+
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+                                </button>
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+                        <!-- ========================================= -->
+                        <!-- STEP 3: DATE & TIME -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel3">
+
+                            <div class="form-section-title">
+
+                                <h4>
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    3. Schedule Appointment
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row margin-bottom-20">
+
+
+                                <!-- Date -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label for="appointment_date" class="field-label">
+                                        Preferred Date *
+                                    </label>
+
+                                    <input type="date" name="appointment_date" id="appointment_date"
+                                        class="form-control custom-input" min="{{ today|date:'Y-m-d' }}"
+                                        title="Preferred Date" placeholder="Preferred Date" required>
+
+
+                                </div>
+
+
+                                <!-- Time -->
+                                <div class="col-sm-6 margin-bottom-15">
+
+                                    <label for="appointment_time" class="field-label">
+                                        Preferred Time *
+                                    </label>
+
+                                    <input type="time" name="appointment_time" id="appointment_time"
+                                        class="form-control custom-input" title="Preferred Time"
+                                        placeholder="Preferred Time" required>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+
+                                </button>
+
+
+                                <button type="button" class="btn btn-theme-sky btn-next">
+
+                                    Next Step
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ========================================= -->
+                        <!-- STEP 4: ATTACHMENTS & NOTES -->
+                        <!-- ========================================= -->
+
+                        <div class="form-step-panel" id="stepPanel4">
+
+                            <div class="form-section-title">
+
+                                <h4>
+                                    <i class="fa-solid fa-paperclip"></i>
+                                    4. Attachments &amp; Notes
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row margin-bottom-20">
+
+
+                                <!-- Attachments -->
+                                <div class="col-xs-12 margin-bottom-15">
+
+                                    <label class="field-label">
+                                        Attach Images or Prescription
+                                        Documents (Optional)
+                                    </label>
+
+
+                                    <div class="file-upload-box">
+
+                                        <input type="file" name="attachments" id="fileAttachment" multiple
+                                            accept="image/*,.pdf,.doc,.docx" class="file-input-hidden">
+
+
+                                        <label for="fileAttachment" class="file-upload-label">
+
+                                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                                            <span id="fileUploadText">
+                                                Click to add images or attach
+                                                documents
+                                            </span>
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Notes -->
+                                <div class="col-xs-12 margin-bottom-20">
+
+                                    <label class="field-label">
+                                        Additional Notes
+                                    </label>
+
+                                    <textarea name="message" class="form-control custom-input" rows="4"
+                                        placeholder="Additional Notes or Specific Instructions for the Appointment..."></textarea>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+                            <div class="step-actions flex-between">
+
+                                <button type="button" class="btn btn-default btn-prev">
+
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    Previous
+
+                                </button>
+
+
+                                <!-- FINAL SUBMIT -->
+                                <button type="submit" class="btn btn-theme-sky">
+
+                                    Book Appointment
+                                    <i class="fa-solid fa-calendar-check"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- appointment end -->
+<script>
+    (function () {
+        function initBooking() {
+            const form = document.getElementById('multiStepBookingForm');
+            if (!form || form.dataset.validationReady === '1') return;
+            form.dataset.validationReady = '1';
+            const panels = Array.from(form.querySelectorAll('.form-step-panel'));
+            const steps = Array.from(document.querySelectorAll('#statusSidebar .step-item'));
+            const dateInput = form.querySelector('#appointment_date');
+            const timeInput = form.querySelector('#appointment_time');
+            const fileInput = form.querySelector('#fileAttachment');
+            let current = 0;
+            let submitting = false;
+
+            function localDate(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            function refreshMinDate() {
+                if (dateInput) dateInput.min = localDate(new Date());
+            }
+            function container(field) {
+                return field.closest('.col-sm-6, .col-xs-12, .col-md-4') || field.parentElement;
+            }
+            function clearError(field) {
+                field.classList.remove('booking-invalid');
+                field.removeAttribute('aria-invalid');
+                const old = container(field).querySelector('[data-booking-error]');
+                if (old) old.remove();
+            }
+            function error(field, message) {
+                clearError(field);
+                field.classList.add('booking-invalid');
+                field.setAttribute('aria-invalid', 'true');
+                const note = document.createElement('small');
+                note.className = 'booking-field-error';
+                note.dataset.bookingError = 'true';
+                note.setAttribute('role', 'alert');
+                note.textContent = message;
+                container(field).appendChild(note);
+                return false;
+            }
+            function validateField(field) {
+                clearError(field);
+                if (field.disabled) return true;
+                const value = field.value.trim();
+                if (field.required && !value) return error(field, 'This field is required.');
+                if (field.type === 'email' && value && !field.validity.valid)
+                    return error(field, 'Enter a valid email address.');
+                if (field.name === 'phone' && value) {
+                    const digits = value.replace(/\D/g, '');
+                    if (digits.length < 9 || digits.length > 15)
+                        return error(field, 'Enter a valid phone number (9–15 digits).');
+                }
+                if (!field.checkValidity()) return error(field, 'Please enter a valid value.');
+                return true;
+            }
+            function showStep(index) {
+                current = Math.max(0, Math.min(index, panels.length - 1));
+                panels.forEach((panel, i) => {
+                    panel.classList.toggle('active-panel', i === current);
+                    panel.style.display = i === current ? 'block' : 'none';
+                });
+                steps.forEach((step, i) => {
+                    step.classList.toggle('active', i === current);
+                    step.classList.toggle('completed', i < current);
+                });
+            }
+            function validateStep(index) {
+                const panel = panels[index];
+                let valid = true;
+                let first = null;
+                panel.querySelectorAll('input:not([type="checkbox"]):not([type="file"]), textarea').forEach(field => {
+                    if (!validateField(field)) { valid = false; if (!first) first = field; }
+                });
+                if (index === 1) {
+                    const old = panel.querySelector('.booking-step-error');
+                    if (old) old.remove();
+                    if (!panel.querySelector('input[name="services"]:checked')) {
+                        const note = document.createElement('div');
+                        note.className = 'booking-step-error';
+                        note.setAttribute('role', 'alert');
+                        note.textContent = 'Please select at least one service.';
+                        panel.querySelector('.form-section-title').after(note);
+                        valid = false;
+                    }
+                }
+                if (index === 2 && dateInput && timeInput && dateInput.value && timeInput.value) {
+                    const selected = new Date(`${dateInput.value}T${timeInput.value}`);
+                    const min = new Date(Date.now() + 60 * 60 * 1000);
+                    if (!Number.isFinite(selected.getTime()) || selected < min) {
+                        error(timeInput, 'Choose a date and time at least one hour from now.');
+                        valid = false;
+                        first = timeInput;
+                    }
+                }
+                if (!valid && first) first.focus();
+                return valid;
+            }
+            form.querySelectorAll('.btn-next').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    if (validateStep(current)) showStep(current + 1);
+                }, true);
+            });
+            form.querySelectorAll('.btn-prev').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    showStep(current - 1);
+                }, true);
+            });
+            form.querySelectorAll('input:not([type="checkbox"]), textarea').forEach(field => {
+                field.addEventListener('blur', () => {
+                    if (field.type !== 'file') validateField(field);
+                });
+                field.addEventListener('input', () => clearError(field));
+                field.addEventListener('change', () => clearError(field));
+            });
+            form.querySelectorAll('input[name="services"]').forEach(field => {
+                field.addEventListener('change', () => {
+                    const note = form.querySelector('.booking-step-error');
+                    if (note) note.remove();
+                });
+            });
+            if (fileInput) fileInput.addEventListener('change', () => {
+                const label = document.getElementById('fileUploadText');
+                if (label) label.textContent = fileInput.files.length
+                    ? `${fileInput.files.length} file(s) selected` : 'Click to add images or attach documents';
+            });
+            form.addEventListener('submit', event => {
+                if (submitting) { event.preventDefault(); return; }
+                refreshMinDate();
+                for (let i = 0; i < panels.length; i++) {
+                    if (!validateStep(i)) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        showStep(i);
+                        return;
+                    }
+                }
+                submitting = true;
+                const button = form.querySelector('button[type="submit"]');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+                }
+            }, true);
+            refreshMinDate();
+            showStep(0);
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBooking);
+        else initBooking();
+    })();
+</script>

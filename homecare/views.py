@@ -278,7 +278,7 @@ def book_appointment(request):
     if request.method == "GET":
 
         return redirect(
-            "core:home"
+            "home"
         )
 
     first_name = request.POST.get("first_name", "").strip()
@@ -348,7 +348,7 @@ def book_appointment(request):
             "appointment_time": appointment_time_value,
             "message": message,
         }
-        return redirect("core:home")
+        return redirect("home")
 
     with transaction.atomic():
         consultation = Consultation(

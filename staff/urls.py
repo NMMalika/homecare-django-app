@@ -212,6 +212,12 @@ path(
     name="appointments",
 ),
 
+path(
+    "consultations/<int:consultation_id>/quotation/",
+    views.consultation_quotation,
+    name="consultation_quotation",
+),
+
 
 # =========================================================
 # QUOTATIONS
