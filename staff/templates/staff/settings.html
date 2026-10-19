@@ -629,6 +629,22 @@ Site Settings
 
 
 
+                    <!-- STAFF NOTIFICATION EMAILS -->
+                    <div class="settings-field settings-full">
+                        {{ form.notification_emails.label_tag }}
+                        {{ form.notification_emails }}
+                        <p style="font-size:12px;color:#6b7280;margin:8px 0 0;line-height:1.6;">
+                            Enter one email address per line, or separate addresses with commas or semicolons.
+                            These addresses receive notifications for new appointments, home care requests,
+                            referrals, submitted payments, and FAQ questions once notifications are connected.
+                            If left blank, the main business email is used as a fallback.
+                        </p>
+                        {% for error in form.notification_emails.errors %}
+                        <div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+
                     <div class="settings-field">
 
                         {{ form.phone.label_tag }}

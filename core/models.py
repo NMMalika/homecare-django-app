@@ -16,6 +16,16 @@ class SiteSettings(models.Model):
     email = models.EmailField(
         blank=True,
     )
+    
+    notification_emails = models.TextField(
+    blank=True,
+    help_text=(
+        "Enter staff notification email addresses, "
+        "separated by commas or new lines. "
+        "Example: admin@example.com, "
+        "reception@example.com"
+    ),
+    )
 
     phone = models.CharField(
         max_length=50,

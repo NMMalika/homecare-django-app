@@ -3818,3 +3818,147 @@ def faq_delete(request, pk):
     return render(request, "staff/questions/faq_delete.html", {
         "faq": faq,
     })
+
+
+# ============================================================
+# STAFF ACTIVITY NOTIFICATIONS (CONFIGURED RECIPIENTS ONLY)
+# ============================================================
+# These receivers are registered when staff.views is loaded by staff.urls.
+# They send staff activity alerts only; caregiver/client emails remain unchanged.
+
+import re as _notification_re
+from django.conf import settings as _notification_django_settings
+from django.db.models.signals import post_save as _notification_post_save
+from django.core.validators import validate_email as _notification_validate_email
+from django.core.exceptions import ValidationError as _NotificationValidationError
+
+
+def _send_configured_staff_alert(subject, description, dashboard_url_name, record_id):
+    """Queue an alert for SiteSettings.notification_emails ONLY."""
+    try:
+        site = SiteSettings.load()
+        raw = (getattr(site, "notification_emails", "") or "")
+        recipients = []
+        seen = set()
+        for candidate in _notification_re.split(r"[,;\n]+", raw):
+            email = candidate.strip()
+            if not email or email.lower() in seen:
+                continue
+            try:
+                _notification_validate_email(email)
+            except _NotificationValidationError:
+                logger.warning("Skipping invalid staff notification email: %s", email)
+                continue
+            seen.add(email.lower())
+            recipients.append(email)
+
+        # Intentionally no fallback to SiteSettings.email.
+        if not recipients:
+            logger.info("Staff activity alert skipped: no notification emails configured.")
+            return
+
+        base_url = (
+            (getattr(site, "website", "") or "").strip().rstrip("/")
+            or (getattr(_notification_django_settings, "SITE_URL", "") or "").strip().rstrip("/")
+        )
+        if not base_url or not base_url.startswith(("https://", "http://")):
+            logger.warning("Staff alert skipped: set SiteSettings.website or SITE_URL to an absolute URL.")
+            return
+
+        path = reverse(dashboard_url_name)
+        # Link to the staff list; include record ID as a reference in the email.
+        url = f"{base_url}{path}"
+        business = site.business_name or "Hands-On Health"
+        body = (
+            f"Hello {business} Team,\n\n"
+            f"{description}\n\n"
+            f"Record ID: {record_id}\n\n"
+            f"Open staff dashboard: {url}\n\n"
+            "Please sign in to review this item.\n\n"
+            f"{business} - Automated staff notification"
+        )
+
+        def _deliver():
+            for email in recipients:
+                try:
+                    send_mail(
+                        subject=f"{business} | {subject}",
+                        message=body,
+                        from_email=getattr(_notification_django_settings, "DEFAULT_FROM_EMAIL", None),
+                        recipient_list=[email],
+                        fail_silently=False,
+                    )
+                except Exception:
+                    logger.exception("Staff notification email failed for %s", email)
+
+        transaction.on_commit(_deliver)
+    except Exception:
+        # Never interrupt a client submission because a notification fails.
+        logger.exception("Could not prepare staff activity notification")
+
+
+def _staff_homecare_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Home Care Request",
+            "A new home care request has been submitted.",
+            "staff:homecare_requests", instance.pk,
+        )
+
+
+def _staff_appointment_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Appointment / Consultation",
+            "A new appointment or consultation has been submitted.",
+            "staff:appointments", instance.pk,
+        )
+
+
+def _staff_referral_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Patient Referral",
+            "A new patient referral has been submitted.",
+            "staff:referrals", instance.pk,
+        )
+
+
+def _staff_payment_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Payment Record",
+            "A new payment record has been created. Review its verification status.",
+            "staff:payments", instance.pk,
+        )
+
+
+def _staff_question_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Customer FAQ Question",
+            "A customer has submitted a new FAQ question.",
+            "staff:question_inbox", instance.pk,
+        )
+
+
+_notification_post_save.connect(
+    _staff_homecare_created, sender=HomeCareRequest,
+    dispatch_uid="staff_alert_homecare_created_v1", weak=False,
+)
+_notification_post_save.connect(
+    _staff_appointment_created, sender=Consultation,
+    dispatch_uid="staff_alert_appointment_created_v1", weak=False,
+)
+_notification_post_save.connect(
+    _staff_referral_created, sender=Referral,
+    dispatch_uid="staff_alert_referral_created_v1", weak=False,
+)
+_notification_post_save.connect(
+    _staff_payment_created, sender=Payment,
+    dispatch_uid="staff_alert_payment_created_v1", weak=False,
+)
+_notification_post_save.connect(
+    _staff_question_created, sender=CustomerQuestion,
+    dispatch_uid="staff_alert_question_created_v1", weak=False,
+)

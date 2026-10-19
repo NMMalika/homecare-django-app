@@ -1,4 +1,9 @@
+
+import re
+
 from django import forms
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 from core.models import SiteSettings
 
@@ -15,7 +20,11 @@ class SiteSettingsForm(forms.ModelForm):
             "logo",
             "favicon",
 
+            # =====================================================
+            # CONTACT INFORMATION
+            # =====================================================
             "email",
+            "notification_emails",
             "phone",
             "whatsapp",
             "emergency_phone",
@@ -24,15 +33,24 @@ class SiteSettingsForm(forms.ModelForm):
             "country",
             "website",
 
+            # =====================================================
+            # SOCIAL MEDIA
+            # =====================================================
             "facebook",
             "instagram",
             "linkedin",
             "tiktok",
             "youtube",
 
+            # =====================================================
+            # GOOGLE LINKS
+            # =====================================================
             "google_maps_url",
             "google_business_url",
 
+            # =====================================================
+            # PAYMENT INFORMATION
+            # =====================================================
             "bank_name",
             "account_name",
             "account_number",
@@ -44,6 +62,10 @@ class SiteSettingsForm(forms.ModelForm):
 
         widgets = {
 
+            # =====================================================
+            # BUSINESS INFORMATION
+            # =====================================================
+
             "business_name": forms.TextInput(attrs={
                 "placeholder": "Business name",
             }),
@@ -52,8 +74,27 @@ class SiteSettingsForm(forms.ModelForm):
                 "placeholder": "Professional, compassionate, and reliable",
             }),
 
+            # =====================================================
+            # CONTACT INFORMATION
+            # =====================================================
+
             "email": forms.EmailInput(attrs={
                 "placeholder": "Email address",
+            }),
+
+            # =====================================================
+            # MULTIPLE STAFF NOTIFICATION EMAILS
+            # =====================================================
+
+            "notification_emails": forms.Textarea(attrs={
+                "rows": 5,
+                "placeholder": (
+                    "admin@example.com\n"
+                    "reception@example.com\n"
+                    "accounts@example.com"
+                ),
+                "class": "form-control",
+                "autocomplete": "off",
             }),
 
             "phone": forms.TextInput(attrs={
@@ -85,6 +126,10 @@ class SiteSettingsForm(forms.ModelForm):
                 "placeholder": "https://example.com",
             }),
 
+            # =====================================================
+            # SOCIAL MEDIA
+            # =====================================================
+
             "facebook": forms.URLInput(attrs={
                 "placeholder": "https://facebook.com/...",
             }),
@@ -105,6 +150,10 @@ class SiteSettingsForm(forms.ModelForm):
                 "placeholder": "https://youtube.com/...",
             }),
 
+            # =====================================================
+            # GOOGLE LINKS
+            # =====================================================
+
             "google_maps_url": forms.URLInput(attrs={
                 "placeholder": "Google Maps URL",
             }),
@@ -112,6 +161,10 @@ class SiteSettingsForm(forms.ModelForm):
             "google_business_url": forms.URLInput(attrs={
                 "placeholder": "Google Business URL",
             }),
+
+            # =====================================================
+            # PAYMENT INFORMATION
+            # =====================================================
 
             "bank_name": forms.TextInput(attrs={
                 "placeholder": "Bank name",
@@ -142,3 +195,67 @@ class SiteSettingsForm(forms.ModelForm):
                 "placeholder": "Payment instructions shown to clients...",
             }),
         }
+
+        labels = {
+            "notification_emails": "Staff Notification Emails",
+        }
+
+        help_texts = {
+            "notification_emails": (
+                "Enter one or more staff email addresses, "
+                "separated by commas, semicolons, or new lines. "
+                "All configured recipients will receive "
+                "website activity notifications."
+            ),
+        }
+
+    # =========================================================
+    # VALIDATE MULTIPLE STAFF NOTIFICATION EMAILS
+    # =========================================================
+
+    def clean_notification_emails(self):
+
+        value = self.cleaned_data.get(
+            "notification_emails",
+            "",
+        )
+
+        if not value or not value.strip():
+            return ""
+
+        # Split addresses using commas, semicolons, or new lines.
+        emails = [
+            email.strip()
+            for email in re.split(r"[,;\n]+", value)
+            if email.strip()
+        ]
+
+        # Validate every email address.
+        for email in emails:
+
+            try:
+                validate_email(email)
+
+            except ValidationError:
+                raise ValidationError(
+                    f"'{email}' is not a valid email address. "
+                    "Please check and try again."
+                )
+
+        # Remove duplicate email addresses,
+        # ignoring uppercase/lowercase differences.
+        unique_emails = []
+        seen_emails = set()
+
+        for email in emails:
+
+            normalized_email = email.lower()
+
+            if normalized_email not in seen_emails:
+
+                seen_emails.add(normalized_email)
+
+                unique_emails.append(email)
+
+        # Store each address on its own line.
+        return "\n".join(unique_emails)
