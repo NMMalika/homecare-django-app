@@ -727,10 +727,11 @@
                         <!-- QUOTATION -->
                         <td class="sh-action-cell">
                             {% if appointment.quotation %}
-                            <a class="sh-btn sh-btn-quote"
-                                href="{% url 'admin:homecare_quotation_change' appointment.quotation.pk %}">
+                            <a class="sh-btn sh-btn-quote" href="{% url 'staff:quotation_detail' appointment.quotation.pk %}">
+                            
                                 <i class="fas fa-file-invoice-dollar"></i>
                                 View Quote
+                            
                             </a>
                             {% elif appointment.status == "PENDING" %}
                             <a class="sh-btn sh-btn-primary"

@@ -1,0 +1,348 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Customer Questions & FAQ Hub | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-hub-wrapper {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .page-header-box {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 0;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .btn-header-action {
+        height: 42px;
+        padding: 0 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-header-primary {
+        background-color: #2563eb;
+        color: #ffffff;
+        border: none;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-header-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-header-secondary {
+        background-color: #ffffff;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+    }
+
+    .btn-header-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    /* Cards Grid */
+    .hub-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .hub-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hub-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 20px -8px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    .hub-card-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .hub-card-icon.blue {
+        background-color: #eff6ff;
+        color: #2563eb;
+    }
+
+    .hub-card-icon.emerald {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+
+    .hub-card-icon.purple {
+        background-color: #f3e8ff;
+        color: #9333ea;
+    }
+
+    .hub-card-title {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.01em;
+    }
+
+    .hub-card-desc {
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-card-action {
+        width: 100%;
+        height: 42px;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-card-blue {
+        background-color: #2563eb;
+        color: #ffffff;
+    }
+
+    .btn-card-blue:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+    }
+
+    .btn-card-emerald {
+        background-color: #059669;
+        color: #ffffff;
+    }
+
+    .btn-card-emerald:hover {
+        background-color: #047857;
+        color: #ffffff;
+    }
+
+    .btn-card-purple {
+        background-color: #9333ea;
+        color: #ffffff;
+    }
+
+    .btn-card-purple:hover {
+        background-color: #7e22ce;
+        color: #ffffff;
+    }
+
+    /* Bottom Preview Banner */
+    .preview-banner {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.5rem 1.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
+
+    .preview-banner-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .preview-banner-desc {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    .btn-preview {
+        height: 40px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-preview:hover {
+        background-color: #0f172a;
+        border-color: #0f172a;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid faq-hub-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header-box">
+        <div>
+            <span class="header-kicker"><i class="fa-solid fa-layer-group me-1"></i> Management Hub</span>
+            <h1 class="page-header-title">Customer Questions &amp; FAQs</h1>
+            <p class="page-header-subtitle">
+                Manage incoming patient inquiries, customize web FAQ entries, and adjust configuration settings.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'staff:question_inbox' %}" class="btn-header-action btn-header-primary">
+                <i class="fa-solid fa-inbox"></i> View Inbox ({{ new_count|default:0 }} New)
+            </a>
+            <a href="{% url 'staff:faq_list' %}" class="btn-header-action btn-header-secondary">
+                <i class="fa-solid fa-circle-question"></i> Manage FAQs
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Cards Grid -->
+    <div class="hub-grid">
+
+        <!-- Card 1: Inbox / Enquiries -->
+        <div class="hub-card">
+            <div>
+                <div class="hub-card-icon blue">
+                    <i class="fa-solid fa-inbox"></i>
+                </div>
+                <h2 class="hub-card-title">Questions Inbox</h2>
+                <p class="hub-card-desc">
+                    Review public patient submissions, assign ticket statuses, and issue direct email responses to
+                    inquiries.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'staff:question_inbox' %}" class="btn-card-action btn-card-blue">
+                    Open Inbox <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 2: FAQ Management -->
+        <div class="hub-card">
+            <div>
+                <div class="hub-card-icon emerald">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <h2 class="hub-card-title">FAQ List &amp; Editor</h2>
+                <p class="hub-card-desc">
+                    Create, modify, reorder, or retire frequently asked questions displayed on the public website.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'staff:faq_list' %}" class="btn-card-action btn-card-emerald">
+                    Manage FAQs <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 3: Form Settings -->
+        <div class="hub-card">
+            <div>
+                <div class="hub-card-icon purple">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <h2 class="hub-card-title">Form Settings</h2>
+                <p class="hub-card-desc">
+                    Configure public form badges, page headers, custom messaging, and dynamic topic dropdowns.
+                </p>
+            </div>
+            <div>
+                <a href="" class="btn-card-action btn-card-purple">
+                    Configure Form <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Action Bar / Public Links -->
+    <div class="preview-banner">
+        <div>
+            <h3 class="preview-banner-title">
+                <i class="fa-solid fa-globe text-primary"></i> Public Page Live Preview
+            </h3>
+            <p class="preview-banner-desc">
+                Preview the live "Ask a Question" form as seen by prospective patients and site visitors.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'staff:ask_question' %}" target="_blank" class="btn-preview">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Public Form
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

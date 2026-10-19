@@ -157,7 +157,14 @@
                     </span>
                     <span>Services</span>
                 </a>
-
+                <a href="{% url 'staff:questions_dashboard' %}"
+                    class="nav-item {% if 'question' in request.resolver_match.url_name or 'faq' in request.resolver_match.url_name %}active{% endif %}"
+                    title="Customer Questions">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </span>
+                    <span>Customer Questions</span>
+                </a>
                 <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' or request.resolver_match.url_name == 'caregiver_payment_delete' %}active{% endif %}"
@@ -275,7 +282,7 @@
             </section>
 
         </main>
-        ```
+       
 
     </div>
 

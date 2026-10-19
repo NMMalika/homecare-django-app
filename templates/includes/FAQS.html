@@ -1,0 +1,86 @@
+
+{% load static %}
+
+<!-- FAQ Section Start -->
+<section class="faq-section padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-title text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 margin-bottom-40">
+
+                    <span class="sub-title-badge sky-badge">
+                        Got Questions?
+                    </span>
+
+                    <h2>
+                        FREQUENTLY ASKED
+                        <span class="color-defult">QUESTIONS</span>
+                    </h2>
+
+                    <div class="line-border-center bg-defult"></div>
+
+                    <p>
+                        Find quick answers to common questions about our
+                        mobile home-based healthcare services and patient arrangements.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Items -->
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div class="faq-accordion" id="faqAccordion">
+
+                        {% for faq in faqs %}
+                        <div class="faq-card">
+
+                            <!-- Question -->
+                            <div class="faq-header" id="faqHeading{{ faq.pk }}">
+                                <button class="faq-button collapsed" type="button" data-toggle="collapse"
+                                    data-target="#faqCollapse{{ faq.pk }}" aria-expanded="false"
+                                    aria-controls="faqCollapse{{ faq.pk }}">
+                                    <span>{{ faq.question }}</span>
+
+                                    <i class="fa-solid fa-chevron-down faq-icon" aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <!-- Answer -->
+                            <div id="faqCollapse{{ faq.pk }}" class="collapse" aria-labelledby="faqHeading{{ faq.pk }}"
+                                data-parent="#faqAccordion">
+                                <div class="faq-body">
+                                    {{ faq.answer|linebreaksbr }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {% empty %}
+                        <!-- Empty State -->
+                        <div class="text-center faq-empty-state">
+                            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+
+                            <h4>No FAQs Available Yet</h4>
+
+                            <p>
+                                Frequently asked questions will be available soon.
+                                Please check back later.
+                            </p>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- FAQ Section End -->

@@ -1,5 +1,6 @@
 
 from functools import wraps
+import logging
 import secrets
 from datetime import timedelta
 
@@ -16,6 +17,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
@@ -60,10 +63,10 @@ from homecare.views import (
     send_caregiver_assignment_email,
     create_consultation_quotation as homecare_create_consultation_quotation,
 )
-
+from .models import FAQItem, QuestionFormSettings, CustomerQuestion
 from .forms import StaffCaregiverInviteForm
 
-
+logger = logging.getLogger(__name__)
 # ============================================================
 # ADMIN ACCESS
 # ============================================================
@@ -1958,7 +1961,28 @@ def quotations(request):
             "site_settings": SiteSettings.load(),
         },
     )
+# ============================================================
+# STAFF QUOTATION DETAIL
+# ============================================================
 
+@admin_required
+def quotation_detail(request, pk):
+
+    quotation = get_object_or_404(
+        Quotation.objects.select_related(
+            "homecare_request",
+            "consultation",
+        ),
+        pk=pk,
+    )
+
+    return render(
+        request,
+        "staff/quotation_detail.html",
+        {
+            "quotation": quotation,
+        },
+    )
 
 # ============================================================
 # PAYMENTS
@@ -3338,3 +3362,459 @@ Hands-On Health
         f"A new three-day registration invitation was sent to {email}.",
     )
     return redirect("staff:caregivers")
+
+
+
+@require_http_methods(["GET", "POST"])
+def ask_question(request):
+    page = QuestionFormSettings.load()
+
+    if not page.is_active:
+        return render(
+            request,
+            "staff/questions/form_disabled.html",
+            status=503,
+        )
+
+    if request.method == "POST":
+        name = request.POST.get("ask_name", "").strip()
+        email = request.POST.get("ask_email", "").strip()
+        phone = request.POST.get("ask_phone", "").strip()
+        topic = request.POST.get("question_topic", "general").strip()
+        question = request.POST.get("user_question", "").strip()
+
+        valid_topics = {
+            item["value"]
+            for item in page.topics
+            if isinstance(item, dict)
+            and item.get("value")
+            and item.get("label")
+        }
+
+        if not all([name, email, phone, question]):
+            messages.error(
+                request,
+                "Please complete all required fields.",
+            )
+        elif topic not in valid_topics:
+            messages.error(
+                request,
+                "Please select a valid question topic.",
+            )
+        else:
+            CustomerQuestion.objects.create(
+                name=name,
+                email=email,
+                phone=phone,
+                topic=topic,
+                question=question,
+            )
+
+            messages.success(
+                request,
+                "Your question has been submitted successfully. "
+                "Our team will get back to you.",
+            )
+            return redirect("pages:faq")
+
+    return render(
+        request,
+        "staff/questions/ask_question.html",
+        {"question_page": page},
+    )
+
+# ============================================================
+# CUSTOMER QUESTIONS DASHBOARD
+# ============================================================
+
+@admin_required
+def questions_dashboard_view(request):
+
+    new_count = CustomerQuestion.objects.filter(
+        status=CustomerQuestion.Status.NEW
+    ).count()
+
+    active_faqs_count = FAQItem.objects.filter(
+        is_active=True
+    ).count()
+
+    context = {
+        "new_count": new_count,
+        "active_faqs_count": active_faqs_count,
+        "site_settings": SiteSettings.load(),
+    }
+
+    return render(
+        request,
+        "staff/questions/faqdashboard.html",
+        context,
+    )
+@admin_required
+def question_inbox(request):
+    questions = CustomerQuestion.objects.all()
+
+    status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
+
+    valid_statuses = {
+        choice[0] for choice in CustomerQuestion.Status.choices
+    }
+
+    if status in valid_statuses:
+        questions = questions.filter(status=status)
+
+    if search:
+        from django.db.models import Q
+
+        questions = questions.filter(
+            Q(name__icontains=search)
+            | Q(email__icontains=search)
+            | Q(phone__icontains=search)
+            | Q(question__icontains=search)
+        )
+
+    context = {
+        "questions": questions,
+        "selected_status": status,
+        "search_query": search,
+        "new_count": CustomerQuestion.objects.filter(
+            status=CustomerQuestion.Status.NEW
+        ).count(),
+        "in_progress_count": CustomerQuestion.objects.filter(
+            status=CustomerQuestion.Status.IN_PROGRESS
+        ).count(),
+        "replied_count": CustomerQuestion.objects.filter(
+            status=CustomerQuestion.Status.REPLIED
+        ).count(),
+    }
+
+    return render(
+        request,
+        "staff/questions/inbox.html",
+        context,
+    )
+
+
+
+
+
+
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def question_reply(request, question_id):
+    question = get_object_or_404(
+        CustomerQuestion,
+        pk=question_id,
+    )
+
+    if request.method == "POST":
+        reply = request.POST.get("staff_reply", "").strip()
+        action = request.POST.get("action", "save").strip()
+
+        if action == "close":
+            question.status = CustomerQuestion.Status.CLOSED
+            question.save(update_fields=["status", "updated_at"])
+
+            messages.success(request, "Question closed successfully.")
+
+            return redirect("staff:question_inbox")
+
+        if action not in {"save", "send"}:
+            messages.error(request, "Invalid action.")
+
+        elif not reply:
+            messages.error(request, "Please enter a reply.")
+
+        else:
+            # Store the reply before attempting email delivery.
+            question.staff_reply = reply
+            question.replied_by = request.user
+
+            if action == "save":
+                question.status = CustomerQuestion.Status.IN_PROGRESS
+                question.save()
+
+                messages.success(request, "Reply draft saved successfully.")
+
+                return redirect(
+                    "staff:question_reply",
+                    question_id=question.pk,
+                )
+
+            # Send the branded HTML email.
+            try:
+                context = {
+                    "customer_name": question.name,
+                    "customer_question": question.question,
+                    "staff_response": reply,
+                }
+
+                html_content = render_to_string(
+                    "staff/questions/email/answer_notification.html",
+                    context,
+                )
+
+                text_content = (
+                    f"Dear {question.name},\n\n"
+                    "Thank you for contacting Hands-On Health.\n\n"
+                    "Your question:\n"
+                    f"{question.question}\n\n"
+                    "Our response:\n"
+                    f"{reply}\n\n"
+                    "Kind regards,\n"
+                    "Hands-On Health Team"
+                )
+
+                email = EmailMultiAlternatives(
+                    subject=(
+                        "Your Question Has Been Answered | Hands-On Health"
+                    ),
+                    body=text_content,
+                    from_email=(
+                        getattr(settings, "DEFAULT_FROM_EMAIL", None)
+                        or None
+                    ),
+                    to=[question.email],
+                )
+
+                email.attach_alternative(
+                    html_content,
+                    "text/html",
+                )
+
+                email.send(fail_silently=False)
+
+            except Exception as exc:
+                # Log the actual error in the Django terminal.
+                logger.exception(
+                    "Question reply email failed for question %s",
+                    question.pk,
+                )
+
+                # Preserve the draft and keep the question open.
+                question.status = CustomerQuestion.Status.IN_PROGRESS
+                question.save()
+
+                # Show a friendly message to the staff user.
+                messages.error(
+                    request,
+                    "The reply was saved, but the email could not be sent. "
+                    "Check the Django terminal for the exact error.",
+                )
+
+                return redirect(
+                    "staff:question_reply",
+                    question_id=question.pk,
+                )
+
+            # Update the status only after the email backend accepts it.
+            question.status = CustomerQuestion.Status.REPLIED
+            question.replied_at = timezone.now()
+            question.save()
+
+            messages.success(
+                request,
+                f"Reply emailed successfully to {question.email}.",
+            )
+
+            return redirect(
+                "staff:question_reply",
+                question_id=question.pk,
+            )
+
+    # Always return a response for GET and invalid POST submissions.
+    return render(
+        request,
+        "staff/questions/reply.html",
+        {"question": question},
+    )
+
+@admin_required
+def faq_list(request):
+    """List and search FAQs in the staff dashboard."""
+    faqs = FAQItem.objects.all().order_by("display_order", "id")
+
+    search = request.GET.get("q", "").strip()
+    if search:
+        from django.db.models import Q
+        faqs = faqs.filter(
+            Q(question__icontains=search) |
+            Q(answer__icontains=search)
+        )
+
+    return render(request, "staff/questions/faq_list.html", {
+        "faqs": faqs,
+        "search": search,
+        "total_faqs": FAQItem.objects.count(),
+        "active_faqs": FAQItem.objects.filter(is_active=True).count(),
+    })
+
+
+# ============================================================
+# CREATE FAQ
+# ============================================================
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def faq_create(request):
+    """Create a new public FAQ."""
+
+    if request.method == "POST":
+
+        question = request.POST.get(
+            "question", ""
+        ).strip()
+
+        answer = request.POST.get(
+            "answer", ""
+        ).strip()
+
+        display_order = request.POST.get(
+            "display_order", "0"
+        ).strip()
+
+        is_active = request.POST.get(
+            "is_active", ""
+        ).strip().lower() in ("on", "true", "1", "yes")
+
+        if not question or not answer:
+
+            messages.error(
+                request,
+                "Enter both a question and its answer."
+            )
+
+        else:
+
+            try:
+                order = int(display_order or 0)
+
+                if order < 0:
+                    raise ValueError
+
+            except ValueError:
+
+                messages.error(
+                    request,
+                    "Display order must be zero or a positive number."
+                )
+
+            else:
+
+                faq = FAQItem.objects.create(
+                    question=question,
+                    answer=answer,
+                    display_order=order,
+                    is_active=is_active,
+                )
+
+                messages.success(
+                    request,
+                    f'FAQ "{faq.question}" added successfully.'
+                )
+
+                return redirect("staff:faq_list")
+
+    return render(
+        request,
+        "staff/questions/faq_form.html",
+        {
+            "page_title": "Add FAQ",
+            "faq": None,
+            "site_settings": SiteSettings.load(),
+        },
+    )
+# ============================================================
+# EDIT FAQ
+# ============================================================
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def faq_edit(request, pk):
+    """Edit an existing FAQ."""
+
+    faq = get_object_or_404(
+        FAQItem,
+        pk=pk,
+    )
+
+    if request.method == "POST":
+
+        question = request.POST.get(
+            "question", ""
+        ).strip()
+
+        answer = request.POST.get(
+            "answer", ""
+        ).strip()
+
+        display_order = request.POST.get(
+            "display_order", "0"
+        ).strip()
+
+        is_active = request.POST.get(
+            "is_active", ""
+        ).strip().lower() in ("on", "true", "1", "yes")
+
+        if not question or not answer:
+
+            messages.error(
+                request,
+                "Enter both a question and its answer."
+            )
+
+        else:
+
+            try:
+                order = int(display_order or 0)
+
+                if order < 0:
+                    raise ValueError
+
+            except ValueError:
+
+                messages.error(
+                    request,
+                    "Display order must be zero or a positive number."
+                )
+
+            else:
+
+                faq.question = question
+                faq.answer = answer
+                faq.display_order = order
+                faq.is_active = is_active
+
+                faq.save()
+
+                messages.success(
+                    request,
+                    f'FAQ "{faq.question}" updated successfully.'
+                )
+
+                return redirect("staff:faq_list")
+
+    return render(
+        request,
+        "staff/questions/faq_form.html",
+        {
+            "page_title": "Edit FAQ",
+            "faq": faq,
+            "site_settings": SiteSettings.load(),
+        },
+    )
+    
+@admin_required
+def faq_delete(request, pk):
+    """Delete an FAQ after a confirmation."""
+    faq = get_object_or_404(FAQItem, pk=pk)
+
+    if request.method == "POST":
+        faq.delete()
+        messages.success(request, "FAQ deleted successfully.")
+        return redirect("staff:faq_list")
+
+    return render(request, "staff/questions/faq_delete.html", {
+        "faq": faq,
+    })

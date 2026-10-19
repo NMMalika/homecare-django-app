@@ -60,7 +60,7 @@
                             </li>
 
                             <li class="{% if request.resolver_match.url_name == 'faq' %}active{% endif %}">
-                                <a href="#">FAQ</a>
+                                <a href="{% url 'pages:faq' %}">FAQ</a>
                             </li>
 
                             <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">

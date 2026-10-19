@@ -1,0 +1,152 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Ask a Question Settings | Hands-On Health{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <span class="text-uppercase text-muted small fw-bold">
+                Website Management
+            </span>
+            <h2 class="fw-bold mb-1">Ask a Question Settings</h2>
+            <p class="text-muted mb-0">
+                Manage the public question form without editing HTML.
+            </p>
+        </div>
+
+        <a href="{% url 'staff:question_inbox' %}" class="btn btn-outline-secondary mt-2">
+            <i class="fa-solid fa-inbox me-1"></i>
+            View Questions Inbox
+        </a>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-pen-to-square me-2 text-info"></i>
+                    Page Content
+                </h5>
+            </div>
+
+            <div class="card-body p-4">
+
+                <div class="form-group mb-3">
+                    <label for="id_badge_text" class="font-weight-bold">
+                        Badge Text
+                    </label>
+                    <input type="text" id="id_badge_text" name="badge_text" class="form-control" maxlength="100"
+                        value="{{ question_page.badge_text }}" required>
+                    <small class="form-text text-muted">
+                        Example: Still Have Questions?
+                    </small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_title" class="font-weight-bold">
+                        Page Heading
+                    </label>
+                    <input type="text" id="id_title" name="title" class="form-control" maxlength="200"
+                        value="{{ question_page.title }}" required>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_description" class="font-weight-bold">
+                        Description
+                    </label>
+                    <textarea id="id_description" name="description" class="form-control" rows="4"
+                        required>{{ question_page.description }}</textarea>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_submit_button_text" class="font-weight-bold">
+                        Submit Button Text
+                    </label>
+                    <input type="text" id="id_submit_button_text" name="submit_button_text" class="form-control"
+                        maxlength="100" value="{{ question_page.submit_button_text }}" required>
+                </div>
+
+                <div class="custom-control custom-switch mt-4">
+                    <input type="checkbox" class="custom-control-input" id="id_is_active" name="is_active" {% if
+                        question_page.is_active %}checked{% endif %}>
+                    <label class="custom-control-label font-weight-bold" for="id_is_active">
+                        Enable the public question form
+                    </label>
+                    <small class="form-text text-muted">
+                        Turning this off should disable submissions on the public page.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-1 fw-bold">
+                    <i class="fa-solid fa-list me-2 text-info"></i>
+                    Question Topics
+                </h5>
+                <small class="text-muted">
+                    Edit the topic choices displayed on your public form.
+                    Enter valid JSON with a value and label for each topic.
+                </small>
+            </div>
+
+            <div class="card-body p-4">
+                <div class="form-group mb-0">
+                    <label for="id_topics_json" class="font-weight-bold">
+                        Topics (JSON)
+                    </label>
+                    <textarea id="id_topics_json" name="topics_json" class="form-control" rows="10" spellcheck="false"
+                        required>{{ topics_json }}</textarea>
+                    <small class="form-text text-muted">
+                        Keep the format shown below. Each value identifies
+                        the topic saved with a submitted question.
+                    </small>
+                </div>
+
+                <div class="mt-3">
+                    <strong>Example:</strong>
+                    <pre class="bg-light p-3 rounded mt-2"><code>[
+  {
+    "value": "care-plans",
+    "label": "Care Plans & Rates"
+  },
+  {
+    "value": "general",
+    "label": "General Enquiry"
+  }
+]</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-5">
+            <a href="{% url 'staff:dashboard' %}" class="btn btn-light border">
+                Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fa-solid fa-floppy-disk mr-2"></i>
+                Save Page Settings
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

@@ -114,6 +114,7 @@ TEMPLATES = [
 
                 "core.context_processors.site_settings",
                 "core.context_processors.admin_dashboard",
+                "staff.context_processors.public_faqs",
             ],
         },
     },

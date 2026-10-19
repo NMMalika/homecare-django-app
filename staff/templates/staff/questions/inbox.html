@@ -1,0 +1,533 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Customer Enquiries | Staff Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .enquiries-dashboard {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .page-header-box {
+        margin-bottom: 2rem;
+    }
+
+    .page-header-box h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-box p {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 0;
+    }
+
+    /* KPI Summary Cards */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+    }
+
+    .kpi-card-info .kpi-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .kpi-card-info .kpi-value {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+        margin: 0;
+    }
+
+    .kpi-icon-badge {
+        width: 48px;
+        height: 48px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .kpi-icon-badge.new {
+        background-color: #eff6ff;
+        color: #2563eb;
+    }
+
+    .kpi-icon-badge.progress {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+
+    .kpi-icon-badge.replied {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+
+    /* Search & Filter Bar */
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.25rem;
+        margin-bottom: 1.75rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .filter-form-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .search-input-group {
+        flex: 1;
+        min-width: 260px;
+        position: relative;
+    }
+
+    .search-input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        height: 44px;
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .form-control-custom:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-select-custom {
+        height: 44px;
+        min-width: 180px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .form-select-custom:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .btn-filter-primary {
+        height: 44px;
+        padding: 0 1.25rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s;
+    }
+
+    .btn-filter-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+    }
+
+    .btn-filter-clear {
+        height: 44px;
+        padding: 0 1rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-filter-clear:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    /* Table & Container */
+    .table-panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .table-custom {
+        width: 100%;
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table-custom th {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+
+    }
+
+    .table-custom td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 0.875rem;
+        color: #334155;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .table-custom tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    /* Customer Info Block */
+    .customer-name {
+        font-weight: 700;
+        color: #0f172a;
+        display: block;
+    }
+
+    .contact-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .contact-link:hover {
+        text-decoration: underline;
+    }
+
+    .contact-phone {
+        font-size: 0.8125rem;
+        color: #64748b;
+    }
+
+    /* Status Pills */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-status.new {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #dbeafe;
+    }
+
+    .badge-status.in-progress {
+        background-color: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fef3c7;
+    }
+
+    .badge-status.replied {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #d1fae5;
+    }
+
+    .badge-status.closed {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Question Excerpt */
+    .question-excerpt {
+        color: #475569;
+        line-height: 1.5;
+        max-width: 320px;
+    }
+
+    .topic-pill {
+        display: inline-block;
+        background-color: #f1f5f9;
+        color: #334155;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.6rem;
+        border-radius: 0.375rem;
+    }
+
+    .btn-action-open {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #1e293b;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        padding: 0.45rem 0.875rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-action-open:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .empty-state-cell {
+        padding: 4rem 1.5rem !important;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 56px;
+        height: 56px;
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+</style>
+
+<div class="container-fluid enquiries-dashboard">
+
+    <!-- Header Section -->
+    <div class="page-header-box">
+        <h2>Customer Questions</h2>
+        <p>Review customer enquiries, track response status, and reply directly.</p>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-card-info">
+                <span class="kpi-label">New Questions</span>
+                <h3 class="kpi-value">{{ new_count }}</h3>
+            </div>
+            <div class="kpi-icon-badge new">
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card-info">
+                <span class="kpi-label">In Progress</span>
+                <h3 class="kpi-value">{{ in_progress_count }}</h3>
+            </div>
+            <div class="kpi-icon-badge progress">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card-info">
+                <span class="kpi-label">Replied</span>
+                <h3 class="kpi-value">{{ replied_count }}</h3>
+            </div>
+            <div class="kpi-icon-badge replied">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-card">
+        <form method="get" class="filter-form-grid">
+            <div class="search-input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" name="q" class="form-control-custom"
+                    placeholder="Search name, email, phone or question..." value="{{ search_query }}">
+            </div>
+
+            <select name="status" class="form-select-custom">
+                <option value="">All Statuses</option>
+                <option value="NEW" {% if selected_status == "NEW" %}selected{% endif %}>New</option>
+                <option value="IN_PROGRESS" {% if selected_status == "IN_PROGRESS" %}selected{% endif %}>In Progress
+                </option>
+                <option value="REPLIED" {% if selected_status == "REPLIED" %}selected{% endif %}>Replied</option>
+                <option value="CLOSED" {% if selected_status == "CLOSED" %}selected{% endif %}>Closed</option>
+            </select>
+
+            <button type="submit" class="btn-filter-primary">
+                <i class="fa-solid fa-filter"></i> Search
+            </button>
+            <a href="{% url 'staff:question_inbox' %}" class="btn-filter-clear">
+                <i class="fa-solid fa-rotate-left"></i> Clear
+            </a>
+        </form>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-panel">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Date Received</th>
+                        <th>Customer</th>
+                        <th>Contact Info</th>
+                        <th>Topic</th>
+                        <th>Status</th>
+                        <th>Question Excerpt</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in questions %}
+                    <tr>
+                        <td style="white-space: nowrap;">
+                            <div class="fw-bold text-slate-800">{{ item.created_at|date:"d M Y" }}</div>
+                            <div class="text-muted small">{{ item.created_at|date:"H:i" }}</div>
+                        </td>
+
+                        <td>
+                            <span class="customer-name">{{ item.name }}</span>
+                        </td>
+
+                        <td>
+                            <div>
+                                <a href="mailto:{{ item.email }}" class="contact-link">{{ item.email }}</a>
+                            </div>
+                            {% if item.phone %}
+                            <div class="contact-phone">
+                                <i class="fa-solid fa-phone fs-7 me-1"></i> {{ item.phone }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="topic-pill">
+                                {{ item.get_topic_display|default:item.topic }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if item.status == "NEW" %}
+                            <span class="badge-status new">
+                                <i class="fa-solid fa-circle-dot"></i> New
+                            </span>
+                            {% elif item.status == "IN_PROGRESS" %}
+                            <span class="badge-status in-progress">
+                                <i class="fa-solid fa-clock"></i> In Progress
+                            </span>
+                            {% elif item.status == "REPLIED" %}
+                            <span class="badge-status replied">
+                                <i class="fa-solid fa-check"></i> Replied
+                            </span>
+                            {% else %}
+                            <span class="badge-status closed">
+                                <i class="fa-solid fa-circle-xmark"></i> Closed
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="question-excerpt" title="{{ item.question }}">
+                                {{ item.question|truncatechars:90 }}
+                            </div>
+                        </td>
+
+                        <td style="text-align: right;">
+                            <a href="{% url 'staff:question_reply' item.pk %}" class="btn-action-open">
+                                <i class="fa-solid fa-reply"></i> Open & Reply
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-state-cell">
+                            <div class="empty-state-icon">
+                                <i class="fa-solid fa-inbox"></i>
+                            </div>
+                            <h4 class="h6 fw-bold text-slate-800 mb-1">No Questions Found</h4>
+                            <p class="text-muted small mb-0">No enquiry records match your selected filter parameters.
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Question Has Been Answered</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f1f6fb;
+             font-family:Arial,Helvetica,sans-serif; color:#243447;">
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+        style="background-color:#f1f6fb; padding:35px 12px;">
+        <tr>
+            <td align="center">
+
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%; max-width:600px; background:#ffffff;
+                          border-radius:14px; overflow:hidden;
+                          box-shadow:0 5px 25px rgba(25,55,90,0.08);">
+
+                    <!-- BRAND HEADER -->
+                    <tr>
+                        <td align="center" style="background:#087fbd; padding:32px 24px;">
+                            <div style="font-size:27px; font-weight:bold;
+                                    letter-spacing:0.5px; color:#ffffff;">
+                                Hands-On Health
+                            </div>
+                            <div style="font-size:12px; color:#e2f4ff;
+                                    margin-top:8px; letter-spacing:1.5px;">
+                                YOUR HEALTH. OUR PRIORITY.
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- INTRODUCTION -->
+                    <tr>
+                        <td style="padding:35px 32px 20px;">
+                            <div style="font-size:12px; font-weight:bold;
+                                    color:#087fbd; letter-spacing:1.5px;
+                                    text-transform:uppercase;">
+                                Customer Support
+                            </div>
+
+                            <h1 style="margin:10px 0 18px; font-size:25px;
+                                   line-height:1.35; color:#153653;">
+                                Your question has been answered!
+                            </h1>
+
+                            <p style="font-size:15px; line-height:1.8;
+                                  margin:0 0 14px;">
+                                Dear <strong>{{ customer_name }}</strong>,
+                            </p>
+
+                            <p style="font-size:15px; line-height:1.8;
+                                  color:#526477; margin:0;">
+                                Thank you for contacting Hands-On Health.
+                                We appreciate your interest in our services
+                                and are happy to assist you.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- CUSTOMER QUESTION -->
+                    <tr>
+                        <td style="padding:10px 32px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f8fc;
+                                      border-left:4px solid #8ab8d8;
+                                      border-radius:7px;">
+                                <tr>
+                                    <td style="padding:20px;">
+                                        <div style="font-size:12px;
+                                                font-weight:bold;
+                                                color:#60788e;
+                                                text-transform:uppercase;
+                                                letter-spacing:1px;
+                                                margin-bottom:10px;">
+                                            Your Question
+                                        </div>
+                                        <div style="font-size:15px;
+                                                line-height:1.8;
+                                                color:#263d52;">
+                                            {{ customer_question|linebreaksbr }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- OUR RESPONSE -->
+                    <tr>
+                        <td style="padding:10px 32px 25px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ecf9f5;
+                                      border:1px solid #ccefe2;
+                                      border-radius:9px;">
+                                <tr>
+                                    <td style="padding:22px;">
+                                        <div style="font-size:12px;
+                                                font-weight:bold;
+                                                color:#16856a;
+                                                text-transform:uppercase;
+                                                letter-spacing:1px;
+                                                margin-bottom:12px;">
+                                            Our Response
+                                        </div>
+                                        <div style="font-size:15px;
+                                                line-height:1.9;
+                                                color:#23483f;">
+                                            {{ staff_response|linebreaksbr }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- CLOSING -->
+                    <tr>
+                        <td style="padding:0 32px 30px;">
+                            <p style="font-size:14px; line-height:1.8;
+                                  color:#526477; margin:0 0 22px;">
+                                We hope this answers your question. If you need
+                                further clarification or assistance, our team
+                                will be happy to help.
+                            </p>
+
+                            <p style="font-size:14px; line-height:1.8;
+                                  color:#526477; margin:0;">
+                                Warm regards,<br>
+                                <strong style="color:#153653;">
+                                    The Hands-On Health Team
+                                </strong><br>
+                                <span style="font-size:12px; color:#087fbd;">
+                                    Compassionate Care. Professional Support.
+                                    Better Health.
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td align="center" style="background:#153653; padding:23px 25px;">
+                            <div style="font-size:13px; font-weight:bold;
+                                    color:#ffffff; margin-bottom:8px;">
+                                Hands-On Health
+                            </div>
+                            <div style="font-size:11px; line-height:1.8;
+                                    color:#d2e1ed;">
+                                Thank you for choosing us for your healthcare
+                                enquiries.<br>
+                                This email relates to your submitted question.
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <p style="font-size:11px; line-height:1.7; color:#8a9bad;
+                      text-align:center; margin:18px 10px 0;">
+                    © {% now "Y" %} Hands-On Health. All rights reserved.
+                </p>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

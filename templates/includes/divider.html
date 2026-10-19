@@ -1,0 +1,96 @@
+{% load static %}
+<!-- Contact Divider Start -->
+<section class="service-area contact-divider-section over-layer-default"
+    style="background-image: url('{% static 'img/bg/5.jpg' %}');">
+
+    <div class="container padding-bottom-none padding-top-40">
+        <div class="section-content">
+            <div class="row display-flex align-items-center">
+
+                <!-- Phone -->
+                <div class="col-sm-12 col-md-3 border-right-item">
+                    <div class="service-item style-1 text-white">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-phone-volume"></i>
+                        </div>
+
+                        <div class="content">
+                            <h5>
+                                <a
+                                    href="{% if site_settings.phone %}tel:{{ site_settings.phone|cut:' ' }}{% else %}#{% endif %}">
+                                    Give us a Call
+                                </a>
+                            </h5>
+                            <p>
+                                {{ site_settings.phone|default:"Phone number not configured" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-sm-12 col-md-3 border-right-item">
+                    <div class="service-item style-1 text-white">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+
+                        <div class="content">
+                            <h5>
+                                <a
+                                    href="{% if site_settings.email %}mailto:{{ site_settings.email }}{% else %}#{% endif %}">
+                                    Send us a Message
+                                </a>
+                            </h5>
+                            <p>
+                                {{ site_settings.email|default:"Email not configured" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="col-sm-12 col-md-3 border-right-item">
+                    <div class="service-item style-1 text-white">
+                        <div class="service-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <div class="content">
+                            <h5>
+                                
+                            </h5>
+
+                            <p>
+                                {% if site_settings.city %}
+                                {{ site_settings.city }}
+                                {% elif site_settings.address %}
+                                {{ site_settings.address|truncatechars:60 }}
+                                {% else %}
+                                {{ site_settings.country|default:"Location not configured" }}
+                                {% endif %}
+
+                                {% if site_settings.city and site_settings.country %}
+                                , {{ site_settings.country }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Home Care Button -->
+                <div class="col-sm-12 col-md-3 text-center">
+                    <div class="cta-action-box">
+                        <a href="{% url 'homecare:request' %}" class="btn btn-divider-cta">
+                            REQUEST HOME CARE
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Contact Divider End -->
+```

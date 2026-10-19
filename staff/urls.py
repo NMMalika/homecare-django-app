@@ -229,6 +229,11 @@ path(
     name="quotations",
 ),
 
+path(
+    "quotations/<int:pk>/",
+    views.quotation_detail,
+    name="quotation_detail",
+),
 
 # =========================================================
 # PAYMENTS
@@ -315,5 +320,28 @@ path(
     name="settings",
 ),
 
+# =========================================================
+# FAQ / CUSTOMER QUESTIONS
+# =========================================================
+    path('questions/dashboard/', views.questions_dashboard_view, name='questions_dashboard'),
+    path(
+        "ask-question/",
+        views.ask_question,
+        name="ask_question",
+    ),
+    path(
+        "questions/",
+        views.question_inbox,
+        name="question_inbox",
+    ),
+    path(
+        "questions/<int:question_id>/",
+        views.question_reply,
+        name="question_reply",
+    ),
+    path("faqs/", views.faq_list, name="faq_list"),
+    path("faqs/add/", views.faq_create, name="faq_create"),
+    path("faqs/<int:pk>/edit/", views.faq_edit, name="faq_edit"),
+    path("faqs/<int:pk>/delete/", views.faq_delete, name="faq_delete"),
 
 ]

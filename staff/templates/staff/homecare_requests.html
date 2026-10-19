@@ -448,14 +448,14 @@ Home Care Requests | Hands-On Health
             
                     {% if item.quotation %}
             
-                    <!-- VIEW EXISTING QUOTATION -->
-                    <a href="{% url 'homecare:quotation_detail' item.quotation.access_token %}"
-                        class="icon-action-btn view-quotation" title="View Quotation">
-            
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>View Quotation</span>
-            
-                    </a>
+                <!-- VIEW EXISTING QUOTATION - STAFF VERSION -->
+                <a href="{% url 'staff:quotation_detail' item.quotation.pk %}" class="icon-action-btn view-quotation"
+                    title="View Staff Quotation">
+                
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>View Quotation</span>
+                
+                </a>
             
                     {% else %}
             

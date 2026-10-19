@@ -1,0 +1,265 @@
+{% extends "staff/base.html" %} {% load static %} {% block title %}{{ page_title
+}} | Hands-On Health{% endblock %} {% block extra_css %}
+<style>
+    .faq-form-wrapper {
+        padding: 1.5rem 0 3rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* Back Link & Header */
+    .btn-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 1.25rem;
+        transition: color 0.2s ease;
+    }
+
+    .btn-back-link:hover {
+        color: #2563eb;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Form Panel Card */
+    .faq-form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2.25rem 2rem;
+        box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.02),
+            0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    }
+
+    .form-group-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .required-star {
+        color: #ef4444;
+        margin-left: 0.125rem;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition:
+            border-color 0.2s,
+            box-shadow 0.2s,
+            background-color 0.2s;
+    }
+
+    .form-control-custom:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-help-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.375rem;
+    }
+
+    /* Modern Toggle Switch */
+    .toggle-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .toggle-label-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.125rem;
+        display: block;
+    }
+
+    .toggle-label-desc {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0;
+        display: block;
+    }
+
+    /* Buttons */
+    .btn-save-primary {
+        height: 46px;
+        padding: 0 1.75rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.625rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        transition:
+            background-color 0.2s,
+            transform 0.1s;
+    }
+
+    .btn-save-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-secondary {
+        height: 46px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition:
+            background-color 0.2s,
+            border-color 0.2s;
+    }
+
+    .btn-cancel-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="container-fluid faq-form-wrapper">
+    <!-- Back Navigation -->
+    <a href="{% url 'staff:faq_list' %}" class="btn-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to FAQ Management
+    </a>
+
+    <!-- Page Header -->
+    <div>
+        <span class="header-kicker"><i class="fa-solid fa-pen-to-square me-1"></i> Content Editor</span>
+        <h1 class="page-header-title">{{ page_title }}</h1>
+        <p class="page-header-subtitle">
+            Author or revise clear questions and answers to be published on the public
+            FAQ section.
+        </p>
+    </div>
+
+    {% if messages %} {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} rounded-3 mb-4">{{ message }}</div>
+    {% endfor %} {% endif %}
+
+    <!-- Editor Card -->
+    <div class="faq-form-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Question Input -->
+            <div class="mb-4">
+                <label for="faq-question" class="form-group-label">
+                    Question <span class="required-star">*</span>
+                </label>
+                <input id="faq-question" type="text" name="question" class="form-control-custom" maxlength="300"
+                    value="{{ faq.question|default:'' }}" placeholder="e.g. Which home-care services do you offer?"
+                    required />
+            </div>
+
+            <!-- Answer Textarea -->
+            <div class="mb-4">
+                <label for="faq-answer" class="form-group-label">
+                    Answer <span class="required-star">*</span>
+                </label>
+                <textarea id="faq-answer" name="answer" class="form-control-custom" rows="6"
+                    placeholder="Provide a thorough, informative response for website visitors..." required>
+{{ faq.answer|default:'' }}</textarea>
+            </div>
+
+            <!-- Display Order -->
+            <div class="mb-4">
+                <label for="faq-order" class="form-group-label">
+                    Display Order Sequence
+                </label>
+                <input id="faq-order" type="number" name="display_order" min="0" class="form-control-custom"
+                    style="max-width: 200px" value="{{ faq.display_order|default:0 }}" />
+                <div class="form-help-text">
+                    Numerical order on the website (e.g., 0 appears first, followed by 1,
+                    2, etc.).
+                </div>
+            </div>
+
+            <!-- Active Status Toggle -->
+            <div class="toggle-card">
+                <div>
+                    <span class="toggle-label-title">Publish Status</span>
+                    <span class="toggle-label-desc">Make this FAQ publicly visible to website visitors immediately upon
+                        saving.</span>
+                </div>
+                <div class="form-check form-switch m-0 fs-5">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="faq-active" {% if faq %} 
+                    {% if faq.is_active %} checked {% endif %} {% else %} checked {% endif %} />
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex align-items-center gap-2">
+                <button type="submit" class="btn-save-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save FAQ Entry
+                </button>
+
+                <a href="{% url 'staff:faq_list' %}" class="btn-cancel-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
