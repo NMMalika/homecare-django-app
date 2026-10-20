@@ -1126,80 +1126,212 @@ def create_consultation_quotation(request, consultation_id):
         },
     )
 
+
 def send_consultation_quotation_email(
     quotation,
     quotation_url,
 ):
+    """
+    Send a professionally styled consultation quotation email
+    with HTML and plain-text alternatives.
+    """
+
+    from django.utils.html import strip_tags
 
     consultation = quotation.consultation
     site_settings = SiteSettings.load()
-    local_deadline = timezone.localtime(quotation.payment_deadline)
 
-    services = consultation.services or []
+    local_deadline = (
+        timezone.localtime(quotation.payment_deadline)
+        if quotation.payment_deadline
+        else None
+    )
 
-    if isinstance(services, list):
-        service_text = ", ".join(str(service) for service in services)
-    else:
-        service_text = str(services)
+    # --------------------------------------------------------
+    # PATIENT NAME
+    # --------------------------------------------------------
 
-    subject = "Your Consultation Quotation - Hands-On Health"
+    patient_name = (
+        f"{consultation.first_name} {consultation.last_name}"
+    ).strip() or "Valued Patient"
+
+    # --------------------------------------------------------
+    # RESOLVE CONSULTATION SERVICE NAMES
+    # The appointment form may store Service IDs.
+    # --------------------------------------------------------
+
+    selected_services = consultation.services or []
+
+    if isinstance(selected_services, str):
+        selected_services = [
+            value.strip()
+            for value in selected_services.split(",")
+            if value.strip()
+        ]
+
+    if not isinstance(selected_services, (list, tuple)):
+        selected_services = []
+
+    service_ids = []
+
+    for value in selected_services:
+        try:
+            service_ids.append(int(value))
+        except (TypeError, ValueError):
+            continue
+
+    services_by_id = Service.objects.in_bulk(service_ids)
+
+    service_names = []
+
+    for value in selected_services:
+        try:
+            service = services_by_id.get(int(value))
+        except (TypeError, ValueError):
+            service = None
+
+        if service:
+            service_names.append(service.name)
+        elif not str(value).isdigit():
+            service_names.append(str(value))
+
+    service_text = ", ".join(dict.fromkeys(service_names))
+    if not service_text:
+        service_text = "Medical Consultation"
+
+    # --------------------------------------------------------
+    # FORMAT DATE AND TIME
+    # --------------------------------------------------------
+
+    requested_date = (
+        consultation.requested_date.strftime("%A, %d %B %Y")
+        if consultation.requested_date
+        else "To be confirmed"
+    )
+
+    requested_time = (
+        consultation.requested_time.strftime("%I:%M %p")
+        if consultation.requested_time
+        else "To be confirmed"
+    )
+
+    payment_deadline_text = (
+        local_deadline.strftime("%d %B %Y at %I:%M %p")
+        if local_deadline
+        else "Please refer to your quotation"
+    )
+
+    business_name = (
+        getattr(site_settings, "business_name", "")
+        or "Hands-On Health"
+    )
+
+    tagline = (
+        getattr(site_settings, "tagline", "")
+        or "Compassionate Care. Professional Service."
+    )
+
+    phone = getattr(site_settings, "phone", "") or ""
+    whatsapp = getattr(site_settings, "whatsapp", "") or ""
+    contact_email = getattr(site_settings, "email", "") or ""
+
+    subject = "Your Consultation Quotation | Hands-On Health"
+
+    # --------------------------------------------------------
+    # EMAIL TEMPLATE CONTEXT
+    # --------------------------------------------------------
+
+    context = {
+        "quotation": quotation,
+        "consultation": consultation,
+        "patient_name": patient_name,
+        "service_text": service_text,
+        "requested_date": requested_date,
+        "requested_time": requested_time,
+        "payment_deadline": local_deadline,
+        "payment_deadline_text": payment_deadline_text,
+        "quotation_url": quotation_url,
+        "site_settings": site_settings,
+        "business_name": business_name,
+        "tagline": tagline,
+        "phone": phone,
+        "whatsapp": whatsapp,
+        "contact_email": contact_email,
+    }
+
+    # --------------------------------------------------------
+    # RENDER PROFESSIONAL HTML EMAIL
+    # --------------------------------------------------------
+
+    html_content = render_to_string(
+        "homecare/email/consultation_quotation_email.html",
+        context,
+    )
+
+    # --------------------------------------------------------
+    # PLAIN-TEXT FALLBACK
+    # --------------------------------------------------------
 
     text_content = f"""
-Dear {consultation.first_name} {consultation.last_name},
+{business_name}
+{tagline}
 
-Thank you for booking a consultation with Hands-On Health.
+YOUR CONSULTATION QUOTATION IS READY
 
-We have reviewed your appointment request and prepared your quotation.
+Dear {patient_name},
 
-Consultation Services:
-{service_text or "Medical Consultation"}
+Thank you for choosing {business_name}.
 
-Requested Date:
-{consultation.requested_date}
+We have reviewed your consultation request and prepared
+your quotation.
 
-Requested Time:
-{consultation.requested_time}
+CONSULTATION DETAILS
+--------------------
+Services: {service_text}
+Requested date: {requested_date}
+Requested time: {requested_time}
 
-Quotation Amount:
+QUOTATION AMOUNT
+----------------
 N$ {quotation.amount:,.2f}
 
-Payment Deadline:
-{local_deadline.strftime("%d %B %Y at %I:%M %p")}
+PAYMENT DEADLINE
+----------------
+{payment_deadline_text}
 
 QUOTATION DETAILS
 -----------------
-{quotation.description}
+{strip_tags(quotation.description or "").strip() or "Please review the quotation page for details."}
 
-You can review your quotation and submit payment using the secure link below:
-
+REVIEW YOUR QUOTATION AND SUBMIT PAYMENT
+----------------------------------------
 {quotation_url}
 
-IMPORTANT
----------
-Your consultation is not scheduled until:
+WHAT HAPPENS NEXT?
+------------------
+1. Review your quotation and submit payment.
+2. Hands-On Health verifies your payment.
+3. Our team shares the available appointment slots.
+4. Select your preferred slot to confirm your consultation.
 
-1. Payment has been submitted.
-2. Payment has been verified.
-3. Hands-On Health shares available appointment slots with you.
-4. You select one of the available slots.
+Your consultation is not confirmed until payment has been
+verified and you have selected an available appointment slot.
 
-Once you select a slot, your consultation will be confirmed and your telemedicine link will be provided.
-
-If you have any questions, please contact:
-
-Phone:
-{site_settings.phone or "Not provided"}
-
-WhatsApp:
-{site_settings.whatsapp or "Not provided"}
-
-Email:
-{site_settings.email or "Not provided"}
+CONTACT US
+----------
+Phone: {phone or "Not provided"}
+WhatsApp: {whatsapp or "Not provided"}
+Email: {contact_email or "Not provided"}
 
 Kind regards,
 
-{site_settings.business_name}
+{business_name}
+{tagline}
 """
+
+    # --------------------------------------------------------
+    # SEND HTML + PLAIN TEXT
+    # --------------------------------------------------------
 
     email = EmailMultiAlternatives(
         subject=subject,
@@ -1208,8 +1340,19 @@ Kind regards,
         to=[consultation.email],
     )
 
-    email.send()
+    email.attach_alternative(
+        html_content,
+        "text/html",
+    )
 
+    email.send(fail_silently=False)
+
+    logger.info(
+        "Consultation quotation email sent successfully "
+        "for quotation #%s to %s",
+        quotation.pk,
+        consultation.email,
+    )
 
 # ============================================================
 # CAREGIVER DASHBOARD

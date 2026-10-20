@@ -1,0 +1,354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>Your Consultation Quotation - {{ business_name }}</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:Arial,Helvetica,sans-serif; color:#26364a;">
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+        style="background-color:#f1f5f9; padding:28px 12px;">
+        <tr>
+            <td align="center">
+
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0"
+                    style="width:100%; max-width:600px; background:#ffffff; border-radius:14px; overflow:hidden;">
+
+                    <!-- BRAND HEADER -->
+                    <tr>
+                        <td align="center" style="background-color:#12345a; padding:34px 24px 30px;">
+
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center"
+                                        style="width:54px; height:54px; background:#ffffff; border-radius:14px; color:#12345a; font-size:27px; font-weight:bold;">
+                                        H+
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <h1
+                                style="margin:16px 0 7px; font-size:25px; line-height:1.3; font-weight:700; color:#ffffff;">
+                                {{ business_name }}
+                            </h1>
+
+                            <p style="margin:0; color:#d8e7f7; font-size:13px; line-height:1.6;">
+                                {{ tagline }}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- MAIN CONTENT -->
+                    <tr>
+                        <td style="padding:32px 30px 20px;">
+
+                            <p
+                                style="margin:0 0 12px; color:#2563a6; font-size:11px; font-weight:bold; letter-spacing:1.5px;">
+                                CONSULTATION QUOTATION
+                            </p>
+
+                            <h2 style="margin:0 0 18px; color:#12345a; font-size:27px; line-height:1.3;">
+                                Your quotation is ready
+                            </h2>
+
+                            <p style="margin:0 0 14px; font-size:15px; line-height:1.8;">
+                                Dear {{ patient_name }},
+                            </p>
+
+                            <p style="margin:0 0 24px; color:#52657a; font-size:14px; line-height:1.9;">
+                                Thank you for choosing {{ business_name }}.
+                                We have reviewed your consultation request and
+                                prepared your quotation. You can review the
+                                details below and securely submit your payment.
+                            </p>
+
+                            <!-- AMOUNT CARD -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="background:#f0f6fc; border:1px solid #dbe8f5; border-radius:12px;">
+                                <tr>
+                                    <td style="padding:23px 22px 21px;">
+
+                                        <p
+                                            style="margin:0 0 9px; color:#52657a; font-size:11px; font-weight:bold; letter-spacing:1.2px;">
+                                            TOTAL QUOTATION AMOUNT
+                                        </p>
+
+                                        <p
+                                            style="margin:0; color:#12345a; font-size:34px; line-height:1.3; font-weight:bold;">
+                                            N$ {{ quotation.amount|floatformat:2 }}
+                                        </p>
+
+                                        <p style="margin:9px 0 0; color:#52657a; font-size:12px; line-height:1.6;">
+                                            Please review your quotation before making payment.
+                                        </p>
+
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- CONSULTATION DETAILS -->
+                            <h3 style="margin:29px 0 14px; color:#12345a; font-size:17px;">
+                                Consultation details
+                            </h3>
+
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+
+                                <tr>
+                                    <td width="36" valign="top"
+                                        style="padding:13px 0; border-bottom:1px solid #edf1f5; color:#2563a6; font-size:18px;">
+                                        &#128197;
+                                    </td>
+                                    <td valign="top" style="padding:13px 0; border-bottom:1px solid #edf1f5;">
+                                        <p
+                                            style="margin:0 0 5px; color:#78879a; font-size:11px; font-weight:bold; text-transform:uppercase;">
+                                            Requested date
+                                        </p>
+                                        <p style="margin:0; color:#26364a; font-size:14px; line-height:1.6;">
+                                            {{ requested_date }}
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="36" valign="top"
+                                        style="padding:13px 0; border-bottom:1px solid #edf1f5; color:#2563a6; font-size:18px;">
+                                        &#128336;
+                                    </td>
+                                    <td valign="top" style="padding:13px 0; border-bottom:1px solid #edf1f5;">
+                                        <p
+                                            style="margin:0 0 5px; color:#78879a; font-size:11px; font-weight:bold; text-transform:uppercase;">
+                                            Requested time
+                                        </p>
+                                        <p style="margin:0; color:#26364a; font-size:14px; line-height:1.6;">
+                                            {{ requested_time }}
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="36" valign="top"
+                                        style="padding:13px 0; border-bottom:1px solid #edf1f5; color:#2563a6; font-size:18px;">
+                                        &#128203;
+                                    </td>
+                                    <td valign="top" style="padding:13px 0; border-bottom:1px solid #edf1f5;">
+                                        <p
+                                            style="margin:0 0 5px; color:#78879a; font-size:11px; font-weight:bold; text-transform:uppercase;">
+                                            Consultation services
+                                        </p>
+                                        <p style="margin:0; color:#26364a; font-size:14px; line-height:1.7;">
+                                            {{ service_text }}
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td width="36" valign="top" style="padding:13px 0; color:#b7791f; font-size:18px;">
+                                        &#9200;
+                                    </td>
+                                    <td valign="top" style="padding:13px 0;">
+                                        <p
+                                            style="margin:0 0 5px; color:#78879a; font-size:11px; font-weight:bold; text-transform:uppercase;">
+                                            Payment deadline
+                                        </p>
+                                        <p
+                                            style="margin:0; color:#9a5b0b; font-size:14px; font-weight:bold; line-height:1.6;">
+                                            {{ payment_deadline_text }}
+                                        </p>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <!-- QUOTATION NOTES -->
+                            {% if quotation.description %}
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="margin-top:23px; background:#f8fafc; border-left:4px solid #8aaed2;">
+                                <tr>
+                                    <td style="padding:16px 18px;">
+                                        <h3 style="margin:0 0 9px; color:#12345a; font-size:14px;">
+                                            Additional quotation details
+                                        </h3>
+                                        <p
+                                            style="margin:0; color:#52657a; font-size:13px; line-height:1.8; white-space:pre-line; overflow-wrap:anywhere;">
+                                            {{ quotation.description }}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+
+                            <!-- PRIMARY CALL TO ACTION -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="margin-top:29px;">
+                                <tr>
+                                    <td align="center" style="background:#1d5f99; border-radius:8px;">
+                                        <a href="{{ quotation_url }}" target="_blank"
+                                            style="display:block; padding:17px 20px; color:#ffffff; font-size:15px; font-weight:bold; line-height:1.5; text-align:center; text-decoration:none;">
+                                            View Quotation &amp; Pay Securely
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p
+                                style="margin:12px 0 0; color:#78879a; font-size:11px; line-height:1.8; text-align:center;">
+                                If the button does not work, copy this link into your browser:
+                                <br>
+                                <a href="{{ quotation_url }}"
+                                    style="color:#1d5f99; overflow-wrap:anywhere; word-break:break-word;">
+                                    {{ quotation_url }}
+                                </a>
+                            </p>
+
+                            <!-- IMPORTANT NOTICE -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="margin-top:28px; background:#fff8e8; border:1px solid #f2dfb3; border-radius:9px;">
+                                <tr>
+                                    <td style="padding:17px 18px;">
+
+                                        <h3 style="margin:0 0 9px; color:#855b12; font-size:14px;">
+                                            Important: Your consultation is not yet confirmed
+                                        </h3>
+
+                                        <p style="margin:0 0 12px; color:#715c35; font-size:13px; line-height:1.8;">
+                                            Your requested date and time are not a confirmed appointment.
+                                            Your consultation will be scheduled after payment has been
+                                            verified and you have selected an available appointment slot.
+                                        </p>
+
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                                            border="0">
+                                            <tr>
+                                                <td width="24" valign="top"
+                                                    style="padding:4px 0; color:#855b12; font-size:13px;">
+                                                    1.
+                                                </td>
+                                                <td
+                                                    style="padding:4px 0; color:#715c35; font-size:13px; line-height:1.6;">
+                                                    Review your quotation and submit payment.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="24" valign="top"
+                                                    style="padding:4px 0; color:#855b12; font-size:13px;">
+                                                    2.
+                                                </td>
+                                                <td
+                                                    style="padding:4px 0; color:#715c35; font-size:13px; line-height:1.6;">
+                                                    Wait for Hands-On Health to verify your payment.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="24" valign="top"
+                                                    style="padding:4px 0; color:#855b12; font-size:13px;">
+                                                    3.
+                                                </td>
+                                                <td
+                                                    style="padding:4px 0; color:#715c35; font-size:13px; line-height:1.6;">
+                                                    Receive the available appointment slots.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="24" valign="top"
+                                                    style="padding:4px 0; color:#855b12; font-size:13px;">
+                                                    4.
+                                                </td>
+                                                <td
+                                                    style="padding:4px 0; color:#715c35; font-size:13px; line-height:1.6;">
+                                                    Select a slot to confirm your appointment and receive your
+                                                    telemedicine link.
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- CONTACT SECTION -->
+                            <h3 style="margin:30px 0 9px; color:#12345a; font-size:17px;">
+                                We're here to help
+                            </h3>
+
+                            <p style="margin:0 0 19px; color:#52657a; font-size:13px; line-height:1.8;">
+                                If you have questions about your quotation or need assistance,
+                                please contact our team.
+                            </p>
+
+                            {% if phone %}
+                            <p style="margin:0 0 8px; font-size:13px; line-height:1.7;">
+                                <strong style="color:#12345a;">Phone:</strong>
+                                <a href="tel:{{ phone }}" style="color:#1d5f99; text-decoration:none;">
+                                    {{ phone }}
+                                </a>
+                            </p>
+                            {% endif %}
+
+                            {% if whatsapp %}
+                            <p style="margin:0 0 8px; font-size:13px; line-height:1.7;">
+                                <strong style="color:#12345a;">WhatsApp:</strong>
+                                <a href="https://wa.me/{{ whatsapp|cut:' '|cut:'+'|cut:'-'|cut:'('|cut:')' }}"
+                                    style="color:#1d5f99; text-decoration:none;">
+                                    {{ whatsapp }}
+                                </a>
+                            </p>
+                            {% endif %}
+
+                            {% if contact_email %}
+                            <p style="margin:0 0 8px; font-size:13px; line-height:1.7;">
+                                <strong style="color:#12345a;">Email:</strong>
+                                <a href="mailto:{{ contact_email }}" style="color:#1d5f99; text-decoration:none;">
+                                    {{ contact_email }}
+                                </a>
+                            </p>
+                            {% endif %}
+
+                            <p style="margin:25px 0 4px; color:#52657a; font-size:14px; line-height:1.8;">
+                                Kind regards,
+                            </p>
+
+                            <p style="margin:0; color:#12345a; font-size:15px; font-weight:bold; line-height:1.7;">
+                                {{ business_name }}
+                            </p>
+
+                            <p style="margin:0 0 20px; color:#78879a; font-size:12px; line-height:1.7;">
+                                {{ tagline }}
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td align="center" style="padding:23px 24px; background:#f6f8fb; border-top:1px solid #e5ebf2;">
+
+                            <p style="margin:0 0 7px; color:#12345a; font-size:13px; font-weight:bold;">
+                                {{ business_name }}
+                            </p>
+
+                            <p style="margin:0; color:#78879a; font-size:11px; line-height:1.8;">
+                                Your health, our priority.
+                            </p>
+
+                            <p style="margin:10px 0 0; color:#98a4b3; font-size:10px; line-height:1.7;">
+                                This email contains information about your consultation quotation.
+                                Please keep your secure quotation link private.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

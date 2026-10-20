@@ -1,0 +1,228 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Reply to Enquiry | Hands-On Health{% endblock %}
+
+{% block content %}
+
+<style>
+    .reply-container {
+        max-width: 850px;
+        margin: 30px auto;
+        padding: 0 15px 40px;
+    }
+
+    .reply-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 5px 25px rgba(15, 23, 42, .05);
+    }
+
+    .reply-header {
+        background: #103b70;
+        color: #fff;
+        padding: 25px;
+    }
+
+    .reply-header h2 {
+        margin: 0 0 8px;
+        color: #fff;
+        font-size: 23px;
+    }
+
+    .reply-header p {
+        margin: 0;
+        color: #dbeafe;
+    }
+
+    .reply-body {
+        padding: 28px;
+    }
+
+    .detail-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 18px;
+        border-radius: 10px;
+        margin-bottom: 22px;
+    }
+
+    .detail-box p {
+        margin: 8px 0;
+        overflow-wrap: anywhere;
+    }
+
+    .message-box {
+        background: #eff6ff;
+        border-left: 4px solid #2563eb;
+        padding: 18px;
+        margin-bottom: 25px;
+        border-radius: 6px;
+        overflow-wrap: anywhere;
+    }
+
+    .reply-label {
+        display: block;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 10px;
+    }
+
+    .reply-textarea {
+        width: 100%;
+        min-height: 190px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 15px;
+        font: inherit;
+        resize: vertical;
+    }
+
+    .reply-textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px #dbeafe;
+    }
+
+    .reply-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    .send-btn {
+        background: #087bd5;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 13px 22px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .back-btn {
+        background: #f1f5f9;
+        color: #334155;
+        border-radius: 8px;
+        padding: 13px 22px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    @media(max-width: 600px) {
+        .reply-container {
+            margin-top: 12px;
+        }
+
+        .reply-header,
+        .reply-body {
+            padding: 18px;
+        }
+
+        .reply-header h2 {
+            font-size: 20px;
+        }
+
+        .reply-actions {
+            flex-direction: column;
+        }
+
+        .send-btn,
+        .back-btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="reply-container">
+
+    <div class="reply-card">
+
+        <div class="reply-header">
+            <h2>
+                <i class="fa-solid fa-reply"></i>
+                Reply to Contact Enquiry
+            </h2>
+            <p>Review the customer's message and send your response.</p>
+        </div>
+
+        <div class="reply-body">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="detail-box">
+                <p><strong>Name:</strong> {{ enquiry.name }}</p>
+
+                <p>
+                    <strong>Email:</strong>
+                    {{ enquiry.email }}
+                </p>
+
+                <p>
+                    <strong>Phone:</strong>
+                    {{ enquiry.phone }}
+                </p>
+
+                <p>
+                    <strong>Service:</strong>
+                    {% if enquiry.is_general_enquiry %}
+                    General Enquiry
+                    {% elif enquiry.service %}
+                    {{ enquiry.service.name }}
+                    {% else %}
+                    Not specified
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Current Status:</strong>
+                    {{ enquiry.get_status_display }}
+                </p>
+            </div>
+
+            <h4>Customer's Message</h4>
+
+            <div class="message-box">
+                {{ enquiry.message|linebreaksbr }}
+            </div>
+
+            <form method="post" action="{% url 'staff:contact_enquiry_reply' enquiry.pk %}">
+                {% csrf_token %}
+
+                <label for="reply" class="reply-label">
+                    Your Email Reply
+                </label>
+
+                <textarea id="reply" name="reply" class="reply-textarea"
+                    placeholder="Write your professional response here..." required></textarea>
+
+                <div class="reply-actions">
+
+                    <button type="submit" class="send-btn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Send Reply
+                    </button>
+
+                    <a href="{% url 'staff:contact_enquiries' %}" class="back-btn">
+                        Back to Enquiries
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

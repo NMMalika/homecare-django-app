@@ -343,5 +343,15 @@ path(
     path("faqs/add/", views.faq_create, name="faq_create"),
     path("faqs/<int:pk>/edit/", views.faq_edit, name="faq_edit"),
     path("faqs/<int:pk>/delete/", views.faq_delete, name="faq_delete"),
+    path(
+    "contact-enquiries/",
+    views.contact_enquiries,
+    name="contact_enquiries",
+),
+    path(
+    "contact-enquiries/<int:pk>/reply/",
+    views.contact_enquiry_reply,
+    name="contact_enquiry_reply",
+),
 
 ]

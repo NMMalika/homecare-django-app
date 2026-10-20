@@ -1,11 +1,82 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-Hands-On Health Home-Based Care Service
-{% endblock %}
+{% block title %}Home-Based Care Services in Windhoek, Namibia | Hands-On Health{% endblock %}
+
+{% block meta_description %}Discover home-based care services in Windhoek, Namibia, with Hands-On Health. Explore home
+nursing, elderly care, bedridden patient support, post-operative recovery and personalised in-home healthcare. Request
+home care today.{% endblock %}
+
+{% block meta_author %}Hands-On Health{% endblock %}
+
+{% block meta_keywords %}home-based care Namibia, home care Windhoek, home nursing Namibia, elderly care Windhoek,
+bedridden patient care, post-operative care, palliative care, in-home healthcare Namibia, professional caregivers
+Namibia{% endblock %}
 
 {% block content %}
+
+<!-- SEO STRUCTURED DATA: Does not change page appearance -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  "name": "Hands-On Health",
+  "description": "Home-based healthcare, nursing support, elderly care, post-operative recovery and personalised patient assistance in Windhoek and other locations in Namibia, subject to availability.",
+  "areaServed": [
+    {
+      "@type": "City",
+      "name": "Windhoek"
+    },
+    {
+      "@type": "Country",
+      "name": "Namibia"
+    }
+  ],
+  "availableService": [
+    {
+      "@type": "Service",
+      "name": "Home-Based Care"
+    },
+    {
+      "@type": "Service",
+      "name": "Home Nursing"
+    },
+    {
+      "@type": "Service",
+      "name": "Elderly Care"
+    },
+    {
+      "@type": "Service",
+      "name": "Bedridden Patient Care"
+    },
+    {
+      "@type": "Service",
+      "name": "Post-Operative Recovery Support"
+    },
+    {
+      "@type": "Service",
+      "name": "Palliative and Supportive Care"
+    }
+  ]
+}
+</script>
+
+<!-- Page Title / Hero Section -->
+<section class="page-title style-2 text-center"
+    style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 60px; position: relative;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="color: #ffffff; font-weight: 700; text-transform: uppercase;">Our Services</h1>
+                <ul class="breadcrumb" style="background: transparent; margin-bottom: 0;">
+                    <li><a href="{% url 'home' %}" style="color: #ffffff;">Home</a></li>
+                    <li class="active" style="color: #00b4d8;">Our Services</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
 
 <!-- services start -->
 <section class="services-section modern-services-section">
@@ -31,10 +102,6 @@ Hands-On Health Home-Based Care Service
         </div>
 
 
-        <!-- ================================================ -->
-        <!-- DYNAMIC SERVICE CATEGORIES -->
-        <!-- ================================================ -->
-
         <!-- DYNAMIC SERVICE CATEGORIES -->
         {% for category in categories %}
         {% if category.services.all %}
@@ -49,15 +116,16 @@ Hands-On Health Home-Based Care Service
                     <div class="service-card-3d">
                         <div class="card-icon-glow">
                             {% if service.image %}
-                            <img src="{{ service.image.url }}" alt="{{ service.name }}" class="img-responsive card-custom-icon">
+                            <img src="{{ service.image.url }}"
+                                alt="{{ service.name }} - Hands-On Health home-based care service"
+                                class="img-responsive card-custom-icon" loading="lazy" decoding="async">
                             {% else %}
                             <i class="{{ service.icon_class|default:'fa-solid fa-heart-pulse' }}"></i>
                             {% endif %}
                         </div>
                         <h4>{{ service.name }}</h4>
                         <div class="border-center-blue"></div>
-        
-                        <!-- UPDATED DESCRIPTION WITH FALLBACK -->
+
                         <p>
                             {% if service.short_description %}
                             {{ service.short_description }}
@@ -67,15 +135,16 @@ Hands-On Health Home-Based Care Service
                             Professional home healthcare service tailored to patient needs.
                             {% endif %}
                         </p>
-        
+
                         {% if service.price > 0 %}
                         <div class="service-price-badge"
                             style="margin-bottom: 15px; font-weight: 600; color: var(--homecare-primary, #123f61);">
                             <span>Starting at: {{ service.formatted_price }}</span>
                         </div>
                         {% endif %}
-        
-                        <a href="{% url 'homecare:request' %}" class="btn btn-glow-card">
+
+                        <a href="{% url 'homecare:request' %}" class="btn btn-glow-card"
+                            aria-label="Request {{ service.name }} from Hands-On Health">
                             REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
@@ -92,11 +161,7 @@ Hands-On Health Home-Based Care Service
         {% endfor %}
 
 
-
-        <!-- ================================================ -->
         <!-- WHO WE CARE FOR -->
-        <!-- ================================================ -->
-
         <div class="who-we-care-wrapper">
 
             <div class="row display-flex align-items-center">
@@ -105,8 +170,9 @@ Hands-On Health Home-Based Care Service
 
                     <div class="care-image-box">
 
-                        <img src="{% static 'img/nurse1.jpeg' %}" alt="Caregiver with senior patient"
-                            class="img-responsive">
+                        <img src="{% static 'img/nurse1.jpeg' %}"
+                            alt="Caregiver with senior patient receiving home-based care" class="img-responsive"
+                            loading="lazy" decoding="async">
 
                         <div class="care-floating-badge">
 
@@ -222,10 +288,7 @@ Hands-On Health Home-Based Care Service
         </div>
 
 
-        <!-- ================================================ -->
         <!-- OUR SERVICE AREA -->
-        <!-- ================================================ -->
-
         <div class="service-area-wrapper">
 
             <div class="row display-flex align-items-center">
@@ -305,5 +368,11 @@ Hands-On Health Home-Based Care Service
     </div>
 </section>
 <!-- services end -->
+
+<!-- divider -->
+{% include "includes/divider.html" %}
+
+<!-- appointments -->
+{% include "includes/appointments/booking_form.html" %}
 
 {% endblock %}

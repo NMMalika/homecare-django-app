@@ -128,3 +128,44 @@ class FAQItem(models.Model):
 
     def __str__(self):
         return self.question
+
+
+class ContactEnquiry(models.Model):
+    class Status(models.TextChoices):
+        NEW = "NEW", "New"
+        IN_PROGRESS = "IN_PROGRESS", "In Progress"
+        CONTACTED = "CONTACTED", "Contacted"
+        RESOLVED = "RESOLVED", "Resolved"
+        CLOSED = "CLOSED", "Closed"
+
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50)
+    service = models.ForeignKey(
+        "services.Service",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="contact_enquiries",
+    )
+    is_general_enquiry = models.BooleanField(default=False)
+    town = models.CharField(max_length=150, blank=True)
+    message = models.TextField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.NEW,
+    )
+    staff_notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Contact Enquiry"
+        verbose_name_plural = "Contact Enquiries"
+
+    def __str__(self):
+        return f"{self.name} — {self.email}"

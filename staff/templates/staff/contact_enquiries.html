@@ -1,0 +1,583 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Contact Enquiries | Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .enquiries-dashboard {
+        padding: 1.5rem 0 3rem;
+    }
+
+    /* Page Header */
+    .page-header-box {
+        margin-bottom: 2rem;
+    }
+
+    .header-kicker {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .page-header-title {
+        margin-bottom: 0.25rem;
+        color: #0f172a;
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        margin-bottom: 0;
+        color: #64748b;
+        font-size: 0.9375rem;
+    }
+
+    /* Table Panel */
+    .table-panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-custom {
+        width: 100%;
+        min-width: 1050px;
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table-custom th {
+        padding: 0.875rem 1.25rem;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .table-custom td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        color: #334155;
+        font-size: 0.875rem;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .table-custom tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    /* Customer Information */
+    .customer-name {
+        display: block;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .contact-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+    }
+
+    .contact-link:hover {
+        text-decoration: underline;
+    }
+
+    .contact-phone {
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 0.8125rem;
+    }
+
+    .date-main {
+        color: #0f172a;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .date-time {
+        margin-top: 4px;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    /* Service Pill */
+    .service-pill {
+        display: inline-block;
+        padding: 0.3rem 0.65rem;
+        background-color: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 0.375rem;
+        color: #1d4ed8;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: normal;
+    }
+
+    .service-pill.general {
+        background-color: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #475569;
+    }
+
+    /* Status Badges */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.3rem 0.65rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-status.new {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #dbeafe;
+    }
+
+    .badge-status.in-progress {
+        background-color: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fef3c7;
+    }
+
+    .badge-status.contacted,
+    .badge-status.resolved {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #d1fae5;
+    }
+
+    .badge-status.closed {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Message Excerpt */
+    .message-excerpt {
+        max-width: 280px;
+        color: #475569;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    /* Reply Button */
+    .enquiry-reply-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: #087bd5;
+        border: 1px solid #087bd5;
+        border-radius: 8px;
+        color: #ffffff !important;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none !important;
+        white-space: nowrap;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .enquiry-reply-btn:hover {
+        background: #075ca3;
+        border-color: #075ca3;
+        transform: translateY(-1px);
+    }
+
+    .enquiry-reply-btn:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 3px;
+    }
+
+    .enquiry-reply-btn.replied {
+        background: #ffffff;
+        border-color: #a7f3d0;
+        color: #047857 !important;
+    }
+
+    .enquiry-reply-btn.replied:hover {
+        background: #ecfdf5;
+    }
+
+    /* Empty State */
+    .empty-state-cell {
+        padding: 4rem 1.5rem !important;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 1rem;
+        background-color: #f1f5f9;
+        border-radius: 50%;
+        color: #94a3b8;
+        font-size: 1.5rem;
+    }
+
+    .empty-state-title {
+        margin: 0 0 8px;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .empty-state-description {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    /* Tablet */
+    @media (max-width: 991px) {
+        .enquiries-dashboard {
+            padding-top: 1rem;
+        }
+
+        .page-header-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Mobile Card Layout */
+    @media (max-width: 767px) {
+        .enquiries-dashboard {
+            padding: 12px 0 30px;
+        }
+
+        .page-header-box {
+            margin-bottom: 1.25rem;
+        }
+
+        .page-header-title {
+            font-size: 1.4rem;
+        }
+
+        .page-header-subtitle {
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .table-panel {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
+        }
+
+        .table-responsive {
+            overflow: visible;
+        }
+
+        .table-custom,
+        .table-custom tbody,
+        .table-custom tr,
+        .table-custom td {
+            display: block;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .table-custom thead {
+            display: none;
+        }
+
+        .table-custom tbody tr {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+
+        .table-custom tbody tr:hover {
+            background: #ffffff;
+        }
+
+        .table-custom td {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            padding: 11px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            overflow-wrap: anywhere;
+        }
+
+        .table-custom td:last-child {
+            border-bottom: none;
+        }
+
+        .table-custom td:not(.empty-state-cell)::before {
+            content: attr(data-label);
+            display: block;
+            color: #64748b;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .customer-name {
+            font-size: 0.95rem;
+        }
+
+        .contact-link {
+            word-break: break-word;
+        }
+
+        .message-excerpt {
+            max-width: 100%;
+        }
+
+        .enquiry-reply-btn {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 0.875rem;
+        }
+
+        .table-custom tbody tr:has(.empty-state-cell) {
+            padding: 0;
+        }
+
+        .table-custom td.empty-state-cell {
+            display: block;
+            padding: 3rem 1rem !important;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid enquiries-dashboard">
+
+    <!-- Page Header -->
+    <div class="page-header-box">
+        <span class="header-kicker">
+            <i class="fa-solid fa-address-book"></i>
+            Public Submissions
+        </span>
+
+        <h1 class="page-header-title">
+            Contact Enquiries
+        </h1>
+
+        <p class="page-header-subtitle">
+            Review customer enquiries, respond to messages,
+            and monitor their progress.
+        </p>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-panel">
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th scope="col">Date Received</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Contact Information</th>
+                        <th scope="col">Service Required</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Message Excerpt</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for enquiry in enquiries %}
+                    <tr>
+
+                        <!-- Date -->
+                        <td data-label="Date Received">
+                            <div class="date-main">
+                                {{ enquiry.created_at|date:"d M Y" }}
+                            </div>
+
+                            <div class="date-time">
+                                <i class="fa-regular fa-clock"></i>
+                                {{ enquiry.created_at|date:"H:i" }}
+                            </div>
+                        </td>
+
+                        <!-- Customer Name -->
+                        <td data-label="Name">
+                            <span class="customer-name">
+                                {{ enquiry.name }}
+                            </span>
+                        </td>
+
+                        <!-- Contact Information -->
+                        <td data-label="Contact Information">
+                            <div>
+                                <a href="mailto:{{ enquiry.email }}" class="contact-link">
+                                    {{ enquiry.email }}
+                                </a>
+                            </div>
+
+                            {% if enquiry.phone %}
+                            <div class="contact-phone">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ enquiry.phone }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <!-- Service -->
+                        <td data-label="Service Required">
+                            {% if enquiry.is_general_enquiry %}
+                            <span class="service-pill general">
+                                General Enquiry
+                            </span>
+                            {% elif enquiry.service %}
+                            <span class="service-pill">
+                                {{ enquiry.service.name }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">
+                                Service unavailable
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Location -->
+                        <td data-label="Location">
+                            {% if enquiry.town %}
+                            <span>
+                                <i class="fa-solid fa-location-dot text-danger"></i>
+                                {{ enquiry.town }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Status -->
+                        <td data-label="Status">
+
+                            {% if enquiry.status == "NEW" %}
+                            <span class="badge-status new">
+                                <i class="fa-solid fa-circle-dot"></i>
+                                New
+                            </span>
+
+                            {% elif enquiry.status == "IN_PROGRESS" %}
+                            <span class="badge-status in-progress">
+                                <i class="fa-solid fa-clock"></i>
+                                In Progress
+                            </span>
+
+                            {% elif enquiry.status == "CONTACTED" %}
+                            <span class="badge-status contacted">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Contacted
+                            </span>
+
+                            {% elif enquiry.status == "RESOLVED" %}
+                            <span class="badge-status resolved">
+                                <i class="fa-solid fa-check-double"></i>
+                                Resolved
+                            </span>
+
+                            {% elif enquiry.status == "CLOSED" %}
+                            <span class="badge-status closed">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                Closed
+                            </span>
+
+                            {% else %}
+                            <span class="badge-status closed">
+                                {{ enquiry.get_status_display }}
+                            </span>
+                            {% endif %}
+
+                        </td>
+
+                        <!-- Message -->
+                        <td data-label="Message Excerpt">
+                            <div class="message-excerpt">
+                                {{ enquiry.message|truncatewords:15 }}
+                            </div>
+                        </td>
+
+                        <!-- Actions -->
+                        <td data-label="Actions">
+
+                            <a href="{% url 'staff:contact_enquiry_reply' enquiry.pk %}"
+                                class="enquiry-reply-btn {% if enquiry.status == 'CONTACTED' %}replied{% endif %}"
+                                aria-label="View and reply to enquiry from {{ enquiry.name }}">
+                                {% if enquiry.status == "CONTACTED" %}
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                                View / Reply Again
+                                {% else %}
+                                <i class="fa-solid fa-reply"></i>
+                                View / Reply
+                                {% endif %}
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="empty-state-cell">
+
+                            <div class="empty-state-icon">
+                                <i class="fa-regular fa-envelope-open"></i>
+                            </div>
+
+                            <h4 class="empty-state-title">
+                                No Contact Enquiries
+                            </h4>
+
+                            <p class="empty-state-description">
+                                No messages have been submitted through
+                                the public contact form yet.
+                            </p>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -247,3 +247,12 @@ DEFAULT_FROM_EMAIL = os.getenv(
 
 # Password reset links expire after 30 minutes.
 PASSWORD_RESET_TIMEOUT = 1800
+
+# =========================================================
+# WEBSITE URL - STAFF EMAIL NOTIFICATION LINKS
+# =========================================================
+
+SITE_URL = os.getenv(
+    "SITE_URL",
+    "http://127.0.0.1:8000"
+).rstrip("/")

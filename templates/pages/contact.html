@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Hands-On Health Home-Based Care Service
+{% endblock %}
+
+{% block content %}
+<!-- Inner Banner Section Start -->
+<section class="inner-banner-section">
+    <div class="container-fluid padding-0">
+        <div class="row align-items-center no-gutters display-flex-center">
+
+            <!-- Left Text Column -->
+            <div class="col-md-6 col-sm-12">
+                <div class="inner-banner-content">
+                    <span class="sub-title-badge sky-badge">
+                        <i class="fa-solid fa-headset"></i> We Are Here To Help
+                    </span>
+                    <h1 class="inner-banner-title">Get in Touch</h1>
+                    <p class="inner-banner-lead">
+                        Have questions about our home care services or need personalized support? Our dedicated care
+                        team is ready to assist you.
+                    </p>
+                    <nav aria-label="breadcrumb">
+                        <ul class="custom-breadcrumb">
+                            <li><a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a></li>
+                            <li class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></li>
+                            <li class="active">Contact Us</li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Right Full-Height Blended Image Column -->
+            <div class="col-md-6 col-sm-12 hidden-xs">
+                <div class="full-height-image-wrapper">
+                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Hands-on Health Care Nurse" class="seamless-banner-img">
+                    <div class="seamless-gradient-overlay"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Inner Banner Section End -->
+
+<!-- Contact Info & Care Needs Section Start -->
+<section class="care-needs-contact-section padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="row text-center margin-bottom-50">
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+                <span class="sub-title-badge sky-badge">
+                    <i class="fa-solid fa-heart-pulse"></i> Hands-on Health Home-Based Care Service
+                </span>
+                <h2 class="section-title-main">
+                    Let's Talk About <span class="highlight-text">Your Care Needs</span>
+                </h2>
+                <div class="accent-line-center"></div>
+                <p class="section-lead-p">
+                    Professional care delivered directly to your home. Reach out to our clinical care coordinator today
+                    to arrange personalized support for you or your loved ones.
+                </p>
+            </div>
+        </div>
+
+        <div class="row style-2 flex-equal-height">
+
+            <!-- Left Column: Scope of Care Checklist -->
+            <div class="col-md-5 col-sm-12 margin-bottom-30 flex-col">
+                <div class="care-scope-card">
+                    <div class="scope-header">
+                        <i class="fa-solid fa-clipboard-user scope-icon"></i>
+                        <h3>Contact Us For:</h3>
+                    </div>
+
+                    <ul class="care-scope-list">
+                        {% for category in categories %}
+                        {% for service in category.services.all %}
+                        {% if service.is_active %}
+                        <li>
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>{{ service.name }}</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        {% empty %}
+                        <li>
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Our care services are being updated.</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="scope-footer-note">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Confidential, tailored assessment by qualified healthcare professionals.</span>
+                    </div>
+                </div>
+            </div>
+
+           
+            <!-- Right Column: Direct Contact Methods Grid -->
+            <div class="col-md-7 col-sm-12 flex-col">
+                <div class="contact-cards-grid">
+            
+                    <!-- Phone Card -->
+                    <div class="contact-card-item">
+                        <div class="contact-icon-box">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>Phone Support</h4>
+                            <p class="contact-label">Speak directly with our team</p>
+            
+                            <a href="tel:{{ site_settings.phone }}" class="contact-link">
+                                {{ site_settings.phone }}
+                            </a>
+                        </div>
+                    </div>
+            
+                    <!-- WhatsApp Card -->
+                    <div class="contact-card-item">
+                        <div class="contact-icon-box whatsapp-bg">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>WhatsApp Care Line</h4>
+                            <p class="contact-label">Instant messaging &amp; consultation</p>
+            
+                            <a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" rel="noopener noreferrer"
+                                class="contact-link">
+                                {{ site_settings.whatsapp }}
+                            </a>
+                        </div>
+                    </div>
+            
+                    <!-- Email Card -->
+                    <div class="contact-card-item full-width-card">
+                        <div class="contact-icon-box">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+                        <div class="contact-card-content">
+                            <h4>Email Enquiries</h4>
+                            <p class="contact-label">
+                                Send us your detailed medical care requests or referrals
+                            </p>
+            
+                            <div class="email-links-wrapper">
+                                <a href="mailto:{{ site_settings.email }}" class="contact-link">
+                                    {{ site_settings.email }}
+                                </a>
+            
+                                <span class="divider-dot">•</span>
+            
+                                <a href="mailto:{{ site_settings.care_email }}" class="contact-link">
+                                    {{ site_settings.care_email }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+           
+
+        </div>
+
+    </div>
+</section>
+<!-- Action Contact Bar Section Start -->
+<section class="action-bar-section">
+    <div class="container">
+        <div class="action-bar-wrapper">
+
+            <!-- Item 1: Core Tagline -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-house-medical"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">We Bring Care Home</span>
+                    <span class="action-value">Doorstep Healthcare</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 2: Our Purpose -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">Accessible Support</span>
+                    <span class="action-value">Where patients feel most comfortable — at home.</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 3: Care Promise -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-user-nurse"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">Hands-on Health Home-Based Care</span>
+                    <span class="action-value">Professional Care. Compassionate Support.</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 4: CTA Button -->
+            <div class="action-bar-cta">
+                <a href="{% url 'homecare:request' %}" class="btn-action-pill">
+                    REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Action Contact Bar Section End -->
+<!-- Contact Info & Care Needs Section End -->
+<!-- Contact Form & Service Coverage Section Start -->
+<section class="contact-form-section padding-top-60 padding-bottom-80">
+    <div class="container">
+        <div class="row display-flex-stretch">
+
+            <!-- Left Column: Premium Contact Form -->
+            <div class="col-md-7 col-sm-12 margin-bottom-30">
+                <div class="form-card-container">
+
+                    <div class="form-header-box">
+                        <span class="form-badge"><i class="fa-solid fa-paper-plane"></i> Quick Enquiry</span>
+                        <h3 class="form-title">Send Us A Message</h3>
+                        <p class="form-subtitle">Fill out the form below to request home care services or schedule an
+                            initial nurse consultation.</p>
+                    </div>
+
+                <form action="{% url 'pages:contact' %}" method="post" class="custom-medical-form">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Full Name <span class="required-star">*</span></label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-regular fa-user field-icon"></i>
+                                        <input type="text" name="name" class="form-control custom-input"
+                                            placeholder="e.g. John Doe" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Email Address <span
+                                            class="required-star">*</span></label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-regular fa-envelope field-icon"></i>
+                                        <input type="email" name="email" class="form-control custom-input"
+                                            placeholder="e.g. john@example.com" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Phone Number <span class="required-star">*</span></label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-solid fa-phone field-icon"></i>
+                                        <input type="tel" name="phone" class="form-control custom-input"
+                                            placeholder="e.g. +264 81 123 4567" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Service Required</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-solid fa-notes-medical field-icon"></i>
+                                        <select name="service" id="service" class="form-control custom-select" required>
+                                            <option value="">Select Service Needed</option>
+                                        
+                                            {% for category in categories %}
+                                            {% for service in category.services.all %}
+                                            {% if service.is_active %}
+                                            <option value="{{ service.id }}">
+                                                {{ service.name }}
+                                            </option>
+                                            {% endif %}
+                                            {% endfor %}
+                                            {% endfor %}
+                                        
+                                            <option value="other">General Enquiry</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group custom-field-group">
+                            <label class="field-label">Location / Town</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fa-solid fa-location-dot field-icon"></i>
+                                <input type="text" name="town" class="form-control custom-input"
+                                    placeholder="e.g. Windhoek, Swakopmund, Walvis Bay">
+                            </div>
+                        </div>
+
+                        <div class="form-group custom-field-group">
+                            <label class="field-label">Your Message <span class="required-star">*</span></label>
+                            <textarea name="message" class="form-control custom-textarea" rows="4"
+                                placeholder="How can our home healthcare team assist you?" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit-request">
+                            <span>Submit Request</span>
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Service Coverage & Operating Hours Card -->
+            <div class="col-md-5 col-sm-12">
+                <div class="coverage-sidebar-card">
+
+                    <div class="sidebar-header">
+                        <div class="sidebar-header-icon">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <h3>Service Coverage &amp; Hours</h3>
+                    </div>
+
+                    <p class="sidebar-description">
+                        Our registered nurses and professional home caregivers are on call across major urban centers in
+                        Namibia.
+                    </p>
+
+                    <div class="info-block-item">
+                        <div class="info-block-title">
+                            <i class="fa-regular fa-clock icon-accent"></i>
+                            <h4>Operating Hours</h4>
+                        </div>
+                        <ul class="info-details-list">
+
+                            <li class="highlight-item">
+                                <i class="fa-solid fa-user-nurse"></i>
+                                <span><strong>24/7</strong> In-Home Patient On-Call Support</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-block-item">
+                        <div class="info-block-title">
+                            <i class="fa-solid fa-map-location-dot icon-accent"></i>
+                            <h4>Regions Covered</h4>
+                        </div>
+                        <ul class="info-details-list">
+                            <li>
+                                <i class="fa-solid fa-location-dot location-pin"></i>
+                                <span><strong>Khomas Region:</strong> Windhoek &amp; Surrounds</span>
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-location-dot location-pin"></i>
+                                <span><strong>Erongo Region:</strong> Swakopmund, Walvis Bay</span>
+                            </li>
+                            <li class="outreach-badge-item">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>Special outreach available upon request</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Emergency Badge Footer -->
+                    <div class="sidebar-footer-callout">
+                        <i class="fa-solid fa-headset"></i>
+                        <div>
+                            <strong>Need Urgent Care Assistance?</strong>
+                            <p>Call our dispatch coordinator directly via phone or WhatsApp.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Contact Form & Service Coverage Section End -->
+{% endblock %}

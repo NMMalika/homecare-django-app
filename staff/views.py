@@ -3,7 +3,7 @@ from functools import wraps
 import logging
 import secrets
 from datetime import timedelta
-
+from django.conf import settings as django_settings
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth import authenticate, login, logout
@@ -18,6 +18,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.core.mail import EmailMultiAlternatives
+from django.utils.html import escape
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -65,6 +66,7 @@ from homecare.views import (
 )
 from .models import FAQItem, QuestionFormSettings, CustomerQuestion
 from .forms import StaffCaregiverInviteForm
+from staff.models import ContactEnquiry
 
 logger = logging.getLogger(__name__)
 # ============================================================
@@ -3820,6 +3822,167 @@ def faq_delete(request, pk):
     })
 
 
+@admin_required
+def contact_enquiries(request):
+    """Display public website contact submissions."""
+
+    enquiries = ContactEnquiry.objects.select_related(
+        "service"
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "staff/contact_enquiries.html",
+        {
+            "enquiries": enquiries,
+        },
+    )
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def contact_enquiry_reply(request, pk):
+    enquiry = get_object_or_404(ContactEnquiry, pk=pk)
+
+    if request.method == "POST":
+        reply_text = request.POST.get("reply", "").strip()
+
+        if not reply_text:
+            messages.error(request, "Please enter a reply message.")
+            return redirect("staff:contact_enquiry_reply", pk=pk)
+
+        site = SiteSettings.load()
+        business = site.business_name or "Hands-On Health"
+
+        subject = f"Re: Your Enquiry | {business}"
+
+        plain_body = (
+            f"Dear {enquiry.name},\n\n"
+            f"Thank you for contacting {business}.\n\n"
+            f"{reply_text}\n\n"
+            f"Kind regards,\n"
+            f"{business} Team"
+        )
+
+        safe_name = escape(enquiry.name)
+        safe_business = escape(business)
+        safe_reply = escape(reply_text).replace("\n", "<br>")
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <body style="margin:0;padding:30px 12px;
+                     background:#f1f6fb;
+                     font-family:Arial,sans-serif;">
+
+          <table role="presentation" width="100%"
+                 cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center">
+                <table role="presentation" width="600"
+                       cellpadding="0" cellspacing="0"
+                       style="max-width:600px;width:100%;
+                              background:#ffffff;
+                              border-radius:14px;overflow:hidden;">
+
+                  <tr>
+                    <td style="background:#103b70;
+                               padding:30px;text-align:center;">
+                      <h2 style="color:white;margin:0;">
+                        {safe_business}
+                      </h2>
+                      <p style="color:#c6e6ff;margin:10px 0 0;">
+                        Home-Based Healthcare
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding:35px 30px;">
+                      <h2 style="color:#103b70;">
+                        Thank You for Contacting Us
+                      </h2>
+
+                      <p>Dear {safe_name},</p>
+
+                      <p>
+                        Thank you for reaching out to
+                        {safe_business}.
+                      </p>
+
+                      <div style="background:#f0f8ff;
+                                  border-left:4px solid #1689d2;
+                                  padding:20px;
+                                  border-radius:6px;
+                                  line-height:1.8;
+                                  overflow-wrap:anywhere;">
+                        {safe_reply}
+                      </div>
+
+                      <p style="margin-top:25px;">
+                        Kind regards,<br>
+                        <strong>{safe_business} Team</strong>
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="background:#eaf4fc;
+                               text-align:center;
+                               padding:20px;
+                               font-size:12px;
+                               color:#54718a;">
+                      Compassionate Care. Professional Support.
+                    </td>
+                  </tr>
+
+                </table>
+              </td>
+            </tr>
+          </table>
+
+        </body>
+        </html>
+        """
+
+        try:
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=plain_body,
+                from_email=django_settings.DEFAULT_FROM_EMAIL,
+                to=[enquiry.email],
+            )
+
+            email.attach_alternative(html_body, "text/html")
+            email.send(fail_silently=False)
+
+        except Exception:
+            logger.exception(
+                "Failed to reply to contact enquiry %s",
+                enquiry.pk,
+            )
+            messages.error(
+                request,
+                "The reply could not be sent. Please try again.",
+            )
+            return redirect("staff:contact_enquiry_reply", pk=pk)
+
+        # Change status ONLY after email.send() succeeds.
+        enquiry.status = ContactEnquiry.Status.CONTACTED
+        enquiry.save(update_fields=["status", "updated_at"])
+
+        messages.success(
+            request,
+            "Reply sent successfully. Enquiry marked as Contacted.",
+        )
+        return redirect("staff:contact_enquiries")
+
+    return render(
+        request,
+        "staff/contact_enquiry_reply.html",
+        {"enquiry": enquiry},
+    )
+
+
 # ============================================================
 # STAFF ACTIVITY NOTIFICATIONS (CONFIGURED RECIPIENTS ONLY)
 # ============================================================
@@ -3866,7 +4029,6 @@ def _send_configured_staff_alert(subject, description, dashboard_url_name, recor
             return
 
         path = reverse(dashboard_url_name)
-        # Link to the staff list; include record ID as a reference in the email.
         url = f"{base_url}{path}"
         business = site.business_name or "Hands-On Health"
         body = (
@@ -3879,17 +4041,193 @@ def _send_configured_staff_alert(subject, description, dashboard_url_name, recor
         )
 
         def _deliver():
+            safe_business = escape(business)
+            safe_subject = escape(subject)
+            safe_description = escape(description)
+            safe_url = escape(url)
+
+            html_body = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>{safe_subject}</title>
+            </head>
+
+            <body style="margin:0;padding:0;background:#f1f6fb;
+                         font-family:Arial,Helvetica,sans-serif;color:#243b53;">
+
+                <table role="presentation" cellpadding="0" cellspacing="0"
+                       width="100%" style="background:#f1f6fb;padding:35px 12px;">
+                    <tr>
+                        <td align="center">
+
+                            <table role="presentation" cellpadding="0" cellspacing="0"
+                                   width="600"
+                                   style="width:100%;max-width:600px;background:#ffffff;
+                                          border-radius:16px;overflow:hidden;">
+
+                                <tr>
+                                    <td style="background:#103b70;padding:32px 35px;
+                                               text-align:center;">
+
+                                        <h1 style="margin:0;color:#ffffff;font-size:25px;
+                                                   line-height:1.4;">
+                                            {safe_business}
+                                        </h1>
+
+                                        <p style="color:#b9e4ff;font-size:13px;
+                                                  margin:10px 0 0;">
+                                            PROFESSIONAL HOME-BASED HEALTHCARE
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:35px 35px 15px;">
+
+                                        <p style="font-size:12px;font-weight:bold;
+                                                  letter-spacing:1px;color:#1689d2;">
+                                            STAFF ACTIVITY NOTIFICATION
+                                        </p>
+
+                                        <h2 style="font-size:25px;color:#103b70;
+                                                   margin:12px 0 18px;">
+                                            {safe_subject}
+                                        </h2>
+
+                                        <p style="font-size:15px;line-height:1.8;">
+                                            Hello {safe_business} Team,
+                                        </p>
+
+                                        <p style="font-size:15px;line-height:1.8;">
+                                            {safe_description}
+                                        </p>
+
+                                        <table role="presentation" width="100%"
+                                               cellpadding="0" cellspacing="0"
+                                               style="background:#edf7ff;
+                                                      border-left:4px solid #1689d2;
+                                                      border-radius:8px;
+                                                      margin:25px 0;">
+                                            <tr>
+                                                <td style="padding:20px;">
+                                                    <p style="margin:0;color:#54718a;
+                                                              font-size:13px;">
+                                                        REFERENCE NUMBER
+                                                    </p>
+                                                    <p style="margin:8px 0 0;
+                                                              font-size:23px;
+                                                              font-weight:bold;
+                                                              color:#103b70;">
+                                                        #{escape(str(record_id))}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <p style="font-size:15px;line-height:1.7;">
+                                            Please sign in to the staff dashboard
+                                            to review this notification and take
+                                            any necessary action.
+                                        </p>
+
+                                        <table role="presentation" cellpadding="0"
+                                               cellspacing="0"
+                                               style="margin:30px 0;">
+                                            <tr>
+                                                <td bgcolor="#087bd5"
+                                                    style="border-radius:8px;">
+                                                    <a href="{safe_url}"
+                                                       style="display:inline-block;
+                                                              padding:16px 28px;
+                                                              color:#ffffff;
+                                                              font-size:15px;
+                                                              font-weight:bold;
+                                                              text-decoration:none;">
+                                                        Open Staff Dashboard &rarr;
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <p style="font-size:12px;line-height:1.7;
+                                                  color:#71869a;overflow-wrap:anywhere;">
+                                            If the button does not work, use this link:
+                                            <a href="{safe_url}"
+                                               style="color:#087bd5;">
+                                                {safe_url}
+                                            </a>
+                                        </p>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:25px 35px;
+                                               border-top:1px solid #e5edf4;">
+
+                                        <p style="font-size:14px;line-height:1.7;
+                                                  color:#54718a;margin:0;">
+                                            Thank you for helping us deliver
+                                            compassionate, professional care.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="background:#eaf4fc;padding:25px;
+                                               text-align:center;">
+
+                                        <p style="font-size:15px;font-weight:bold;
+                                                  color:#103b70;margin:0;">
+                                            {safe_business}
+                                        </p>
+
+                                        <p style="font-size:12px;color:#637f96;
+                                                  margin:10px 0 0;">
+                                            Automated Staff Notification
+                                        </p>
+
+                                        <p style="font-size:11px;color:#8295a6;
+                                                  margin:10px 0 0;">
+                                            This message was generated automatically.
+                                            Please do not reply to this email.
+                                        </p>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </body>
+            </html>
+            """
+
             for email in recipients:
                 try:
-                    send_mail(
+                    message = EmailMultiAlternatives(
                         subject=f"{business} | {subject}",
-                        message=body,
-                        from_email=getattr(_notification_django_settings, "DEFAULT_FROM_EMAIL", None),
-                        recipient_list=[email],
-                        fail_silently=False,
+                        body=body,
+                        from_email=getattr(
+                            _notification_django_settings,
+                            "DEFAULT_FROM_EMAIL",
+                            None,
+                        ),
+                        to=[email],
                     )
+
+                    message.attach_alternative(html_body, "text/html")
+                    message.send(fail_silently=False)
                 except Exception:
-                    logger.exception("Staff notification email failed for %s", email)
+                    logger.exception(
+                        "Staff notification email failed for %s",
+                        email,
+                    )
 
         transaction.on_commit(_deliver)
     except Exception:
@@ -3940,6 +4278,15 @@ def _staff_question_created(sender, instance, created, **kwargs):
             "A customer has submitted a new FAQ question.",
             "staff:question_inbox", instance.pk,
         )
+        
+def _staff_contact_enquiry_created(sender, instance, created, **kwargs):
+    if created:
+        _send_configured_staff_alert(
+            "New Contact Enquiry",
+            "A visitor has submitted a new contact enquiry through the website.",
+            "staff:contact_enquiries",
+            instance.pk,
+        )
 
 
 _notification_post_save.connect(
@@ -3961,4 +4308,11 @@ _notification_post_save.connect(
 _notification_post_save.connect(
     _staff_question_created, sender=CustomerQuestion,
     dispatch_uid="staff_alert_question_created_v1", weak=False,
+)
+
+_notification_post_save.connect(
+    _staff_contact_enquiry_created,
+    sender=ContactEnquiry,
+    dispatch_uid="staff_alert_contact_enquiry_created_v1",
+    weak=False,
 )

@@ -163,7 +163,15 @@
                     <span class="nav-icon">
                         <i class="fa-solid fa-comments"></i>
                     </span>
-                    <span>Customer Questions</span>
+                    <span>Frequently Asked Questions</span>
+                </a>
+                <a href="{% url 'staff:contact_enquiries' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'contact_enquiries' %}active{% endif %}"
+                    title="Contact Enquiries">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </span>
+                    <span>Contact Enquiries</span>
                 </a>
                 <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"

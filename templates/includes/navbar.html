@@ -64,7 +64,7 @@
                             </li>
 
                             <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
-                                <a href="#">Contact</a>
+                                <a href="{% url 'pages:contact' %}">Contact</a>
                             </li>
 
                             <li class="nav-btn-wrapper">
