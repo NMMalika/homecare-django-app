@@ -100,8 +100,12 @@ class SiteSettings(models.Model):
         blank=True,
     )
 
-    # =========================================================
+        # =========================================================
     # PAYMENT INFORMATION
+    # =========================================================
+
+    # =========================================================
+    # BANK TRANSFER
     # =========================================================
 
     bank_name = models.CharField(
@@ -124,24 +128,92 @@ class SiteSettings(models.Model):
         blank=True,
     )
 
-    mobile_money_name = models.CharField(
-        max_length=200,
-        blank=True,
+    # =========================================================
+    # PAYFAST PAYMENT SETTINGS
+    # =========================================================
+
+    payfast_enabled = models.BooleanField(
+        default=False,
+        help_text="Enable PayFast payments on the website.",
     )
 
-    mobile_money_number = models.CharField(
-        max_length=50,
+    payfast_merchant_id = models.CharField(
+        max_length=150,
         blank=True,
+        help_text="Your PayFast Merchant ID.",
     )
+
+    payfast_merchant_key = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Your PayFast Merchant Key.",
+    )
+
+    payfast_passphrase = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Your PayFast integration passphrase.",
+    )
+
+    payfast_sandbox = models.BooleanField(
+        default=True,
+        help_text="Enable PayFast sandbox mode for testing.",
+    )
+
+    # =========================================================
+    # PAYPAL PAYMENT SETTINGS
+    # =========================================================
+
+    paypal_enabled = models.BooleanField(
+        default=False,
+        help_text="Enable PayPal payments on the website.",
+    )
+
+    paypal_email = models.EmailField(
+        blank=True,
+        help_text="Your PayPal Business Account email address.",
+    )
+
+    paypal_client_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Your PayPal REST API Client ID.",
+    )
+
+    paypal_secret = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Your PayPal REST API Secret.",
+    )
+
+    paypal_sandbox = models.BooleanField(
+        default=True,
+        help_text="Enable PayPal sandbox mode for testing.",
+    )
+
+    # =========================================================
+    # GENERAL PAYMENT INSTRUCTIONS
+    # =========================================================
 
     payment_instructions = models.TextField(
         blank=True,
-        help_text="Additional instructions shown to clients on quotations.",
+        help_text=(
+            "Additional payment instructions shown to "
+            "clients on quotations and payment pages."
+        ),
     )
+
+    # =========================================================
+    # TIMESTAMPS
+    # =========================================================
 
     updated_at = models.DateTimeField(
         auto_now=True,
     )
+
+    # =========================================================
+    # MODEL META
+    # =========================================================
 
     class Meta:
         verbose_name = "Site Settings"
@@ -150,10 +222,18 @@ class SiteSettings(models.Model):
     def __str__(self):
         return self.business_name
 
+    # =========================================================
+    # SAVE SETTINGS
+    # =========================================================
+
     def save(self, *args, **kwargs):
         # Always use one settings record
         self.pk = 1
         super().save(*args, **kwargs)
+
+    # =========================================================
+    # LOAD SITE SETTINGS
+    # =========================================================
 
     @classmethod
     def load(cls):

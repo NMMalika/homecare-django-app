@@ -164,7 +164,7 @@ Site Settings
         font-weight: 700;
     }
 
-    .settings-field input:not([type="file"]),
+    .settings-field input:not([type="file"]):not([type="checkbox"]),
     .settings-field textarea,
     .settings-field select {
         width: 100%;
@@ -180,7 +180,7 @@ Site Settings
         transition: .2s;
     }
 
-    .settings-field input:not([type="file"]) {
+    .settings-field input:not([type="file"]):not([type="checkbox"]) {
         height: 43px;
     }
 
@@ -189,7 +189,7 @@ Site Settings
         resize: vertical;
     }
 
-    .settings-field input:not([type="file"]):focus,
+    .settings-field input:not([type="file"]):not([type="checkbox"]):focus,
     .settings-field textarea:focus,
     .settings-field select:focus {
         border-color: #2f7d95;
@@ -366,6 +366,28 @@ Site Settings
             width: 100%;
         }
 
+    }
+
+    /* Payment gateway toggles and field guidance */
+    .settings-field.settings-checkbox label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .settings-field.settings-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        accent-color: #2f7d95;
+    }
+
+    .settings-help {
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 6px 0 0;
     }
 </style>
 
@@ -909,146 +931,174 @@ Site Settings
 
 
         <!-- =================================================
-             PAYMENT
+             PAYMENT INFORMATION
              ================================================= -->
-
+        <div class="payment-notice">
+            <i class="fa fa-shield-alt"></i>
+            Payment gateway settings are for administrators only. Enabling a gateway
+            does not activate online payments until its integration is implemented
+            and the merchant account is approved.
+        </div>
         <div class="settings-card">
-
             <div class="settings-card-header">
-
-                <div class="settings-card-icon">
-                    <i class="fa fa-credit-card"></i>
-                </div>
-
+                <div class="settings-card-icon"><i class="fa fa-university"></i></div>
                 <div>
-
-                    <h2>Payment Information</h2>
-
-                    <p>
-                        Payment information shown to clients on quotations.
-                    </p>
-
+                    <h2>Bank Transfer</h2>
+                    <p>Bank details for quotation payments.</p>
                 </div>
-
             </div>
-
-
             <div class="settings-card-body">
-
-
-                <div class="payment-notice">
-
-                    <i class="fa fa-info-circle"></i>
-
-                    &nbsp;
-
-                    These details may be displayed to clients
-                    when they receive quotations and payment
-                    instructions.
-
-                </div>
-
-
                 <div class="settings-grid">
-
-
                     <div class="settings-field">
-
                         {{ form.bank_name.label_tag }}
                         {{ form.bank_name }}
-
-                        {% for error in form.bank_name.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
+                        {% if form.bank_name.help_text %}<p class="settings-help">{{ form.bank_name.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.bank_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
                     </div>
-
-
-
                     <div class="settings-field">
-
                         {{ form.account_name.label_tag }}
                         {{ form.account_name }}
-
-                        {% for error in form.account_name.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        {% if form.account_name.help_text %}<p class="settings-help">{{ form.account_name.help_text }}
+                        </p>{% endif %}
+                        {% for error in form.account_name.errors %}<div class="field-error">{{ error }}</div>
                         {% endfor %}
-
                     </div>
-
-
-
                     <div class="settings-field">
-
                         {{ form.account_number.label_tag }}
                         {{ form.account_number }}
-
-                        {% for error in form.account_number.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        {% if form.account_number.help_text %}<p class="settings-help">{{ form.account_number.help_text }}</p>{% endif %}
+                        {% for error in form.account_number.errors %}<div class="field-error">{{ error }}</div>
                         {% endfor %}
-
                     </div>
-
-
-
                     <div class="settings-field">
-
                         {{ form.branch_name.label_tag }}
                         {{ form.branch_name }}
-
-                        {% for error in form.branch_name.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
+                        {% if form.branch_name.help_text %}<p class="settings-help">{{ form.branch_name.help_text }}</p>
+                        {% endif %}
+                        {% for error in form.branch_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
                     </div>
-
-
-
-                    <div class="settings-field">
-
-                        {{ form.mobile_money_name.label_tag }}
-                        {{ form.mobile_money_name }}
-
-                        {% for error in form.mobile_money_name.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-
-                    <div class="settings-field">
-
-                        {{ form.mobile_money_number.label_tag }}
-                        {{ form.mobile_money_number }}
-
-                        {% for error in form.mobile_money_number.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-
-                    <div class="settings-field settings-full">
-
-                        {{ form.payment_instructions.label_tag }}
-                        {{ form.payment_instructions }}
-
-                        {% for error in form.payment_instructions.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
                 </div>
-
             </div>
-
         </div>
 
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-card-icon"><i class="fa fa-credit-card"></i></div>
+                <div>
+                    <h2>PayFast</h2>
+                    <p>Configure this payment option.</p>
+                </div>
+            </div>
+            <div class="settings-card-body">
+                <div class="settings-grid">
+                    <div class="settings-field settings-checkbox">
+                        <label for="{{ form.payfast_enabled.id_for_label }}">{{ form.payfast_enabled }} {{ form.payfast_enabled.label }}</label>
+                        {% if form.payfast_enabled.help_text %}<p class="settings-help">{{ form.payfast_enabled.help_text }}</p>{% endif %}
+                        {% for error in form.payfast_enabled.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.payfast_merchant_id.label_tag }}
+                        {{ form.payfast_merchant_id }}
+                        {% if form.payfast_merchant_id.help_text %}<p class="settings-help">{{ form.payfast_merchant_id.help_text }}</p>{% endif %}
+                        {% for error in form.payfast_merchant_id.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.payfast_merchant_key.label_tag }}
+                        {{ form.payfast_merchant_key }}
+                        {% if form.payfast_merchant_key.help_text %}<p class="settings-help">{{ form.payfast_merchant_key.help_text }}</p>{% endif %}
+                        {% for error in form.payfast_merchant_key.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.payfast_passphrase.label_tag }}
+                        {{ form.payfast_passphrase }}
+                        {% if form.payfast_passphrase.help_text %}<p class="settings-help">{{ form.payfast_passphrase.help_text }}</p>{% endif %}
+                        {% for error in form.payfast_passphrase.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field settings-checkbox">
+                        <label for="{{ form.payfast_sandbox.id_for_label }}">{{ form.payfast_sandbox }} {{ form.payfast_sandbox.label }}</label>
+                        {% if form.payfast_sandbox.help_text %}<p class="settings-help">{{ form.payfast_sandbox.help_text }}</p>{% endif %}
+                        {% for error in form.payfast_sandbox.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-card-icon"><i class="fa fa-globe"></i></div>
+                <div>
+                    <h2>PayPal</h2>
+                    <p>Configure this payment option.</p>
+                </div>
+            </div>
+            <div class="settings-card-body">
+                <div class="settings-grid">
+                    <div class="settings-field settings-checkbox">
+                        <label for="{{ form.paypal_enabled.id_for_label }}">{{ form.paypal_enabled }} {{ form.paypal_enabled.label }}</label>
+                        {% if form.paypal_enabled.help_text %}<p class="settings-help">{{ form.paypal_enabled.help_text}}</p>{% endif %}
+                        {% for error in form.paypal_enabled.errors %}<div class="field-error">{{ error }}</div> 
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.paypal_email.label_tag }}
+                        {{ form.paypal_email }}
+                        {% if form.paypal_email.help_text %}<p class="settings-help">{{ form.paypal_email.help_text }}
+                        </p>{% endif %}
+                        {% for error in form.paypal_email.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.paypal_client_id.label_tag }}
+                        {{ form.paypal_client_id }}
+                        {% if form.paypal_client_id.help_text %}<p class="settings-help">{{ form.paypal_client_id.help_text }}</p>{% endif %}
+                        {% for error in form.paypal_client_id.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field">
+                        {{ form.paypal_secret.label_tag }}
+                        {{ form.paypal_secret }}
+                        {% if form.paypal_secret.help_text %}<p class="settings-help">{{ form.paypal_secret.help_text }}
+                        </p>{% endif %}
+                        {% for error in form.paypal_secret.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="settings-field settings-checkbox">
+                        <label for="{{ form.paypal_sandbox.id_for_label }}">{{ form.paypal_sandbox }} {{ form.paypal_sandbox.label }}</label>
+                        {% if form.paypal_sandbox.help_text %}<p class="settings-help">
+                            {{ form.paypal_sandbox.help_text }}</p>{% endif %}
+                        {% for error in form.paypal_sandbox.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-card-icon"><i class="fa fa-info-circle"></i></div>
+                <div>
+                    <h2>Additional Payment Instructions</h2>
+                    <p>Instructions shown to clients on quotations.</p>
+                </div>
+            </div>
+            <div class="settings-card-body">
+                <div class="settings-grid">
+                    <div class="settings-field settings-full">
+                        {{ form.payment_instructions.label_tag }}
+                        {{ form.payment_instructions }}
+                        {% if form.payment_instructions.help_text %}<p class="settings-help">{{ form.payment_instructions.help_text }}</p>{% endif %}
+                        {% for error in form.payment_instructions.errors %}<div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- =================================================
              SAVE
