@@ -1,4 +1,7 @@
+from django.urls import reverse
 
+from testimonials.models import Testimonial
+from testimonials.forms import TestimonialForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.validators import validate_email
@@ -80,7 +83,6 @@ def professionals(request):
         "pages/professionals.html",
         {"faqs": public_faqs()},
     )
-
 
 
 def contact(request):
@@ -201,3 +203,64 @@ def services(request):
     }
 
     return render(request, "pages/services.html", context)
+
+
+def reviews(request):
+    """Display approved testimonials and process new public submissions.
+
+    New testimonials require staff approval before publication.
+    """
+    if request.method == "POST":
+        form = TestimonialForm(
+            request.POST,
+            request.FILES,
+        )
+
+        if form.is_valid():
+            testimonial = form.save(commit=False)
+
+            # Public submissions must never self-approve.
+            testimonial.status = Testimonial.Status.PENDING
+            testimonial.approved_at = None
+
+            if request.user.is_authenticated:
+                testimonial.submitted_by = request.user
+
+            testimonial.save()
+
+            messages.success(
+                request,
+                "Thank you for sharing your experience! "
+                "Your testimonial has been submitted for review.",
+            )
+
+            # Set session flag to hide form on successful submit
+            request.session["form_submitted"] = True
+
+            return redirect(reverse("pages:reviews"))
+
+        messages.error(request, "Please correct the errors in the testimonial form.")
+
+    else:
+        form = TestimonialForm()
+
+    # Read and reset session flag
+    form_submitted = request.session.pop("form_submitted", False)
+
+    approved_testimonials = Testimonial.objects.filter(
+        status=Testimonial.Status.APPROVED,
+        consent_to_publish=True,
+    ).order_by("-approved_at", "-created_at")
+
+    context = {
+        "form": form,
+        "testimonials": approved_testimonials,
+        "faqs": public_faqs(),
+        "form_submitted": form_submitted,
+    }
+
+    return render(
+        request,
+        "pages/reviews.html",
+        context,
+    )

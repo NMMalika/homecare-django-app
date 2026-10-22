@@ -55,9 +55,9 @@
                                 <a href="#">For Healthcare Professionals</a>
                             </li>
 
-                            <li class="{% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
-                                <a href="#">Reviews</a>
-                            </li>
+                        <li class="{% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
+                            <a href="{% url 'pages:reviews' %}">Reviews</a>
+                        </li>
 
                             <li class="{% if request.resolver_match.url_name == 'faq' %}active{% endif %}">
                                 <a href="{% url 'pages:faq' %}">FAQ</a>

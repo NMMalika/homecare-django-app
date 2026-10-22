@@ -173,6 +173,14 @@
                     </span>
                     <span>Contact Enquiries</span>
                 </a>
+                <a href="{% url 'staff:testimonials' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}"
+                    title="Testimonials">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </span>
+                    <span>Testimonials</span>
+                </a>
                 <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' or request.resolver_match.url_name == 'caregiver_payment_delete' %}active{% endif %}"

@@ -1,4 +1,3 @@
-
 from functools import wraps
 import logging
 import secrets
@@ -67,6 +66,7 @@ from homecare.views import (
 from .models import FAQItem, QuestionFormSettings, CustomerQuestion
 from .forms import StaffCaregiverInviteForm
 from staff.models import ContactEnquiry
+from testimonials.models import Testimonial
 
 logger = logging.getLogger(__name__)
 # ============================================================
@@ -951,7 +951,7 @@ Hands-On Health
             "site_settings": SiteSettings.load(),
         },
     )
-         
+
 
 # ============================================================
 # CAREGIVER ASSIGNMENTS
@@ -1036,8 +1036,6 @@ def caregiver_assignments(request):
             "site_settings": SiteSettings.load(),
         },
     )
-
-
 
 
 # ============================================================
@@ -3230,8 +3228,8 @@ Kind regards,
             "form": form,
         },
     )
-    
- 
+
+
 # ============================================================
 # RESEND CAREGIVER REGISTRATION INVITATION
 # ============================================================
@@ -3366,7 +3364,6 @@ Hands-On Health
     return redirect("staff:caregivers")
 
 
-
 @require_http_methods(["GET", "POST"])
 def ask_question(request):
     page = QuestionFormSettings.load()
@@ -3495,11 +3492,6 @@ def question_inbox(request):
         "staff/questions/inbox.html",
         context,
     )
-
-
-
-
-
 
 
 @admin_required
@@ -3806,7 +3798,7 @@ def faq_edit(request, pk):
             "site_settings": SiteSettings.load(),
         },
     )
-    
+
 @admin_required
 def faq_delete(request, pk):
     """Delete an FAQ after a confirmation."""
@@ -4278,7 +4270,7 @@ def _staff_question_created(sender, instance, created, **kwargs):
             "A customer has submitted a new FAQ question.",
             "staff:question_inbox", instance.pk,
         )
-        
+
 def _staff_contact_enquiry_created(sender, instance, created, **kwargs):
     if created:
         _send_configured_staff_alert(
@@ -4316,3 +4308,75 @@ _notification_post_save.connect(
     dispatch_uid="staff_alert_contact_enquiry_created_v1",
     weak=False,
 )
+
+
+# ============================================================
+# TESTIMONIAL MANAGEMENT
+# ============================================================
+
+
+@admin_required
+def testimonials(request):
+    """List testimonials for staff moderation."""
+
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
+
+    testimonials_queryset = Testimonial.objects.all().order_by("-created_at")
+
+    if current_status in {value for value, label in Testimonial.Status.choices}:
+        testimonials_queryset = testimonials_queryset.filter(status=current_status)
+    else:
+        current_status = ""
+
+    if search:
+        testimonials_queryset = testimonials_queryset.filter(
+            Q(name__icontains=search)
+            | Q(email__icontains=search)
+            | Q(message__icontains=search)
+        )
+
+    context = {
+        "testimonials": testimonials_queryset,
+        "current_status": current_status,
+        "search": search,
+        "status_choices": Testimonial.Status.choices,
+        "pending_testimonials": Testimonial.objects.filter(
+            status=Testimonial.Status.PENDING
+        ).count(),
+        "site_settings": SiteSettings.load(),
+    }
+
+    return render(
+        request,
+        "staff/testimonials.html",
+        context,
+    )
+
+
+@admin_required
+@require_http_methods(["POST"])
+def testimonial_moderate(request, pk):
+    """Approve or reject a testimonial."""
+    testimonial = get_object_or_404(Testimonial, pk=pk)
+    action = request.POST.get("action", "").strip().lower()
+
+    if action == "approve":
+        if not testimonial.consent_to_publish:
+            messages.error(
+                request,
+                "This testimonial cannot be published without consent.",
+            )
+            return redirect("staff:testimonials")
+
+        testimonial.approve()
+        messages.success(request, "Testimonial approved successfully.")
+
+    elif action == "reject":
+        testimonial.reject()
+        messages.success(request, "Testimonial rejected successfully.")
+
+    else:
+        messages.error(request, "Please select a valid moderation action.")
+
+    return redirect("staff:testimonials")

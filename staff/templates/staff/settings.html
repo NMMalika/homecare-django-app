@@ -1,27 +1,13 @@
 {% extends "staff/base.html" %}
-
-{% block title %}
-Site Settings
-{% endblock %}
-
+{% block title %}Site Settings{% endblock %}
 
 {% block content %}
-
 <style>
-    /* =========================================================
-   PAGE
-   ========================================================= */
-
     .settings-page {
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
     }
-
-
-    /* =========================================================
-   HEADER
-   ========================================================= */
 
     .settings-header {
         display: flex;
@@ -60,11 +46,6 @@ Site Settings
         font-size: 13px;
     }
 
-
-    /* =========================================================
-   MESSAGES
-   ========================================================= */
-
     .settings-message {
         padding: 14px 18px;
         margin-bottom: 20px;
@@ -85,11 +66,6 @@ Site Settings
         color: #be123c;
         font-size: 13px;
     }
-
-
-    /* =========================================================
-   CARD
-   ========================================================= */
 
     .settings-card {
         background: white;
@@ -136,11 +112,6 @@ Site Settings
         padding: 23px;
     }
 
-
-    /* =========================================================
-   GRID
-   ========================================================= */
-
     .settings-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -148,13 +119,8 @@ Site Settings
     }
 
     .settings-full {
-        grid-column: 1 / -1;
+        grid-column: 1/-1;
     }
-
-
-    /* =========================================================
-   FORM
-   ========================================================= */
 
     .settings-field label {
         display: block;
@@ -177,7 +143,7 @@ Site Settings
         font-family: inherit;
         font-size: 14px;
         outline: none;
-        transition: .2s;
+        transition: 0.2s;
     }
 
     .settings-field input:not([type="file"]):not([type="checkbox"]) {
@@ -193,7 +159,7 @@ Site Settings
     .settings-field textarea:focus,
     .settings-field select:focus {
         border-color: #2f7d95;
-        box-shadow: 0 0 0 3px rgba(47, 125, 149, .12);
+        box-shadow: 0 0 0 3px rgba(47, 125, 149, 0.12);
     }
 
     .settings-field input[type="file"] {
@@ -205,21 +171,11 @@ Site Settings
         background: #f8fafc;
     }
 
-
-    /* =========================================================
-   ERRORS
-   ========================================================= */
-
     .field-error {
         margin-top: 5px;
         color: #dc2626;
         font-size: 12px;
     }
-
-
-    /* =========================================================
-   IMAGE PREVIEW
-   ========================================================= */
 
     .current-image {
         margin-top: 12px;
@@ -250,11 +206,6 @@ Site Settings
         object-fit: contain;
     }
 
-
-    /* =========================================================
-   NOTICE
-   ========================================================= */
-
     .settings-notice {
         margin-bottom: 20px;
         padding: 13px 15px;
@@ -266,11 +217,6 @@ Site Settings
         line-height: 1.6;
     }
 
-
-    /* =========================================================
-   PAYMENT NOTICE
-   ========================================================= */
-
     .payment-notice {
         margin-bottom: 20px;
         padding: 13px 15px;
@@ -279,30 +225,22 @@ Site Settings
         border-radius: 8px;
         color: #92400e;
         font-size: 13px;
+        line-height: 1.6;
     }
-
-
-    /* =========================================================
-   SAVE BAR
-   ========================================================= */
 
     .settings-save-bar {
         position: sticky;
         bottom: 15px;
         z-index: 20;
-
         display: flex;
         justify-content: space-between;
         align-items: center;
-
         margin-top: 25px;
         padding: 15px 18px;
-
-        background: rgba(255, 255, 255, .97);
+        background: rgba(255, 255, 255, 0.97);
         border: 1px solid #dbe1e6;
         border-radius: 10px;
-
-        box-shadow: 0 8px 25px rgba(0, 0, 0, .12);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     }
 
     .settings-save-text {
@@ -325,50 +263,6 @@ Site Settings
         background: #24677c;
     }
 
-
-    /* =========================================================
-   MOBILE
-   ========================================================= */
-
-    @media(max-width: 800px) {
-
-        .settings-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .settings-full {
-            grid-column: auto;
-        }
-
-        .settings-header {
-            align-items: flex-start;
-        }
-
-    }
-
-
-    @media(max-width: 600px) {
-
-        .settings-page {
-            padding: 10px;
-        }
-
-        .settings-card-body {
-            padding: 17px;
-        }
-
-        .settings-save-bar {
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .save-button {
-            width: 100%;
-        }
-
-    }
-
-    /* Payment gateway toggles and field guidance */
     .settings-field.settings-checkbox label {
         display: flex;
         align-items: center;
@@ -389,556 +283,453 @@ Site Settings
         line-height: 1.5;
         margin: 6px 0 0;
     }
+
+    @media (max-width: 800px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-full {
+            grid-column: auto;
+        }
+
+        .settings-header {
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .settings-page {
+            padding: 10px;
+        }
+
+        .settings-card-body {
+            padding: 17px;
+        }
+
+        .settings-save-bar {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .save-button {
+            width: 100%;
+        }
+    }
 </style>
 
-
 <div class="settings-page">
-
-
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
-
     <div class="settings-header">
-
         <div class="settings-header-left">
-
-            <div class="settings-icon">
-                <i class="fa fa-cog"></i>
-            </div>
-
+            <div class="settings-icon"><i class="fa fa-cog"></i></div>
             <div>
-
                 <h1>Site Settings</h1>
-
                 <p>
-                    Manage your business information, branding,
-                    contact details and payment information.
+                    Manage your business information, branding, contact details and
+                    payment information.
                 </p>
-
             </div>
-
         </div>
-
     </div>
-
-
-
-    <!-- =====================================================
-         SUCCESS MESSAGES
-         ===================================================== -->
 
     {% if messages %}
-
     {% for message in messages %}
-
     <div class="settings-message">
-
         <i class="fa fa-check-circle"></i>
-
-        &nbsp;
-
         {{ message }}
-
     </div>
-
     {% endfor %}
-
     {% endif %}
-
-
-
-    <!-- =====================================================
-         FORM ERRORS
-         ===================================================== -->
 
     {% if form.non_field_errors %}
-
     <div class="settings-error">
-
-        <strong>
-            <i class="fa fa-exclamation-circle"></i>
-            Please correct the errors below.
-        </strong>
-
+        <strong>Please correct the errors below.</strong>
         {% for error in form.non_field_errors %}
-
-        <div>{{ error }}</div>
-
+        <div> {{ error }} </div>
         {% endfor %}
-
     </div>
-
     {% endif %}
 
-
-
-    <!-- =====================================================
-         FORM
-         ===================================================== -->
-
     <form method="post" enctype="multipart/form-data" action="{% url 'staff:settings' %}" id="site-settings-form">
-
         {% csrf_token %}
-
-
-
-        <!-- =================================================
-             BUSINESS INFORMATION
-             ================================================= -->
-
-        <div class="settings-card">
-
-            <div class="settings-card-header">
-
-                <div class="settings-card-icon">
-                    <i class="fa fa-building"></i>
-                </div>
-
-                <div>
-
-                    <h2>Business Information</h2>
-
-                    <p>
-                        Basic information about your organization.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="settings-card-body">
-
-                <div class="settings-grid">
-
-
-                    <div class="settings-field">
-
-                        {{ form.business_name.label_tag }}
-
-                        {{ form.business_name }}
-
-                        {% for error in form.business_name.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-
-                    <div class="settings-field">
-
-                        {{ form.tagline.label_tag }}
-
-                        {{ form.tagline }}
-
-                        {% for error in form.tagline.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-
-                    <!-- LOGO -->
-
-                    <div class="settings-field">
-
-                        {{ form.logo.label_tag }}
-
-                        {{ form.logo }}
-
-                        {% if settings.logo %}
-
-                        <div class="current-image">
-
-                            <span class="current-image-title">
-                                Current Logo
-                            </span>
-
-                            <img src="{{ settings.logo.url }}" class="logo-preview" alt="Business Logo">
-
-                        </div>
-
-                        {% endif %}
-
-                        {% for error in form.logo.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-
-                    <!-- FAVICON -->
-
-                    <div class="settings-field">
-
-                        {{ form.favicon.label_tag }}
-
-                        {{ form.favicon }}
-
-                        {% if settings.favicon %}
-
-                        <div class="current-image">
-
-                            <span class="current-image-title">
-                                Current Favicon
-                            </span>
-
-                            <img src="{{ settings.favicon.url }}" class="favicon-preview" alt="Favicon">
-
-                        </div>
-
-                        {% endif %}
-
-                        {% for error in form.favicon.errors %}
-                        <div class="field-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
+        <input type="hidden" name="payfast_enabled" id="manual-payfast-enabled" value="">
+        <input type="hidden" name="paypal_enabled" id="manual-paypal-enabled" value="">
+        <div class="payment-notice">
+            <i class="fa fa-shield-alt"></i> Bank Transfer, PayPal and PayFast are
+            manual payment options. Patients must pay externally and submit proof.
+            Staff must verify the actual transaction before approving payment.
+            Enabling a method here does not automatically process or verify payments.
         </div>
 
-
-
-        <!-- =================================================
-             CONTACT INFORMATION
-             ================================================= -->
-
         <div class="settings-card">
-
             <div class="settings-card-header">
-
-                <div class="settings-card-icon">
-                    <i class="fa fa-phone"></i>
-                </div>
-
+                <div class="settings-card-icon"><i class="fa fa-building"></i></div>
                 <div>
-
-                    <h2>Contact Information</h2>
-
-                    <p>
-                        Phone, email and physical location.
-                    </p>
-
+                    <h2>Business Information</h2>
+                    <p>Basic information about your organization.</p>
                 </div>
-
             </div>
-
-
             <div class="settings-card-body">
-
                 <div class="settings-grid">
-
-
                     <div class="settings-field">
-
-                        {{ form.email.label_tag }}
-                        {{ form.email }}
-
-                        {% for error in form.email.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        {{ form.business_name.label_tag }}
+                        {{ form.business_name }}
+                        {% if form.business_name.help_text %}
+                        <p class="settings-help">
+                            {{ form.business_name.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.business_name.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
+                    <div class="settings-field">
+                        {{ form.tagline.label_tag }}
+                        {{ form.tagline }}
+                        {% if form.tagline.help_text %}
+                        <p class="settings-help">
+                            {{ form.tagline.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.tagline.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
 
+                    <div class="settings-field">
+                        {{ form.logo.label_tag }}
+                        {{ form.logo }}
+                        {% if settings.logo %}
+                        <div class="current-image">
+                            <span class="current-image-title">Current Logo</span>
+                            <img src="{{ settings.logo.url }}" class="logo-preview" alt="Current Logo" />
+                        </div>
+                        {% endif %}
+                        {% if form.logo.help_text %}
+                        <p class="settings-help">
+                            {{ form.logo.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.logo.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
 
-                    <!-- STAFF NOTIFICATION EMAILS -->
+                    <div class="settings-field">
+                        {{ form.favicon.label_tag }}
+                        {{ form.favicon }}
+                        {% if settings.favicon %}
+                        <div class="current-image">
+                            <span class="current-image-title">Current Favicon</span>
+                            <img src="{{ settings.favicon.url }}" class="favicon-preview" alt="Current Favicon" />
+                        </div>
+                        {% endif %}
+                        {% if form.favicon.help_text %}
+                        <p class="settings-help">
+                            {{ form.favicon.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.favicon.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <div class="settings-card-icon"><i class="fa fa-phone"></i></div>
+                <div>
+                    <h2>Contact Information</h2>
+                    <p>Phone, email and physical location.</p>
+                </div>
+            </div>
+            <div class="settings-card-body">
+                <div class="settings-grid">
+                    <div class="settings-field">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.help_text %}
+                        <p class="settings-help">
+                            {{ form.email.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.email.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
+                    </div>
+
                     <div class="settings-field settings-full">
                         {{ form.notification_emails.label_tag }}
                         {{ form.notification_emails }}
-                        <p style="font-size:12px;color:#6b7280;margin:8px 0 0;line-height:1.6;">
-                            Enter one email address per line, or separate addresses with commas or semicolons.
-                            These addresses receive notifications for new appointments, home care requests,
-                            referrals, submitted payments, and FAQ questions once notifications are connected.
-                            If left blank, the main business email is used as a fallback.
+                        <p class="settings-help">
+                            Enter one email address per line, or separate addresses with
+                            commas or semicolons. These addresses receive configured staff
+                            notifications.
                         </p>
+                        {% if form.notification_emails.help_text %}
+                        <p class="settings-help">
+                            {{ form.notification_emails.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.notification_emails.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
 
-
                     <div class="settings-field">
-
                         {{ form.phone.label_tag }}
                         {{ form.phone }}
-
+                        {% if form.phone.help_text %}
+                        <p class="settings-help">
+                            {{ form.phone.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.phone.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.whatsapp.label_tag }}
                         {{ form.whatsapp }}
-
+                        {% if form.whatsapp.help_text %}
+                        <p class="settings-help">
+                            {{ form.whatsapp.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.whatsapp.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.emergency_phone.label_tag }}
                         {{ form.emergency_phone }}
-
+                        {% if form.emergency_phone.help_text %}
+                        <p class="settings-help">
+                            {{ form.emergency_phone.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.emergency_phone.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field settings-full">
-
                         {{ form.address.label_tag }}
                         {{ form.address }}
-
+                        {% if form.address.help_text %}
+                        <p class="settings-help">
+                            {{ form.address.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.address.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.city.label_tag }}
                         {{ form.city }}
-
+                        {% if form.city.help_text %}
+                        <p class="settings-help">
+                            {{ form.city.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.city.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.country.label_tag }}
                         {{ form.country }}
-
+                        {% if form.country.help_text %}
+                        <p class="settings-help">
+                            {{ form.country.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.country.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field settings-full">
-
                         {{ form.website.label_tag }}
                         {{ form.website }}
-
+                        {% if form.website.help_text %}
+                        <p class="settings-help">
+                            {{ form.website.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.website.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
-
-
                 </div>
-
             </div>
-
         </div>
 
-
-
-        <!-- =================================================
-             SOCIAL MEDIA
-             ================================================= -->
-
         <div class="settings-card">
-
             <div class="settings-card-header">
-
-                <div class="settings-card-icon">
-                    <i class="fa fa-share-alt"></i>
-                </div>
-
+                <div class="settings-card-icon"><i class="fa fa-share-alt"></i></div>
                 <div>
-
                     <h2>Social Media</h2>
-
-                    <p>
-                        Official social media profiles.
-                    </p>
-
+                    <p>Official social media profiles.</p>
                 </div>
-
             </div>
-
-
             <div class="settings-card-body">
-
                 <div class="settings-grid">
-
-
                     <div class="settings-field">
-
                         {{ form.facebook.label_tag }}
                         {{ form.facebook }}
-
+                        {% if form.facebook.help_text %}
+                        <p class="settings-help">
+                            {{ form.facebook.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.facebook.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.instagram.label_tag }}
                         {{ form.instagram }}
-
+                        {% if form.instagram.help_text %}
+                        <p class="settings-help">
+                            {{ form.instagram.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.instagram.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.linkedin.label_tag }}
                         {{ form.linkedin }}
-
+                        {% if form.linkedin.help_text %}
+                        <p class="settings-help">
+                            {{ form.linkedin.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.linkedin.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
 
-
-
                     <div class="settings-field">
-
                         {{ form.tiktok.label_tag }}
                         {{ form.tiktok }}
-
+                        {% if form.tiktok.help_text %}
+                        <p class="settings-help">
+                            {{ form.tiktok.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.tiktok.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
-
-
 
                     <div class="settings-field settings-full">
-
                         {{ form.youtube.label_tag }}
                         {{ form.youtube }}
-
+                        {% if form.youtube.help_text %}
+                        <p class="settings-help">
+                            {{ form.youtube.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.youtube.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
-
-
                 </div>
-
             </div>
-
         </div>
-
-
-
-        <!-- =================================================
-             MAPS
-             ================================================= -->
 
         <div class="settings-card">
-
             <div class="settings-card-header">
-
-                <div class="settings-card-icon">
-                    <i class="fa fa-map-marker"></i>
-                </div>
-
+                <div class="settings-card-icon"><i class="fa fa-map-marker"></i></div>
                 <div>
-
                     <h2>Maps & Google Business</h2>
-
-                    <p>
-                        Manage your business location links.
-                    </p>
-
+                    <p>Manage your business location links.</p>
                 </div>
-
             </div>
-
-
             <div class="settings-card-body">
-
                 <div class="settings-grid">
-
-
                     <div class="settings-field">
-
                         {{ form.google_maps_url.label_tag }}
                         {{ form.google_maps_url }}
-
+                        {% if form.google_maps_url.help_text %}
+                        <p class="settings-help">
+                            {{ form.google_maps_url.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.google_maps_url.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
-
-
 
                     <div class="settings-field">
-
                         {{ form.google_business_url.label_tag }}
                         {{ form.google_business_url }}
-
+                        {% if form.google_business_url.help_text %}
+                        <p class="settings-help">
+                            {{ form.google_business_url.help_text }}
+                        </p>
+                        {% endif %}
                         {% for error in form.google_business_url.errors %}
-                        <div class="field-error">{{ error }}</div>
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
-
                     </div>
-
-
                 </div>
-
             </div>
-
         </div>
 
-
-
-        <!-- =================================================
-             PAYMENT INFORMATION
-             ================================================= -->
-        <div class="payment-notice">
-            <i class="fa fa-shield-alt"></i>
-            Payment gateway settings are for administrators only. Enabling a gateway
-            does not activate online payments until its integration is implemented
-            and the merchant account is approved.
-        </div>
         <div class="settings-card">
             <div class="settings-card-header">
                 <div class="settings-card-icon"><i class="fa fa-university"></i></div>
@@ -952,31 +743,61 @@ Site Settings
                     <div class="settings-field">
                         {{ form.bank_name.label_tag }}
                         {{ form.bank_name }}
-                        {% if form.bank_name.help_text %}<p class="settings-help">{{ form.bank_name.help_text }}</p>
+                        {% if form.bank_name.help_text %}
+                        <p class="settings-help">
+                            {{ form.bank_name.help_text }}
+                        </p>
                         {% endif %}
-                        {% for error in form.bank_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                        {% for error in form.bank_name.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
                     </div>
+
                     <div class="settings-field">
                         {{ form.account_name.label_tag }}
                         {{ form.account_name }}
-                        {% if form.account_name.help_text %}<p class="settings-help">{{ form.account_name.help_text }}
-                        </p>{% endif %}
-                        {% for error in form.account_name.errors %}<div class="field-error">{{ error }}</div>
+                        {% if form.account_name.help_text %}
+                        <p class="settings-help">
+                            {{ form.account_name.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.account_name.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
+
                     <div class="settings-field">
                         {{ form.account_number.label_tag }}
                         {{ form.account_number }}
-                        {% if form.account_number.help_text %}<p class="settings-help">{{ form.account_number.help_text }}</p>{% endif %}
-                        {% for error in form.account_number.errors %}<div class="field-error">{{ error }}</div>
+                        {% if form.account_number.help_text %}
+                        <p class="settings-help">
+                            {{ form.account_number.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.account_number.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
+
                     <div class="settings-field">
                         {{ form.branch_name.label_tag }}
                         {{ form.branch_name }}
-                        {% if form.branch_name.help_text %}<p class="settings-help">{{ form.branch_name.help_text }}</p>
+                        {% if form.branch_name.help_text %}
+                        <p class="settings-help">
+                            {{ form.branch_name.help_text }}
+                        </p>
                         {% endif %}
-                        {% for error in form.branch_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                        {% for error in form.branch_name.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -987,42 +808,38 @@ Site Settings
                 <div class="settings-card-icon"><i class="fa fa-credit-card"></i></div>
                 <div>
                     <h2>PayFast</h2>
-                    <p>Configure this payment option.</p>
+
                 </div>
             </div>
             <div class="settings-card-body">
                 <div class="settings-grid">
-                    <div class="settings-field settings-checkbox">
-                        <label for="{{ form.payfast_enabled.id_for_label }}">{{ form.payfast_enabled }} {{ form.payfast_enabled.label }}</label>
-                        {% if form.payfast_enabled.help_text %}<p class="settings-help">{{ form.payfast_enabled.help_text }}</p>{% endif %}
-                        {% for error in form.payfast_enabled.errors %}<div class="field-error">{{ error }}</div>
+                    <div class="settings-field settings-full">
+                        {{ form.payfast_payment_url.label_tag }}
+                        {{ form.payfast_payment_url }}
+                        {% if form.payfast_payment_url.help_text %}
+                        <p class="settings-help">
+                            {{ form.payfast_payment_url.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.payfast_payment_url.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
-                    <div class="settings-field">
-                        {{ form.payfast_merchant_id.label_tag }}
-                        {{ form.payfast_merchant_id }}
-                        {% if form.payfast_merchant_id.help_text %}<p class="settings-help">{{ form.payfast_merchant_id.help_text }}</p>{% endif %}
-                        {% for error in form.payfast_merchant_id.errors %}<div class="field-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="settings-field">
-                        {{ form.payfast_merchant_key.label_tag }}
-                        {{ form.payfast_merchant_key }}
-                        {% if form.payfast_merchant_key.help_text %}<p class="settings-help">{{ form.payfast_merchant_key.help_text }}</p>{% endif %}
-                        {% for error in form.payfast_merchant_key.errors %}<div class="field-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="settings-field">
-                        {{ form.payfast_passphrase.label_tag }}
-                        {{ form.payfast_passphrase }}
-                        {% if form.payfast_passphrase.help_text %}<p class="settings-help">{{ form.payfast_passphrase.help_text }}</p>{% endif %}
-                        {% for error in form.payfast_passphrase.errors %}<div class="field-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="settings-field settings-checkbox">
-                        <label for="{{ form.payfast_sandbox.id_for_label }}">{{ form.payfast_sandbox }} {{ form.payfast_sandbox.label }}</label>
-                        {% if form.payfast_sandbox.help_text %}<p class="settings-help">{{ form.payfast_sandbox.help_text }}</p>{% endif %}
-                        {% for error in form.payfast_sandbox.errors %}<div class="field-error">{{ error }}</div>
+
+                    <div class="settings-field settings-full">
+                        {{ form.payfast_instructions.label_tag }}
+                        {{ form.payfast_instructions }}
+                        {% if form.payfast_instructions.help_text %}
+                        <p class="settings-help">
+                            {{ form.payfast_instructions.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.payfast_instructions.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -1034,45 +851,53 @@ Site Settings
                 <div class="settings-card-icon"><i class="fa fa-globe"></i></div>
                 <div>
                     <h2>PayPal</h2>
-                    <p>Configure this payment option.</p>
+
                 </div>
             </div>
             <div class="settings-card-body">
                 <div class="settings-grid">
-                    <div class="settings-field settings-checkbox">
-                        <label for="{{ form.paypal_enabled.id_for_label }}">{{ form.paypal_enabled }} {{ form.paypal_enabled.label }}</label>
-                        {% if form.paypal_enabled.help_text %}<p class="settings-help">{{ form.paypal_enabled.help_text}}</p>{% endif %}
-                        {% for error in form.paypal_enabled.errors %}<div class="field-error">{{ error }}</div> 
-                        {% endfor %}
-                    </div>
                     <div class="settings-field">
                         {{ form.paypal_email.label_tag }}
                         {{ form.paypal_email }}
-                        {% if form.paypal_email.help_text %}<p class="settings-help">{{ form.paypal_email.help_text }}
-                        </p>{% endif %}
-                        {% for error in form.paypal_email.errors %}<div class="field-error">{{ error }}</div>
+                        {% if form.paypal_email.help_text %}
+                        <p class="settings-help">
+                            {{ form.paypal_email.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.paypal_email.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
+
                     <div class="settings-field">
-                        {{ form.paypal_client_id.label_tag }}
-                        {{ form.paypal_client_id }}
-                        {% if form.paypal_client_id.help_text %}<p class="settings-help">{{ form.paypal_client_id.help_text }}</p>{% endif %}
-                        {% for error in form.paypal_client_id.errors %}<div class="field-error">{{ error }}</div>
+                        {{ form.paypal_payment_url.label_tag }}
+                        {{ form.paypal_payment_url }}
+                        {% if form.paypal_payment_url.help_text %}
+                        <p class="settings-help">
+                            {{ form.paypal_payment_url.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.paypal_payment_url.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
-                    <div class="settings-field">
-                        {{ form.paypal_secret.label_tag }}
-                        {{ form.paypal_secret }}
-                        {% if form.paypal_secret.help_text %}<p class="settings-help">{{ form.paypal_secret.help_text }}
-                        </p>{% endif %}
-                        {% for error in form.paypal_secret.errors %}<div class="field-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="settings-field settings-checkbox">
-                        <label for="{{ form.paypal_sandbox.id_for_label }}">{{ form.paypal_sandbox }} {{ form.paypal_sandbox.label }}</label>
-                        {% if form.paypal_sandbox.help_text %}<p class="settings-help">
-                            {{ form.paypal_sandbox.help_text }}</p>{% endif %}
-                        {% for error in form.paypal_sandbox.errors %}<div class="field-error">{{ error }}</div>
+
+                    <div class="settings-field settings-full">
+                        {{ form.paypal_instructions.label_tag }}
+                        {{ form.paypal_instructions }}
+                        {% if form.paypal_instructions.help_text %}
+                        <p class="settings-help">
+                            {{ form.paypal_instructions.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.paypal_instructions.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -1092,44 +917,46 @@ Site Settings
                     <div class="settings-field settings-full">
                         {{ form.payment_instructions.label_tag }}
                         {{ form.payment_instructions }}
-                        {% if form.payment_instructions.help_text %}<p class="settings-help">{{ form.payment_instructions.help_text }}</p>{% endif %}
-                        {% for error in form.payment_instructions.errors %}<div class="field-error">{{ error }}</div>
+                        {% if form.payment_instructions.help_text %}
+                        <p class="settings-help">
+                            {{ form.payment_instructions.help_text }}
+                        </p>
+                        {% endif %}
+                        {% for error in form.payment_instructions.errors %}
+                        <div class="field-error">
+                            {{ error }}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- =================================================
-             SAVE
-             ================================================= -->
-
         <div class="settings-save-bar">
-
             <div class="settings-save-text">
-
-                <i class="fa fa-info-circle"></i>
-
-                Changes will update the main site settings.
-
+                <i class="fa fa-info-circle"></i> Changes will update the main site
+                settings.
             </div>
-
-
             <button type="submit" class="save-button">
-
-                <i class="fa fa-save"></i>
-
-                &nbsp;
-
-                Save Changes
-
+                <i class="fa fa-save"></i> &nbsp; Save Changes
             </button>
-
         </div>
-
-
     </form>
-
 </div>
-
+<script>
+    (function () {
+        const form = document.getElementById('site-settings-form');
+        if (!form) return;
+        form.addEventListener('submit', function () {
+            const filled = (name) => {
+                const field = form.elements.namedItem(name);
+                return field && String(field.value || '').trim().length > 0;
+            };
+            document.getElementById('manual-payfast-enabled').value =
+                (filled('payfast_payment_url') || filled('payfast_instructions')) ? 'on' : '';
+            document.getElementById('manual-paypal-enabled').value =
+                (filled('paypal_email') || filled('paypal_payment_url')) ? 'on' : '';
+        });
+    })();
+</script>
 {% endblock %}

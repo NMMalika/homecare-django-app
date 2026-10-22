@@ -8,14 +8,13 @@ from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
 
 from core.models import SiteSettings
 
@@ -41,16 +40,123 @@ from .models import (
     Consultation,
     ConsultationAttachment,
     ConsultationSlot,
-  
 )
-from services.models import Service
 
 logger = logging.getLogger(__name__)
 
 
 # ============================================================
+# PAYMENT METHODS (HOSTED LINKS / STAFF VERIFICATION)
+# ============================================================
+
+
+def _payment_options(site_settings=None):
+    """Payment instructions from Site Settings; no gateway API is called."""
+    site_settings = site_settings or SiteSettings.load()
+    options = {
+        "BANK": {
+            "label": "Bank Transfer",
+            "available": True,
+            "details": "\n".join(
+                filter(
+                    None,
+                    [
+                        (
+                            f"Bank: {getattr(site_settings, 'bank_name', '')}"
+                            if getattr(site_settings, "bank_name", "")
+                            else ""
+                        ),
+                        (
+                            f"Account holder: {getattr(site_settings, 'account_name', '')}"
+                            if getattr(site_settings, "account_name", "")
+                            else ""
+                        ),
+                        (
+                            f"Account number: {getattr(site_settings, 'account_number', '')}"
+                            if getattr(site_settings, "account_number", "")
+                            else ""
+                        ),
+                        (
+                            f"Branch: {getattr(site_settings, 'branch_name', '')}"
+                            if getattr(site_settings, "branch_name", "")
+                            else ""
+                        ),
+                    ],
+                )
+            ),
+        },
+    }
+    for code, prefix, label in (
+        ("PAYFAST", "payfast", "PayFast"),
+        ("PAYPAL", "paypal", "PayPal"),
+    ):
+        url = (
+            getattr(site_settings, f"{prefix}_payment_url", "")
+            or getattr(site_settings, f"{prefix}_payment_link", "")
+            or ""
+        ).strip()
+        email = (
+            (getattr(site_settings, "paypal_email", "") or "").strip()
+            if prefix == "paypal"
+            else ""
+        )
+        instructions = (
+            getattr(site_settings, f"{prefix}_instructions", "")
+            or getattr(site_settings, f"{prefix}_payment_instructions", "")
+            or ""
+        ).strip()
+        enabled = getattr(site_settings, f"{prefix}_enabled", None)
+        # An explicitly disabled method stays disabled. Older settings
+        # without a toggle are available only when configured.
+        configured = bool(url or email or instructions)
+        available = configured if enabled is None else bool(enabled and configured)
+        details = "\n".join(
+            filter(
+                None,
+                [
+                    f"Payment link: {url}" if url else "",
+                    f"PayPal email: {email}" if email else "",
+                    instructions,
+                ],
+            )
+        )
+        options[code] = {
+            "label": label,
+            "available": available,
+            "details": details,
+            "url": url,
+        }
+    return options
+
+
+def _payment_instructions_text(site_settings):
+    options = _payment_options(site_settings)
+    parts = []
+    for option in options.values():
+        if option["available"] and option["details"]:
+            parts.append(f"{option['label']}\n{option['details']}")
+    general = (getattr(site_settings, "payment_instructions", "") or "").strip()
+    if general:
+        parts.append(f"Additional instructions\n{general}")
+    return "\n\n".join(parts)
+
+
+def _configure_payment_form(form, options):
+    """Offer only configured methods without changing other form fields."""
+    field = form.fields.get("payment_method")
+    if field is not None:
+        field.choices = [
+            (code, option["label"])
+            for code, option in options.items()
+            if option["available"]
+        ]
+    return form
+
+
+# ============================================================
 # HOME CARE REQUEST
 # ============================================================
+
 
 def request_home_care(request):
 
@@ -65,23 +171,16 @@ def request_home_care(request):
 
             homecare_request = form.save()
 
-            custom_services = form.cleaned_data.get(
-                "custom_services"
-            )
+            custom_services = form.cleaned_data.get("custom_services")
 
             if custom_services:
                 homecare_request.description += (
-                    f"\n\n[Custom Requested Services]: "
-                    f"{custom_services}"
+                    f"\n\n[Custom Requested Services]: " f"{custom_services}"
                 )
 
-                homecare_request.save(
-                    update_fields=["description"]
-                )
+                homecare_request.save(update_fields=["description"])
 
-            files = request.FILES.getlist(
-                "attachments"
-            )
+            files = request.FILES.getlist("attachments")
 
             for f in files:
 
@@ -90,9 +189,7 @@ def request_home_care(request):
                     file=f,
                 )
 
-            request.session["homecare_reference"] = (
-                homecare_request.id
-            )
+            request.session["homecare_reference"] = homecare_request.id
 
             messages.success(
                 request,
@@ -100,9 +197,7 @@ def request_home_care(request):
                 "Our team will contact you shortly.",
             )
 
-            return redirect(
-                "homecare:success"
-            )
+            return redirect("homecare:success")
 
     else:
 
@@ -119,9 +214,7 @@ def request_home_care(request):
 
 def request_success(request):
 
-    reference = request.session.get(
-        "homecare_reference"
-    )
+    reference = request.session.get("homecare_reference")
 
     return render(
         request,
@@ -135,134 +228,101 @@ def request_success(request):
 # ============================================================
 # REFERRAL
 # ============================================================
+
+
 def refer_a_patient(request):
 
     if request.method == "POST":
 
-        referral_form = ReferralForm(
+        form = ReferralForm(
             request.POST,
             request.FILES,
         )
 
-        homecare_form = HomeCareRequestForm(
-            request.POST,
-            request.FILES,
-        )
+        if form.is_valid():
 
-        if referral_form.is_valid() and homecare_form.is_valid():
+            referral = form.save()
 
-            with transaction.atomic():
+            custom_services = form.cleaned_data.get("custom_services")
 
-                # ------------------------------------------------
-                # SAVE REFERRER DETAILS
-                # ------------------------------------------------
+            if custom_services:
 
-                referral = referral_form.save()
-
-                # ------------------------------------------------
-                # SAVE PATIENT USING NORMAL HOME CARE FORM
-                # ------------------------------------------------
-
-                homecare_request = homecare_form.save()
-
-                # ------------------------------------------------
-                # ADD REFERRER INFORMATION TO HOME CARE REQUEST
-                # ------------------------------------------------
-
-                facility_name = (
-                    referral.referring_facility.strip()
-                    if referral.referring_facility
-                    else ""
+                referral.additional_notes += (
+                    f"\n\n[Custom Requested Services]: " f"{custom_services}"
                 )
 
-                facility_info = (
-                    f" ({facility_name})"
-                    if facility_name
-                    else ""
+                referral.save(update_fields=["additional_notes"])
+
+            files = request.FILES.getlist("attachments")
+
+            for f in files:
+
+                ReferralAttachment.objects.create(
+                    referral=referral,
+                    file=f,
                 )
 
-                referral_information = (
-                    f"\n\n"
-                    f"[REFERRAL INFORMATION]\n"
-                    f"Referred by: {referral.referrer_name}"
-                    f"{facility_info}\n"
-                    f"Referrer Email: {referral.referrer_email}\n"
-                    f"Referrer Phone: {referral.referrer_phone}"
+            facility_name = (
+                referral.referring_facility.strip()
+                if referral.referring_facility
+                else ""
+            )
+
+            facility_info = f" ({facility_name})" if facility_name else ""
+
+            homecare_request = HomeCareRequest.objects.create(
+                full_name=referral.patient_name,
+                email=referral.patient_email,
+                phone=referral.patient_phone,
+                location="To be confirmed",
+                preferred_date=(timezone.now().date() + timedelta(days=1)),
+                preferred_time="09:00:00",
+                description=(
+                    f"Referred by: "
+                    f"{referral.referrer_name}"
+                    f"{facility_info} "
+                    f"({referral.referrer_email}, "
+                    f"{referral.referrer_phone}).\n\n"
+                    f"Notes: "
+                    f"{referral.additional_notes}"
+                ),
+            )
+
+            homecare_request.services.set(referral.services_needed.all())
+
+            for ref_attachment in referral.attachments.all():
+
+                HomeCareRequestAttachment.objects.create(
+                    homecare_request=homecare_request,
+                    file=ref_attachment.file,
                 )
 
-                if homecare_request.description:
-                    homecare_request.description += (
-                        referral_information
-                    )
-                else:
-                    homecare_request.description = (
-                        referral_information
-                    )
+            referral.homecare_request = homecare_request
 
-                homecare_request.save(
-                    update_fields=["description"]
-                )
-
-                # ------------------------------------------------
-                # COPY ATTACHMENTS TO HOME CARE REQUEST
-                # ------------------------------------------------
-
-                files = request.FILES.getlist(
-                    "attachments"
-                )
-
-                for f in files:
-
-                    ReferralAttachment.objects.create(
-                        referral=referral,
-                        file=f,
-                    )
-
-                    HomeCareRequestAttachment.objects.create(
-                        homecare_request=homecare_request,
-                        file=f,
-                    )
-
-                # ------------------------------------------------
-                # LINK REFERRAL TO HOME CARE REQUEST
-                # ------------------------------------------------
-
-                referral.homecare_request = (
-                    homecare_request
-                )
-
-                referral.save(
-                    update_fields=[
-                        "homecare_request"
-                    ]
-                )
+            referral.save(update_fields=["homecare_request"])
 
             messages.success(
                 request,
                 "Thank you! Your referral has been submitted. "
-                "Our care team will review the patient details "
-                "and contact the patient with a quotation.",
+                "Our care team will review the details and contact "
+                "the patient with a quotation.",
             )
 
-            return redirect(
-                "homecare:referral_success"
-            )
+            return redirect("homecare:referral_success")
 
     else:
 
-        referral_form = ReferralForm()
-
-        homecare_form = HomeCareRequestForm()
+        form = ReferralForm()
 
     return render(
         request,
         "homecare/referral_form.html",
         {
-            "referral_form": referral_form,
-            "homecare_form": homecare_form,
+            "form": form,
         },
     )
-    
+
+
 def referral_success(request):
 
     return render(
@@ -275,14 +335,13 @@ def referral_success(request):
 # BOOK APPOINTMENT / CONSULTATION
 # ============================================================
 
+
 @require_http_methods(["GET", "POST"])
 def book_appointment(request):
 
     if request.method == "GET":
 
-        return redirect(
-            "home"
-        )
+        return redirect("core:home")
 
     first_name = request.POST.get("first_name", "").strip()
     last_name = request.POST.get("last_name", "").strip()
@@ -351,7 +410,7 @@ def book_appointment(request):
             "appointment_time": appointment_time_value,
             "message": message,
         }
-        return redirect("home")
+        return redirect("core:home")
 
     with transaction.atomic():
         consultation = Consultation(
@@ -390,9 +449,7 @@ def book_appointment(request):
 
 def appointment_success(request):
 
-    reference = request.session.get(
-        "consultation_reference"
-    )
+    reference = request.session.get("consultation_reference")
 
     return render(
         request,
@@ -403,10 +460,10 @@ def appointment_success(request):
     )
 
 
-
 # ============================================================
 # HOME CARE QUOTATION
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -416,8 +473,7 @@ def create_quotation(
 ):
 
     homecare_request = get_object_or_404(
-        HomeCareRequest.objects
-        .prefetch_related("services"),
+        HomeCareRequest.objects.prefetch_related("services"),
         id=request_id,
     )
 
@@ -444,9 +500,7 @@ def create_quotation(
     # CREATE UNSAVED QUOTATION
     # --------------------------------------------------------
 
-    quotation_instance = Quotation(
-        homecare_request=homecare_request
-    )
+    quotation_instance = Quotation(homecare_request=homecare_request)
 
     # --------------------------------------------------------
     # POST
@@ -473,25 +527,17 @@ def create_quotation(
                     # SAVE QUOTATION
                     # ----------------------------------------
 
-                    quotation = form.save(
-                        commit=False
-                    )
+                    quotation = form.save(commit=False)
 
-                    quotation.homecare_request = (
-                        homecare_request
-                    )
+                    quotation.homecare_request = homecare_request
 
-                    quotation.payment_status = (
-                        Quotation.PaymentStatus.PENDING
-                    )
+                    quotation.payment_status = Quotation.PaymentStatus.PENDING
 
                     now = timezone.now()
 
                     quotation.sent_at = now
 
-                    quotation.payment_deadline = (
-                        now + timedelta(hours=24)
-                    )
+                    quotation.payment_deadline = now + timedelta(hours=24)
 
                     # Initial values.
                     quotation.base_amount = Decimal("0.00")
@@ -511,13 +557,9 @@ def create_quotation(
                     if not item_formset.is_valid():
 
                         # Roll back the quotation.
-                        raise ValueError(
-                            "Please correct the quotation items."
-                        )
+                        raise ValueError("Please correct the quotation items.")
 
-                    items = item_formset.save(
-                        commit=False
-                    )
+                    items = item_formset.save(commit=False)
 
                     # ----------------------------------------
                     # SAVE / DELETE ITEMS
@@ -531,28 +573,21 @@ def create_quotation(
                             # If staff leaves name blank,
                             # use the actual database service name.
                             if not item.name.strip():
-                                item.name = (
-                                    item.service.name
-                                )
+                                item.name = item.service.name
 
                         # Custom service.
                         else:
 
-                            item.name = (
-                                item.name or ""
-                            ).strip()
+                            item.name = (item.name or "").strip()
 
                             if not item.name:
 
                                 raise ValueError(
-                                    "Every custom service "
-                                    "must have a name."
+                                    "Every custom service " "must have a name."
                                 )
 
                         # Server-side line total.
-                        item.line_total = (
-                            item.calculate_total()
-                        )
+                        item.line_total = item.calculate_total()
 
                         item.save()
 
@@ -565,13 +600,9 @@ def create_quotation(
                     # SECURE SERVER-SIDE TOTAL
                     # ----------------------------------------
 
-                    quotation.base_amount = (
-                        quotation.calculate_items_total()
-                    )
+                    quotation.base_amount = quotation.calculate_items_total()
 
-                    quotation.amount = (
-                        quotation.calculate_total()
-                    )
+                    quotation.amount = quotation.calculate_total()
 
                     quotation.save(
                         update_fields=[
@@ -585,9 +616,7 @@ def create_quotation(
                     # UPDATE HOME CARE REQUEST
                     # ----------------------------------------
 
-                    homecare_request.status = (
-                        HomeCareRequest.Status.PAYMENT_PENDING
-                    )
+                    homecare_request.status = HomeCareRequest.Status.PAYMENT_PENDING
 
                     homecare_request.save(
                         update_fields=[
@@ -603,9 +632,7 @@ def create_quotation(
                 quotation_url = request.build_absolute_uri(
                     reverse(
                         "homecare:quotation_detail",
-                        kwargs={
-                            "token": quotation.access_token
-                        },
+                        kwargs={"token": quotation.access_token},
                     )
                 )
 
@@ -622,17 +649,12 @@ def create_quotation(
 
                     messages.success(
                         request,
-                        (
-                            "Quotation saved and sent "
-                            "successfully to the client."
-                        ),
+                        ("Quotation saved and sent " "successfully to the client."),
                     )
 
                 except Exception as e:
 
-                    logger.exception(
-                        "Failed to send quotation email."
-                    )
+                    logger.exception("Failed to send quotation email.")
 
                     messages.warning(
                         request,
@@ -708,11 +730,7 @@ def create_quotation(
             "homecare_request": homecare_request,
             "calculated_total": (
                 sum(
-                    (
-                        service.price
-                        for service
-                        in homecare_request.services.all()
-                    ),
+                    (service.price for service in homecare_request.services.all()),
                     Decimal("0.00"),
                 )
             ),
@@ -738,6 +756,7 @@ def send_quotation_email(
         "quotation_url": quotation_url,
         "payment_deadline": local_deadline,
         "site_settings": site_settings,
+        "payment_options": _payment_options(site_settings),
     }
 
     html_content = render_to_string(
@@ -793,13 +812,7 @@ Account Number:
 Branch:
 {site_settings.branch_name or "Please refer to the quotation page."}
 
-Mobile Money:
-{site_settings.mobile_money_name or "Please refer to the quotation page."}
-
-Mobile Money Number:
-{site_settings.mobile_money_number or "Please refer to the quotation page."}
-
-{site_settings.payment_instructions or ""}
+{_payment_instructions_text(site_settings)}
 
 Review your quotation and payment information using the secure link below:
 
@@ -836,13 +849,12 @@ Kind regards,
 # CONSULTATION QUOTATION
 # ============================================================
 
-# ============================================================
-# CONSULTATION / BOOK APPOINTMENT QUOTATION
-# ============================================================
 
 @login_required
-@require_http_methods(["GET", "POST"])
-def create_consultation_quotation(request, consultation_id):
+def create_consultation_quotation(
+    request,
+    consultation_id,
+):
 
     if not _user_is_admin_or_superuser(request.user):
         raise Http404
@@ -852,275 +864,81 @@ def create_consultation_quotation(request, consultation_id):
         pk=consultation_id,
     )
 
-    # ========================================================
-    # PREVENT DUPLICATE QUOTATIONS
-    # ========================================================
-
     if hasattr(consultation, "quotation"):
-
         messages.warning(
             request,
-            "A quotation already exists for this appointment.",
+            "A quotation already exists for this consultation.",
         )
-
         return redirect(
             "admin:homecare_consultation_change",
-            consultation.pk,
+            consultation.id,
         )
 
-    # ========================================================
-    # PREPARE QUOTATION
-    # ========================================================
-
-    quotation_instance = Quotation(
-        consultation=consultation,
-    )
-
-    # ========================================================
-    # GET SERVICES SELECTED DURING APPOINTMENT BOOKING
-    # ========================================================
-
-    selected_services = consultation.services or []
-
-    if isinstance(selected_services, str):
-        selected_services = [
-            value.strip()
-            for value in selected_services.split(",")
-            if value.strip()
-        ]
-
-    if not isinstance(selected_services, (list, tuple)):
-        selected_services = []
-
-    # The appointment form submits Service primary keys.
-    service_ids = []
-
-    for value in selected_services:
-
-        try:
-            service_ids.append(int(value))
-        except (TypeError, ValueError):
-            continue
-
-    services_by_id = Service.objects.in_bulk(service_ids)
-
-    # ========================================================
-    # POST: SAVE QUOTATION AND LINE ITEMS
-    # ========================================================
+    quotation_instance = Quotation(consultation=consultation)
 
     if request.method == "POST":
-
         form = QuotationForm(
             request.POST,
             instance=quotation_instance,
         )
 
-        item_formset = QuotationItemFormSet(
-            request.POST,
-            instance=quotation_instance,
-        )
+        if form.is_valid():
+            quotation = form.save(commit=False)
+            now = timezone.now()
 
-        if form.is_valid() and item_formset.is_valid():
+            quotation.sent_at = now
+            quotation.payment_deadline = now + timedelta(hours=24)
+            quotation.payment_status = Quotation.PaymentStatus.PENDING
+            quotation.save()
 
-            try:
+            consultation.status = Consultation.Status.PAYMENT_PENDING
+            consultation.save(update_fields=["status", "updated_at"])
 
-                with transaction.atomic():
-
-                    quotation = form.save(commit=False)
-
-                    quotation.consultation = consultation
-
-                    quotation.payment_status = (
-                        Quotation.PaymentStatus.PENDING
-                    )
-
-                    now = timezone.now()
-
-                    quotation.sent_at = now
-
-                    quotation.payment_deadline = (
-                        now + timedelta(hours=24)
-                    )
-
-                    quotation.base_amount = Decimal("0.00")
-                    quotation.amount = Decimal("0.00")
-
-                    quotation.save()
-
-                    # ----------------------------------------
-                    # SAVE QUOTATION SERVICES
-                    # ----------------------------------------
-
-                    items = item_formset.save(commit=False)
-
-                    for item in items:
-
-                        item.quotation = quotation
-
-                        if item.service:
-
-                            if not (item.name or "").strip():
-                                item.name = item.service.name
-
-                        else:
-
-                            item.name = (
-                                item.name or ""
-                            ).strip()
-
-                            if not item.name:
-                                raise ValueError(
-                                    "Every custom service must have a name."
-                                )
-
-                        item.line_total = item.calculate_total()
-
-                        item.save()
-
-                    # ----------------------------------------
-                    # CALCULATE TOTALS ON SERVER
-                    # ----------------------------------------
-
-                    quotation.base_amount = (
-                        quotation.calculate_items_total()
-                    )
-
-                    quotation.amount = (
-                        quotation.calculate_total()
-                    )
-
-                    quotation.save(
-                        update_fields=[
-                            "base_amount",
-                            "amount",
-                            "updated_at",
-                        ]
-                    )
-
-                    # ----------------------------------------
-                    # UPDATE APPOINTMENT STATUS
-                    # ----------------------------------------
-
-                    consultation.status = (
-                        Consultation.Status.PAYMENT_PENDING
-                    )
-
-                    consultation.save(
-                        update_fields=[
-                            "status",
-                            "updated_at",
-                        ]
-                    )
-
-                # ============================================
-                # CREATE SECURE QUOTATION LINK
-                # ============================================
-
-                quotation_url = request.build_absolute_uri(
-                    reverse(
-                        "homecare:quotation_detail",
-                        kwargs={
-                            "token": quotation.access_token,
-                        },
-                    )
+            quotation_url = request.build_absolute_uri(
+                reverse(
+                    "homecare:quotation_detail",
+                    kwargs={"token": quotation.access_token},
                 )
-
-                # ============================================
-                # SEND EMAIL
-                # ============================================
-
-                try:
-
-                    send_consultation_quotation_email(
-                        quotation,
-                        quotation_url,
-                    )
-
-                    messages.success(
-                        request,
-                        "Appointment quotation saved and sent "
-                        "successfully to the patient.",
-                    )
-
-                except Exception as email_error:
-
-                    logger.exception(
-                        "Failed to send appointment quotation email."
-                    )
-
-                    messages.warning(
-                        request,
-                        "The appointment quotation was saved "
-                        "successfully, but the email could not "
-                        f"be sent: {email_error}",
-                    )
-
-                return redirect(
-                    "admin:homecare_consultation_change",
-                    consultation.pk,
-                )
-
-            except ValueError as error:
-
-                messages.error(
-                    request,
-                    str(error),
-                )
-
-        else:
-
-            messages.error(
-                request,
-                "Please correct the quotation form errors below.",
             )
 
-    # ========================================================
-    # GET: AUTOMATICALLY POPULATE SELECTED SERVICES
-    # ========================================================
+            try:
+                send_consultation_quotation_email(quotation, quotation_url)
+                messages.success(
+                    request,
+                    "Consultation quotation created and sent to the patient.",
+                )
+            except Exception as e:
+                logger.exception("Consultation quotation email failed.")
+                messages.warning(
+                    request,
+                    f"Quotation was created, but email failed: {e}",
+                )
+
+            return redirect(
+                "admin:homecare_consultation_change",
+                consultation.id,
+            )
 
     else:
-
         form = QuotationForm(
             instance=quotation_instance,
             initial={
-                "transportation_fee": Decimal("0.00"),
-                "discount_amount": Decimal("0.00"),
-                "description": "",
+                "base_amount": 0,
+                "transportation_fee": 0,
+                "discount_amount": 0,
+                "amount": 0,
+                "description": (
+                    "Consultation Services:\n"
+                    f"{consultation.services or 'Consultation'}"
+                ),
             },
         )
-
-        initial_items = []
-
-        for service_id in service_ids:
-
-            service = services_by_id.get(service_id)
-
-            if service is None:
-                continue
-
-            initial_items.append({
-                "service": service.pk,
-                "name": service.name,
-                "description": "",
-                "quantity": Decimal("1.00"),
-                "unit_price": service.price,
-            })
-
-        item_formset = QuotationItemFormSet(
-            instance=quotation_instance,
-            initial=initial_items,
-        )
-
-    # ========================================================
-    # DISPLAY QUOTATION FORM
-    # ========================================================
 
     return render(
         request,
         "homecare/quotation_form.html",
         {
             "form": form,
-            "item_formset": item_formset,
             "consultation": consultation,
             "is_consultation": True,
         },
@@ -1131,207 +949,76 @@ def send_consultation_quotation_email(
     quotation,
     quotation_url,
 ):
-    """
-    Send a professionally styled consultation quotation email
-    with HTML and plain-text alternatives.
-    """
-
-    from django.utils.html import strip_tags
 
     consultation = quotation.consultation
     site_settings = SiteSettings.load()
+    local_deadline = timezone.localtime(quotation.payment_deadline)
 
-    local_deadline = (
-        timezone.localtime(quotation.payment_deadline)
-        if quotation.payment_deadline
-        else None
-    )
+    services = consultation.services or []
 
-    # --------------------------------------------------------
-    # PATIENT NAME
-    # --------------------------------------------------------
+    if isinstance(services, list):
+        service_text = ", ".join(str(service) for service in services)
+    else:
+        service_text = str(services)
 
-    patient_name = (
-        f"{consultation.first_name} {consultation.last_name}"
-    ).strip() or "Valued Patient"
-
-    # --------------------------------------------------------
-    # RESOLVE CONSULTATION SERVICE NAMES
-    # The appointment form may store Service IDs.
-    # --------------------------------------------------------
-
-    selected_services = consultation.services or []
-
-    if isinstance(selected_services, str):
-        selected_services = [
-            value.strip()
-            for value in selected_services.split(",")
-            if value.strip()
-        ]
-
-    if not isinstance(selected_services, (list, tuple)):
-        selected_services = []
-
-    service_ids = []
-
-    for value in selected_services:
-        try:
-            service_ids.append(int(value))
-        except (TypeError, ValueError):
-            continue
-
-    services_by_id = Service.objects.in_bulk(service_ids)
-
-    service_names = []
-
-    for value in selected_services:
-        try:
-            service = services_by_id.get(int(value))
-        except (TypeError, ValueError):
-            service = None
-
-        if service:
-            service_names.append(service.name)
-        elif not str(value).isdigit():
-            service_names.append(str(value))
-
-    service_text = ", ".join(dict.fromkeys(service_names))
-    if not service_text:
-        service_text = "Medical Consultation"
-
-    # --------------------------------------------------------
-    # FORMAT DATE AND TIME
-    # --------------------------------------------------------
-
-    requested_date = (
-        consultation.requested_date.strftime("%A, %d %B %Y")
-        if consultation.requested_date
-        else "To be confirmed"
-    )
-
-    requested_time = (
-        consultation.requested_time.strftime("%I:%M %p")
-        if consultation.requested_time
-        else "To be confirmed"
-    )
-
-    payment_deadline_text = (
-        local_deadline.strftime("%d %B %Y at %I:%M %p")
-        if local_deadline
-        else "Please refer to your quotation"
-    )
-
-    business_name = (
-        getattr(site_settings, "business_name", "")
-        or "Hands-On Health"
-    )
-
-    tagline = (
-        getattr(site_settings, "tagline", "")
-        or "Compassionate Care. Professional Service."
-    )
-
-    phone = getattr(site_settings, "phone", "") or ""
-    whatsapp = getattr(site_settings, "whatsapp", "") or ""
-    contact_email = getattr(site_settings, "email", "") or ""
-
-    subject = "Your Consultation Quotation | Hands-On Health"
-
-    # --------------------------------------------------------
-    # EMAIL TEMPLATE CONTEXT
-    # --------------------------------------------------------
-
-    context = {
-        "quotation": quotation,
-        "consultation": consultation,
-        "patient_name": patient_name,
-        "service_text": service_text,
-        "requested_date": requested_date,
-        "requested_time": requested_time,
-        "payment_deadline": local_deadline,
-        "payment_deadline_text": payment_deadline_text,
-        "quotation_url": quotation_url,
-        "site_settings": site_settings,
-        "business_name": business_name,
-        "tagline": tagline,
-        "phone": phone,
-        "whatsapp": whatsapp,
-        "contact_email": contact_email,
-    }
-
-    # --------------------------------------------------------
-    # RENDER PROFESSIONAL HTML EMAIL
-    # --------------------------------------------------------
-
-    html_content = render_to_string(
-        "homecare/email/consultation_quotation_email.html",
-        context,
-    )
-
-    # --------------------------------------------------------
-    # PLAIN-TEXT FALLBACK
-    # --------------------------------------------------------
+    subject = "Your Consultation Quotation - Hands-On Health"
 
     text_content = f"""
-{business_name}
-{tagline}
+Dear {consultation.first_name} {consultation.last_name},
 
-YOUR CONSULTATION QUOTATION IS READY
+Thank you for booking a consultation with Hands-On Health.
 
-Dear {patient_name},
+We have reviewed your appointment request and prepared your quotation.
 
-Thank you for choosing {business_name}.
+Consultation Services:
+{service_text or "Medical Consultation"}
 
-We have reviewed your consultation request and prepared
-your quotation.
+Requested Date:
+{consultation.requested_date}
 
-CONSULTATION DETAILS
---------------------
-Services: {service_text}
-Requested date: {requested_date}
-Requested time: {requested_time}
+Requested Time:
+{consultation.requested_time}
 
-QUOTATION AMOUNT
-----------------
+Quotation Amount:
 N$ {quotation.amount:,.2f}
 
-PAYMENT DEADLINE
-----------------
-{payment_deadline_text}
+Payment Deadline:
+{local_deadline.strftime("%d %B %Y at %I:%M %p")}
 
 QUOTATION DETAILS
 -----------------
-{strip_tags(quotation.description or "").strip() or "Please review the quotation page for details."}
+{quotation.description}
 
-REVIEW YOUR QUOTATION AND SUBMIT PAYMENT
-----------------------------------------
+You can review your quotation and submit payment using the secure link below:
+
 {quotation_url}
 
-WHAT HAPPENS NEXT?
-------------------
-1. Review your quotation and submit payment.
-2. Hands-On Health verifies your payment.
-3. Our team shares the available appointment slots.
-4. Select your preferred slot to confirm your consultation.
+IMPORTANT
+---------
+Your consultation is not scheduled until:
 
-Your consultation is not confirmed until payment has been
-verified and you have selected an available appointment slot.
+1. Payment has been submitted.
+2. Payment has been verified.
+3. Hands-On Health shares available appointment slots with you.
+4. You select one of the available slots.
 
-CONTACT US
-----------
-Phone: {phone or "Not provided"}
-WhatsApp: {whatsapp or "Not provided"}
-Email: {contact_email or "Not provided"}
+Once you select a slot, your consultation will be confirmed and your telemedicine link will be provided.
+
+If you have any questions, please contact:
+
+Phone:
+{site_settings.phone or "Not provided"}
+
+WhatsApp:
+{site_settings.whatsapp or "Not provided"}
+
+Email:
+{site_settings.email or "Not provided"}
 
 Kind regards,
 
-{business_name}
-{tagline}
+{site_settings.business_name}
 """
-
-    # --------------------------------------------------------
-    # SEND HTML + PLAIN TEXT
-    # --------------------------------------------------------
 
     email = EmailMultiAlternatives(
         subject=subject,
@@ -1340,23 +1027,13 @@ Kind regards,
         to=[consultation.email],
     )
 
-    email.attach_alternative(
-        html_content,
-        "text/html",
-    )
+    email.send()
 
-    email.send(fail_silently=False)
-
-    logger.info(
-        "Consultation quotation email sent successfully "
-        "for quotation #%s to %s",
-        quotation.pk,
-        consultation.email,
-    )
 
 # ============================================================
 # CAREGIVER DASHBOARD
 # ============================================================
+
 
 @login_required
 def caregiver_dashboard(
@@ -1381,21 +1058,16 @@ def caregiver_dashboard(
             "homecare/caregiver_link_expired.html",
             {
                 "message": (
-                    "This caregiver dashboard link is invalid "
-                    "or has expired."
+                    "This caregiver dashboard link is invalid " "or has expired."
                 ),
             },
         )
 
     assignment = get_object_or_404(
-        CaregiverAssignment.objects
-        .select_related(
+        CaregiverAssignment.objects.select_related(
             "caregiver",
             "homecare_request",
-        )
-        .prefetch_related(
-            "homecare_request__services"
-        ),
+        ).prefetch_related("homecare_request__services"),
         id=assignment_id,
     )
 
@@ -1404,9 +1076,7 @@ def caregiver_dashboard(
             request,
             "homecare/caregiver_link_expired.html",
             {
-                "message": (
-                    "This caregiver account is currently inactive."
-                ),
+                "message": ("This caregiver account is currently inactive."),
             },
         )
 
@@ -1457,9 +1127,7 @@ def send_caregiver_assignment_email(
     assignment = actual_assignment
 
     if assignment is None:
-        raise ValueError(
-            "Caregiver assignment was not supplied."
-        )
+        raise ValueError("Caregiver assignment was not supplied.")
 
     caregiver = assignment.caregiver
     homecare_request = assignment.homecare_request
@@ -1473,9 +1141,7 @@ def send_caregiver_assignment_email(
             "Caregiver assignment #%s has no caregiver email address.",
             assignment.id,
         )
-        raise ValueError(
-            "The assigned caregiver does not have an email address."
-        )
+        raise ValueError("The assigned caregiver does not have an email address.")
 
     # --------------------------------------------------------
     # SITE SETTINGS
@@ -1503,9 +1169,7 @@ def send_caregiver_assignment_email(
             request_object,
             "build_absolute_uri",
         ):
-            dashboard_url = request_object.build_absolute_uri(
-                assignment_path
-            )
+            dashboard_url = request_object.build_absolute_uri(assignment_path)
         else:
             actual_base_url = (
                 actual_base_url
@@ -1513,19 +1177,13 @@ def send_caregiver_assignment_email(
                 or "http://127.0.0.1:8000"
             ).rstrip("/")
 
-            dashboard_url = (
-                f"{actual_base_url}{assignment_path}"
-            )
+            dashboard_url = f"{actual_base_url}{assignment_path}"
 
     except Exception:
-        logger.exception(
-            "Could not build caregiver assignment detail URL."
-        )
+        logger.exception("Could not build caregiver assignment detail URL.")
 
         # Legacy signed-token URL fallback.
-        token = signing.TimestampSigner().sign(
-            str(assignment.id)
-        )
+        token = signing.TimestampSigner().sign(str(assignment.id))
 
         if request_object is not None and hasattr(
             request_object,
@@ -1541,9 +1199,7 @@ def send_caregiver_assignment_email(
                 or "http://127.0.0.1:8000"
             ).rstrip("/")
 
-            dashboard_url = (
-                f"{actual_base_url}/caregiver/dashboard/{token}/"
-            )
+            dashboard_url = f"{actual_base_url}/caregiver/dashboard/{token}/"
 
     # --------------------------------------------------------
     # SAFE DATE / TIME DISPLAY
@@ -1566,16 +1222,12 @@ def send_caregiver_assignment_email(
     )
 
     if service_date:
-        service_date_text = service_date.strftime(
-            "%d %B %Y"
-        )
+        service_date_text = service_date.strftime("%d %B %Y")
     else:
         service_date_text = "To be confirmed"
 
     if service_time:
-        service_time_text = service_time.strftime(
-            "%I:%M %p"
-        )
+        service_time_text = service_time.strftime("%I:%M %p")
     else:
         service_time_text = "To be confirmed"
 
@@ -1600,11 +1252,14 @@ def send_caregiver_assignment_email(
     # PLAIN TEXT EMAIL
     # --------------------------------------------------------
 
-    caregiver_name = getattr(
-        caregiver,
-        "name",
-        "Caregiver",
-    ) or "Caregiver"
+    caregiver_name = (
+        getattr(
+            caregiver,
+            "name",
+            "Caregiver",
+        )
+        or "Caregiver"
+    )
 
     text_content = f"""
 Dear {caregiver_name},
@@ -1655,10 +1310,7 @@ Kind regards,
     # --------------------------------------------------------
 
     email = EmailMultiAlternatives(
-        subject=(
-            "New Patient Assigned to You — "
-            f"{homecare_request.full_name}"
-        ),
+        subject=("New Patient Assigned to You — " f"{homecare_request.full_name}"),
         body=text_content,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[caregiver.email],
@@ -1671,13 +1323,10 @@ Kind regards,
 
     # IMPORTANT: fail_silently=False so staff receives the actual
     # SMTP/template error instead of believing the email was sent.
-    email.send(
-        fail_silently=False
-    )
+    email.send(fail_silently=False)
 
     logger.info(
-        "Caregiver assignment email sent successfully. "
-        "Assignment #%s -> %s",
+        "Caregiver assignment email sent successfully. " "Assignment #%s -> %s",
         assignment.id,
         caregiver.email,
     )
@@ -1686,6 +1335,7 @@ Kind regards,
 # ============================================================
 # QUOTATION DETAIL
 # ============================================================
+
 
 def quotation_detail(
     request,
@@ -1705,15 +1355,15 @@ def quotation_detail(
     local_deadline = None
 
     if quotation.payment_deadline:
-        local_deadline = timezone.localtime(
-            quotation.payment_deadline
-        )
+        local_deadline = timezone.localtime(quotation.payment_deadline)
 
     return render(
         request,
         "homecare/quotation_detail.html",
         {
             "quotation": quotation,
+            "site_settings": site_settings,
+            "payment_options": _payment_options(site_settings),
             "homecare_request": quotation.homecare_request,
             "consultation": quotation.consultation,
             "site_settings": site_settings,
@@ -1725,6 +1375,7 @@ def quotation_detail(
 # ============================================================
 # PAYMENT PLACEHOLDER
 # ============================================================
+
 
 def payment_placeholder(
     request,
@@ -1739,11 +1390,15 @@ def payment_placeholder(
         access_token=token,
     )
 
+    site_settings = SiteSettings.load()
+
     return render(
         request,
         "homecare/payment_placeholder.html",
         {
             "quotation": quotation,
+            "site_settings": site_settings,
+            "payment_options": _payment_options(site_settings),
             "homecare_request": quotation.homecare_request,
             "consultation": quotation.consultation,
         },
@@ -1753,6 +1408,7 @@ def payment_placeholder(
 # ============================================================
 # SUBMIT PAYMENT
 # ============================================================
+
 
 def submit_payment(
     request,
@@ -1767,14 +1423,41 @@ def submit_payment(
         access_token=token,
     )
 
+    site_settings = SiteSettings.load()
+    payment_options = _payment_options(site_settings)
     homecare_request = quotation.homecare_request
     consultation = quotation.consultation
 
     if request.method == "POST":
 
-        form = PaymentSubmissionForm(request.POST)
+        form = _configure_payment_form(
+            PaymentSubmissionForm(request.POST), payment_options
+        )
 
         if form.is_valid():
+
+            chosen_method = form.cleaned_data.get("payment_method")
+            if (
+                chosen_method not in payment_options
+                or not payment_options[chosen_method]["available"]
+            ):
+                form.add_error(
+                    "payment_method", "Please choose an available payment method."
+                )
+                return render(
+                    request,
+                    "homecare/payment_form.html",
+                    {
+                        "quotation": quotation,
+                        "homecare_request": homecare_request,
+                        "consultation": consultation,
+                        "form": form,
+                        "site_settings": site_settings,
+                        "payment_options": payment_options,
+                        "site_settings": site_settings,
+                        "payment_options": payment_options,
+                    },
+                )
 
             payment = form.save(commit=False)
             payment.quotation = quotation
@@ -1803,7 +1486,7 @@ def submit_payment(
 
     else:
 
-        form = PaymentSubmissionForm()
+        form = _configure_payment_form(PaymentSubmissionForm(), payment_options)
 
     return render(
         request,
@@ -1820,6 +1503,7 @@ def submit_payment(
 # ============================================================
 # PAYMENT SUBMITTED
 # ============================================================
+
 
 def payment_submitted(
     request,
@@ -1848,6 +1532,7 @@ def payment_submitted(
 # ============================================================
 # VERIFY PAYMENT
 # ============================================================
+
 
 @login_required
 def verify_payment(
@@ -1936,7 +1621,9 @@ def verify_payment(
         if homecare_request:
             homecare_request.status = HomeCareRequest.Status.CONFIRMED
             homecare_request.confirmed_at = now
-            homecare_request.save(update_fields=["status", "confirmed_at", "updated_at"])
+            homecare_request.save(
+                update_fields=["status", "confirmed_at", "updated_at"]
+            )
             transaction.on_commit(lambda: send_payment_confirmation_email(payment))
             messages.success(
                 request,
@@ -1946,7 +1633,9 @@ def verify_payment(
         elif consultation:
             consultation.status = Consultation.Status.PAID
             consultation.save(update_fields=["status", "updated_at"])
-            transaction.on_commit(lambda: send_consultation_payment_confirmation_email(payment))
+            transaction.on_commit(
+                lambda: send_consultation_payment_confirmation_email(payment)
+            )
             messages.success(
                 request,
                 "Payment verified successfully. Consultation marked as PAID.",
@@ -1958,6 +1647,7 @@ def verify_payment(
 # ============================================================
 # HOME CARE PAYMENT CONFIRMATION EMAIL
 # ============================================================
+
 
 def send_payment_confirmation_email(
     payment,
@@ -2030,6 +1720,7 @@ Kind regards,
 # CONSULTATION PAYMENT CONFIRMATION EMAIL
 # ============================================================
 
+
 def send_consultation_payment_confirmation_email(
     payment,
 ):
@@ -2100,19 +1791,16 @@ Email:
 # ADMIN / DOCTOR HELPER
 # ============================================================
 
-def _user_is_admin_or_superuser(
-    user
-):
 
-    return (
-        user.is_superuser
-        or user.is_staff
-    )
+def _user_is_admin_or_superuser(user):
+
+    return user.is_superuser or user.is_staff
 
 
 # ============================================================
 # MANAGE CONSULTATION SLOTS
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -2162,7 +1850,9 @@ def schedule_consultation(
         current_date = timezone.localdate()
 
         if slot_date < current_date:
-            messages.error(request, "You cannot create an appointment slot in the past.")
+            messages.error(
+                request, "You cannot create an appointment slot in the past."
+            )
             return redirect("homecare:schedule_consultation", consultation.pk)
 
         if slot_date == current_date:
@@ -2214,9 +1904,9 @@ def schedule_consultation(
 
         return redirect("homecare:schedule_consultation", consultation.pk)
 
-    slots = ConsultationSlot.objects.filter(
-        consultation=consultation
-    ).order_by("date", "time")
+    slots = ConsultationSlot.objects.filter(consultation=consultation).order_by(
+        "date", "time"
+    )
 
     available_slots = slots.filter(
         is_available=True,
@@ -2237,6 +1927,7 @@ def schedule_consultation(
 # ============================================================
 # DELETE / REMOVE AVAILABLE SLOT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -2269,6 +1960,7 @@ def delete_consultation_slot(
 # ============================================================
 # SEND CONSULTATION AVAILABILITY
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -2328,6 +2020,7 @@ def send_consultation_availability(
 # PATIENT APPOINTMENT AVAILABILITY
 # ============================================================
 
+
 @require_http_methods(["GET"])
 def consultation_availability(
     request,
@@ -2383,6 +2076,7 @@ def consultation_availability(
 # ============================================================
 # PATIENT SELECTS APPOINTMENT SLOT
 # ============================================================
+
 
 @require_http_methods(["POST"])
 def select_consultation_slot(
@@ -2475,9 +2169,7 @@ def select_consultation_slot(
         consultation.doctor_join_url = doctor_url
         consultation.save()
 
-        transaction.on_commit(
-            lambda: send_consultation_scheduled_email(consultation)
-        )
+        transaction.on_commit(lambda: send_consultation_scheduled_email(consultation))
 
     return redirect(
         "homecare:consultation_scheduled",
@@ -2488,6 +2180,7 @@ def select_consultation_slot(
 # ============================================================
 # APPOINTMENT SCHEDULED SUCCESS PAGE
 # ============================================================
+
 
 def consultation_scheduled(
     request,
@@ -2512,6 +2205,7 @@ def consultation_scheduled(
 # ============================================================
 # CONSULTATION AVAILABILITY EMAIL
 # ============================================================
+
 
 def send_consultation_availability_email(
     consultation,
@@ -2626,6 +2320,7 @@ Kind regards,
 # ============================================================
 # CONSULTATION SCHEDULED EMAIL
 # ============================================================
+
 
 def send_consultation_scheduled_email(
     consultation,
@@ -2747,6 +2442,7 @@ Kind regards,
 # PATIENT TELEMEDICINE
 # ============================================================
 
+
 def _get_patient_consultation(token):
     consultation = get_object_or_404(
         Consultation,
@@ -2760,6 +2456,39 @@ def _get_patient_consultation(token):
         raise Http404
 
     return consultation
+
+
+@require_http_methods(["GET"])
+def patient_telemedicine_status(request, token):
+    """Return the patient's consultation status for the telemedicine page.
+
+    This endpoint is token-protected in the same way as the patient room URL.
+    It intentionally does not expose the doctor's private join URL.
+    """
+    consultation = get_object_or_404(
+        Consultation,
+        patient_access_token=token,
+    )
+
+    status_value = getattr(consultation, "status", "")
+    status_display = (
+        consultation.get_status_display()
+        if hasattr(consultation, "get_status_display")
+        else str(status_value)
+    )
+    joinable_statuses = {
+        getattr(Consultation.Status, "SCHEDULED", "SCHEDULED"),
+        getattr(Consultation.Status, "IN_PROGRESS", "IN_PROGRESS"),
+    }
+
+    return JsonResponse(
+        {
+            "status": str(status_value),
+            "status_display": status_display,
+            "room_name": getattr(consultation, "room_name", "") or "",
+            "can_join": status_value in joinable_statuses,
+        }
+    )
 
 
 def patient_telemedicine(
@@ -2779,28 +2508,11 @@ def patient_telemedicine(
         },
     )
 
-def patient_telemedicine_status(request, token):
-    consultation = get_object_or_404(
-        Consultation,
-        patient_access_token=token,
-    )
-
-    if consultation.status == Consultation.Status.SCHEDULED:
-        status = "waiting"
-    elif consultation.status == Consultation.Status.IN_PROGRESS:
-        status = "active"
-    else:
-        status = "ended"
-
-    return JsonResponse({
-        "status": status,
-    })
-
-
 
 # ============================================================
 # DOCTOR TELEMEDICINE
 # ============================================================
+
 
 def _get_doctor_consultation(token):
     consultation = get_object_or_404(
@@ -2850,6 +2562,7 @@ def doctor_telemedicine(
 # START CONSULTATION
 # ============================================================
 
+
 @login_required
 @require_http_methods(["POST"])
 def start_consultation(
@@ -2889,6 +2602,7 @@ def start_consultation(
 # COMPLETE CONSULTATION
 # ============================================================
 
+
 @login_required
 @require_http_methods(["POST"])
 def complete_consultation(
@@ -2925,7 +2639,6 @@ def complete_consultation(
     messages.success(request, "Consultation completed successfully.")
 
     return redirect("admin:homecare_consultation_change", consultation.pk)
-
 
 
 # ============================================================
@@ -2978,17 +2691,13 @@ def _caregiver_assignment_queryset():
     """
     Common queryset used by caregiver portal pages.
     """
-    return (
-        CaregiverAssignment.objects
-        .select_related(
-            "caregiver",
-            "caregiver__user",
-            "homecare_request",
-        )
-        .prefetch_related(
-            "homecare_request__services",
-            "daily_reports",
-        )
+    return CaregiverAssignment.objects.select_related(
+        "caregiver",
+        "caregiver__user",
+        "homecare_request",
+    ).prefetch_related(
+        "homecare_request__services",
+        "daily_reports",
     )
 
 
@@ -3032,9 +2741,8 @@ def _assignment_start_date(assignment):
     Support the new start_date field while remaining compatible with
     older assignments that still have service_date.
     """
-    return (
-        getattr(assignment, "start_date", None)
-        or getattr(assignment, "service_date", None)
+    return getattr(assignment, "start_date", None) or getattr(
+        assignment, "service_date", None
     )
 
 
@@ -3085,11 +2793,9 @@ def _set_homecare_assignment_status(homecare_request):
     try:
         if hasattr(HomeCareRequest.Status, "ASSIGNED"):
             homecare_request.status = HomeCareRequest.Status.ASSIGNED
-            homecare_request.save(update_fields=["status", ])
+            homecare_request.save(update_fields=["status", "updated_at"])
     except Exception:
-        logger.exception(
-            "Unable to update HomeCareRequest assignment status."
-        )
+        logger.exception("Unable to update HomeCareRequest assignment status.")
 
 
 def _set_homecare_completed(homecare_request):
@@ -3110,25 +2816,24 @@ def _set_homecare_completed(homecare_request):
                     update_fields=[
                         "status",
                         "completed_at",
-                        
+                        "updated_at",
                     ]
                 )
             else:
                 homecare_request.save(
                     update_fields=[
                         "status",
-                       
+                        "updated_at",
                     ]
                 )
     except Exception:
-        logger.exception(
-            "Unable to update HomeCareRequest completion status."
-        )
+        logger.exception("Unable to update HomeCareRequest completion status.")
 
 
 # ============================================================
 # CAREGIVER PORTAL DASHBOARD
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -3157,15 +2862,12 @@ def caregiver_portal_dashboard(request):
         return redirect("caregivers:login")
 
     assignments = (
-        CaregiverAssignment.objects
-        .filter(caregiver=caregiver)
+        CaregiverAssignment.objects.filter(caregiver=caregiver)
         .select_related("homecare_request")
         .order_by("-assigned_at", "-id")
     )
 
-    pending_assignments = assignments.filter(
-        status=CaregiverAssignment.Status.PENDING
-    )
+    pending_assignments = assignments.filter(status=CaregiverAssignment.Status.PENDING)
 
     active_assignments = assignments.filter(
         status__in=[
@@ -3192,7 +2894,6 @@ def caregiver_portal_dashboard(request):
             "active_assignments": active_assignments,
             "completed_assignments": completed_assignments,
             "declined_assignments": declined_assignments,
-
             "pending_count": pending_assignments.count(),
             "active_count": active_assignments.count(),
             "completed_count": completed_assignments.count(),
@@ -3204,6 +2905,7 @@ def caregiver_portal_dashboard(request):
 # ============================================================
 # CAREGIVER ASSIGNMENTS
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -3229,23 +2931,16 @@ def caregiver_assignments(request):
         return redirect("caregivers:login")
 
     assignments = (
-        CaregiverAssignment.objects
-        .filter(caregiver=caregiver)
+        CaregiverAssignment.objects.filter(caregiver=caregiver)
         .select_related("homecare_request")
         .order_by("-assigned_at", "-id")
     )
 
-    selected_status = (
-        request.GET.get("status", "")
-        .strip()
-        .lower()
-    )
+    selected_status = request.GET.get("status", "").strip().lower()
 
     if selected_status == "pending":
 
-        assignments = assignments.filter(
-            status=CaregiverAssignment.Status.PENDING
-        )
+        assignments = assignments.filter(status=CaregiverAssignment.Status.PENDING)
 
     elif selected_status == "active":
 
@@ -3258,15 +2953,11 @@ def caregiver_assignments(request):
 
     elif selected_status == "completed":
 
-        assignments = assignments.filter(
-            status=CaregiverAssignment.Status.COMPLETED
-        )
+        assignments = assignments.filter(status=CaregiverAssignment.Status.COMPLETED)
 
     elif selected_status == "declined":
 
-        assignments = assignments.filter(
-            status=CaregiverAssignment.Status.DECLINED
-        )
+        assignments = assignments.filter(status=CaregiverAssignment.Status.DECLINED)
 
     return render(
         request,
@@ -3284,6 +2975,7 @@ def caregiver_assignments(request):
 # CAREGIVER ASSIGNMENT DETAIL
 # ============================================================
 
+
 @login_required
 @require_http_methods(["GET"])
 def caregiver_assignment_detail(request, pk):
@@ -3298,22 +2990,14 @@ def caregiver_assignment_detail(request, pk):
         pk,
     )
 
-    reports = (
-        assignment.daily_reports
-        .all()
-        .order_by(
-            "-report_date",
-            "-submitted_at",
-        )
+    reports = assignment.daily_reports.all().order_by(
+        "-report_date",
+        "-submitted_at",
     )
 
-    weekly_reports = (
-        assignment.weekly_reports
-        .all()
-        .order_by(
-            "-week_start",
-            "-submitted_at",
-        )
+    weekly_reports = assignment.weekly_reports.all().order_by(
+        "-week_start",
+        "-submitted_at",
     )
 
     return render(
@@ -3324,28 +3008,18 @@ def caregiver_assignment_detail(request, pk):
             "assignment": assignment,
             "reports": reports,
             "weekly_reports": weekly_reports,
-
-            "assignment_start": _assignment_start_date(
-                assignment
-            ),
-
-            "assignment_end": _assignment_end_date(
-                assignment
-            ),
-
-            "assignment_type_display": _assignment_type_display(
-                assignment
-            ),
-
+            "assignment_start": _assignment_start_date(assignment),
+            "assignment_end": _assignment_end_date(assignment),
+            "assignment_type_display": _assignment_type_display(assignment),
             "status_display": assignment.get_status_display(),
         },
     )
 
 
-
 # ============================================================
 # ACCEPT ASSIGNMENT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -3371,17 +3045,10 @@ def caregiver_assignment_accept(request, pk):
             pk=assignment.pk,
         )
 
-    response_note = (
-        request.POST.get(
-            "response_note",
-            "",
-        )
-        .strip()
-    )
-
-    # --------------------------------------------------------
-    # UPDATE ASSIGNMENT
-    # --------------------------------------------------------
+    response_note = request.POST.get(
+        "response_note",
+        "",
+    ).strip()
 
     assignment.status = CaregiverAssignment.Status.ACCEPTED
     assignment.accepted_at = timezone.now()
@@ -3394,21 +3061,16 @@ def caregiver_assignment_accept(request, pk):
             "accepted_at",
             "declined_at",
             "caregiver_response_note",
+            "updated_at",
         ]
     )
 
-    # --------------------------------------------------------
-    # KEEP HOME CARE REQUEST SYNCHRONIZED
-    # --------------------------------------------------------
-
-    _set_homecare_assignment_status(
-        assignment.homecare_request
-    )
+    # Keep the HomeCareRequest synchronized.
+    _set_homecare_assignment_status(assignment.homecare_request)
 
     # --------------------------------------------------------
     # STAFF NOTIFICATION
     # --------------------------------------------------------
-
     _notify_staff_assignment_response(
         assignment=assignment,
         action="ACCEPTED",
@@ -3429,6 +3091,7 @@ def caregiver_assignment_accept(request, pk):
 # ============================================================
 # DECLINE ASSIGNMENT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -3456,13 +3119,10 @@ def caregiver_assignment_decline(request, pk):
             pk=assignment.pk,
         )
 
-    reason = (
-        request.POST.get(
-            "response_note",
-            "",
-        )
-        .strip()
-    )
+    reason = request.POST.get(
+        "response_note",
+        "",
+    ).strip()
 
     if not reason:
 
@@ -3487,7 +3147,7 @@ def caregiver_assignment_decline(request, pk):
             "declined_at",
             "accepted_at",
             "caregiver_response_note",
-            
+            "updated_at",
         ]
     )
 
@@ -3506,14 +3166,13 @@ def caregiver_assignment_decline(request, pk):
         "The assignment has been declined. Staff have been notified.",
     )
 
-    return redirect(
-        "caregivers:assignments"
-    )
+    return redirect("caregivers:assignments")
 
 
 # ============================================================
 # START ASSIGNMENT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -3544,7 +3203,7 @@ def caregiver_assignment_start(request, pk):
     assignment.save(
         update_fields=[
             "status",
-           
+            "updated_at",
         ]
     )
 
@@ -3562,6 +3221,7 @@ def caregiver_assignment_start(request, pk):
 # ============================================================
 # DAILY REPORT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -3611,23 +3271,16 @@ def caregiver_daily_report_create(request, pk):
             pk=assignment.pk,
         )
 
-    start_date = _assignment_start_date(
-        assignment
-    )
+    start_date = _assignment_start_date(assignment)
 
-    end_date = _assignment_end_date(
-        assignment
-    )
+    end_date = _assignment_end_date(assignment)
 
     if request.method == "POST":
 
-        date_value = (
-            request.POST.get(
-                "report_date",
-                "",
-            )
-            .strip()
-        )
+        date_value = request.POST.get(
+            "report_date",
+            "",
+        ).strip()
 
         try:
 
@@ -3680,35 +3333,30 @@ def caregiver_daily_report_create(request, pk):
                 ).strip()
                 or "STABLE"
             ),
-
             "vital_observations": (
                 request.POST.get(
                     "vital_observations",
                     "",
                 ).strip()
             ),
-
             "care_provided": (
                 request.POST.get(
                     "care_provided",
                     "",
                 ).strip()
             ),
-
             "patient_progress": (
                 request.POST.get(
                     "patient_progress",
                     "",
                 ).strip()
             ),
-
             "concerns": (
                 request.POST.get(
                     "concerns",
                     "",
                 ).strip()
             ),
-
             "caregiver_notes": (
                 request.POST.get(
                     "caregiver_notes",
@@ -3745,13 +3393,10 @@ def caregiver_daily_report_create(request, pk):
         # VISIT START TIME
         # ----------------------------------------------------
 
-        start_time_value = (
-            request.POST.get(
-                "visit_start_time",
-                "",
-            )
-            .strip()
-        )
+        start_time_value = request.POST.get(
+            "visit_start_time",
+            "",
+        ).strip()
 
         if start_time_value:
 
@@ -3778,13 +3423,10 @@ def caregiver_daily_report_create(request, pk):
         # VISIT END TIME
         # ----------------------------------------------------
 
-        end_time_value = (
-            request.POST.get(
-                "visit_end_time",
-                "",
-            )
-            .strip()
-        )
+        end_time_value = request.POST.get(
+            "visit_end_time",
+            "",
+        ).strip()
 
         if end_time_value:
 
@@ -3811,13 +3453,10 @@ def caregiver_daily_report_create(request, pk):
         # NEXT VISIT
         # ----------------------------------------------------
 
-        next_visit_date_value = (
-            request.POST.get(
-                "next_visit_date",
-                "",
-            )
-            .strip()
-        )
+        next_visit_date_value = request.POST.get(
+            "next_visit_date",
+            "",
+        ).strip()
 
         if next_visit_date_value:
 
@@ -3844,12 +3483,10 @@ def caregiver_daily_report_create(request, pk):
 
             defaults["next_visit_date"] = None
 
-        report, created = (
-            CaregiverDailyReport.objects.update_or_create(
-                assignment=assignment,
-                report_date=report_date,
-                defaults=defaults,
-            )
+        report, created = CaregiverDailyReport.objects.update_or_create(
+            assignment=assignment,
+            report_date=report_date,
+            defaults=defaults,
         )
 
         # ----------------------------------------------------
@@ -3858,14 +3495,12 @@ def caregiver_daily_report_create(request, pk):
 
         if assignment.status == CaregiverAssignment.Status.ACCEPTED:
 
-            assignment.status = (
-                CaregiverAssignment.Status.IN_PROGRESS
-            )
+            assignment.status = CaregiverAssignment.Status.IN_PROGRESS
 
             assignment.save(
                 update_fields=[
                     "status",
-                   
+                    "updated_at",
                 ]
             )
 
@@ -3874,8 +3509,7 @@ def caregiver_daily_report_create(request, pk):
             (
                 "Daily report submitted successfully."
                 if created
-                else
-                "Daily report updated successfully."
+                else "Daily report updated successfully."
             ),
         )
 
@@ -3888,14 +3522,10 @@ def caregiver_daily_report_create(request, pk):
     # EXISTING REPORT FOR TODAY
     # --------------------------------------------------------
 
-    existing_report = (
-        CaregiverDailyReport.objects
-        .filter(
-            assignment=assignment,
-            report_date=timezone.localdate(),
-        )
-        .first()
-    )
+    existing_report = CaregiverDailyReport.objects.filter(
+        assignment=assignment,
+        report_date=timezone.localdate(),
+    ).first()
 
     return render(
         request,
@@ -3906,11 +3536,7 @@ def caregiver_daily_report_create(request, pk):
             "report": existing_report,
             "assignment_start": start_date,
             "assignment_end": end_date,
-            "condition_choices": (
-                CaregiverDailyReport
-                .PatientCondition
-                .choices
-            ),
+            "condition_choices": (CaregiverDailyReport.PatientCondition.choices),
         },
     )
 
@@ -3918,6 +3544,7 @@ def caregiver_daily_report_create(request, pk):
 # ============================================================
 # CAREGIVER REPORTS
 # ============================================================
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -3932,19 +3559,14 @@ def caregiver_reports(request):
             "Your caregiver profile could not be found.",
         )
 
-        return redirect(
-            "caregivers:login"
-        )
+        return redirect("caregivers:login")
 
     reports = (
-        CaregiverDailyReport.objects
-        .select_related(
+        CaregiverDailyReport.objects.select_related(
             "assignment",
             "assignment__homecare_request",
         )
-        .filter(
-            assignment__caregiver=caregiver
-        )
+        .filter(assignment__caregiver=caregiver)
         .order_by(
             "-report_date",
             "-submitted_at",
@@ -3965,6 +3587,7 @@ def caregiver_reports(request):
 # WEEKLY SUMMARY
 # ============================================================
 
+
 @login_required
 @require_http_methods(["GET", "POST"])
 def caregiver_weekly_summary(request, pk):
@@ -3979,21 +3602,13 @@ def caregiver_weekly_summary(request, pk):
         pk,
     )
 
-    start_date = _assignment_start_date(
-        assignment
-    )
+    start_date = _assignment_start_date(assignment)
 
-    end_date = _assignment_end_date(
-        assignment
-    )
+    end_date = _assignment_end_date(assignment)
 
-    reports = (
-        assignment.daily_reports
-        .all()
-        .order_by(
-            "report_date",
-            "submitted_at",
-        )
+    reports = assignment.daily_reports.all().order_by(
+        "report_date",
+        "submitted_at",
     )
 
     if start_date and end_date:
@@ -4007,25 +3622,16 @@ def caregiver_weekly_summary(request, pk):
 
     if start_date and end_date:
 
-        total_days = (
-            end_date - start_date
-        ).days + 1
+        total_days = (end_date - start_date).days + 1
 
-    submitted_days = (
-        reports
-        .values("report_date")
-        .distinct()
-        .count()
-    )
+    submitted_days = reports.values("report_date").distinct().count()
 
     existing_summary = (
-        CaregiverWeeklyReport.objects
-        .filter(
+        CaregiverWeeklyReport.objects.filter(
             assignment=assignment,
             week_start=start_date,
             week_end=end_date,
-        )
-        .first()
+        ).first()
         if start_date and end_date
         else None
     )
@@ -4038,11 +3644,7 @@ def caregiver_weekly_summary(request, pk):
             "assignment": assignment,
             "assignment_start": start_date,
             "assignment_end": end_date,
-            "assignment_type_display": (
-                _assignment_type_display(
-                    assignment
-                )
-            ),
+            "assignment_type_display": (_assignment_type_display(assignment)),
             "reports": reports,
             "weekly_report": existing_summary,
             "total_days": total_days,
@@ -4053,9 +3655,12 @@ def caregiver_weekly_summary(request, pk):
             ),
         },
     )
+
+
 # ============================================================
 # STAFF ASSIGNMENT NOTIFICATION
 # ============================================================
+
 
 def _notify_staff_assignment_response(
     assignment,
@@ -4075,10 +3680,7 @@ def _notify_staff_assignment_response(
     patient = assignment.homecare_request.full_name
     caregiver = assignment.caregiver.name
 
-    subject = (
-        f"Home Care Assignment {action}: "
-        f"{patient}"
-    )
+    subject = f"Home Care Assignment {action}: " f"{patient}"
 
     message = (
         f"Home Care Assignment Update\n\n"
@@ -4090,10 +3692,7 @@ def _notify_staff_assignment_response(
 
     if note:
 
-        message += (
-            f"Caregiver Response / Note:\n"
-            f"{note}\n\n"
-        )
+        message += f"Caregiver Response / Note:\n" f"{note}\n\n"
 
     message += (
         "Please log into the Hands-On Health staff dashboard "
@@ -4114,9 +3713,11 @@ def _notify_staff_assignment_response(
         # status change.
         pass
 
+
 # ============================================================
 # COMPLETE ASSIGNMENT
 # ============================================================
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -4142,13 +3743,9 @@ def caregiver_assignment_complete(request, pk):
             pk=assignment.pk,
         )
 
-    start_date = _assignment_start_date(
-        assignment
-    )
+    start_date = _assignment_start_date(assignment)
 
-    end_date = _assignment_end_date(
-        assignment
-    )
+    end_date = _assignment_end_date(assignment)
 
     # --------------------------------------------------------
     # VERIFY ALL REQUIRED DAILY REPORTS
@@ -4156,13 +3753,10 @@ def caregiver_assignment_complete(request, pk):
 
     if start_date and end_date:
 
-        expected_days = (
-            end_date - start_date
-        ).days + 1
+        expected_days = (end_date - start_date).days + 1
 
         submitted_days = (
-            assignment.daily_reports
-            .filter(
+            assignment.daily_reports.filter(
                 report_date__gte=start_date,
                 report_date__lte=end_date,
             )
@@ -4192,9 +3786,7 @@ def caregiver_assignment_complete(request, pk):
     # COMPLETE
     # --------------------------------------------------------
 
-    assignment.status = (
-        CaregiverAssignment.Status.COMPLETED
-    )
+    assignment.status = CaregiverAssignment.Status.COMPLETED
 
     assignment.completed_at = timezone.now()
 
@@ -4202,13 +3794,11 @@ def caregiver_assignment_complete(request, pk):
         update_fields=[
             "status",
             "completed_at",
-            
+            "updated_at",
         ]
     )
 
-    _set_homecare_completed(
-        assignment.homecare_request
-    )
+    _set_homecare_completed(assignment.homecare_request)
 
     # --------------------------------------------------------
     # STAFF NOTIFICATION
@@ -4225,9 +3815,9 @@ def caregiver_assignment_complete(request, pk):
         "Assignment marked as completed successfully.",
     )
 
-    return redirect(
-        "caregivers:assignments"
-    )
+    return redirect("caregivers:assignments")
+
+
 # ============================================================
 # CAREGIVER TOKEN DASHBOARD - LEGACY COMPATIBILITY
 # ============================================================
@@ -4239,6 +3829,7 @@ def caregiver_assignment_complete(request, pk):
 # can only open an assignment belonging to their own caregiver
 # profile.
 # ============================================================
+
 
 @login_required
 def caregiver_dashboard(request, token):
@@ -4258,8 +3849,7 @@ def caregiver_dashboard(request, token):
             "homecare/caregiver_link_expired.html",
             {
                 "message": (
-                    "This caregiver dashboard link is invalid "
-                    "or has expired."
+                    "This caregiver dashboard link is invalid " "or has expired."
                 ),
             },
         )
@@ -4278,18 +3868,16 @@ def caregiver_dashboard(request, token):
     )
 
 
-
-
 # ============================================================
 # ADMIN DASHBOARD
 # ============================================================
+
 
 @login_required
 def admin_dashboard(request):
 
     if not (
-        request.user.is_superuser
-        or getattr(request.user, "role", None) == "ADMIN"
+        request.user.is_superuser or getattr(request.user, "role", None) == "ADMIN"
     ):
         raise Http404
 
@@ -4300,9 +3888,7 @@ def admin_dashboard(request):
     ).count()
 
     total_homecare_requests = HomeCareRequest.objects.count()
-    pending_payments = Payment.objects.filter(
-        status=Payment.Status.PENDING
-    ).count()
+    pending_payments = Payment.objects.filter(status=Payment.Status.PENDING).count()
     pending_consultations = Consultation.objects.filter(
         status=Consultation.Status.PENDING
     ).count()
@@ -4310,14 +3896,11 @@ def admin_dashboard(request):
     recent_caregivers = Caregiver.objects.all().order_by("-id")[:5]
     recent_requests = HomeCareRequest.objects.all().order_by("-id")[:5]
 
-    recent_payments = (
-        Payment.objects.select_related(
-            "quotation",
-            "quotation__homecare_request",
-            "quotation__consultation",
-        )
-        .order_by("-id")[:5]
-    )
+    recent_payments = Payment.objects.select_related(
+        "quotation",
+        "quotation__homecare_request",
+        "quotation__consultation",
+    ).order_by("-id")[:5]
 
     return render(
         request,

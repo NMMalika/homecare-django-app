@@ -1,0 +1,578 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Manage Testimonials | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .testimonials-dashboard {
+        padding: 1.5rem 0 3rem;
+    }
+
+    /* Page Header */
+    .page-header-box {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 0;
+    }
+
+    .pending-counter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Search & Filter Bar */
+    .filter-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.25rem;
+        margin-bottom: 1.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .filter-form-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .form-group-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.375rem;
+    }
+
+    .search-input-group {
+        position: relative;
+    }
+
+    .search-input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.875rem;
+    }
+
+    .form-control-custom,
+    .form-select-custom {
+        width: 100%;
+        height: 44px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .search-input-group .form-control-custom {
+        padding-left: 2.5rem;
+    }
+
+    .form-control-custom:focus,
+    .form-select-custom:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .btn-filter-primary {
+        height: 44px;
+        padding: 0 1.25rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s;
+    }
+
+    .btn-filter-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+    }
+
+    .btn-filter-clear {
+        height: 44px;
+        padding: 0 1rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-filter-clear:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    /* Testimonial Card Styling */
+    .testimonial-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .testimonial-card:hover {
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+    }
+
+    .reviewer-title {
+        font-size: 1.0625rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rating-stars {
+        color: #f59e0b;
+        font-size: 0.9375rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.125rem;
+    }
+
+    .rating-score {
+        color: #64748b;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-left: 0.375rem;
+    }
+
+    .testimonial-body-text {
+        color: #334155;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        background-color: #f8fafc;
+        border-left: 3px solid #cbd5e1;
+        padding: 1rem 1.25rem;
+        border-radius: 0 0.5rem 0.5rem 0;
+        margin: 1rem 0;
+    }
+
+    /* Meta Metadata Box */
+    .testimonial-meta-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        font-size: 0.8125rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+        padding-bottom: 0.875rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .meta-item i {
+        color: #94a3b8;
+    }
+
+    /* Consent Pill */
+    .consent-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.375rem;
+    }
+
+    .consent-badge.yes {
+        background-color: #ecfdf5;
+        color: #047857;
+    }
+
+    .consent-badge.no {
+        background-color: #fef2f2;
+        color: #b91c1c;
+    }
+
+    /* Status Pill */
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .badge-status.approved {
+        background-color: #ecfdf5;
+        color: #047857;
+        border: 1px solid #d1fae5;
+    }
+
+    .badge-status.rejected {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fee2e2;
+    }
+
+    /* NEW COLOR FOR PENDING REVIEW BADGE */
+    .badge-status.pending {
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+    }
+
+    /* Photo Thumbnail */
+    .photo-thumb-box {
+        margin-bottom: 1rem;
+    }
+
+    .photo-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Action Buttons Side-by-Side Flex Layout */
+    .action-buttons-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .action-buttons-group form {
+        margin: 0;
+    }
+
+    /* Buttons */
+    .btn-approve {
+        background-color: #059669;
+        color: #ffffff;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-approve:hover:not(:disabled) {
+        background-color: #047857;
+        color: #ffffff;
+    }
+
+    .btn-approve:disabled {
+        background-color: #cbd5e1;
+        color: #64748b;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .btn-reject {
+        background-color: #ffffff;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reject:hover {
+        background-color: #fef2f2;
+        color: #b91c1c;
+        border-color: #fca5a5;
+    }
+
+    /* Empty State */
+    .empty-state-panel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.875rem;
+        padding: 4rem 1.5rem;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin: 0 auto 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .filter-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid testimonials-dashboard">
+
+    <!-- Page Header -->
+    <div class="page-header-box">
+        <div>
+            <span class="header-kicker"><i class="fa-solid fa-thumbs-up me-1"></i> Public Feedback</span>
+            <h1 class="page-header-title">Manage Testimonials</h1>
+            <p class="page-header-subtitle">
+                Review client reviews, verify publishing consent, and manage website display approvals.
+            </p>
+        </div>
+
+        <div class="pending-counter-pill">
+            <i class="fa-solid fa-clock"></i> Pending Moderation: {{ pending_testimonials|default:0 }}
+        </div>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="filter-card">
+        <form method="get" class="filter-form-grid">
+            <div>
+                <label for="q" class="form-group-label">Search Keywords</label>
+                <div class="search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="q" name="q" class="form-control-custom"
+                        placeholder="Search reviewer name, email, or feedback message..." value="{{ search }}">
+                </div>
+            </div>
+
+            <div>
+                <label for="status" class="form-group-label">Moderation Status</label>
+                <select id="status" name="status" class="form-select-custom">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-filter-primary">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+                <a href="{% url 'staff:testimonials' %}" class="btn-filter-clear">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Testimonials Feed List -->
+    {% for testimonial in testimonials %}
+    <div class="testimonial-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <div class="reviewer-title">
+                    {% if testimonial.is_anonymous %}
+                    <i class="fa-solid fa-user-secret text-slate-400"></i> Anonymous Reviewer
+                    {% else %}
+                    <i class="fa-solid fa-user-circle text-primary"></i> {{ testimonial.name }}
+                    {% endif %}
+                </div>
+
+                <div class="rating-stars" aria-label="{{ testimonial.rating }} out of 5 stars">
+                    {% for star in "12345" %}
+                    {% if forloop.counter <= testimonial.rating %} <i class="fa-solid fa-star"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star text-slate-300"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span class="rating-score">({{ testimonial.rating }}.0/5.0)</span>
+                </div>
+            </div>
+
+            <div>
+                {% if testimonial.status == "APPROVED" %}
+                <span class="badge-status approved">
+                    <i class="fa-solid fa-circle-check"></i> Approved
+                </span>
+                {% elif testimonial.status == "REJECTED" %}
+                <span class="badge-status rejected">
+                    <i class="fa-solid fa-circle-xmark"></i> Rejected
+                </span>
+                {% else %}
+                <span class="badge-status pending">
+                    <i class="fa-solid fa-clock"></i> Pending Review
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Feedback Message -->
+        <div class="testimonial-body-text">
+            {{ testimonial.message|linebreaksbr }}
+        </div>
+
+        <!-- Submission Meta Info -->
+        <div class="testimonial-meta-grid">
+            {% if testimonial.email %}
+            <div class="meta-item">
+                <i class="fa-solid fa-envelope"></i>
+                <span>{{ testimonial.email }}</span>
+            </div>
+            {% endif %}
+
+            <div class="meta-item">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Submitted: {{ testimonial.created_at|date:"d M Y, H:i" }}</span>
+            </div>
+
+            <div class="meta-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Publishing Consent:</span>
+                {% if testimonial.consent_to_publish %}
+                <span class="consent-badge yes"><i class="fa-solid fa-check"></i> Granted</span>
+                {% else %}
+                <span class="consent-badge no"><i class="fa-solid fa-xmark"></i> Withheld</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Optional Submitted Photo -->
+        {% if testimonial.photo %}
+        <div class="photo-thumb-box">
+            <a href="{{ testimonial.photo.url }}" target="_blank" title="View full image">
+                <img src="{{ testimonial.photo.url }}" alt="Photo submitted with testimonial" class="photo-thumb">
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Side-by-Side Moderation Action Buttons -->
+        <div class="action-buttons-group">
+            {% if testimonial.status != "APPROVED" %}
+            <form method="post" action="{% url 'staff:testimonial_moderate' testimonial.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn-approve" {% if not testimonial.consent_to_publish %}disabled
+                    title="Publishing consent was withheld by the reviewer" {% endif %}>
+                    <i class="fa-solid fa-check"></i> Approve &amp; Publish
+                </button>
+            </form>
+            {% endif %}
+
+            {% if testimonial.status != "REJECTED" %}
+            <form method="post" action="{% url 'staff:testimonial_moderate' testimonial.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject">
+                <button type="submit" class="btn-reject">
+                    <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="empty-state-panel">
+        <div class="empty-state-icon">
+            <i class="fa-regular fa-comments"></i>
+        </div>
+        <h3 class="h6 fw-bold text-slate-800 mb-1">No Testimonials Found</h3>
+        <p class="text-muted small mb-0">
+            Submitted client testimonials matching your filter parameters will appear here for moderation.
+        </p>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

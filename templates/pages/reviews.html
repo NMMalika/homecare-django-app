@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Reviews | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<!-- Testimonial start -->
+<section class="testimonial-section padding-top-80 padding-bottom-80">
+    <div class="container">
+        <div class="section-title">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <span class="sub-title-badge sky-badge">Client Testimonials</span>
+                    <h2>What Families Say About <span class="color-defult">Hands-On Health</span></h2>
+                    <div class="line-border-center bg-defult"></div>
+                    <p>Read heart-felt experiences from families who trusted us with the care and well-being of their
+                        loved ones right at home.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-content">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+
+                    {% if testimonials %}
+                    <!-- Loop through approved testimonials -->
+                    <div class="testimonial-slider-wrapper">
+                        {% for testimonial in testimonials %}
+                        <div class="testimonial-card text-center margin-bottom-30"
+                            style="padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+
+                            {% if testimonial.photo %}
+                            <img src="{{ testimonial.photo.url }}" alt="{{ testimonial.name }}" class="img-circle"
+                                style="width: 80px; height: 80px; object-fit: cover; margin-bottom: 15px;">
+                            {% endif %}
+
+                            <div class="star-rating-display margin-bottom-15" style="color: #f39c12;">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= testimonial.rating %} <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                    <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                            </div>
+
+                            <p class="testimonial-message"
+                                style="font-style: italic; font-size: 16px; margin-bottom: 20px;">
+                                "{{ testimonial.message }}"
+                            </p>
+
+                            <h4 class="reviewer-name" style="margin-bottom: 0; font-weight: bold;">
+                                {% if testimonial.is_anonymous %}
+                                Anonymous Family Member
+                                {% else %}
+                                {{ testimonial.name }}
+                                {% endif %}
+                            </h4>
+
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Empty State (Fallback if no approved testimonials exist) -->
+                    <div class="testimonial-empty-card text-center">
+                        <div class="empty-state-icon">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h4>No Testimonials Available Yet</h4>
+                        <p>We value feedback from the families we care for. Have you experienced our home-based health
+                            services? We would love to hear your story!</p>
+
+                        <div class="share-experience-cta">
+                            <a href="#share-feedback" class="btn btn-theme-sky btn-share-experience">
+                                Share Your Experience <i class="fa-solid fa-paper-plane"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Testimonial end -->
+
+
+<!-- Leave Your Review & Feedback Section Start -->
+<section id="share-feedback" class="reviews-section padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="row text-center margin-bottom-40">
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+                <span class="sub-title-badge sky-badge">
+                    <i class="fa-solid fa-heart"></i> Client & Family Feedback
+                </span>
+                <h2 class="section-title-main">
+                    Give Us Your Review, <span class="highlight-text">They Help Us Grow</span>
+                </h2>
+                <div class="accent-line-center"></div>
+                <p class="section-lead-p">
+                    Your experience helps us continuously refine our home healthcare services and guides other families
+                    in making informed decisions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 1: Interactive Testimonial Submission Form -->
+        <div class="row margin-bottom-40">
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible text-center"
+                    role="alert" style="margin-bottom: 25px; border-radius: 8px; font-size: 16px; padding: 15px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    {% if message.tags == 'error' %}
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
+                    {% else %}
+                    <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <div class="testimonial-form-card">
+
+                    <div class="form-header-box text-center">
+                        <span class="form-badge"><i class="fa-solid fa-pen-to-square"></i> Client Feedback Form</span>
+                        <h3 class="form-title">Leave Your Testimonial</h3>
+                        <p class="form-subtitle">Share your story below—you can choose to post with your name or remain
+                            anonymous.</p>
+                    </div>
+
+                    <!-- Django Form Integration -->
+                    <form method="post" enctype="multipart/form-data" class="custom-medical-form">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger" style="margin-bottom: 20px;">
+                            Please correct the errors below.
+                        </div>
+                        {% endif %}
+
+                        <!-- Interactive 5-Star Selector -->
+                        <div class="form-group text-center custom-field-group margin-bottom-25">
+                            <label class="field-label center-label">Select Your Rating <span
+                                    class="required-star">*</span></label>
+                            <div class="star-rating-input">
+                                <input type="radio" id="star5" name="rating" value="5" checked><label for="star5"
+                                    title="5 Stars"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star4" name="rating" value="4"><label for="star4"
+                                    title="4 Stars"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star3" name="rating" value="3"><label for="star3"
+                                    title="3 Stars"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star2" name="rating" value="2"><label for="star2"
+                                    title="2 Stars"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" id="star1" name="rating" value="1"><label for="star1"
+                                    title="1 Star"><i class="fa-solid fa-star"></i></label>
+                            </div>
+                        </div>
+
+                        <!-- Name & Relationship -->
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Your Name / Initials</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-regular fa-user field-icon"></i>
+                                        <input type="text" name="name" class="form-control custom-input"
+                                            placeholder="e.g. S. M. or John Doe" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="form-group custom-field-group">
+                                    <label class="field-label">Relationship to Care</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fa-solid fa-users field-icon"></i>
+                                        <select name="relationship" class="form-control custom-select">
+                                            <option value="client">Client / Patient</option>
+                                            <option value="family">Family Member</option>
+                                            <option value="guardian">Legal Guardian</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Anonymous Choice Toggle -->
+                        <div class="form-group custom-field-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="is_anonymous" value="true">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Publish this testimonial anonymously (your name/initials
+                                    will be hidden)</span>
+                            </label>
+                        </div>
+
+                        <!-- Photo Upload Field -->
+                        <div class="form-group custom-field-group">
+                            <label class="field-label">Upload Your Photo <span
+                                    class="optional-tag">(Optional)</span></label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="photo" id="photoUpload" accept="image/*"
+                                    class="file-input-hidden">
+                                <label for="photoUpload" class="file-upload-btn">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <span id="fileNameDisplay">Choose Image File (JPG, PNG)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Review Textarea -->
+                        <div class="form-group custom-field-group">
+                            <label class="field-label">Your Review / Experience <span
+                                    class="required-star">*</span></label>
+                            <textarea name="message" class="form-control custom-textarea" rows="4"
+                                placeholder="Share how Hands-on Health helped your family..." required></textarea>
+                        </div>
+
+                        <!-- Publishing Consent Checkbox -->
+                        <div class="form-group custom-field-group margin-bottom-25">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="consent_to_publish" value="true" required 
+                                {% if request.POST %}
+                                {% if request.POST.consent_to_publish %}checked{% endif %}{% else %}checked{% endif %} 
+       required>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text" style="font-weight: 600; color: #334155;">
+                                    By submitting, I consent to having my testimonial published on Hands-On Health's
+                                    website and marketing materials. <span class="required-star">*</span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Submit CTA -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-submit-request">
+                                <span>Submit Your Testimonial</span>
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- External Google Review Banner -->
+        <div class="row margin-top-30">
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+                <div class="external-review-callout flex-column-center">
+                    <div class="callout-content text-center-content">
+                        <div class="google-icon-wrapper">
+                            <span class="g-blue">G</span><span class="g-red">o</span><span
+                                class="g-yellow">o</span><span class="g-blue">g</span><span
+                                class="g-green">l</span><span class="g-red">e</span>
+                        </div>
+                        <div>
+                            <h3>Prefer Google Reviews?</h3>
+                            <p>Help other families find trusted healthcare by sharing your feedback on our official
+                                Google Business page.</p>
+                        </div>
+                    </div>
+                    <div class="callout-action-center">
+                        <a href="https://g.page/r/your-google-review-link" target="_blank" rel="noopener"
+                            class="btn btn-review-platform">
+                            <span>Leave a Google Review</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- Leave Your Review & Feedback Section End -->
+{% endblock %}

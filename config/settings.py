@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Custom apps
     "accounts",
     "caregivers",
@@ -51,6 +50,7 @@ INSTALLED_APPS = [
     "homecare",
     "services",
     "staff",
+    "testimonials",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
