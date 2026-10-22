@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Reviews | Hands-On Health
+{% endblock %}
+
+{% block content %}
+<!-- For Healthcare Professionals Hero Header Start -->
+<section class="page-title-faq text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                <!-- Category Badge -->
+                <span class="faq-hero-badge">
+                    <i class="fa-solid fa-user-doctor"></i> Medical Partnerships
+                </span>
+
+                <!-- Main Page Heading -->
+                <h1 class="faq-hero-title">
+                    For Hospitals, Doctors &amp; <span class="highlight-text">Healthcare Professionals</span>
+                </h1>
+
+                <!-- Subtitle / Lead Paragraph -->
+                <p class="faq-hero-subtitle">
+                    Partner with Hands-on Health for seamless post-discharge care, patient referrals, and dependable
+                    in-home clinical support.
+                </p>
+
+                <!-- Breadcrumb Navigation -->
+                <ul class="custom-breadcrumb">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="active">Medical Partners</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- For Healthcare Professionals Hero Header End -->
+<!-- Referral & Continuity of Care Section Start -->
+<section class="referral-section padding-top-80 padding-bottom-80">
+    <div class="container">
+        <div class="row display-flex-align">
+
+            <!-- Left Column: Overview & Context -->
+            <div class="col-md-6 col-sm-12 margin-bottom-30">
+                <div class="referral-info-content">
+                    <span class="sub-title-badge sky-badge">
+                        <i class="fa-solid fa-hospital-user"></i> Medical Partner Network
+                    </span>
+                    <h2 class="section-title-main text-left">
+                        Referral &amp; <span class="highlight-text">Continuity of Care</span>
+                    </h2>
+                    <div class="accent-line-left"></div>
+                    <p class="referral-lead-p">
+                        Hands-on Health supports patients who require ongoing medical assistance and personal care after
+                        leaving a healthcare facility and returning home.
+                    </p>
+                    <p class="referral-body-p">
+                        Healthcare professionals, doctors, and hospital discharge teams can directly refer patients who
+                        would benefit from structured, compassionate, and appropriate home-based clinical support.
+                    </p>
+
+                    <div class="referral-cta-box">
+                        <a href="{% url 'homecare:referral' %}" class="btn btn-submit-request">
+                            <span>Make a Patient Referral</span>
+                            <i class="fa-solid fa-user-plus"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Structured Referral Options Card -->
+            <div class="col-md-6 col-sm-12 margin-bottom-30">
+                <div class="referral-card-container">
+                    <div class="card-header-badge">
+                        <i class="fa-solid fa-list-check"></i> Available Referral Programs
+                    </div>
+                    <h3 class="card-title">Comprehensive Home-Care Support</h3>
+
+                    <ul class="referral-options-list">
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Patient referrals</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Post-discharge support</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Post-operative home care</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Wound-care support</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Elderly care</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Chronic-care support</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-check option-icon"></i>
+                            <span>Ongoing home assistance</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Referral & Continuity of Care Section End -->
+
+
+
+
+
+
+<!-- divider start -->
+ {% include "includes/divider.html" %} 
+<!-- divider end -->
+
+
+
+<!-- payment options start -->
+<section class="payment-options-section bg-f8">
+    <div class="container">
+        <div class="section-title text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 margin-bottom-30">
+                    <span class="sub-title-badge sky-badge">Care Designed Around Your Needs</span>
+                    <h2>PAYMENT <span class="color-defult">OPTIONS</span></h2>
+                    <div class="line-border-center bg-defult"></div>
+                    <p>We provide professional, compassionate, and reliable care for your loved ones in the comfort
+                        of their home. Here are our flexible payment options:</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-content">
+            <div class="row payment-grid">
+                <!-- 1. Ewallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Ewallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Blue Wallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Blue Wallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Easy Wallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Easy Wallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Nedbank Deposit -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Nedbank Deposit</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Swiping -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Swiping</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Medical Aid -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-stethoscope"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Medical Aid</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Cash -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Cash</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Service Fees Badge -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center service-fee-card">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Service Fees Apply</a></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Factors & Quote Request Block -->
+            <div class="row margin-top-20">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="care-pricing-info-card text-center">
+                        <p class="pricing-lead-text">
+                            Because every patient has different needs, the cost of care depends on factors such as:
+                        </p>
+
+                        <div class="cost-factors-grid">
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Type of care required</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Number of hours</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Duration of care</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Level of assistance
+                                required</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Day/night requirements</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Location</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Stay-in requirements</span>
+                        </div>
+
+                        <div class="quote-action-area">
+                            <a href="{% url 'homecare:request' %}" class="btn btn-theme-sky btn-quote-action">
+                                Request a Care Quote <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                            <p class="quote-subtext">A detailed quotation can then be provided after discussing the
+                                patient's requirements.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- payment options end -->
+{% endblock %}

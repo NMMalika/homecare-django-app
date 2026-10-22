@@ -46,14 +46,13 @@
                                 <a href="{% url 'pages:services' %}">Our Services</a>
                             </li>
 
-                            <li class="{% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">
-                                <a href="#">How It Works</a>
-                            </li>
-
-                            <li
-                                class="{% if request.resolver_match.url_name == 'for_professionals' %}active{% endif %}">
-                                <a href="#">For Healthcare Professionals</a>
-                            </li>
+                        <li class="{% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">
+                            <a href="{% url 'pages:how_it_works' %}">How It Works</a>
+                        </li>
+                        
+                        <li class="{% if request.resolver_match.url_name == 'professionals' %}active{% endif %}">
+                            <a href="{% url 'pages:professionals' %}">For Healthcare Professionals</a>
+                        </li>
 
                         <li class="{% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
                             <a href="{% url 'pages:reviews' %}">Reviews</a>

@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+how it works | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<!-- How It Works Hero Title / Header Start -->
+<section class="page-title-faq text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                <!-- Category Badge -->
+                <span class="faq-hero-badge">
+                    <i class="fa-solid fa-clipboard-check"></i> Care Process &amp; Journey
+                </span>
+
+                <!-- Main Page Heading -->
+                <h1 class="faq-hero-title">
+                    How Our Home-Based <span class="highlight-text">Care Works</span>
+                </h1>
+
+                <!-- Subtitle / Lead Paragraph -->
+                <p class="faq-hero-subtitle">
+                    A simple step-by-step guide to assessing your needs, matching certified caregivers, and
+                    delivering
+                    compassionate in-home healthcare.
+                </p>
+
+                <!-- Breadcrumb Navigation -->
+                <ul class="custom-breadcrumb">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                    <li class="active">How It Works</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- How It Works Hero Title / Header End -->
+
+<!-- How Our Home-Based Care Works Section Start -->
+<section class="care-process-section padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <!-- Section Header -->
+        <div class="row text-center margin-bottom-60">
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+                <span class="sub-title-badge sky-badge">
+                    <i class="fa-solid fa-list-check"></i> Step-By-Step Journey
+                </span>
+                <h2 class="section-title-main">
+                    How Our Home-Based <span class="highlight-text">Care Works</span>
+                </h2>
+                <div class="accent-line-center"></div>
+                <p class="section-lead-p">
+                    We guide you through a seamless, transparent process from your initial inquiry to ongoing home
+                    healthcare management.
+                </p>
+            </div>
+        </div>
+
+        <!-- 5-Step Process Flow -->
+        <div class="process-flow-wrapper">
+
+            <!-- Step 1 -->
+            <div class="process-step-card">
+                <div class="step-number-badge">01</div>
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h3 class="step-title">Contact Us</h3>
+                <p class="step-description">
+                    The patient or family contacts Hands-on Health to discuss the care required.
+                </p>
+                <div class="step-connector-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="process-step-card">
+                <div class="step-number-badge">02</div>
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <h3 class="step-title">Care Assessment</h3>
+                <p class="step-description">
+                    We establish the patient's needs and the level of assistance required.
+                </p>
+                <div class="step-connector-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="process-step-card">
+                <div class="step-number-badge">03</div>
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-file-signature"></i>
+                </div>
+                <h3 class="step-title">Care Plan</h3>
+                <p class="step-description">
+                    A suitable home-care arrangement is discussed and agreed upon with the patient/family.
+                </p>
+                <div class="step-connector-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="process-step-card">
+                <div class="step-number-badge">04</div>
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-house-medical"></i>
+                </div>
+                <h3 class="step-title">Care At Home</h3>
+                <p class="step-description">
+                    Our assigned healthcare professional or caregiver provides the agreed service at the patient's
+                    home.
+                </p>
+                <div class="step-connector-arrow">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="process-step-card last-step">
+                <div class="step-number-badge">05</div>
+                <div class="step-icon-box">
+                    <i class="fa-solid fa-comments-messaage"></i>
+                </div>
+                <h3 class="step-title">Follow-up &amp; Communication</h3>
+                <p class="step-description">
+                    Care needs can be reviewed and adjusted when necessary.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<!-- How Our Home-Based Care Works Section End -->
+
+<!-- welcome start -->
+<section class="welcome-section modern-welcome-section">
+    <div class="container">
+        <div class="section-content">
+            <div class="row display-flex align-items-stretch">
+
+                <!-- Left Content Column -->
+                <div class="col-md-7 col-sm-12 display-flex-col">
+                    <div class="welcome-text-content">
+                        <span class="sub-title-badge">Why Choose Hands-On Health</span>
+                        <h2 class="main-heading">Premium Home Healthcare &amp; Private Nursing in Namibia</h2>
+
+                        <p class="lead-text">
+                            Compassionate, clinical excellence delivered directly to your home.
+                        </p>
+
+                        <p class="body-description">
+                            Hands-On Health offers comprehensive, individualized home care services designed to
+                            uphold
+                            patient dignity while supporting independent living. From skilled clinical nursing and
+                            post-operative recovery to long-term palliative and elderly care, our qualified medical
+                            professionals ensure your loved ones receive personalized support across Windhoek and
+                            nationwide.
+                        </p>
+
+                        <!-- Feature Highlight Box -->
+                        <div class="feature-media-box">
+                            <div class="media-img-wrapper">
+                                <img src="{% static 'img/nurse2.jpeg' %}" alt="Professional Nurse Assisting Patient at Home"
+                                    class="img-responsive img-rounded">
+                            </div>
+                            <div class="media-body-text">
+                                <h5>Skilled &amp; Compassionate Practitioners</h5>
+                                <p>Our registered nurses and certified caregivers provide complete clinical
+                                    oversight,
+                                    from medication management and wound care to vital monitoring and mobility
+                                    support.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 6 Core Value Pillars with Key Word Highlighting -->
+                        <div class="why-choose-list">
+                            <div class="row">
+                                <!-- Column 1 -->
+                                <div class="col-sm-6">
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Professional Approach:</strong>
+                                            We provide <span >structured home-based
+                                                support</span>
+                                            according to individual patient needs.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Care Where You Live:</strong>
+                                            Patients receive appropriate support without leaving the <span
+                                               >comfort of their own home</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Individualised Care:</strong>
+                                            Care arrangements are <span >tailored to the
+                                                patient's
+                                                condition</span> and specific requirements.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2 -->
+                                <div class="col-sm-6">
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Family Support:</strong>
+                                            We work alongside families to make caring for a loved one <span
+                                                >more manageable</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Compassionate Service:</strong>
+                                            We combine professional clinical care with <span
+                                                >genuine human compassion</span>.
+                                        </div>
+                                    </div>
+                                    <div class="check-item">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <strong>Flexible Care Arrangements:</strong>
+                                            Customized schedules including <span >short-term,
+                                                long-term, day, overnight, and stay-in care</span>.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Call-To-Action & Direct Call Bar -->
+                        <div class="welcome-cta-group margin-top-30">
+                            <a href="{% url 'homecare:request' %}" class="btn btn-glow-action main-req-btn">
+                                REQUEST HOME CARE <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </a>
+
+                            <a href="tel:{{ site_settings.phone }}" class="phone-call-pill">
+                                <span class="phone-icon-box">
+                                    <i class="fa-solid fa-phone-volume"></i>
+                                </span>
+                                <span class="phone-text-meta">
+                                    <small>Speak with a Nurse</small>
+                                    <strong>{{ site_settings.phone }}</strong>
+                                </span>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Media Column -->
+                <div class="col-md-5 col-sm-12 display-flex-col">
+                    <div class="welcome-main-img-card full-height-card">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80"
+                            alt="Nurse Reviewing Patient Care Plan" class="img-responsive main-img-full">
+                        <div class="experience-badge">
+                            <span class="badge-number">100%</span>
+                            <span class="badge-text">Personalized Home-Based Medical Care</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- welcome end -->
+
+
+
+
+
+
+<!-- divider start -->
+{% include "includes/divider.html" %}
+<!-- divider end -->
+
+
+
+<!-- payment options start -->
+<section class="payment-options-section bg-f8">
+    <div class="container">
+        <div class="section-title text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 margin-bottom-30">
+                    <span class="sub-title-badge sky-badge">Care Designed Around Your Needs</span>
+                    <h2>PAYMENT <span class="color-defult">OPTIONS</span></h2>
+                    <div class="line-border-center bg-defult"></div>
+                    <p>We provide professional, compassionate, and reliable care for your loved ones in the comfort
+                        of their home. Here are our flexible payment options:</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-content">
+            <div class="row payment-grid">
+                <!-- 1. Ewallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Ewallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Blue Wallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Blue Wallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Easy Wallet -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Easy Wallet</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Nedbank Deposit -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Nedbank Deposit</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Swiping -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Swiping</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Medical Aid -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-stethoscope"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Medical Aid</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Cash -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Cash</a></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Service Fees Badge -->
+                <div class="col-md-3 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center service-fee-card">
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div class="practice-content">
+                            <h4><a href="#">Service Fees Apply</a></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Factors & Quote Request Block -->
+            <div class="row margin-top-20">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="care-pricing-info-card text-center">
+                        <p class="pricing-lead-text">
+                            Because every patient has different needs, the cost of care depends on factors such as:
+                        </p>
+
+                        <div class="cost-factors-grid">
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Type of care required</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Number of hours</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Duration of care</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Level of assistance
+                                required</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Day/night requirements</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Location</span>
+                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Stay-in requirements</span>
+                        </div>
+
+                        <div class="quote-action-area">
+                            <a href="{% url 'homecare:request' %}" class="btn btn-theme-sky btn-quote-action">
+                                Request a Care Quote <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                            <p class="quote-subtext">A detailed quotation can then be provided after discussing the
+                                patient's requirements.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- payment options end -->
+
+
+{% endblock %}

@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Reviews | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Title / Hero Section -->
+<section class="page-title style-2 text-center"
+    style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 60px; position: relative;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 style="color: #ffffff; font-weight: 700; text-transform: uppercase;">About Us</h1>
+                <ul class="breadcrumb" style="background: transparent; margin-bottom: 0;">
+                    <li><a href="{% url 'home' %}" style="color: #ffffff;">Home</a></li>
+                    <li class="active" style="color: #00b4d8;">About Us</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section Start -->
+<section class="about-area padding-top-80 padding-bottom-80">
+    <div class="container">
+        <div class="row style-2" style="display: flex; align-items: center; flex-wrap: wrap;">
+
+            <!-- Image Block -->
+            <div class="col-md-6 col-sm-12 margin-bottom-30">
+                <div class="about-img">
+                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Warm Caregiver Holding Hands with Senior Patient"
+                        class="img-responsive"
+                        style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 126, 163, 0.08); width: 100%;">
+                </div>
+            </div>
+
+            <!-- Content Block -->
+            <div class="col-md-6 col-sm-12">
+                <div class="about-content">
+                    <span class="sub-title-badge sky-badge">About Us</span>
+                    <h2 style="font-weight: 800; margin-bottom: 15px; color: #0B3B60;">
+                        Compassionate &amp; Reliable <span class="color-defult" style="color: #007EA3;">Home-Based
+                            Care</span>
+                    </h2>
+                    <div class="line-border bg-defult margin-bottom-20"
+                        style="width: 50px; height: 3px; background-color: #007EA3; border-radius: 2px;"></div>
+
+                    <p style="font-size: 15px; line-height: 1.8; color: #475569; margin-bottom: 15px;">
+                        <strong>Hands-on Health Home-Based Care Service</strong> was founded to provide compassionate
+                        and reliable care to individuals and families who need professional support at home.
+                    </p>
+
+                    <p style="font-size: 15px; line-height: 1.8; color: #475569; margin-bottom: 15px;">
+                        We understand that caring for an elderly, recovering, chronically ill, bedridden or dependent
+                        family member can be challenging. Our purpose is to support patients and families with dignity,
+                        respect, compassion and a professional approach to home-based care.
+                    </p>
+
+                    <p style="font-size: 15px; line-height: 1.8; color: #475569; margin-bottom: 25px;">
+                        Our services are tailored according to each patient's individual needs and circumstances.
+                    </p>
+
+                    <!-- Feature Highlights -->
+                    <div class="row margin-bottom-30">
+                        <div class="col-sm-6 margin-bottom-15">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-clock-rotate-left"
+                                    style="font-size: 22px; color: #007EA3; margin-right: 12px;"></i>
+                                <h5 style="margin: 0; font-weight: 700; color: #0B3B60; font-size: 14.5px;">24/7
+                                    Dispatch &amp; Care</h5>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 margin-bottom-15">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-house-medical"
+                                    style="font-size: 22px; color: #007EA3; margin-right: 12px;"></i>
+                                <h5 style="margin: 0; font-weight: 700; color: #0B3B60; font-size: 14.5px;">In-Home
+                                    Comfort</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call to Action Button -->
+                    <!-- Full Width Call to Action Button -->
+                    <div class="about-cta" style="width: 100%; margin-top: 25px;">
+                        <a href="{% url 'homecare:request' %}" class="btn btn-theme-sky btn-request-care"
+                            style="width: 100%; justify-content: center;">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- About Section End -->
+
+<!-- Our Care Philosophy Section -->
+<section class="care-philosophy-section padding-top-80 padding-bottom-80" style="background-color: #F8FAFC;">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="section-title text-center margin-bottom-40">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <span class="sub-title-badge sky-badge">Our Foundation</span>
+                    <h2 style="font-weight: 800; color: #0B3B60; margin-bottom: 10px;">
+                        OUR CARE <span class="color-defult" style="color: #007EA3;">PHILOSOPHY</span>
+                    </h2>
+                    <div class="line-border-center bg-defult"
+                        style="width: 50px; height: 3px; background-color: #007EA3; margin: 12px auto 20px auto; border-radius: 2px;">
+                    </div>
+
+                    <h3
+                        style="font-size: 20px; font-weight: 700; color: #007EA3; margin-bottom: 18px; font-family: 'Poppins', sans-serif;">
+                        Care With Dignity. Support With Compassion.
+                    </h3>
+
+                    <p
+                        style="font-size: 15.5px; line-height: 1.8; color: #475569; max-width: 720px; margin: 0 auto 12px auto; font-family: 'Raleway', sans-serif;">
+                        At <strong>Hands-on Health</strong>, we believe that being cared for should never mean losing
+                        one's dignity.
+                    </p>
+                    <p
+                        style="font-size: 15px; line-height: 1.8; color: #64748B; max-width: 780px; margin: 0 auto; font-family: 'Raleway', sans-serif;">
+                        We treat every patient as an individual and aim to provide care that respects their privacy,
+                        preferences, independence, and personal circumstances.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Philosophy Core Pillars -->
+        <div class="section-content margin-top-40">
+            <div class="row style-2" style="display: flex; flex-wrap: wrap; justify-content: center;">
+
+                <!-- Dignity -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h4>Dignity</h4>
+                        <p>Preserving personal honor, self-worth, and confidentiality in every care activity.</p>
+                    </div>
+                </div>
+
+                <!-- Compassion -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <h4>Compassion</h4>
+                        <p>Providing genuine empathy, emotional warmth, and attentive bedside manner.</p>
+                    </div>
+                </div>
+
+                <!-- Respect -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <h4>Respect</h4>
+                        <p>Honoring every patient’s lifestyle, personal preferences, and individual independence.</p>
+                    </div>
+                </div>
+
+                <!-- Safety -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h4>Safety</h4>
+                        <p>Ensuring rigorous medical standards and total security within the home environment.</p>
+                    </div>
+                </div>
+
+                <!-- Professionalism -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-user-nurse"></i>
+                        </div>
+                        <h4>Professionalism</h4>
+                        <p>Delivering qualified, high-quality care with reliability, ethics, and accountability.</p>
+                    </div>
+                </div>
+
+                <!-- Communication -->
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="philosophy-card text-center">
+                        <div class="icon-box">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h4>Communication</h4>
+                        <p>Maintaining transparent, open, and clear dialogue with patients and their families.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Our Care Philosophy Section End -->
+<!-- Action Contact Bar Section Start -->
+<section class="action-bar-section">
+    <div class="container">
+        <div class="action-bar-wrapper">
+
+            <!-- Item 1: Core Tagline -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-house-medical"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">We Bring Care Home</span>
+                    <span class="action-value">Doorstep Healthcare</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 2: Our Purpose -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">Accessible Support</span>
+                    <span class="action-value">Where patients feel most comfortable — at home.</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 3: Care Promise -->
+            <div class="action-bar-item">
+                <div class="action-icon-circle">
+                    <i class="fa-solid fa-user-nurse"></i>
+                </div>
+                <div class="action-text">
+                    <span class="action-label">Hands-on Health Home-Based Care</span>
+                    <span class="action-value">Professional Care. Compassionate Support.</span>
+                </div>
+            </div>
+
+            <div class="action-divider"></div>
+
+            <!-- Item 4: CTA Button -->
+            <div class="action-bar-cta">
+                <a href="{% url 'homecare:request' %}" class="btn-action-pill">
+                    REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Action Contact Bar Section End -->
+
+
+<!-- Founder & Director Section Start -->
+<section class="founder-section padding-top-80 padding-bottom-80">
+    <div class="container">
+        <div class="founder-card-wrapper">
+            <div class="row style-2" style="display: flex; align-items: center; flex-wrap: wrap;">
+
+                <!-- Founder Photo Column -->
+                <div class="col-md-5 col-sm-12 margin-bottom-30">
+                    <div class="founder-image-container">
+                        <img src="img/jacobine.jpeg" alt="Jacobine Joseph - CEO & Director"
+                            class="img-responsive founder-img">
+                        <div class="founder-badge">
+                            <i class="fa-solid fa-user-nurse"></i>
+                            <span>Enrolled Nurse</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Founder Narrative Column -->
+                <div class="col-md-7 col-sm-12">
+                    <div class="founder-content">
+                        <span class="sub-title-badge sky-badge">Leadership</span>
+
+                        <h2 class="founder-title">CEO &amp; DIRECTOR</h2>
+                        <h3 class="founder-name">Jacobine Joseph</h3>
+
+                        <div class="founder-divider"></div>
+
+                        <p class="founder-bio lead-p">
+                            <strong>Jacobine Joseph</strong> is a dedicated healthcare professional and the Founder,
+                            Chief Executive Officer and Director of <strong>Hands-on Health Home-Based Care
+                                Service</strong>. With professional nursing experience across both public and private
+                            healthcare settings, she brings practical clinical knowledge, compassion and a strong
+                            commitment to patient-centred care.
+                        </p>
+
+                        <p class="founder-bio">
+                            Driven by a passion for supporting elderly, recovering and dependent patients in the comfort
+                            of their homes, Jacobine established Hands-on Health to provide reliable, dignified and
+                            personalised home-based care to individuals and families.
+                        </p>
+
+                        <p class="founder-bio">
+                            Her leadership is built on professionalism, integrity, compassion and a commitment to
+                            quality care. Through Hands-on Health, she continues to work towards creating a trusted
+                            home-care service that supports families while promoting dignity, comfort and continuity of
+                            care.
+                        </p>
+
+                        <!-- Key Pillars Grid -->
+                        <div class="founder-pillars">
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-hand-holding-heart"></i>
+                                <span>Dignity-First Care</span>
+                            </div>
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>Clinical Reliability</span>
+                            </div>
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-house-medical"></i>
+                                <span>In-Home Comfort</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Founder & Director Section End -->
+
+<!-- Who We Care For Section Start -->
+<section class="who-we-care-for-section padding-top-80 padding-bottom-80">
+    <div class="container">
+
+        <div class="row flex-equal-height">
+            <!-- Left Side: Sticky Callout Card -->
+            <div class="col-md-5 col-sm-12 margin-bottom-30 flex-col">
+                <div class="care-highlight-box">
+                    <div class="care-content-top">
+                        <span class="sub-title-badge sky-badge">Patient Care Services</span>
+                        <h2>WHO WE <br><span class="highlight-text">CARE FOR</span></h2>
+                        <div class="accent-line"></div>
+                        <p class="care-intro-p">
+                            Hands-on Health provides compassionate, professional home-based nursing and dedicated
+                            support
+                            for individuals and families across a wide range of needs.
+                        </p>
+                    </div>
+
+                    <div class="cta-box-wrapper margin-top-30">
+                        <a href="#booking" class="btn-request-care-full">
+                            REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Two-Column Checklist -->
+            <div class="col-md-7 col-sm-12">
+                <div class="care-list-wrapper">
+                    <div class="row">
+
+                        <!-- List Column 1 -->
+                        <div class="col-sm-6 col-xs-12">
+                            <ul class="care-check-list">
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Elderly patients needing daily support</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Bedridden patients requiring total care</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Patients recovering after surgery</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Patients recently discharged from hospital</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Patients requiring post-operative care</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Patients living with chronic conditions</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- List Column 2 -->
+                        <div class="col-sm-6 col-xs-12">
+                            <ul class="care-check-list">
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Individuals needing daily activity assistance</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Patients requiring palliative/supportive care</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Individuals requiring short-term assistance</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Individuals needing long-term home care</span>
+                                </li>
+                                <li>
+                                    <div class="list-icon"><i class="fa-solid fa-circle-check"></i></div>
+                                    <span>Families needing support caring for loved ones</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+<!-- Who We Care For Section End -->
+
+{% endblock %}
