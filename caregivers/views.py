@@ -1,4 +1,3 @@
-
 import logging
 
 from django.conf import settings
@@ -25,6 +24,7 @@ from homecare.models import (
 from .forms import (
     CaregiverLoginForm,
     CaregiverInvitationRegistrationForm,
+    CaregiverPublicApplicationForm,
 )
 
 
@@ -865,3 +865,143 @@ def caregiver_logout(request):
     )
 
     return redirect("caregivers:login")
+
+
+def caregiver_public_apply(request):
+    """
+    Public caregiver application.
+    Applicants do not need an invitation.
+    Applications remain inactive until staff approval.
+    """
+    if request.method == "POST":
+        form = CaregiverPublicApplicationForm(
+            request.POST,
+            request.FILES,
+        )
+
+        if form.is_valid():
+            data = form.cleaned_data
+            email = data["email"].strip().lower()
+
+            try:
+                with transaction.atomic():
+                    # Create a caregiver account, but do not allow login yet.
+                    user = User(
+                        username=email,
+                        email=email,
+                        first_name=data["first_name"].strip(),
+                        last_name=data["last_name"].strip(),
+                        phone=data.get("phone", "").strip(),
+                        role=User.Role.CAREGIVER,
+                        is_active=False,
+                    )
+                    user.set_password(data["password"])
+                    user.save()
+
+                    # Save the application for staff review.
+                    caregiver = Caregiver.objects.create(
+                        user=user,
+                        name=f"{user.first_name} {user.last_name}".strip(),
+                        professional_title=data.get("professional_title", ""),
+                        specialization=data.get("specialization", ""),
+                        phone=data.get("phone", ""),
+                        email=email,
+                        licence_number=data.get("licence_number", ""),
+                        licence_issuing_authority=data.get(
+                            "licence_issuing_authority", ""
+                        ),
+                        licence_expiry_date=data.get("licence_expiry_date") or None,
+                        cv=data.get("cv"),
+                        cover_letter=data.get("cover_letter"),
+                        licence_document=data.get("licence_document"),
+                        verification_status=Caregiver.VerificationStatus.PENDING,
+                        is_active=False,
+                    )
+
+                    # Save uploaded certificates.
+                    certificates = data.get("certificates") or []
+
+                    for uploaded_file in certificates:
+                        certificate_name = os.path.splitext(uploaded_file.name)[0][:255]
+
+                        CaregiverCertificate.objects.create(
+                            caregiver=caregiver,
+                            certificate_name=certificate_name
+                            or "Supporting Certificate",
+                            document=uploaded_file,
+                        )
+
+                    caregiver.certificate_submitted = bool(certificates)
+                    caregiver.save(
+                        update_fields=[
+                            "certificate_submitted",
+                            "updated_at",
+                        ]
+                    )
+
+            except Exception:
+                # Keep database changes atomic and avoid exposing
+                # internal errors to applicants.
+                form.add_error(
+                    None,
+                    "We could not submit your application right now. "
+                    "Please try again or contact Hands-On Health.",
+                )
+            else:
+                # Notify the applicant.
+                send_mail(
+                    subject="Caregiver application received - Hands-On Health",
+                    message=(
+                        f"Dear {user.first_name},\n\n"
+                        "Thank you for applying to join Hands-On Health.\n\n"
+                        "We have received your caregiver application. "
+                        "Your account will remain inactive while our team "
+                        "reviews your application and supporting documents.\n\n"
+                        "We will contact you when a decision has been made.\n\n"
+                        "Kind regards,\n"
+                        "Hands-On Health"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
+                    fail_silently=True,
+                )
+
+                # Notify the staff responsible for reviewing applications.
+                staff_emails = _get_staff_emails()
+
+                if staff_emails:
+                    send_mail(
+                        subject="New caregiver application requires review",
+                        message=(
+                            "A new caregiver application has been submitted.\n\n"
+                            f"Applicant: {user.get_full_name()}\n"
+                            f"Email: {email}\n"
+                            f"Phone: {caregiver.phone}\n"
+                            f"Professional title: "
+                            f"{caregiver.professional_title}\n"
+                            f"Specialization: {caregiver.specialization}\n\n"
+                            "Please open the staff dashboard to review "
+                            "the application and supporting documents."
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=staff_emails,
+                        fail_silently=True,
+                    )
+
+                return redirect("caregivers:application_success")
+
+    else:
+        form = CaregiverPublicApplicationForm()
+
+    return render(
+        request,
+        "caregivers/public_apply.html",
+        {"form": form},
+    )
+
+
+def caregiver_application_success(request):
+    return render(
+        request,
+        "caregivers/application_success.html",
+    )

@@ -6,7 +6,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from datetime import timedelta
+from calendar import monthrange
 
 # ============================================================
 # TOKEN / ROOM GENERATORS
@@ -1109,6 +1110,12 @@ class Caregiver(models.Model):
     availability = models.TextField(
         blank=True,
     )
+    preferred_working_locations = models.TextField(
+        blank=True,
+        help_text=(
+            "Enter preferred working towns, areas or regions, " "separated by commas."
+        ),
+    )
 
     # ========================================================
     # LICENCE
@@ -1295,16 +1302,39 @@ class Caregiver(models.Model):
 # ============================================================
 # CAREGIVER ASSIGNMENT
 # ============================================================
+# ============================================================
+# CAREGIVER ASSIGNMENT
+# ============================================================
+
 
 class CaregiverAssignment(models.Model):
+
+    # ========================================================
+    # DURATION
+    # ========================================================
 
     class Duration(models.TextChoices):
         ONE_DAY = "ONE_DAY", "One Day"
         ONE_WEEK = "ONE_WEEK", "One Week"
+        ONE_MONTH = "ONE_MONTH", "One Month"
+        CUSTOM = "CUSTOM", "Other (Custom Duration)"
+
+    class CustomDurationUnit(models.TextChoices):
+        DAYS = "DAYS", "Days"
+        WEEKS = "WEEKS", "Weeks"
+        MONTHS = "MONTHS", "Months"
+
+    # ========================================================
+    # REPORT FREQUENCY
+    # ========================================================
 
     class ReportFrequency(models.TextChoices):
         DAILY = "DAILY", "Daily Reports"
         WEEKLY = "WEEKLY", "Weekly Report"
+
+    # ========================================================
+    # STATUS
+    # ========================================================
 
     class Status(models.TextChoices):
         PENDING = "PENDING", "Pending Acceptance"
@@ -1314,11 +1344,19 @@ class CaregiverAssignment(models.Model):
         DECLINED = "DECLINED", "Declined"
         CANCELLED = "CANCELLED", "Cancelled"
 
+    # ========================================================
+    # HOME CARE REQUEST
+    # ========================================================
+
     homecare_request = models.OneToOneField(
         HomeCareRequest,
         on_delete=models.CASCADE,
         related_name="caregiver_assignment",
     )
+
+    # ========================================================
+    # CAREGIVER
+    # ========================================================
 
     caregiver = models.ForeignKey(
         Caregiver,
@@ -1326,26 +1364,58 @@ class CaregiverAssignment(models.Model):
         related_name="assignments",
     )
 
+    # ========================================================
+    # ASSIGNMENT DURATION
+    # ========================================================
+
     duration = models.CharField(
         max_length=20,
         choices=Duration.choices,
         default=Duration.ONE_DAY,
-        help_text="Whether this assignment is for one day or one week.",
+        help_text=("Choose one day, one week, one month, " "or a custom duration."),
     )
 
-    start_date = models.DateField(null=True, blank=True,
+    custom_duration_value = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text=(
+            "Enter the number of days, weeks, or months "
+            "when using a custom duration."
+        ),
+    )
+
+    custom_duration_unit = models.CharField(
+        max_length=10,
+        choices=CustomDurationUnit.choices,
+        blank=True,
+        help_text="Select days, weeks, or months.",
+    )
+
+    # ========================================================
+    # ASSIGNMENT DATES
+    # ========================================================
+
+    start_date = models.DateField(
+        null=True,
+        blank=True,
         help_text="First day of the caregiver assignment.",
     )
 
-    end_date = models.DateField(null=True, blank=True,
-        help_text="Last day of the caregiver assignment.",
+    end_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text=(
+            "Last day of the assignment, calculated " "from the selected duration."
+        ),
     )
 
-    # Kept for compatibility with the existing assignment code.
+    # Kept for compatibility with existing assignment code.
     service_date = models.DateField(
         null=True,
         blank=True,
-        help_text="Specific/legacy service date. Normally use start_date.",
+        help_text=(
+            "Specific/legacy service date. " "Normally uses the assignment start date."
+        ),
     )
 
     service_time = models.TimeField(
@@ -1353,12 +1423,20 @@ class CaregiverAssignment(models.Model):
         blank=True,
     )
 
+    # ========================================================
+    # REPORTING
+    # ========================================================
+
     report_frequency = models.CharField(
         max_length=20,
         choices=ReportFrequency.choices,
         default=ReportFrequency.DAILY,
         help_text="How the caregiver should submit reports.",
     )
+
+    # ========================================================
+    # ASSIGNMENT STATUS
+    # ========================================================
 
     status = models.CharField(
         max_length=20,
@@ -1383,12 +1461,18 @@ class CaregiverAssignment(models.Model):
 
     caregiver_response_note = models.TextField(
         blank=True,
-        help_text="Optional note entered by the caregiver when accepting or declining.",
+        help_text=(
+            "Optional note entered by the caregiver " "when accepting or declining."
+        ),
     )
 
     notes = models.TextField(
         blank=True,
     )
+
+    # ========================================================
+    # ASSIGNMENT AUDIT
+    # ========================================================
 
     assigned_at = models.DateTimeField(
         auto_now_add=True,
@@ -1405,54 +1489,193 @@ class CaregiverAssignment(models.Model):
     class Meta:
         ordering = ["-assigned_at"]
 
+    # ========================================================
+    # MONTH CALCULATION
+    # ========================================================
+
+    @staticmethod
+    def _add_months(start_date, months):
+        """
+        Add calendar months safely.
+
+        Handles different month lengths and leap years.
+        """
+
+        month_index = start_date.month - 1 + months
+
+        year = start_date.year + month_index // 12
+
+        month = month_index % 12 + 1
+
+        last_day = monthrange(year, month)[1]
+
+        day = min(start_date.day, last_day)
+
+        return start_date.replace(
+            year=year,
+            month=month,
+            day=day,
+        )
+
+    # ========================================================
+    # CALCULATE END DATE
+    # ========================================================
+
+    def calculate_end_date(self):
+        """
+        Calculate the inclusive end date for an assignment.
+
+        One Day: same start and end date.
+        One Week: 7 calendar days.
+        One Month: 1 calendar month.
+        Custom: specified days, weeks, or months.
+        """
+
+        if not self.start_date:
+            return None
+
+        if self.duration == self.Duration.ONE_DAY:
+            return self.start_date
+
+        if self.duration == self.Duration.ONE_WEEK:
+            return self.start_date + timedelta(days=6)
+
+        if self.duration == self.Duration.ONE_MONTH:
+            return self._add_months(self.start_date, 1) - timedelta(days=1)
+
+        if self.duration == self.Duration.CUSTOM:
+
+            value = self.custom_duration_value
+            unit = self.custom_duration_unit
+
+            if not value or value < 1:
+                return None
+
+            if unit == self.CustomDurationUnit.DAYS:
+                return self.start_date + timedelta(days=value - 1)
+
+            if unit == self.CustomDurationUnit.WEEKS:
+                return self.start_date + timedelta(days=(value * 7) - 1)
+
+            if unit == self.CustomDurationUnit.MONTHS:
+                return self._add_months(self.start_date, value) - timedelta(days=1)
+
+        return None
+
+    # ========================================================
+    # VALIDATION
+    # ========================================================
+
     def clean(self):
         super().clean()
 
-        if self.start_date and self.end_date:
-            if self.end_date < self.start_date:
-                raise ValidationError(
-                    "Assignment end date cannot be before the start date."
+        errors = {}
+
+        if self.duration == self.Duration.CUSTOM:
+
+            if self.custom_duration_value is None or self.custom_duration_value < 1:
+                errors["custom_duration_value"] = (
+                    "Enter a custom duration greater than zero."
                 )
 
-            if self.duration == self.Duration.ONE_DAY:
-                if self.start_date != self.end_date:
-                    raise ValidationError(
-                        "A one-day assignment must have the same start and end date."
+            if self.custom_duration_unit not in self.CustomDurationUnit.values:
+                errors["custom_duration_unit"] = "Choose days, weeks, or months."
+
+        if self.start_date and self.end_date:
+
+            if self.end_date < self.start_date:
+                errors["end_date"] = (
+                    "Assignment end date cannot be " "before the start date."
+                )
+
+            elif not errors:
+
+                expected_end_date = self.calculate_end_date()
+
+                if expected_end_date and self.end_date != expected_end_date:
+                    errors["end_date"] = (
+                        "The end date must be "
+                        f"{expected_end_date} "
+                        "for the selected duration."
                     )
 
-            elif self.duration == self.Duration.ONE_WEEK:
-                days = (self.end_date - self.start_date).days + 1
-                if days != 7:
-                    raise ValidationError(
-                        "A one-week assignment must cover exactly 7 days."
-                    )
+        if errors:
+            raise ValidationError(errors)
+
+    # ========================================================
+    # TOTAL ASSIGNMENT DAYS
+    # ========================================================
 
     @property
     def total_days(self):
+
         if not self.start_date or not self.end_date:
             return 0
+
         return (self.end_date - self.start_date).days + 1
+
+    # ========================================================
+    # HUMAN-READABLE DURATION
+    # ========================================================
+
+    @property
+    def duration_label(self):
+
+        if self.duration != self.Duration.CUSTOM:
+            return self.get_duration_display()
+
+        value = self.custom_duration_value
+        unit = self.custom_duration_unit
+
+        if not value or not unit:
+            return "Custom Duration"
+
+        unit_labels = {
+            self.CustomDurationUnit.DAYS: "day",
+            self.CustomDurationUnit.WEEKS: "week",
+            self.CustomDurationUnit.MONTHS: "month",
+        }
+
+        unit_name = unit_labels.get(unit, "day")
+
+        if value != 1:
+            unit_name += "s"
+
+        return f"{value} {unit_name}"
+
+    # ========================================================
+    # ACCEPTANCE STATUS
+    # ========================================================
 
     @property
     def is_accepted(self):
+
         return self.status in {
             self.Status.ACCEPTED,
             self.Status.IN_PROGRESS,
             self.Status.COMPLETED,
         }
 
+    # ========================================================
+    # ACTIVE STATUS
+    # ========================================================
+
     @property
     def is_active(self):
+
         return self.status in {
             self.Status.ACCEPTED,
             self.Status.IN_PROGRESS,
         }
 
+    # ========================================================
+    # STRING REPRESENTATION
+    # ========================================================
+
     def __str__(self):
-        return (
-            f"{self.caregiver.name} → "
-            f"{self.homecare_request.full_name}"
-        )
+
+        return f"{self.caregiver.name} → " f"{self.homecare_request.full_name}"
+
 
 # ============================================================
 # CAREGIVER ASSIGNMENT HISTORY

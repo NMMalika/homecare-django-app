@@ -65,6 +65,11 @@
                             <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
                                 <a href="{% url 'pages:contact' %}">Contact</a>
                             </li>
+                            <!-- Careers -->
+                            <li
+                                class="{% if request.resolver_match.url_name == 'careers' or request.resolver_match.url_name == 'public_careers' %}active{% endif %}">
+                                <a href="{% url 'caregivers:careers' %}">Careers</a>
+                            </li>
 
                             <li class="nav-btn-wrapper">
                                 <a href="{% url 'homecare:request' %}" class="nav-cta-btn">Request Home Care</a>

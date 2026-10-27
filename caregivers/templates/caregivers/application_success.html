@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Application Received | Hands-On Health{% endblock %}
+
+{% block content %}
+<style>
+    .application-success {
+        min-height: 65vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f4f8fb;
+        padding: 55px 15px;
+    }
+
+    .application-success-card {
+        max-width: 650px;
+        width: 100%;
+        padding: 45px 30px;
+        background: white;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 12px 40px rgba(16, 42, 67, .08);
+    }
+
+    .success-icon {
+        width: 76px;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 22px;
+        border-radius: 50%;
+        background: #e3f8f1;
+        color: #087f68;
+        font-size: 38px;
+        font-weight: 700;
+    }
+
+    .application-success-card h1 {
+        color: #102a43;
+        font-weight: 800;
+        font-size: 30px;
+    }
+
+    .application-success-card p {
+        color: #627d98;
+        line-height: 1.8;
+        margin: 15px 0;
+    }
+
+    .success-home-link {
+        display: inline-block;
+        background: #0879bd;
+        color: white;
+        text-decoration: none;
+        padding: 13px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-top: 15px;
+    }
+
+    .success-home-link:hover {
+        background: #075d91;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<section class="application-success">
+    <div class="application-success-card">
+        <div class="success-icon">&#10003;</div>
+
+        <h1>Application Submitted!</h1>
+
+        <p>
+            Thank you for your interest in joining Hands-On Health.
+            Your caregiver application and supporting documents have
+            been submitted successfully.
+        </p>
+
+        <p>
+            Our team will review your application. Your caregiver account
+            will remain inactive until your application has been reviewed
+            and approved.
+        </p>
+
+        <p>
+            Please check your email for confirmation and further updates.
+        </p>
+
+        <a href="/" class="success-home-link">
+            Return to Home
+        </a>
+    </div>
+</section>
+{% endblock %}

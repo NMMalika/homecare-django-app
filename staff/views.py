@@ -78,6 +78,7 @@ logger = logging.getLogger(__name__)
 # ADMIN ACCESS
 # ============================================================
 
+
 def admin_required(view_func):
     """
     Only Hands-On Health ADMIN users can access
@@ -97,6 +98,7 @@ def admin_required(view_func):
 
     return wrapper
 
+
 @admin_required
 def consultation_quotation(request, consultation_id):
     return homecare_create_consultation_quotation(
@@ -109,6 +111,7 @@ def consultation_quotation(request, consultation_id):
 # CAREGIVER REGISTRATION INVITATION HELPER
 # ============================================================
 
+
 def send_caregiver_registration_invitation(request, caregiver):
     """
     Create or reuse a valid invitation and email the caregiver
@@ -116,15 +119,17 @@ def send_caregiver_registration_invitation(request, caregiver):
     """
 
     email = (
-        getattr(caregiver, "email", None)
-        or getattr(getattr(caregiver, "user", None), "email", None)
-        or ""
-    ).strip().lower()
+        (
+            getattr(caregiver, "email", None)
+            or getattr(getattr(caregiver, "user", None), "email", None)
+            or ""
+        )
+        .strip()
+        .lower()
+    )
 
     if not email:
-        raise ValueError(
-            "The caregiver does not have an email address."
-        )
+        raise ValueError("The caregiver does not have an email address.")
 
     user = caregiver.user
 
@@ -142,8 +147,7 @@ def send_caregiver_registration_invitation(request, caregiver):
     # Reuse an existing valid invitation to avoid sending
     # multiple different links unnecessarily.
     invitation = (
-        CaregiverInvitation.objects
-        .filter(
+        CaregiverInvitation.objects.filter(
             caregiver=caregiver,
             used_at__isnull=True,
             expires_at__gt=now,
@@ -209,6 +213,7 @@ Hands-On Health
 # STAFF LOGIN
 # ============================================================
 
+
 def staff_login(request):
 
     site_settings = SiteSettings.load()
@@ -260,10 +265,7 @@ def staff_login(request):
                 user,
             )
 
-            next_url = (
-                request.POST.get("next")
-                or request.GET.get("next")
-            )
+            next_url = request.POST.get("next") or request.GET.get("next")
 
             if next_url and url_has_allowed_host_and_scheme(
                 url=next_url,
@@ -272,9 +274,7 @@ def staff_login(request):
             ):
                 return redirect(next_url)
 
-            return redirect(
-                "staff:dashboard"
-            )
+            return redirect("staff:dashboard")
 
         messages.error(
             request,
@@ -294,6 +294,7 @@ def staff_login(request):
 # STAFF LOGOUT
 # ============================================================
 
+
 @login_required
 def staff_logout(request):
 
@@ -304,14 +305,13 @@ def staff_logout(request):
         "You have been logged out successfully.",
     )
 
-    return redirect(
-        "staff:login"
-    )
+    return redirect("staff:login")
 
 
 # ============================================================
 # CHANGE PASSWORD
 # ============================================================
+
 
 @admin_required
 def change_password(request):
@@ -337,9 +337,7 @@ def change_password(request):
                 "Your password has been changed successfully.",
             )
 
-            return redirect(
-                "staff:dashboard"
-            )
+            return redirect("staff:dashboard")
 
     else:
 
@@ -361,6 +359,7 @@ def change_password(request):
 # STAFF DASHBOARD
 # ============================================================
 
+
 @admin_required
 def dashboard(request):
 
@@ -368,107 +367,54 @@ def dashboard(request):
         verification_status=Caregiver.VerificationStatus.PENDING
     ).count()
 
-    recent_requests = (
-        HomeCareRequest.objects
-        .order_by("-created_at")[:5]
-    )
+    recent_requests = HomeCareRequest.objects.order_by("-created_at")[:5]
     recent_referrals = (
-    Referral.objects
-    .select_related("homecare_request")
-    .prefetch_related("services_needed")
-    .order_by("-created_at")[:5]
-    )
-
-    recent_appointments = (
-        Consultation.objects
-        .select_related("doctor")
+        Referral.objects.select_related("homecare_request")
+        .prefetch_related("services_needed")
         .order_by("-created_at")[:5]
     )
 
-    recent_payments = (
-        Payment.objects
-        .select_related(
-            "quotation",
-            "quotation__homecare_request",
-            "quotation__consultation",
-            "verified_by",
-        )
-        .order_by("-submitted_at")[:5]
-    )
+    recent_appointments = Consultation.objects.select_related("doctor").order_by(
+        "-created_at"
+    )[:5]
 
-    recent_quotations = (
-        Quotation.objects
-        .select_related(
-            "homecare_request",
-            "consultation",
-        )
-        .order_by("-created_at")[:5]
-    )
+    recent_payments = Payment.objects.select_related(
+        "quotation",
+        "quotation__homecare_request",
+        "quotation__consultation",
+        "verified_by",
+    ).order_by("-submitted_at")[:5]
 
-    recent_assignments = (
-        CaregiverAssignment.objects
-        .select_related(
-            "caregiver",
-            "homecare_request",
-            "assigned_by",
-        )
-        .order_by("-assigned_at")[:5]
-    )
+    recent_quotations = Quotation.objects.select_related(
+        "homecare_request",
+        "consultation",
+    ).order_by("-created_at")[:5]
+
+    recent_assignments = CaregiverAssignment.objects.select_related(
+        "caregiver",
+        "homecare_request",
+        "assigned_by",
+    ).order_by("-assigned_at")[:5]
 
     context = {
-
         "site_settings": SiteSettings.load(),
-
         "pending_caregivers": pending_caregivers,
-
-        "caregiver_count": (
-            Caregiver.objects.count()
-        ),
-
-        "assignment_count": (
-            CaregiverAssignment.objects.count()
-        ),
-
-        "homecare_request_count": (
-            HomeCareRequest.objects.count()
-        ),
-
-        "appointment_count": (
-            Consultation.objects.count()
-        ),
-
-        "payment_count": (
-            Payment.objects.count()
-        ),
-
-        "quotation_count": (
-            Quotation.objects.count()
-        ),
-
-        "report_count": (
-            CaregiverDailyReport.objects.count()
-        ),
-
-        "caregiver_payment_count": (
-            CaregiverPayment.objects.count()
-        ),
-
+        "caregiver_count": (Caregiver.objects.count()),
+        "assignment_count": (CaregiverAssignment.objects.count()),
+        "homecare_request_count": (HomeCareRequest.objects.count()),
+        "appointment_count": (Consultation.objects.count()),
+        "payment_count": (Payment.objects.count()),
+        "quotation_count": (Quotation.objects.count()),
+        "report_count": (CaregiverDailyReport.objects.count()),
+        "caregiver_payment_count": (CaregiverPayment.objects.count()),
         "recent_requests": recent_requests,
-
         "recent_appointments": recent_appointments,
-
         "recent_payments": recent_payments,
-
         "recent_quotations": recent_quotations,
-
         "recent_assignments": recent_assignments,
         "referral_count": Referral.objects.count(),
-
-        "pending_referrals": Referral.objects.filter(
-        status="PENDING"
-        ).count(),
-
-       "recent_referrals": recent_referrals,
+        "pending_referrals": Referral.objects.filter(status="PENDING").count(),
+        "recent_referrals": recent_referrals,
     }
 
     return render(
@@ -482,23 +428,20 @@ def dashboard(request):
 # CAREGIVER DIRECTORY AND AUTOMATIC REGISTRATION STATUS
 # ============================================================
 
+
 @admin_required
 def caregivers(request):
     current_status = request.GET.get("status", "").strip()
     search = request.GET.get("q", "").strip()
 
     caregivers_queryset = (
-        Caregiver.objects
-        .select_related("user", "approved_by")
+        Caregiver.objects.select_related("user", "approved_by")
         .prefetch_related("certificates")
         .order_by("name")
     )
 
     # Filter by the caregiver's actual verification status.
-    valid_statuses = {
-        value
-        for value, label in Caregiver.VerificationStatus.choices
-    }
+    valid_statuses = {value for value, label in Caregiver.VerificationStatus.choices}
 
     if current_status in valid_statuses:
         caregivers_queryset = caregivers_queryset.filter(
@@ -525,13 +468,10 @@ def caregivers(request):
         user = caregiver.user
 
         # A usable password indicates that registration was completed.
-        caregiver.registration_complete = bool(
-            user and user.has_usable_password()
-        )
+        caregiver.registration_complete = bool(user and user.has_usable_password())
 
         caregiver.latest_invitation = (
-            CaregiverInvitation.objects
-            .filter(caregiver=caregiver)
+            CaregiverInvitation.objects.filter(caregiver=caregiver)
             .order_by("-created_at")
             .first()
         )
@@ -539,28 +479,18 @@ def caregivers(request):
         invitation = caregiver.latest_invitation
 
         caregiver.invitation_is_valid = bool(
-            invitation
-            and invitation.used_at is None
-            and invitation.expires_at > now
+            invitation and invitation.used_at is None and invitation.expires_at > now
         )
 
         caregiver.invitation_expired = bool(
-            invitation
-            and invitation.used_at is None
-            and invitation.expires_at <= now
+            invitation and invitation.used_at is None and invitation.expires_at <= now
         )
 
         # Determine the label to display in the staff directory.
-        if (
-            caregiver.verification_status
-            == Caregiver.VerificationStatus.APPROVED
-        ):
+        if caregiver.verification_status == Caregiver.VerificationStatus.APPROVED:
             caregiver.workflow_status = "approved"
 
-        elif (
-            caregiver.verification_status
-            == Caregiver.VerificationStatus.REJECTED
-        ):
+        elif caregiver.verification_status == Caregiver.VerificationStatus.REJECTED:
             caregiver.workflow_status = "rejected"
 
         elif caregiver.registration_complete:
@@ -579,8 +509,7 @@ def caregivers(request):
         # Only show the resend option if registration is incomplete
         # and there is no currently valid invitation.
         caregiver.can_resend_invitation = bool(
-            caregiver.verification_status
-            == Caregiver.VerificationStatus.PENDING
+            caregiver.verification_status == Caregiver.VerificationStatus.PENDING
             and not caregiver.registration_complete
             and not caregiver.invitation_is_valid
         )
@@ -595,17 +524,18 @@ def caregivers(request):
         {
             "caregivers": caregivers_queryset,
             "current_status": current_status,
-            "verification_choices": (
-                Caregiver.VerificationStatus.choices
-            ),
+            "verification_choices": (Caregiver.VerificationStatus.choices),
             "pending_caregivers": pending_caregivers,
             "search": search,
             "site_settings": SiteSettings.load(),
         },
     )
+
+
 # ============================================================
 # CAREGIVER VERIFICATION AND ACTIVATION EMAIL
 # ============================================================
+
 
 @admin_required
 @require_http_methods(["GET", "POST"])
@@ -632,10 +562,7 @@ def caregiver_verify(request, pk):
 
             # Do not approve a caregiver who has not completed
             # the invitation registration process.
-            if (
-                not caregiver.user
-                or not caregiver.user.has_usable_password()
-            ):
+            if not caregiver.user or not caregiver.user.has_usable_password():
                 messages.error(
                     request,
                     (
@@ -648,9 +575,7 @@ def caregiver_verify(request, pk):
 
             with transaction.atomic():
 
-                caregiver.verification_status = (
-                    Caregiver.VerificationStatus.APPROVED
-                )
+                caregiver.verification_status = Caregiver.VerificationStatus.APPROVED
                 caregiver.is_active = True
                 caregiver.verification_notes = comment
                 caregiver.approved_by = request.user
@@ -659,9 +584,7 @@ def caregiver_verify(request, pk):
 
                 if caregiver.user:
                     caregiver.user.is_active = True
-                    caregiver.user.save(
-                        update_fields=["is_active"]
-                    )
+                    caregiver.user.save(update_fields=["is_active"])
 
             recipient_email = (
                 getattr(caregiver.user, "email", None)
@@ -672,9 +595,7 @@ def caregiver_verify(request, pk):
             if recipient_email:
 
                 try:
-                    login_url = request.build_absolute_uri(
-                        reverse("caregivers:login")
-                    )
+                    login_url = request.build_absolute_uri(reverse("caregivers:login"))
 
                     send_mail(
                         subject=(
@@ -738,25 +659,20 @@ Hands-On Health
                 )
 
             return redirect("staff:caregivers")
-        
-        
-                # ----------------------------------------------------
+
+            # ----------------------------------------------------
         # SUSPEND APPROVED CAREGIVER
         # ----------------------------------------------------
 
         elif action == "suspend":
 
             if caregiver.verification_status != Caregiver.VerificationStatus.APPROVED:
-                messages.error(
-                    request,
-                    "Only approved caregivers can be suspended."
-                )
+                messages.error(request, "Only approved caregivers can be suspended.")
                 return redirect("staff:caregivers")
 
             if not comment:
                 messages.error(
-                    request,
-                    "Please provide a reason for suspending this caregiver."
+                    request, "Please provide a reason for suspending this caregiver."
                 )
                 return redirect("staff:caregiver_verify", pk=caregiver.pk)
 
@@ -797,13 +713,11 @@ Hands-On Health
                     )
                 except Exception as error:
                     messages.warning(
-                        request,
-                        f"Caregiver suspended, but email failed: {error}"
+                        request, f"Caregiver suspended, but email failed: {error}"
                     )
 
             messages.success(
-                request,
-                f"{caregiver.name} has been suspended successfully."
+                request, f"{caregiver.name} has been suspended successfully."
             )
 
             return redirect("staff:caregivers")
@@ -815,16 +729,13 @@ Hands-On Health
         elif action == "reactivate":
 
             if caregiver.verification_status != Caregiver.VerificationStatus.SUSPENDED:
-                messages.error(
-                    request,
-                    "Only suspended caregivers can be reactivated."
-                )
+                messages.error(request, "Only suspended caregivers can be reactivated.")
                 return redirect("staff:caregivers")
 
             if not caregiver.user or not caregiver.user.has_usable_password():
                 messages.error(
                     request,
-                    "This caregiver must have a completed registration before reactivation."
+                    "This caregiver must have a completed registration before reactivation.",
                 )
                 return redirect("staff:caregivers")
 
@@ -838,17 +749,11 @@ Hands-On Health
                 caregiver.user.is_active = True
                 caregiver.user.save(update_fields=["is_active"])
 
-            recipient_email = (
-                caregiver.user.email
-                or caregiver.email
-                or ""
-            ).strip()
+            recipient_email = (caregiver.user.email or caregiver.email or "").strip()
 
             if recipient_email:
                 try:
-                    login_url = request.build_absolute_uri(
-                        reverse("caregivers:login")
-                    )
+                    login_url = request.build_absolute_uri(reverse("caregivers:login"))
 
                     send_mail(
                         subject="Your Hands-On Health Caregiver Account Has Been Reactivated",
@@ -866,17 +771,15 @@ Hands-On Health
                     )
                 except Exception as error:
                     messages.warning(
-                        request,
-                        f"Caregiver reactivated, but email failed: {error}"
+                        request, f"Caregiver reactivated, but email failed: {error}"
                     )
 
             messages.success(
-                request,
-                f"{caregiver.name} has been reactivated successfully."
+                request, f"{caregiver.name} has been reactivated successfully."
             )
 
             return redirect("staff:caregivers")
-        
+
         # ----------------------------------------------------
         # DECLINE CAREGIVER
         # ----------------------------------------------------
@@ -885,18 +788,14 @@ Hands-On Health
 
             with transaction.atomic():
 
-                caregiver.verification_status = (
-                    Caregiver.VerificationStatus.REJECTED
-                )
+                caregiver.verification_status = Caregiver.VerificationStatus.REJECTED
                 caregiver.is_active = False
                 caregiver.verification_notes = comment
                 caregiver.save()
 
                 if caregiver.user:
                     caregiver.user.is_active = False
-                    caregiver.user.save(
-                        update_fields=["is_active"]
-                    )
+                    caregiver.user.save(update_fields=["is_active"])
 
             recipient_email = (
                 getattr(caregiver.user, "email", None)
@@ -908,8 +807,7 @@ Hands-On Health
                 try:
                     send_mail(
                         subject=(
-                            "Update on Your Hands-On Health "
-                            "Caregiver Application"
+                            "Update on Your Hands-On Health " "Caregiver Application"
                         ),
                         message=f"""
 Hello {caregiver.name},
@@ -962,6 +860,7 @@ Hands-On Health
 # CAREGIVER ASSIGNMENTS
 # ============================================================
 
+
 @admin_required
 def caregiver_assignments(request):
 
@@ -976,8 +875,7 @@ def caregiver_assignments(request):
     ).strip()
 
     assignments_queryset = (
-        CaregiverAssignment.objects
-        .select_related(
+        CaregiverAssignment.objects.select_related(
             "caregiver",
             "homecare_request",
             "assigned_by",
@@ -997,21 +895,10 @@ def caregiver_assignments(request):
     if search:
 
         assignments_queryset = assignments_queryset.filter(
-            Q(
-                caregiver__name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__first_name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__last_name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__email__icontains=search
-            )
+            Q(caregiver__name__icontains=search)
+            | Q(caregiver__user__first_name__icontains=search)
+            | Q(caregiver__user__last_name__icontains=search)
+            | Q(caregiver__user__email__icontains=search)
         )
 
     # --------------------------------------------------------
@@ -1020,24 +907,16 @@ def caregiver_assignments(request):
 
     if current_status:
 
-        assignments_queryset = assignments_queryset.filter(
-            status=current_status
-        )
+        assignments_queryset = assignments_queryset.filter(status=current_status)
 
     return render(
         request,
         "staff/assignments.html",
         {
             "assignments": assignments_queryset,
-
             "current_status": current_status,
-
             "search": search,
-
-            "status_choices": (
-                CaregiverAssignment.Status.choices
-            ),
-
+            "status_choices": (CaregiverAssignment.Status.choices),
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1047,21 +926,19 @@ def caregiver_assignments(request):
 # ADD CAREGIVER ASSIGNMENT
 # ============================================================
 
+
 @admin_required
 def caregiver_assignment_add(request):
 
-    request_id = (
-        request.POST.get("homecare_request")
-        or request.GET.get("homecare_request")
+    request_id = request.POST.get("homecare_request") or request.GET.get(
+        "homecare_request"
     )
 
     selected_request = None
 
     if request_id:
         selected_request = get_object_or_404(
-            HomeCareRequest.objects.prefetch_related(
-                "services"
-            ),
+            HomeCareRequest.objects.prefetch_related("services"),
             pk=request_id,
         )
 
@@ -1072,7 +949,8 @@ def caregiver_assignment_add(request):
     if request.method == "POST":
 
         form = CaregiverAssignmentForm(
-            request.POST
+            request.POST,
+            homecare_request=selected_request,
         )
 
         # ----------------------------------------------------
@@ -1100,16 +978,12 @@ def caregiver_assignment_add(request):
             # Also make sure the selected request is preserved.
             if selected_request is None:
 
-                posted_request_id = request.POST.get(
-                    "homecare_request"
-                )
+                posted_request_id = request.POST.get("homecare_request")
 
                 if posted_request_id:
 
                     selected_request = get_object_or_404(
-                        HomeCareRequest.objects.prefetch_related(
-                            "services"
-                        ),
+                        HomeCareRequest.objects.prefetch_related("services"),
                         pk=posted_request_id,
                     )
 
@@ -1123,9 +997,7 @@ def caregiver_assignment_add(request):
 
                 with transaction.atomic():
 
-                    assignment = form.save(
-                        commit=False
-                    )
+                    assignment = form.save(commit=False)
 
                     # ------------------------------------------------
                     # KEEP SELECTED HOME CARE REQUEST
@@ -1133,9 +1005,7 @@ def caregiver_assignment_add(request):
 
                     if selected_request:
 
-                        assignment.homecare_request = (
-                            selected_request
-                        )
+                        assignment.homecare_request = selected_request
 
                     # ------------------------------------------------
                     # RECORD STAFF MEMBER
@@ -1147,9 +1017,7 @@ def caregiver_assignment_add(request):
                     # NEW ASSIGNMENTS WAIT FOR ACCEPTANCE
                     # ------------------------------------------------
 
-                    assignment.status = (
-                        CaregiverAssignment.Status.PENDING
-                    )
+                    assignment.status = CaregiverAssignment.Status.PENDING
 
                     # ------------------------------------------------
                     # RESET RESPONSE FIELDS
@@ -1170,15 +1038,11 @@ def caregiver_assignment_add(request):
                     # UPDATE HOME CARE REQUEST
                     # ------------------------------------------------
 
-                    homecare_request = (
-                        assignment.homecare_request
-                    )
+                    homecare_request = assignment.homecare_request
 
                     if homecare_request:
 
-                        homecare_request.status = (
-                            HomeCareRequest.Status.ASSIGNED
-                        )
+                        homecare_request.status = HomeCareRequest.Status.ASSIGNED
 
                         homecare_request.save(
                             update_fields=[
@@ -1195,9 +1059,7 @@ def caregiver_assignment_add(request):
                     caregiver = assignment.caregiver
 
                     if caregiver is None:
-                        raise ValueError(
-                            "No caregiver was selected."
-                        )
+                        raise ValueError("No caregiver was selected.")
 
                     caregiver_email = (
                         getattr(caregiver, "email", None)
@@ -1210,9 +1072,7 @@ def caregiver_assignment_add(request):
                     ).strip()
 
                     if not caregiver_email:
-                        raise ValueError(
-                            "The caregiver has no email address."
-                        )
+                        raise ValueError("The caregiver has no email address.")
 
                     user = caregiver.user
 
@@ -1288,10 +1148,7 @@ def caregiver_assignment_add(request):
 
                 messages.error(
                     request,
-                    (
-                        "The caregiver assignment could not be "
-                        f"created. Error: {e}"
-                    ),
+                    ("The caregiver assignment could not be " f"created. Error: {e}"),
                 )
 
     # ========================================================
@@ -1304,9 +1161,7 @@ def caregiver_assignment_add(request):
 
         if selected_request:
 
-            initial["homecare_request"] = (
-                selected_request.pk
-            )
+            initial["homecare_request"] = selected_request.pk
 
             if getattr(
                 selected_request,
@@ -1314,9 +1169,7 @@ def caregiver_assignment_add(request):
                 None,
             ):
 
-                initial["service_date"] = (
-                    selected_request.preferred_date
-                )
+                initial["service_date"] = selected_request.preferred_date
 
             if getattr(
                 selected_request,
@@ -1324,23 +1177,18 @@ def caregiver_assignment_add(request):
                 None,
             ):
 
-                initial["service_time"] = (
-                    selected_request.preferred_time
-                )
+                initial["service_time"] = selected_request.preferred_time
 
         form = CaregiverAssignmentForm(
-            initial=initial
+            initial=initial,
+            homecare_request=selected_request,
         )
 
     # ========================================================
     # REQUESTED SERVICES
     # ========================================================
 
-    services = (
-        selected_request.services.all()
-        if selected_request
-        else []
-    )
+    services = selected_request.services.all() if selected_request else []
 
     # ========================================================
     # RENDER
@@ -1358,16 +1206,17 @@ def caregiver_assignment_add(request):
         },
     )
 
+
 # ============================================================
 # EDIT / REASSIGN CAREGIVER
 # ============================================================
+
 
 @admin_required
 def caregiver_assignment_edit(request, pk):
 
     assignment = get_object_or_404(
-        CaregiverAssignment.objects
-        .select_related(
+        CaregiverAssignment.objects.select_related(
             "caregiver",
             "homecare_request",
         ),
@@ -1383,6 +1232,7 @@ def caregiver_assignment_edit(request, pk):
         form = CaregiverAssignmentForm(
             request.POST,
             instance=assignment,
+            homecare_request=assignment.homecare_request,
         )
 
         if form.is_valid():
@@ -1395,9 +1245,7 @@ def caregiver_assignment_edit(request, pk):
                     # SAVE FORM WITHOUT FINAL STATUS
                     # ------------------------------------------------
 
-                    assignment = form.save(
-                        commit=False
-                    )
+                    assignment = form.save(commit=False)
 
                     # ------------------------------------------------
                     # RECORD STAFF MEMBER
@@ -1410,9 +1258,7 @@ def caregiver_assignment_edit(request, pk):
                     # PENDING ACCEPTANCE
                     # ------------------------------------------------
 
-                    assignment.status = (
-                        CaregiverAssignment.Status.PENDING
-                    )
+                    assignment.status = CaregiverAssignment.Status.PENDING
 
                     # ------------------------------------------------
                     # RESET CAREGIVER RESPONSE
@@ -1433,13 +1279,9 @@ def caregiver_assignment_edit(request, pk):
                     # ENSURE HOME CARE REQUEST IS ASSIGNED
                     # ------------------------------------------------
 
-                    homecare_request = (
-                        assignment.homecare_request
-                    )
+                    homecare_request = assignment.homecare_request
 
-                    homecare_request.status = (
-                        HomeCareRequest.Status.ASSIGNED
-                    )
+                    homecare_request.status = HomeCareRequest.Status.ASSIGNED
 
                     homecare_request.save(
                         update_fields=[
@@ -1455,17 +1297,12 @@ def caregiver_assignment_edit(request, pk):
                 try:
 
                     send_caregiver_assignment_email(
-                        
-                        
                         request,
                         assignment,
                     )
 
                     # Determine whether it was a reassignment.
-                    if (
-                        original_caregiver.pk
-                        != assignment.caregiver.pk
-                    ):
+                    if original_caregiver.pk != assignment.caregiver.pk:
 
                         messages.success(
                             request,
@@ -1501,24 +1338,20 @@ def caregiver_assignment_edit(request, pk):
                         ),
                     )
 
-                return redirect(
-                    "staff:assignments"
-                )
+                return redirect("staff:assignments")
 
             except Exception as e:
 
                 messages.error(
                     request,
-                    (
-                        "The caregiver assignment could not be "
-                        f"updated. Error: {e}"
-                    ),
+                    ("The caregiver assignment could not be " f"updated. Error: {e}"),
                 )
 
     else:
 
         form = CaregiverAssignmentForm(
             instance=assignment,
+            homecare_request=assignment.homecare_request,
         )
 
     return render(
@@ -1526,11 +1359,8 @@ def caregiver_assignment_edit(request, pk):
         "staff/caregiver_assignment_form.html",
         {
             "form": form,
-
             "title": "Edit Caregiver Assignment",
-
             "assignment": assignment,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1539,6 +1369,7 @@ def caregiver_assignment_edit(request, pk):
 # ============================================================
 # DELETE CAREGIVER ASSIGNMENT
 # ============================================================
+
 
 @admin_required
 def caregiver_assignment_delete(request, pk):
@@ -1557,16 +1388,13 @@ def caregiver_assignment_delete(request, pk):
             "Caregiver assignment deleted successfully.",
         )
 
-        return redirect(
-            "staff:assignments"
-        )
+        return redirect("staff:assignments")
 
     return render(
         request,
         "staff/caregiver_assignment_confirm_delete.html",
         {
             "assignment": assignment,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1575,6 +1403,7 @@ def caregiver_assignment_delete(request, pk):
 # ============================================================
 # HOME CARE REQUESTS
 # ============================================================
+
 
 @admin_required
 def homecare_requests(request):
@@ -1589,46 +1418,32 @@ def homecare_requests(request):
         "",
     ).strip()
 
-    requests_queryset = (
-        HomeCareRequest.objects
-        .prefetch_related("services")
-        .order_by("-created_at")
+    requests_queryset = HomeCareRequest.objects.prefetch_related("services").order_by(
+        "-created_at"
     )
 
     if search:
 
         requests_queryset = requests_queryset.filter(
             Q(full_name__icontains=search)
-            |
-            Q(phone__icontains=search)
-            |
-            Q(email__icontains=search)
-            |
-            Q(address__icontains=search)
-            |
-            Q(city__icontains=search)
+            | Q(phone__icontains=search)
+            | Q(email__icontains=search)
+            | Q(address__icontains=search)
+            | Q(city__icontains=search)
         )
 
     if current_status:
 
-        requests_queryset = requests_queryset.filter(
-            status=current_status
-        )
+        requests_queryset = requests_queryset.filter(status=current_status)
 
     return render(
         request,
         "staff/homecare_requests.html",
         {
             "homecare_requests": requests_queryset,
-
             "current_status": current_status,
-
             "search": search,
-
-            "status_choices": (
-                HomeCareRequest.Status.choices
-            ),
-
+            "status_choices": (HomeCareRequest.Status.choices),
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1638,26 +1453,21 @@ def homecare_requests(request):
 # ADD HOME CARE REQUEST
 # ============================================================
 
+
 @admin_required
 def homecare_request_add(request):
 
     if request.method == "POST":
 
-        form = HomeCareRequestForm(
-            request.POST
-        )
+        form = HomeCareRequestForm(request.POST)
 
         if form.is_valid():
 
-            homecare_request = form.save(
-                commit=False
-            )
+            homecare_request = form.save(commit=False)
 
             if not homecare_request.status:
 
-                homecare_request.status = (
-                    HomeCareRequest.Status.NEW
-                )
+                homecare_request.status = HomeCareRequest.Status.NEW
 
             homecare_request.save()
 
@@ -1666,32 +1476,24 @@ def homecare_request_add(request):
             messages.success(
                 request,
                 (
-                    f'Home care request for '
+                    f"Home care request for "
                     f'"{homecare_request.full_name}" '
-                    f'has been created successfully.'
+                    f"has been created successfully."
                 ),
             )
 
-            return redirect(
-                "staff:homecare_requests"
-            )
+            return redirect("staff:homecare_requests")
 
     else:
 
-        form = HomeCareRequestForm(
-            initial={
-                "status": HomeCareRequest.Status.NEW
-            }
-        )
+        form = HomeCareRequestForm(initial={"status": HomeCareRequest.Status.NEW})
 
     return render(
         request,
         "staff/homecare_request_form.html",
         {
             "form": form,
-
             "title": "Create Home Care Request",
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1700,6 +1502,7 @@ def homecare_request_add(request):
 # ============================================================
 # EDIT HOME CARE REQUEST
 # ============================================================
+
 
 @admin_required
 def homecare_request_edit(request, pk):
@@ -1723,15 +1526,13 @@ def homecare_request_edit(request, pk):
             messages.success(
                 request,
                 (
-                    f'Home care request for '
+                    f"Home care request for "
                     f'"{homecare_request.full_name}" '
-                    f'has been updated successfully.'
+                    f"has been updated successfully."
                 ),
             )
 
-            return redirect(
-                "staff:homecare_requests"
-            )
+            return redirect("staff:homecare_requests")
 
     else:
 
@@ -1744,14 +1545,8 @@ def homecare_request_edit(request, pk):
         "staff/homecare_request_form.html",
         {
             "form": form,
-
             "homecare_request": homecare_request,
-
-            "title": (
-                f"Edit Home Care Request - "
-                f"{homecare_request.full_name}"
-            ),
-
+            "title": (f"Edit Home Care Request - " f"{homecare_request.full_name}"),
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1760,6 +1555,7 @@ def homecare_request_edit(request, pk):
 # ============================================================
 # DELETE HOME CARE REQUEST
 # ============================================================
+
 
 @admin_required
 def homecare_request_delete(request, pk):
@@ -1778,15 +1574,13 @@ def homecare_request_delete(request, pk):
         messages.success(
             request,
             (
-                f'Home care request for '
+                f"Home care request for "
                 f'"{patient_name}" '
-                f'has been deleted successfully.'
+                f"has been deleted successfully."
             ),
         )
 
-        return redirect(
-            "staff:homecare_requests"
-        )
+        return redirect("staff:homecare_requests")
 
     return render(
         request,
@@ -1800,6 +1594,7 @@ def homecare_request_delete(request, pk):
 # ============================================================
 # REFERRALS
 # ============================================================
+
 
 @admin_required
 def referrals(request):
@@ -1825,8 +1620,7 @@ def referrals(request):
     ).count()
 
     referrals_queryset = (
-        Referral.objects
-        .select_related(
+        Referral.objects.select_related(
             "homecare_request",
         )
         .prefetch_related(
@@ -1858,19 +1652,12 @@ def referrals(request):
 
     context = {
         "referrals": referrals_queryset,
-
         "total_referrals": total_referrals,
-
         "pending_referrals": pending_referrals,
-
         "completed_referrals": completed_referrals,
-
         "current_status": current_status,
-
         "search": search,
-
         "status_choices": Referral.Status.choices,
-
         "site_settings": SiteSettings.load(),
     }
 
@@ -1885,6 +1672,7 @@ def referrals(request):
 # APPOINTMENTS / CONSULTATIONS
 # ============================================================
 
+
 @admin_required
 def appointments(request):
 
@@ -1898,42 +1686,28 @@ def appointments(request):
         "",
     ).strip()
 
-    appointments_queryset = (
-        Consultation.objects
-        .select_related("doctor")
-        .order_by(
-            "-created_at"
-        )
+    appointments_queryset = Consultation.objects.select_related("doctor").order_by(
+        "-created_at"
     )
 
     if current_status:
 
-        appointments_queryset = appointments_queryset.filter(
-            status=current_status
-        )
+        appointments_queryset = appointments_queryset.filter(status=current_status)
 
     if appointment_id:
 
         if appointment_id.isdigit():
 
-            appointments_queryset = appointments_queryset.filter(
-                pk=appointment_id
-            )
+            appointments_queryset = appointments_queryset.filter(pk=appointment_id)
 
     return render(
         request,
         "staff/appointments.html",
         {
             "appointments": appointments_queryset,
-
             "current_status": current_status,
-
             "selected_appointment_id": appointment_id,
-
-            "status_choices": (
-                Consultation.Status.choices
-            ),
-
+            "status_choices": (Consultation.Status.choices),
             "site_settings": SiteSettings.load(),
         },
     )
@@ -1943,32 +1717,29 @@ def appointments(request):
 # QUOTATIONS
 # ============================================================
 
+
 @admin_required
 def quotations(request):
 
-    quotations_queryset = (
-        Quotation.objects
-        .select_related(
-            "homecare_request",
-            "consultation",
-        )
-        .order_by(
-            "-created_at"
-        )
-    )
+    quotations_queryset = Quotation.objects.select_related(
+        "homecare_request",
+        "consultation",
+    ).order_by("-created_at")
 
     return render(
         request,
         "staff/quotations.html",
         {
             "quotations": quotations_queryset,
-
             "site_settings": SiteSettings.load(),
         },
     )
+
+
 # ============================================================
 # STAFF QUOTATION DETAIL
 # ============================================================
+
 
 @admin_required
 def quotation_detail(request, pk):
@@ -1989,9 +1760,11 @@ def quotation_detail(request, pk):
         },
     )
 
+
 # ============================================================
 # PAYMENTS
 # ============================================================
+
 
 @admin_required
 def payments(request):
@@ -2024,6 +1797,7 @@ def payments(request):
 # ============================================================
 # PAYMENT VERIFICATION
 # ============================================================
+
 
 @admin_required
 def payment_verify(request, payment_id):
@@ -2064,9 +1838,7 @@ def payment_verify(request, payment_id):
 
     elif consultation:
 
-        client_name = str(
-            consultation
-        )
+        client_name = str(consultation)
 
     if request.method == "POST":
 
@@ -2076,19 +1848,12 @@ def payment_verify(request, payment_id):
         )
 
     context = {
-
         "payment": payment,
-
         "quotation": quotation,
-
         "homecare_request": homecare_request,
-
         "consultation": consultation,
-
         "client_name": client_name,
-
         "site_settings": SiteSettings.load(),
-
     }
 
     return render(
@@ -2101,6 +1866,7 @@ def payment_verify(request, payment_id):
 # ============================================================
 # PAYMENT DETAIL
 # ============================================================
+
 
 @admin_required
 def payment_detail(request, pk):
@@ -2129,6 +1895,7 @@ def payment_detail(request, pk):
 # CAREGIVER DAILY REPORTS
 # ============================================================
 
+
 @admin_required
 def caregiver_daily_reports(request):
 
@@ -2142,47 +1909,29 @@ def caregiver_daily_reports(request):
         "",
     ).strip()
 
-    reports_queryset = (
-        CaregiverDailyReport.objects
-        .select_related(
-            "assignment",
-            "assignment__caregiver",
-            "assignment__homecare_request",
-            "reviewed_by",
-        )
-        .order_by(
-            "-report_date",
-            "-submitted_at",
-        )
+    reports_queryset = CaregiverDailyReport.objects.select_related(
+        "assignment",
+        "assignment__caregiver",
+        "assignment__homecare_request",
+        "reviewed_by",
+    ).order_by(
+        "-report_date",
+        "-submitted_at",
     )
 
     if search:
 
         reports_queryset = reports_queryset.filter(
-            Q(
-                assignment__caregiver__name__icontains=search
-            )
-            |
-            Q(
-                assignment__caregiver__user__first_name__icontains=search
-            )
-            |
-            Q(
-                assignment__caregiver__user__last_name__icontains=search
-            )
+            Q(assignment__caregiver__name__icontains=search)
+            | Q(assignment__caregiver__user__first_name__icontains=search)
+            | Q(assignment__caregiver__user__last_name__icontains=search)
         )
 
     if condition:
 
-        reports_queryset = reports_queryset.filter(
-            patient_condition=condition
-        )
+        reports_queryset = reports_queryset.filter(patient_condition=condition)
 
-    condition_field = (
-        CaregiverDailyReport._meta.get_field(
-            "patient_condition"
-        )
-    )
+    condition_field = CaregiverDailyReport._meta.get_field("patient_condition")
 
     condition_choices = condition_field.choices
 
@@ -2191,13 +1940,9 @@ def caregiver_daily_reports(request):
         "staff/reports.html",
         {
             "reports": reports_queryset,
-
             "condition": condition,
-
             "search": search,
-
             "condition_choices": condition_choices,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2207,14 +1952,13 @@ def caregiver_daily_reports(request):
 # ADD CAREGIVER DAILY REPORT
 # ============================================================
 
+
 @admin_required
 def caregiver_daily_report_add(request):
 
     if request.method == "POST":
 
-        form = CaregiverDailyReportForm(
-            request.POST
-        )
+        form = CaregiverDailyReportForm(request.POST)
 
         if form.is_valid():
 
@@ -2225,9 +1969,7 @@ def caregiver_daily_report_add(request):
                 "Caregiver daily report created successfully.",
             )
 
-            return redirect(
-                "staff:reports"
-            )
+            return redirect("staff:reports")
 
     else:
 
@@ -2238,9 +1980,7 @@ def caregiver_daily_report_add(request):
         "staff/caregiver_daily_report_form.html",
         {
             "form": form,
-
             "title": "Add Caregiver Daily Report",
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2249,6 +1989,7 @@ def caregiver_daily_report_add(request):
 # ============================================================
 # EDIT CAREGIVER DAILY REPORT
 # ============================================================
+
 
 @admin_required
 def caregiver_daily_report_edit(request, pk):
@@ -2274,9 +2015,7 @@ def caregiver_daily_report_edit(request, pk):
                 "Caregiver daily report updated successfully.",
             )
 
-            return redirect(
-                "staff:reports"
-            )
+            return redirect("staff:reports")
 
     else:
 
@@ -2289,11 +2028,8 @@ def caregiver_daily_report_edit(request, pk):
         "staff/caregiver_daily_report_form.html",
         {
             "form": form,
-
             "title": "Edit Caregiver Daily Report",
-
             "report": report,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2302,6 +2038,7 @@ def caregiver_daily_report_edit(request, pk):
 # ============================================================
 # DELETE CAREGIVER DAILY REPORT
 # ============================================================
+
 
 @admin_required
 def caregiver_daily_report_delete(request, pk):
@@ -2320,16 +2057,13 @@ def caregiver_daily_report_delete(request, pk):
             "Caregiver daily report deleted successfully.",
         )
 
-        return redirect(
-            "staff:reports"
-        )
+        return redirect("staff:reports")
 
     return render(
         request,
         "staff/caregiver_daily_report_confirm_delete.html",
         {
             "report": report,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2338,6 +2072,7 @@ def caregiver_daily_report_delete(request, pk):
 # ============================================================
 # CAREGIVER PAYMENTS
 # ============================================================
+
 
 @admin_required
 def caregiver_payments(request):
@@ -2352,49 +2087,26 @@ def caregiver_payments(request):
         "",
     ).strip()
 
-    payments_queryset = (
-        CaregiverPayment.objects
-        .select_related(
-            "caregiver",
-            "assignment",
-            "assignment__homecare_request",
-        )
-        .order_by(
-            "-created_at"
-        )
-    )
+    payments_queryset = CaregiverPayment.objects.select_related(
+        "caregiver",
+        "assignment",
+        "assignment__homecare_request",
+    ).order_by("-created_at")
 
     if search:
 
         payments_queryset = payments_queryset.filter(
-            Q(
-                caregiver__name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__first_name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__last_name__icontains=search
-            )
-            |
-            Q(
-                caregiver__user__email__icontains=search
-            )
+            Q(caregiver__name__icontains=search)
+            | Q(caregiver__user__first_name__icontains=search)
+            | Q(caregiver__user__last_name__icontains=search)
+            | Q(caregiver__user__email__icontains=search)
         )
 
     if current_status:
 
-        payments_queryset = payments_queryset.filter(
-            status=current_status
-        )
+        payments_queryset = payments_queryset.filter(status=current_status)
 
-    status_field = (
-        CaregiverPayment._meta.get_field(
-            "status"
-        )
-    )
+    status_field = CaregiverPayment._meta.get_field("status")
 
     status_choices = status_field.choices
 
@@ -2403,13 +2115,9 @@ def caregiver_payments(request):
         "staff/caregiver_payments.html",
         {
             "payments": payments_queryset,
-
             "current_status": current_status,
-
             "search": search,
-
             "status_choices": status_choices,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2419,14 +2127,13 @@ def caregiver_payments(request):
 # ADD CAREGIVER PAYMENT
 # ============================================================
 
+
 @admin_required
 def caregiver_payment_add(request):
 
     if request.method == "POST":
 
-        form = CaregiverPaymentForm(
-            request.POST
-        )
+        form = CaregiverPaymentForm(request.POST)
 
         if form.is_valid():
 
@@ -2437,9 +2144,7 @@ def caregiver_payment_add(request):
                 "Caregiver payment created successfully.",
             )
 
-            return redirect(
-                "staff:caregiver_payments"
-            )
+            return redirect("staff:caregiver_payments")
 
     else:
 
@@ -2450,9 +2155,7 @@ def caregiver_payment_add(request):
         "staff/caregiver_payment_form.html",
         {
             "form": form,
-
             "title": "Add Caregiver Payment",
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2461,6 +2164,7 @@ def caregiver_payment_add(request):
 # ============================================================
 # EDIT CAREGIVER PAYMENT
 # ============================================================
+
 
 @admin_required
 def caregiver_payment_edit(request, pk):
@@ -2486,9 +2190,7 @@ def caregiver_payment_edit(request, pk):
                 "Caregiver payment updated successfully.",
             )
 
-            return redirect(
-                "staff:caregiver_payments"
-            )
+            return redirect("staff:caregiver_payments")
 
     else:
 
@@ -2501,11 +2203,8 @@ def caregiver_payment_edit(request, pk):
         "staff/caregiver_payment_form.html",
         {
             "form": form,
-
             "title": "Edit Caregiver Payment",
-
             "payment": payment,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2514,6 +2213,7 @@ def caregiver_payment_edit(request, pk):
 # ============================================================
 # DELETE CAREGIVER PAYMENT
 # ============================================================
+
 
 @admin_required
 def caregiver_payment_delete(request, pk):
@@ -2532,16 +2232,13 @@ def caregiver_payment_delete(request, pk):
             "Caregiver payment deleted successfully.",
         )
 
-        return redirect(
-            "staff:caregiver_payments"
-        )
+        return redirect("staff:caregiver_payments")
 
     return render(
         request,
         "staff/caregiver_payment_confirm_delete.html",
         {
             "payment": payment,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2550,6 +2247,7 @@ def caregiver_payment_delete(request, pk):
 # ============================================================
 # SERVICES
 # ============================================================
+
 
 @admin_required
 def services(request):
@@ -2570,8 +2268,7 @@ def services(request):
     ).strip()
 
     services_queryset = (
-        Service.objects
-        .select_related("category")
+        Service.objects.select_related("category")
         .all()
         .order_by(
             "order",
@@ -2583,39 +2280,26 @@ def services(request):
 
         services_queryset = services_queryset.filter(
             Q(name__icontains=search)
-            |
-            Q(category__name__icontains=search)
-            |
-            Q(short_description__icontains=search)
-            |
-            Q(description__icontains=search)
+            | Q(category__name__icontains=search)
+            | Q(short_description__icontains=search)
+            | Q(description__icontains=search)
         )
 
     if category:
 
-        services_queryset = services_queryset.filter(
-            category_id=category
-        )
+        services_queryset = services_queryset.filter(category_id=category)
 
     if active == "yes":
 
-        services_queryset = services_queryset.filter(
-            is_active=True
-        )
+        services_queryset = services_queryset.filter(is_active=True)
 
     elif active == "no":
 
-        services_queryset = services_queryset.filter(
-            is_active=False
-        )
+        services_queryset = services_queryset.filter(is_active=False)
 
-    categories = (
-        ServiceCategory.objects
-        .all()
-        .order_by(
-            "order",
-            "name",
-        )
+    categories = ServiceCategory.objects.all().order_by(
+        "order",
+        "name",
     )
 
     if request.method == "POST":
@@ -2625,9 +2309,7 @@ def services(request):
             "",
         )
 
-        selected_ids = request.POST.getlist(
-            "selected_services"
-        )
+        selected_ids = request.POST.getlist("selected_services")
 
         if not selected_ids:
 
@@ -2636,19 +2318,13 @@ def services(request):
                 "Please select at least one service.",
             )
 
-            return redirect(
-                "staff:services"
-            )
+            return redirect("staff:services")
 
-        selected_services = Service.objects.filter(
-            id__in=selected_ids
-        )
+        selected_services = Service.objects.filter(id__in=selected_ids)
 
         if action == "activate":
 
-            updated = selected_services.update(
-                is_active=True
-            )
+            updated = selected_services.update(is_active=True)
 
             messages.success(
                 request,
@@ -2657,9 +2333,7 @@ def services(request):
 
         elif action == "deactivate":
 
-            updated = selected_services.update(
-                is_active=False
-            )
+            updated = selected_services.update(is_active=False)
 
             messages.success(
                 request,
@@ -2684,47 +2358,36 @@ def services(request):
                 "Please select a valid action.",
             )
 
-        return redirect(
-            "staff:services"
-        )
+        return redirect("staff:services")
 
     return render(
         request,
         "staff/services.html",
         {
             "services": services_queryset,
-
             "categories": categories,
-
             "search": search,
-
             "current_category": category,
-
             "current_active": active,
-
             "site_settings": SiteSettings.load(),
         },
     )
-
 
 
 # ============================================================
 # ADD SERVICE
 # ============================================================
 
+
 @admin_required
 def service_add(request):
 
-    categories = ServiceCategory.objects.all().order_by(
-        "order", "name"
-    )
+    categories = ServiceCategory.objects.all().order_by("order", "name")
 
     if request.method == "POST":
 
         post_data = request.POST.copy()
-        new_category_name = post_data.get(
-            "new_category", ""
-        ).strip()
+        new_category_name = post_data.get("new_category", "").strip()
 
         created_category = None
 
@@ -2737,9 +2400,7 @@ def service_add(request):
             ).first()
 
             if category is None:
-                category = ServiceCategory.objects.create(
-                    name=new_category_name
-                )
+                category = ServiceCategory.objects.create(name=new_category_name)
                 created_category = category
 
             post_data["category"] = str(category.pk)
@@ -2787,15 +2448,11 @@ def service_add(request):
 
         if created_category:
 
-            if not Service.objects.filter(
-                category=created_category
-            ).exists():
+            if not Service.objects.filter(category=created_category).exists():
 
                 created_category.delete()
 
-        categories = ServiceCategory.objects.all().order_by(
-            "order", "name"
-        )
+        categories = ServiceCategory.objects.all().order_by("order", "name")
 
     else:
 
@@ -2811,9 +2468,12 @@ def service_add(request):
             "site_settings": SiteSettings.load(),
         },
     )
+
+
 # ============================================================
 # EDIT SERVICE
 # ============================================================
+
 
 @admin_required
 def service_edit(request, pk):
@@ -2828,16 +2488,12 @@ def service_edit(request, pk):
 
         if new_category_name:
             new_category_name = new_category_name[:150]
-            category = (
-                ServiceCategory.objects
-                .filter(name__iexact=new_category_name)
-                .first()
-            )
+            category = ServiceCategory.objects.filter(
+                name__iexact=new_category_name
+            ).first()
 
             if category is None:
-                category = ServiceCategory.objects.create(
-                    name=new_category_name
-                )
+                category = ServiceCategory.objects.create(name=new_category_name)
                 created_category = category
 
             post_data["category"] = str(category.pk)
@@ -2865,9 +2521,10 @@ def service_edit(request, pk):
 
         # Remove a newly created category if validation failed and
         # no service uses it.
-        if created_category and not Service.objects.filter(
-            category=created_category
-        ).exists():
+        if (
+            created_category
+            and not Service.objects.filter(category=created_category).exists()
+        ):
             created_category.delete()
 
         # Refresh the category list so a newly created category that
@@ -2894,6 +2551,7 @@ def service_edit(request, pk):
 # DELETE SERVICE
 # ============================================================
 
+
 @admin_required
 def service_delete(request, pk):
 
@@ -2913,16 +2571,13 @@ def service_delete(request, pk):
             f'"{service_name}" has been deleted successfully.',
         )
 
-        return redirect(
-            "staff:services"
-        )
+        return redirect("staff:services")
 
     return render(
         request,
         "staff/service_confirm_delete.html",
         {
             "service": service,
-
             "site_settings": SiteSettings.load(),
         },
     )
@@ -2931,6 +2586,7 @@ def service_delete(request, pk):
 # ============================================================
 # STAFF SETTINGS
 # ============================================================
+
 
 @admin_required
 def settings(request):
@@ -2954,9 +2610,7 @@ def settings(request):
                 "Site settings have been updated successfully.",
             )
 
-            return redirect(
-                "staff:settings"
-            )
+            return redirect("staff:settings")
 
     else:
 
@@ -2969,39 +2623,34 @@ def settings(request):
         "staff/settings.html",
         {
             "form": form,
-
             "settings": site_settings,
-
             "site_settings": site_settings,
         },
     )
+
+
 # ============================================================
 # ADD CAREGIVER
 # ============================================================
+
 
 @admin_required
 @require_http_methods(["GET", "POST"])
 def caregiver_add(request):
 
-    form = StaffCaregiverInviteForm(
-        request.POST or None
-    )
+    form = StaffCaregiverInviteForm(request.POST or None)
 
     if request.method == "POST":
 
         if form.is_valid():
 
-            email = form.cleaned_data[
-                "email"
-            ].strip().lower()
+            email = form.cleaned_data["email"].strip().lower()
 
             # -------------------------------------------------
             # CHECK EXISTING USER
             # -------------------------------------------------
 
-            existing_user = User.objects.filter(
-                email__iexact=email
-            ).first()
+            existing_user = User.objects.filter(email__iexact=email).first()
 
             if existing_user:
 
@@ -3025,18 +2674,13 @@ def caregiver_add(request):
             # CHECK EXISTING CAREGIVER
             # -------------------------------------------------
 
-            existing_caregiver = Caregiver.objects.filter(
-                email__iexact=email
-            ).first()
+            existing_caregiver = Caregiver.objects.filter(email__iexact=email).first()
 
             if existing_caregiver:
 
                 messages.error(
                     request,
-                    (
-                        "A caregiver profile already exists "
-                        f"for {email}."
-                    ),
+                    ("A caregiver profile already exists " f"for {email}."),
                 )
 
                 return render(
@@ -3068,21 +2712,14 @@ def caregiver_add(request):
                 # generate a unique internal username.
                 if hasattr(user, "username"):
 
-                    username_base = (
-                        email.split("@")[0]
-                    )
+                    username_base = email.split("@")[0]
 
                     username = username_base
                     counter = 1
 
-                    while User.objects.filter(
-                        username=username
-                    ).exists():
+                    while User.objects.filter(username=username).exists():
 
-                        username = (
-                            f"{username_base}"
-                            f"{counter}"
-                        )
+                        username = f"{username_base}" f"{counter}"
 
                         counter += 1
 
@@ -3094,23 +2731,17 @@ def caregiver_add(request):
                 # CREATE CAREGIVER PROFILE
                 # -------------------------------------------------
 
-                caregiver = form.save(
-                    commit=False
-                )
+                caregiver = form.save(commit=False)
 
                 caregiver.user = user
 
-                caregiver.name = (
-                    form.cleaned_data["name"]
-                )
+                caregiver.name = form.cleaned_data["name"]
 
                 caregiver.email = email
 
                 caregiver.is_active = False
 
-                caregiver.verification_status = (
-                    Caregiver.VerificationStatus.PENDING
-                )
+                caregiver.verification_status = Caregiver.VerificationStatus.PENDING
 
                 caregiver.save()
 
@@ -3121,9 +2752,7 @@ def caregiver_add(request):
                 CaregiverInvitation.objects.filter(
                     caregiver=caregiver,
                     used_at__isnull=True,
-                ).update(
-                    used_at=timezone.now()
-                )
+                ).update(used_at=timezone.now())
 
                 # -------------------------------------------------
                 # GENERATE SECURE TOKEN
@@ -3135,10 +2764,7 @@ def caregiver_add(request):
                     caregiver=caregiver,
                     email=email,
                     token=token,
-                    expires_at=(
-                        timezone.now()
-                        + timedelta(days=3)
-                    ),
+                    expires_at=(timezone.now() + timedelta(days=3)),
                     created_by=request.user,
                 )
 
@@ -3161,9 +2787,7 @@ def caregiver_add(request):
 
             business_name = "Hands-On Health"
 
-            subject = (
-                f"{business_name} Caregiver Registration Invitation"
-            )
+            subject = f"{business_name} Caregiver Registration Invitation"
 
             message = f"""
 Hello {caregiver.name},
@@ -3205,9 +2829,7 @@ Kind regards,
                     "DEFAULT_FROM_EMAIL",
                     None,
                 ),
-                recipient_list=[
-                    email
-                ],
+                recipient_list=[email],
                 fail_silently=False,
             )
 
@@ -3219,9 +2841,7 @@ Kind regards,
                 ),
             )
 
-            return redirect(
-                "staff:caregivers"
-            )
+            return redirect("staff:caregivers")
 
     return render(
         request,
@@ -3236,6 +2856,7 @@ Kind regards,
 # RESEND CAREGIVER REGISTRATION INVITATION
 # ============================================================
 
+
 @admin_required
 @require_http_methods(["POST"])
 def caregiver_send_invitation(request, pk):
@@ -3244,10 +2865,7 @@ def caregiver_send_invitation(request, pk):
         pk=pk,
     )
 
-    if (
-        caregiver.verification_status
-        != Caregiver.VerificationStatus.PENDING
-    ):
+    if caregiver.verification_status != Caregiver.VerificationStatus.PENDING:
         messages.warning(
             request,
             "Invitations can only be resent to pending caregivers.",
@@ -3262,10 +2880,14 @@ def caregiver_send_invitation(request, pk):
         return redirect("staff:caregiver_verify", pk=caregiver.pk)
 
     email = (
-        getattr(caregiver, "email", None)
-        or getattr(caregiver.user, "email", None)
-        or ""
-    ).strip().lower()
+        (
+            getattr(caregiver, "email", None)
+            or getattr(caregiver.user, "email", None)
+            or ""
+        )
+        .strip()
+        .lower()
+    )
 
     if not email:
         messages.error(
@@ -3284,8 +2906,7 @@ def caregiver_send_invitation(request, pk):
     now = timezone.now()
 
     active_invitation = (
-        CaregiverInvitation.objects
-        .filter(
+        CaregiverInvitation.objects.filter(
             caregiver=caregiver,
             used_at__isnull=True,
             expires_at__gt=now,
@@ -3387,9 +3008,7 @@ def ask_question(request):
         valid_topics = {
             item["value"]
             for item in page.topics
-            if isinstance(item, dict)
-            and item.get("value")
-            and item.get("label")
+            if isinstance(item, dict) and item.get("value") and item.get("label")
         }
 
         if not all([name, email, phone, question]):
@@ -3424,9 +3043,11 @@ def ask_question(request):
         {"question_page": page},
     )
 
+
 # ============================================================
 # CUSTOMER QUESTIONS DASHBOARD
 # ============================================================
+
 
 @admin_required
 def questions_dashboard_view(request):
@@ -3435,9 +3056,7 @@ def questions_dashboard_view(request):
         status=CustomerQuestion.Status.NEW
     ).count()
 
-    active_faqs_count = FAQItem.objects.filter(
-        is_active=True
-    ).count()
+    active_faqs_count = FAQItem.objects.filter(is_active=True).count()
 
     context = {
         "new_count": new_count,
@@ -3450,6 +3069,8 @@ def questions_dashboard_view(request):
         "staff/questions/faqdashboard.html",
         context,
     )
+
+
 @admin_required
 def question_inbox(request):
     questions = CustomerQuestion.objects.all()
@@ -3457,9 +3078,7 @@ def question_inbox(request):
     status = request.GET.get("status", "").strip()
     search = request.GET.get("q", "").strip()
 
-    valid_statuses = {
-        choice[0] for choice in CustomerQuestion.Status.choices
-    }
+    valid_statuses = {choice[0] for choice in CustomerQuestion.Status.choices}
 
     if status in valid_statuses:
         questions = questions.filter(status=status)
@@ -3563,14 +3182,9 @@ def question_reply(request, question_id):
                 )
 
                 email = EmailMultiAlternatives(
-                    subject=(
-                        "Your Question Has Been Answered | Hands-On Health"
-                    ),
+                    subject=("Your Question Has Been Answered | Hands-On Health"),
                     body=text_content,
-                    from_email=(
-                        getattr(settings, "DEFAULT_FROM_EMAIL", None)
-                        or None
-                    ),
+                    from_email=(getattr(settings, "DEFAULT_FROM_EMAIL", None) or None),
                     to=[question.email],
                 )
 
@@ -3626,6 +3240,7 @@ def question_reply(request, question_id):
         {"question": question},
     )
 
+
 @admin_required
 def faq_list(request):
     """List and search FAQs in the staff dashboard."""
@@ -3634,22 +3249,25 @@ def faq_list(request):
     search = request.GET.get("q", "").strip()
     if search:
         from django.db.models import Q
-        faqs = faqs.filter(
-            Q(question__icontains=search) |
-            Q(answer__icontains=search)
-        )
 
-    return render(request, "staff/questions/faq_list.html", {
-        "faqs": faqs,
-        "search": search,
-        "total_faqs": FAQItem.objects.count(),
-        "active_faqs": FAQItem.objects.filter(is_active=True).count(),
-    })
+        faqs = faqs.filter(Q(question__icontains=search) | Q(answer__icontains=search))
+
+    return render(
+        request,
+        "staff/questions/faq_list.html",
+        {
+            "faqs": faqs,
+            "search": search,
+            "total_faqs": FAQItem.objects.count(),
+            "active_faqs": FAQItem.objects.filter(is_active=True).count(),
+        },
+    )
 
 
 # ============================================================
 # CREATE FAQ
 # ============================================================
+
 
 @admin_required
 @require_http_methods(["GET", "POST"])
@@ -3658,28 +3276,22 @@ def faq_create(request):
 
     if request.method == "POST":
 
-        question = request.POST.get(
-            "question", ""
-        ).strip()
+        question = request.POST.get("question", "").strip()
 
-        answer = request.POST.get(
-            "answer", ""
-        ).strip()
+        answer = request.POST.get("answer", "").strip()
 
-        display_order = request.POST.get(
-            "display_order", "0"
-        ).strip()
+        display_order = request.POST.get("display_order", "0").strip()
 
-        is_active = request.POST.get(
-            "is_active", ""
-        ).strip().lower() in ("on", "true", "1", "yes")
+        is_active = request.POST.get("is_active", "").strip().lower() in (
+            "on",
+            "true",
+            "1",
+            "yes",
+        )
 
         if not question or not answer:
 
-            messages.error(
-                request,
-                "Enter both a question and its answer."
-            )
+            messages.error(request, "Enter both a question and its answer.")
 
         else:
 
@@ -3692,8 +3304,7 @@ def faq_create(request):
             except ValueError:
 
                 messages.error(
-                    request,
-                    "Display order must be zero or a positive number."
+                    request, "Display order must be zero or a positive number."
                 )
 
             else:
@@ -3705,10 +3316,7 @@ def faq_create(request):
                     is_active=is_active,
                 )
 
-                messages.success(
-                    request,
-                    f'FAQ "{faq.question}" added successfully.'
-                )
+                messages.success(request, f'FAQ "{faq.question}" added successfully.')
 
                 return redirect("staff:faq_list")
 
@@ -3721,9 +3329,12 @@ def faq_create(request):
             "site_settings": SiteSettings.load(),
         },
     )
+
+
 # ============================================================
 # EDIT FAQ
 # ============================================================
+
 
 @admin_required
 @require_http_methods(["GET", "POST"])
@@ -3737,28 +3348,22 @@ def faq_edit(request, pk):
 
     if request.method == "POST":
 
-        question = request.POST.get(
-            "question", ""
-        ).strip()
+        question = request.POST.get("question", "").strip()
 
-        answer = request.POST.get(
-            "answer", ""
-        ).strip()
+        answer = request.POST.get("answer", "").strip()
 
-        display_order = request.POST.get(
-            "display_order", "0"
-        ).strip()
+        display_order = request.POST.get("display_order", "0").strip()
 
-        is_active = request.POST.get(
-            "is_active", ""
-        ).strip().lower() in ("on", "true", "1", "yes")
+        is_active = request.POST.get("is_active", "").strip().lower() in (
+            "on",
+            "true",
+            "1",
+            "yes",
+        )
 
         if not question or not answer:
 
-            messages.error(
-                request,
-                "Enter both a question and its answer."
-            )
+            messages.error(request, "Enter both a question and its answer.")
 
         else:
 
@@ -3771,8 +3376,7 @@ def faq_edit(request, pk):
             except ValueError:
 
                 messages.error(
-                    request,
-                    "Display order must be zero or a positive number."
+                    request, "Display order must be zero or a positive number."
                 )
 
             else:
@@ -3784,10 +3388,7 @@ def faq_edit(request, pk):
 
                 faq.save()
 
-                messages.success(
-                    request,
-                    f'FAQ "{faq.question}" updated successfully.'
-                )
+                messages.success(request, f'FAQ "{faq.question}" updated successfully.')
 
                 return redirect("staff:faq_list")
 
@@ -3801,6 +3402,7 @@ def faq_edit(request, pk):
         },
     )
 
+
 @admin_required
 def faq_delete(request, pk):
     """Delete an FAQ after a confirmation."""
@@ -3811,18 +3413,20 @@ def faq_delete(request, pk):
         messages.success(request, "FAQ deleted successfully.")
         return redirect("staff:faq_list")
 
-    return render(request, "staff/questions/faq_delete.html", {
-        "faq": faq,
-    })
+    return render(
+        request,
+        "staff/questions/faq_delete.html",
+        {
+            "faq": faq,
+        },
+    )
 
 
 @admin_required
 def contact_enquiries(request):
     """Display public website contact submissions."""
 
-    enquiries = ContactEnquiry.objects.select_related(
-        "service"
-    ).order_by("-created_at")
+    enquiries = ContactEnquiry.objects.select_related("service").order_by("-created_at")
 
     return render(
         request,
@@ -3831,6 +3435,7 @@ def contact_enquiries(request):
             "enquiries": enquiries,
         },
     )
+
 
 @admin_required
 @require_http_methods(["GET", "POST"])
@@ -3994,7 +3599,7 @@ def _send_configured_staff_alert(subject, description, dashboard_url_name, recor
     """Queue an alert for SiteSettings.notification_emails ONLY."""
     try:
         site = SiteSettings.load()
-        raw = (getattr(site, "notification_emails", "") or "")
+        raw = getattr(site, "notification_emails", "") or ""
         recipients = []
         seen = set()
         for candidate in _notification_re.split(r"[,;\n]+", raw):
@@ -4011,15 +3616,18 @@ def _send_configured_staff_alert(subject, description, dashboard_url_name, recor
 
         # Intentionally no fallback to SiteSettings.email.
         if not recipients:
-            logger.info("Staff activity alert skipped: no notification emails configured.")
+            logger.info(
+                "Staff activity alert skipped: no notification emails configured."
+            )
             return
 
-        base_url = (
-            (getattr(site, "website", "") or "").strip().rstrip("/")
-            or (getattr(_notification_django_settings, "SITE_URL", "") or "").strip().rstrip("/")
-        )
+        base_url = (getattr(site, "website", "") or "").strip().rstrip("/") or (
+            getattr(_notification_django_settings, "SITE_URL", "") or ""
+        ).strip().rstrip("/")
         if not base_url or not base_url.startswith(("https://", "http://")):
-            logger.warning("Staff alert skipped: set SiteSettings.website or SITE_URL to an absolute URL.")
+            logger.warning(
+                "Staff alert skipped: set SiteSettings.website or SITE_URL to an absolute URL."
+            )
             return
 
         path = reverse(dashboard_url_name)
@@ -4234,7 +3842,8 @@ def _staff_homecare_created(sender, instance, created, **kwargs):
         _send_configured_staff_alert(
             "New Home Care Request",
             "A new home care request has been submitted.",
-            "staff:homecare_requests", instance.pk,
+            "staff:homecare_requests",
+            instance.pk,
         )
 
 
@@ -4243,7 +3852,8 @@ def _staff_appointment_created(sender, instance, created, **kwargs):
         _send_configured_staff_alert(
             "New Appointment / Consultation",
             "A new appointment or consultation has been submitted.",
-            "staff:appointments", instance.pk,
+            "staff:appointments",
+            instance.pk,
         )
 
 
@@ -4252,7 +3862,8 @@ def _staff_referral_created(sender, instance, created, **kwargs):
         _send_configured_staff_alert(
             "New Patient Referral",
             "A new patient referral has been submitted.",
-            "staff:referrals", instance.pk,
+            "staff:referrals",
+            instance.pk,
         )
 
 
@@ -4261,7 +3872,8 @@ def _staff_payment_created(sender, instance, created, **kwargs):
         _send_configured_staff_alert(
             "New Payment Record",
             "A new payment record has been created. Review its verification status.",
-            "staff:payments", instance.pk,
+            "staff:payments",
+            instance.pk,
         )
 
 
@@ -4270,8 +3882,10 @@ def _staff_question_created(sender, instance, created, **kwargs):
         _send_configured_staff_alert(
             "New Customer FAQ Question",
             "A customer has submitted a new FAQ question.",
-            "staff:question_inbox", instance.pk,
+            "staff:question_inbox",
+            instance.pk,
         )
+
 
 def _staff_contact_enquiry_created(sender, instance, created, **kwargs):
     if created:
@@ -4284,24 +3898,34 @@ def _staff_contact_enquiry_created(sender, instance, created, **kwargs):
 
 
 _notification_post_save.connect(
-    _staff_homecare_created, sender=HomeCareRequest,
-    dispatch_uid="staff_alert_homecare_created_v1", weak=False,
+    _staff_homecare_created,
+    sender=HomeCareRequest,
+    dispatch_uid="staff_alert_homecare_created_v1",
+    weak=False,
 )
 _notification_post_save.connect(
-    _staff_appointment_created, sender=Consultation,
-    dispatch_uid="staff_alert_appointment_created_v1", weak=False,
+    _staff_appointment_created,
+    sender=Consultation,
+    dispatch_uid="staff_alert_appointment_created_v1",
+    weak=False,
 )
 _notification_post_save.connect(
-    _staff_referral_created, sender=Referral,
-    dispatch_uid="staff_alert_referral_created_v1", weak=False,
+    _staff_referral_created,
+    sender=Referral,
+    dispatch_uid="staff_alert_referral_created_v1",
+    weak=False,
 )
 _notification_post_save.connect(
-    _staff_payment_created, sender=Payment,
-    dispatch_uid="staff_alert_payment_created_v1", weak=False,
+    _staff_payment_created,
+    sender=Payment,
+    dispatch_uid="staff_alert_payment_created_v1",
+    weak=False,
 )
 _notification_post_save.connect(
-    _staff_question_created, sender=CustomerQuestion,
-    dispatch_uid="staff_alert_question_created_v1", weak=False,
+    _staff_question_created,
+    sender=CustomerQuestion,
+    dispatch_uid="staff_alert_question_created_v1",
+    weak=False,
 )
 
 _notification_post_save.connect(
@@ -4382,6 +4006,7 @@ def testimonial_moderate(request, pk):
         messages.error(request, "Please select a valid moderation action.")
 
     return redirect("staff:testimonials")
+
 
 @admin_required
 def about_us_edit(request):
@@ -4482,6 +4107,7 @@ def hero_slides(request):
 def hero_slide_edit(request, position):
     if position not in (1, 2, 3):
         from django.http import Http404
+
         raise Http404("Hero slide not found.")
 
     slide, created = HeroSlide.objects.get_or_create(
@@ -4520,4 +4146,3 @@ def hero_slide_edit(request, position):
             "site_settings": SiteSettings.load(),
         },
     )
-
