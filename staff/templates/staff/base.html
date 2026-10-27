@@ -181,6 +181,25 @@
                     </span>
                     <span>Testimonials</span>
                 </a>
+                <a href="{% url 'staff:about_us_edit' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'about_us_edit' %}active{% endif %}" title="About Us">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-info-circle"></i>
+                    </span>
+                    <span>About Us</span>
+                </a>
+            <!-- Hero Section Management -->
+            <a href="{% url 'staff:hero_slides' %}"
+                class="nav-item {% if 'hero_slide' in request.resolver_match.url_name or request.resolver_match.url_name == 'hero_slides' %}active{% endif %}"
+                title="Manage Home Page Hero Slides">
+            
+                <span class="nav-icon">
+                    <i class="fa-solid fa-images"></i>
+                </span>
+            
+                <span>Hero Section</span>
+            </a>
+
                 <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' or request.resolver_match.url_name == 'caregiver_payment_delete' %}active{% endif %}"

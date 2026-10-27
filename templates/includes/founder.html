@@ -1,0 +1,107 @@
+{% load static %}
+
+<!-- Founder & Director Section Start -->
+{% if founder %}
+<section class="founder-section padding-top-80 padding-bottom-80">
+    <div class="container">
+        <div class="founder-card-wrapper">
+            <div class="row style-2" style="display: flex; align-items: center; flex-wrap: wrap;">
+
+                <!-- Founder Photo Column -->
+                <div class="col-md-5 col-sm-12 margin-bottom-30">
+                    <div class="founder-image-container">
+
+                        {% if founder.photo %}
+                        <img src="{{ founder.photo.url }}" alt="{{ founder.name }} - {{ founder.position }}"
+                            class="img-responsive founder-img" loading="lazy">
+                        {% else %}
+                        <img src="{% static 'img/jacobine.jpeg' %}" alt="{{ founder.name }} - {{ founder.position }}"
+                            class="img-responsive founder-img" loading="lazy">
+                        {% endif %}
+
+                        {% if founder.qualification %}
+                        <div class="founder-badge">
+                            <i class="fa-solid fa-user-nurse"></i>
+                            <span>{{ founder.qualification }}</span>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Founder Narrative Column -->
+                <div class="col-md-7 col-sm-12">
+                    <div class="founder-content">
+
+                        <span class="sub-title-badge sky-badge">
+                            Leadership
+                        </span>
+
+                        <h2 class="founder-title">
+                            {{ founder.position|default:"CEO & DIRECTOR" }}
+                        </h2>
+
+                        <h3 class="founder-name">
+                            {{ founder.name|default:"Jacobine Joseph" }}
+                        </h3>
+
+                        <div class="founder-divider"></div>
+
+                        <!-- Founder Biography Paragraph 1 -->
+                        {% if founder.biography_1 %}
+                        <p class="founder-bio lead-p">
+                            {{ founder.biography_1|linebreaksbr }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Founder Biography Paragraph 2 -->
+                        {% if founder.biography_2 %}
+                        <p class="founder-bio">
+                            {{ founder.biography_2|linebreaksbr }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Founder Biography Paragraph 3 -->
+                        {% if founder.biography_3 %}
+                        <p class="founder-bio">
+                            {{ founder.biography_3|linebreaksbr }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Key Pillars Grid -->
+                        <div class="founder-pillars">
+
+                            {% if founder.pillar_1 %}
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-hand-holding-heart"></i>
+                                <span>{{ founder.pillar_1 }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if founder.pillar_2 %}
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>{{ founder.pillar_2 }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if founder.pillar_3 %}
+                            <div class="pillar-item">
+                                <i class="fa-solid fa-house-medical"></i>
+                                <span>{{ founder.pillar_3 }}</span>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                        <!-- Key Pillars Grid End -->
+
+                    </div>
+                </div>
+                <!-- Founder Narrative Column End -->
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- Founder & Director Section End -->

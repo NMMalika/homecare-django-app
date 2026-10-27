@@ -301,4 +301,19 @@ urlpatterns = [
         views.testimonial_moderate,
         name="testimonial_moderate",
     ),
+    path(
+    "about-us/",
+    views.about_us_edit,
+    name="about_us_edit",
+),
+    path(
+    "hero-slides/",
+    views.hero_slides,
+    name="hero_slides",
+),
+path(
+    "hero-slides/<int:position>/",
+    views.hero_slide_edit,
+    name="hero_slide_edit",
+),
 ]

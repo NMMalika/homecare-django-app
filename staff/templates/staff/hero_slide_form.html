@@ -1,0 +1,436 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Edit Hero Slide {{ slide.position }} | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-form-wrapper {
+        padding: 1.5rem 0 3rem;
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    /* Back Link & Header */
+    .btn-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 1.25rem;
+        transition: color 0.2s ease;
+    }
+
+    .btn-back-link:hover {
+        color: #2563eb;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Editor Card Panels */
+    .editor-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .editor-card:hover {
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    .editor-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .editor-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+        background-color: #eff6ff;
+        color: #2563eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+    }
+
+    .editor-card-title {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .section-description {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    /* Form Inputs Styling */
+    .form-group-custom {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-form-wrapper input[type="text"],
+    .hero-form-wrapper input[type="url"],
+    .hero-form-wrapper select,
+    .hero-form-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .hero-form-wrapper textarea {
+        min-height: 120px;
+        line-height: 1.6;
+    }
+
+    .hero-form-wrapper input[type="text"]:focus,
+    .hero-form-wrapper select:focus,
+    .hero-form-wrapper textarea:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-help-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.375rem;
+    }
+
+    .field-error {
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-top: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Image Preview Container */
+    .preview-media-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .preview-media-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    .hero-preview-img {
+        display: block;
+        width: 100%;
+        max-height: 280px;
+        object-fit: cover;
+        border-radius: 0.625rem;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Toggle Card */
+    .toggle-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .toggle-label-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.125rem;
+        display: block;
+    }
+
+    .toggle-label-desc {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0;
+        display: block;
+    }
+
+    /* Actions Bar */
+    .editor-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .btn-save-primary {
+        height: 46px;
+        padding: 0 1.75rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.625rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-save-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-secondary {
+        height: 46px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-cancel-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+        .editor-actions-bar {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-save-primary,
+        .btn-cancel-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid hero-form-wrapper">
+
+    <!-- Back Navigation -->
+    <a href="{% url 'staff:hero_slides' %}" class="btn-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Hero Slider Management
+    </a>
+
+    <!-- Page Header -->
+    <div>
+        <span class="header-kicker"><i class="fa-solid fa-sliders me-1"></i> Slider Manager</span>
+        <h1 class="page-header-title">Edit Hero Slide {{ slide.position }}</h1>
+        <p class="page-header-subtitle">
+            Revise headline copy, call-to-actions, and high-resolution background imagery for your homepage.
+        </p>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3 mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Slide Content Panel -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <h2 class="editor-card-title">Slide Copy &amp; Messaging</h2>
+            </div>
+            <p class="section-description">
+                Customize the kicker tagline, primary hero title, and supporting body content.
+            </p>
+
+            <div class="form-group-custom">
+                <label for="{{ form.tagline.id_for_label }}" class="form-group-label">Kicker Tagline</label>
+                {{ form.tagline }}
+                {% if form.tagline.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.tagline.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group-custom">
+                <label for="{{ form.heading.id_for_label }}" class="form-group-label">Main Heading Title</label>
+                {{ form.heading }}
+                {% if form.heading.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.heading.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group-custom mb-0">
+                <label for="{{ form.description.id_for_label }}" class="form-group-label">Supporting Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.description.errors }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Background Image Panel -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+                <h2 class="editor-card-title">Background Banner Image</h2>
+            </div>
+            <p class="section-description">
+                Upload a wide, high-definition image designed for large viewport hero sections.
+            </p>
+
+            {% if slide.image %}
+            <div class="preview-media-box">
+                <span class="preview-media-label">Currently Published Banner</span>
+                <img class="hero-preview-img" src="{{ slide.image.url }}" alt="{{ slide.heading }}">
+            </div>
+            {% endif %}
+
+            <div class="form-group-custom mb-0">
+                <label for="{{ form.image.id_for_label }}" class="form-group-label">Upload New Banner File</label>
+                {{ form.image }}
+                <div class="form-help-text">
+                    Recommended resolution: 1920×1080px (JPG or PNG). If left blank, your current background image
+                    remains active.
+                </div>
+                {% if form.image.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.image.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Display Settings Panel -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <h2 class="editor-card-title">Visibility &amp; Publication Status</h2>
+            </div>
+            <p class="section-description">
+                Manage whether this slide is included in the live hero carousel sequence.
+            </p>
+
+            <div class="toggle-card">
+                <div>
+                    <span class="toggle-label-title">Publish Hero Slide</span>
+                    <span class="toggle-label-desc">Display this slide live on the public homepage hero slider.</span>
+                </div>
+                <div class="form-check form-switch m-0 fs-5">
+                    {{ form.is_active }}
+                </div>
+            </div>
+
+            {% if form.is_active.errors %}
+            <div class="field-error mt-2"><i class="fa-solid fa-circle-exclamation"></i> {{ form.is_active.errors }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Action Controls Bar -->
+        <div class="editor-actions-bar">
+            <a href="{% url 'staff:hero_slides' %}" class="btn-cancel-secondary">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn-save-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Save Hero Slide
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

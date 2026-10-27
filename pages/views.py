@@ -11,7 +11,8 @@ from django.db.models import Prefetch
 from services.models import Service, ServiceCategory
 from staff.models import FAQItem
 from staff.models import ContactEnquiry
-
+from leadership.models import Founder
+from hero.models import HeroSlide
 
 def public_faqs():
     """
@@ -30,19 +31,13 @@ def faq(request):
 
 def home(request):
     """
-    Public homepage.
-    Supplies active FAQs to home.html so the FAQ section
-    can display questions managed through the staff dashboard.
+    Public homepage with editable hero slides, active services,
+    and frequently asked questions.
     """
-    active_services = (
-        Service.objects
-        .filter(is_active=True)
-        .order_by("order", "name")
-    )
+    active_services = Service.objects.filter(is_active=True).order_by("order", "name")
 
     categories = (
-        ServiceCategory.objects
-        .filter(services__is_active=True)
+        ServiceCategory.objects.filter(services__is_active=True)
         .distinct()
         .prefetch_related(
             Prefetch(
@@ -53,9 +48,12 @@ def home(request):
         .order_by("order", "name")
     )
 
+    hero_slides = HeroSlide.objects.filter(is_active=True).order_by("position")
+
     context = {
         "categories": categories,
         "faqs": public_faqs(),
+        "hero_slides": hero_slides,
     }
 
     return render(request, "home.html", context)
@@ -262,5 +260,22 @@ def reviews(request):
     return render(
         request,
         "pages/reviews.html",
+        context,
+    )
+
+def about(request):
+
+    founder = Founder.objects.filter(
+        is_active=True
+    ).first()
+
+    context = {
+        "faqs": public_faqs(),
+        "founder": founder,
+    }
+
+    return render(
+        request,
+        "pages/about.html",
         context,
     )

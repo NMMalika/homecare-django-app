@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "services",
     "staff",
     "testimonials",
+    "leadership",
+    "hero",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

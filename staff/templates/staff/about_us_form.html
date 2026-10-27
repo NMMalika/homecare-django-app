@@ -1,0 +1,505 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}About Us Editor | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-editor-wrapper {
+        padding: 1.5rem 0 3rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    /* Page Header */
+    .page-header-box {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 0;
+    }
+
+    /* Section Cards */
+    .editor-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .editor-card:hover {
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    .editor-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .editor-card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 0.5rem;
+        background-color: #eff6ff;
+        color: #2563eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+    }
+
+    .editor-card-title {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .section-description {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    /* Form Fields & Typography */
+    .form-group-custom {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .about-editor-wrapper input[type="text"],
+    .about-editor-wrapper input[type="email"],
+    .about-editor-wrapper input[type="url"],
+    .about-editor-wrapper select,
+    .about-editor-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .about-editor-wrapper textarea {
+        min-height: 110px;
+        line-height: 1.6;
+    }
+
+    .about-editor-wrapper input[type="text"]:focus,
+    .about-editor-wrapper select:focus,
+    .about-editor-wrapper textarea:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* Photo Upload Component */
+    .photo-upload-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .photo-preview-container {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 0.75rem;
+        border: 2px solid #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .photo-input-group {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .field-error {
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-top: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Modern Toggle Card */
+    .toggle-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .toggle-label-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.125rem;
+        display: block;
+    }
+
+    .toggle-label-desc {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0;
+        display: block;
+    }
+
+    /* Actions Bar */
+    .editor-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .btn-save-primary {
+        height: 46px;
+        padding: 0 1.75rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.625rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-save-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-secondary {
+        height: 46px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-cancel-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+        .editor-actions-bar {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-save-primary,
+        .btn-cancel-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid about-editor-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header-box">
+        <div>
+            <span class="header-kicker"><i class="fa-solid fa-pen-to-square me-1"></i> Content Management</span>
+            <h1 class="page-header-title">About Us Editor</h1>
+            <p class="page-header-subtitle">
+                Update leadership profiles, corporate biographies, and core organizational pillars.
+            </p>
+        </div>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3 mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Founder & Leadership Card -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <h2 class="editor-card-title">Founder &amp; Leadership Profile</h2>
+            </div>
+            <p class="section-description">
+                Manage executive leadership details including position title, qualifications, and official headshot.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="{{ form.name.id_for_label }}" class="form-group-label">Full Name</label>
+                        {{ form.name }}
+                        {% for error in form.name.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group-custom">
+                        <label for="{{ form.position.id_for_label }}" class="form-group-label">Executive
+                            Position</label>
+                        {{ form.position }}
+                        {% for error in form.position.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group-custom">
+                <label for="{{ form.qualification.id_for_label }}" class="form-group-label">Professional Credentials
+                    &amp; Qualification</label>
+                {{ form.qualification }}
+                {% for error in form.qualification.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group-custom mb-0">
+                <label for="{{ form.photo.id_for_label }}" class="form-group-label">Founder Photograph</label>
+
+                <div class="photo-upload-box">
+                    {% if founder.photo %}
+                    <div class="photo-preview-container">
+                        <img src="{{ founder.photo.url }}" alt="{{ founder.name }}" class="photo-preview">
+                    </div>
+                    {% endif %}
+
+                    <div class="photo-input-group">
+                        {{ form.photo }}
+                        <div class="form-text text-muted small mt-2">
+                            Upload high-resolution portrait (JPG, PNG). Recommended minimum aspect ratio 1:1.
+                        </div>
+                        {% for error in form.photo.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biography Card -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <h2 class="editor-card-title">Corporate Narrative &amp; Biography</h2>
+            </div>
+            <p class="section-description">
+                Compose paragraph sections that outline the history, mission, and background story displayed publicly.
+            </p>
+
+            <div class="form-group-custom">
+                <label for="{{ form.biography_1.id_for_label }}" class="form-group-label">Biography — Paragraph 1
+                    (Introduction)</label>
+                {{ form.biography_1 }}
+                {% for error in form.biography_1.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group-custom">
+                <label for="{{ form.biography_2.id_for_label }}" class="form-group-label">Biography — Paragraph 2
+                    (Mission &amp; Values)</label>
+                {{ form.biography_2 }}
+                {% for error in form.biography_2.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="form-group-custom mb-0">
+                <label for="{{ form.biography_3.id_for_label }}" class="form-group-label">Biography — Paragraph 3
+                    (Vision &amp; Outlook)</label>
+                {{ form.biography_3 }}
+                {% for error in form.biography_3.errors %}
+                <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pillars Card -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <h2 class="editor-card-title">Our Three Core Pillars</h2>
+            </div>
+            <p class="section-description">
+                Specify the primary foundational principles highlighted across the About Us showcase section.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="form-group-custom mb-md-0">
+                        <label for="{{ form.pillar_1.id_for_label }}" class="form-group-label">Pillar 1</label>
+                        {{ form.pillar_1 }}
+                        {% for error in form.pillar_1.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group-custom mb-md-0">
+                        <label for="{{ form.pillar_2.id_for_label }}" class="form-group-label">Pillar 2</label>
+                        {{ form.pillar_2 }}
+                        {% for error in form.pillar_2.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group-custom mb-0">
+                        <label for="{{ form.pillar_3.id_for_label }}" class="form-group-label">Pillar 3</label>
+                        {{ form.pillar_3 }}
+                        {% for error in form.pillar_3.errors %}
+                        <div class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Publication Settings Card -->
+        <div class="editor-card">
+            <div class="editor-card-header">
+                <div class="editor-card-icon">
+                    <i class="fa-solid fa-globe"></i>
+                </div>
+                <h2 class="editor-card-title">Publication Settings</h2>
+            </div>
+            <p class="section-description">
+                Control visibility settings for this founder profile on the public-facing website.
+            </p>
+
+            <div class="toggle-card">
+                <div>
+                    <span class="toggle-label-title">Publish Founder Profile</span>
+                    <span class="toggle-label-desc">When enabled, this founder record and biography will be visible on
+                        the public About Us page.</span>
+                </div>
+                <div class="form-check form-switch m-0 fs-5">
+                    {{ form.is_active }}
+                </div>
+            </div>
+
+            {% for error in form.is_active.errors %}
+            <div class="field-error mt-2"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Action Controls -->
+        <div class="editor-actions-bar">
+            <a href="{% url 'staff:dashboard' %}" class="btn-cancel-secondary">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn-save-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Save About Us Information
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

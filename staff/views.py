@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 
+
 from accounts.models import User
 
 from services.models import (
@@ -67,6 +68,10 @@ from .models import FAQItem, QuestionFormSettings, CustomerQuestion
 from .forms import StaffCaregiverInviteForm
 from staff.models import ContactEnquiry
 from testimonials.models import Testimonial
+from leadership.models import Founder
+from leadership.forms import FounderForm
+from hero.models import HeroSlide
+from hero.forms import HeroSlideForm
 
 logger = logging.getLogger(__name__)
 # ============================================================
@@ -2702,9 +2707,6 @@ def services(request):
     )
 
 
-# ============================================================
-# ADD SERVICE
-# ============================================================
 
 # ============================================================
 # ADD SERVICE
@@ -4380,3 +4382,142 @@ def testimonial_moderate(request, pk):
         messages.error(request, "Please select a valid moderation action.")
 
     return redirect("staff:testimonials")
+
+@admin_required
+def about_us_edit(request):
+    # Reuse the existing Founder record.
+    founder = Founder.objects.order_by("pk").first()
+
+    # Create a record only if none exists.
+    if founder is None:
+        founder = Founder.objects.create()
+
+    if request.method == "POST":
+        form = FounderForm(
+            request.POST,
+            request.FILES,
+            instance=founder,
+        )
+
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "About Us information updated successfully.",
+            )
+            return redirect("staff:about_us_edit")
+
+        messages.error(
+            request,
+            "Please correct the errors below.",
+        )
+    else:
+        form = FounderForm(instance=founder)
+
+    return render(
+        request,
+        "staff/about_us_form.html",
+        {
+            "form": form,
+            "founder": founder,
+            "site_settings": SiteSettings.load(),
+        },
+    )
+
+
+# ============================================================
+# HERO SLIDER MANAGEMENT
+# ============================================================
+
+HERO_DEFAULTS = {
+    1: {
+        "tagline": "Compassionate • Reliable • Dignified",
+        "heading": "Quality Care in the Comfort & Dignity of Home",
+        "description": (
+            "Professional mobile nursing and personal care for "
+            "elderly, recovering, and dependent loved ones across Namibia."
+        ),
+    },
+    2: {
+        "tagline": "Professional Nursing Support",
+        "heading": "Clinical Care Beyond Hospital Walls",
+        "description": (
+            "Vital signs monitoring, wound dressing, post-surgery "
+            "recovery, and chronic condition management at home."
+        ),
+    },
+    3: {
+        "tagline": "Support for Patients & Families",
+        "heading": "Dependable Assistance Tailored Around You",
+        "description": (
+            "Dedicated daily living support, bedridden care, and "
+            "extended family respite delivered with genuine respect."
+        ),
+    },
+}
+
+
+@admin_required
+def hero_slides(request):
+    # Ensure there is one database record for each slide.
+    for position, defaults in HERO_DEFAULTS.items():
+        HeroSlide.objects.get_or_create(
+            position=position,
+            defaults=defaults,
+        )
+
+    slides = HeroSlide.objects.all()
+
+    return render(
+        request,
+        "staff/hero_slides.html",
+        {
+            "slides": slides,
+            "site_settings": SiteSettings.load(),
+        },
+    )
+
+
+@admin_required
+def hero_slide_edit(request, position):
+    if position not in (1, 2, 3):
+        from django.http import Http404
+        raise Http404("Hero slide not found.")
+
+    slide, created = HeroSlide.objects.get_or_create(
+        position=position,
+        defaults=HERO_DEFAULTS[position],
+    )
+
+    if request.method == "POST":
+        form = HeroSlideForm(
+            request.POST,
+            request.FILES,
+            instance=slide,
+        )
+
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                f"Slide {position} updated successfully.",
+            )
+            return redirect("staff:hero_slides")
+
+        messages.error(
+            request,
+            "Please correct the errors below.",
+        )
+    else:
+        form = HeroSlideForm(instance=slide)
+
+    return render(
+        request,
+        "staff/hero_slide_form.html",
+        {
+            "form": form,
+            "slide": slide,
+            "site_settings": SiteSettings.load(),
+        },
+    )
+
