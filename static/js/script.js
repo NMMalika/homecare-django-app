@@ -117,19 +117,33 @@
     });
   }
 
-// Scroll Up Button (Appears only after scrolling down)
-  $(window).scroll(function () {
-    if ($(this).scrollTop() > 400) { // Adjust 400 to a higher number if needed
-      $(".scrollup").fadeIn();
-    } else {
-      $(".scrollup").fadeOut();
-    }
-  });
+// =====================================================
+// SCROLL UP BUTTON - HANDS-ON HEALTH
+// =====================================================
 
-  $(".scrollup").on("click", function () {
-    $("html, body").animate({ scrollTop: 0 }, 1500);
-    return false;
-  });
+function updateScrollUp() {
+    if ($(window).scrollTop() > 300) {
+        $(".scrollup").addClass("active");
+    } else {
+        $(".scrollup").removeClass("active");
+    }
+}
+
+// Check while scrolling
+$(window).on("scroll", updateScrollUp);
+
+// Check immediately when the page loads
+updateScrollUp();
+
+// Smooth scroll to top
+$(".scrollup").on("click", function (event) {
+    event.preventDefault();
+
+    $("html, body").stop().animate(
+        { scrollTop: 0 },
+        700
+    );
+});
   
   $(window).on("load", function () {
     preloader();

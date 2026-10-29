@@ -1,0 +1,249 @@
+<!-- Payment Options Start -->
+{% if site_settings %}
+<section class="payment-options-section bg-f8">
+    <div class="container">
+
+        <div class="section-title text-center">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2 margin-bottom-30">
+
+                    <span class="sub-title-badge sky-badge">
+                        Care Designed Around Your Needs
+                    </span>
+
+                    <h2>
+                        PAYMENT <span class="color-defult">OPTIONS</span>
+                    </h2>
+
+                    <div class="line-border-center bg-defult"></div>
+
+                    <p>
+                        Explore our available payment arrangements
+                        for professional home-based care.
+                        Payment details are confirmed when
+                        your care quotation is prepared.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="section-content">
+
+            <div class="row payment-grid">
+
+                <!-- BANK TRANSFER -->
+                {% if site_settings.bank_name and site_settings.account_number %}
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+
+                        <div class="practice-content">
+                            <h4>Bank Transfer</h4>
+
+                            <p>
+                                {{ site_settings.bank_name }}
+                            </p>
+
+                            {% if site_settings.account_name %}
+                            <p>
+                                <strong>Account Name:</strong>
+                                {{ site_settings.account_name }}
+                            </p>
+                            {% endif %}
+
+                            <p>
+                                <strong>Account Number:</strong>
+                                {{ site_settings.account_number }}
+                            </p>
+
+                            {% if site_settings.branch_name %}
+                            <p>
+                                <strong>Branch:</strong>
+                                {{ site_settings.branch_name }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- PAYFAST -->
+                {% if site_settings.payfast_enabled %}
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+
+                        <div class="practice-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+
+                        <div class="practice-content">
+
+                            <h4>PayFast</h4>
+
+                            <p>
+                                Pay using the payment instructions
+                                provided by our team.
+                            </p>
+
+                            {% if site_settings.payfast_instructions %}
+                            <p>
+                                {{ site_settings.payfast_instructions|linebreaksbr }}
+                            </p>
+                            {% endif %}
+
+                            {% if site_settings.payfast_payment_url %}
+                            <a href="{{ site_settings.payfast_payment_url }}" target="_blank" rel="noopener noreferrer"
+                                class="btn btn-theme-sky">
+                                Pay with PayFast
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- PAYPAL -->
+                {% if site_settings.paypal_enabled %}
+                <div class="col-md-4 col-sm-6 margin-bottom-30">
+                    <div class="practice-item-1 text-center">
+
+                        <div class="practice-icon">
+                            <i class="fa-brands fa-paypal"></i>
+                        </div>
+
+                        <div class="practice-content">
+
+                            <h4>PayPal</h4>
+
+                            {% if site_settings.paypal_email %}
+                            <p>
+                                <strong>Payment Email:</strong>
+                                {{ site_settings.paypal_email }}
+                            </p>
+                            {% endif %}
+
+                            {% if site_settings.paypal_instructions %}
+                            <p>
+                                {{ site_settings.paypal_instructions|linebreaksbr }}
+                            </p>
+                            {% endif %}
+
+                            {% if site_settings.paypal_payment_url %}
+                            <a href="{{ site_settings.paypal_payment_url }}" target="_blank" rel="noopener noreferrer"
+                                class="btn btn-theme-sky">
+                                Pay with PayPal
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- GENERAL PAYMENT INSTRUCTIONS -->
+            {% if site_settings.payment_instructions %}
+            <div class="row margin-bottom-30">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div class="care-pricing-info-card text-center">
+
+                        <h3>Payment Information</h3>
+
+                        <p>
+                            {{ site_settings.payment_instructions|linebreaksbr }}
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+
+            <!-- COST FACTORS AND QUOTATION -->
+            <div class="row margin-top-20">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <div class="care-pricing-info-card text-center">
+
+                        <p class="pricing-lead-text">
+                            Because every patient has different needs,
+                            the cost of care depends on factors such as:
+                        </p>
+
+                        <div class="cost-factors-grid">
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Type of care required
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Number of hours
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Duration of care
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Level of assistance required
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Day/night requirements
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Location
+                            </span>
+
+                            <span class="factor-tag">
+                                <i class="fa-solid fa-check"></i>
+                                Stay-in requirements
+                            </span>
+
+                        </div>
+
+                        <div class="quote-action-area">
+
+                            <a href="{% url 'homecare:request' %}" class="btn btn-theme-sky btn-quote-action">
+
+                                Request a Care Quote
+                                <i class="fa-solid fa-arrow-right"></i>
+
+                            </a>
+
+                            <p class="quote-subtext">
+                                A detailed quotation can be provided
+                                after discussing the patient's requirements.
+                            </p>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endif %}
+<!-- Payment Options End -->

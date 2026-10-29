@@ -1,0 +1,524 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Quotation Management | Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .q-wrap {
+        max-width: 1480px;
+        margin: auto;
+        padding: 24px 18px;
+        color: #183047;
+    }
+
+    .q-hero {
+        background: linear-gradient(120deg, #123c55, #237e96);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        box-shadow: 0 10px 25px -5px rgba(18, 60, 85, 0.2);
+    }
+
+    .q-hero h1 {
+        margin: 0 0 8px;
+        font-size: 29px;
+        font-weight: 800;
+        color: white;
+    }
+
+    .q-hero p {
+        margin: 0;
+        color: #d8eff4;
+    }
+
+    .q-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        background: #e6f5fa;
+        color: #13556d;
+        font-weight: 700;
+        border: 1px solid #c9e4ec;
+        transition: all 0.2s ease;
+    }
+
+    .q-btn:hover {
+        background: #d5edf4;
+        transform: translateY(-1px);
+    }
+
+    .q-btn-dark {
+        background: #14627c;
+        color: white;
+        border-color: #14627c;
+    }
+
+    .q-btn-dark:hover {
+        background: #104e62;
+        color: white;
+    }
+
+    .q-stats {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .q-stat {
+        background: white;
+        border: 1px solid #e4eaf0;
+        border-radius: 15px;
+        padding: 18px 16px;
+        box-shadow: 0 4px 15px rgba(18, 51, 75, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .q-stat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(18, 51, 75, 0.08);
+    }
+
+    .q-stat small {
+        color: #63758a;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        display: block;
+    }
+
+    .q-stat strong {
+        display: block;
+        font-size: 24px;
+        margin-top: 6px;
+        color: #163d55;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .q-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 17px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(21, 51, 74, 0.05);
+        margin-top: 20px;
+    }
+
+    .q-panel-head {
+        padding: 21px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #e8edf2;
+    }
+
+    .q-panel-head h2 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 800;
+        color: #1c3b52;
+    }
+
+    .q-muted {
+        color: #718096;
+        font-size: 13px;
+    }
+
+    .q-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 18px 24px;
+        background: #f9fbfd;
+        border-bottom: 1px solid #e8edf2;
+    }
+
+    .q-input,
+    .q-select {
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        background: white;
+        color: #213b4f;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        min-width: 140px;
+    }
+
+    .q-input:focus,
+    .q-select:focus {
+        border-color: #237e96;
+        box-shadow: 0 0 0 3px rgba(35, 126, 150, 0.12);
+    }
+
+    .q-input {
+        flex: 1;
+        min-width: 240px;
+    }
+
+    .q-table-wrap {
+        overflow-x: auto;
+    }
+
+    .q-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 960px;
+    }
+
+    .q-table th {
+        background: #f8fafc;
+        color: #64778b;
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        padding: 15px 18px;
+        white-space: nowrap;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .q-table td {
+        padding: 17px 18px;
+        border-top: 1px solid #edf1f5;
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .q-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .q-name {
+        font-weight: 750;
+        color: #1a3a50;
+        text-decoration: none;
+    }
+
+    .q-name:hover {
+        color: #237e96;
+    }
+
+    .q-ref {
+        color: #637a8d;
+        font-size: 12px;
+    }
+
+    .q-pill {
+        display: inline-flex;
+        padding: 5px 10px;
+        border-radius: 100px;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .q-pill.paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .q-pill.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .q-pill.expired,
+    .q-pill.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .q-money {
+        font-weight: 800;
+        color: #153b54;
+        white-space: nowrap;
+    }
+
+    .q-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .q-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c8190;
+    }
+
+    .q-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e7edf2;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: #f8fafc;
+    }
+
+    @media (max-width: 1200px) {
+        .q-stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .q-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .q-wrap {
+            padding: 12px;
+        }
+
+        .q-hero {
+            padding: 22px;
+        }
+
+        .q-stats {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="q-wrap">
+
+    <!-- Hero Header -->
+    <div class="q-hero">
+        <div>
+            <div style="opacity: 0.8; font-size: 11px; letter-spacing: 0.12em; font-weight: 800;">FINANCE / QUOTATIONS
+            </div>
+            <h1><i class="fa fa-file-invoice-dollar" aria-hidden="true"></i> Quotation Management</h1>
+            <p>Track home-care and appointment quotations in one unified workspace.</p>
+        </div>
+        <a class="q-btn" href="{% url 'staff:homecare_requests' %}">
+            <i class="fa fa-plus"></i> New from Home Care
+        </a>
+    </div>
+
+    <!-- Stat Metrics Grid -->
+    <div class="q-stats">
+        <div class="q-stat">
+            <small>Total Quotations</small>
+            <strong id="q-total">{{ total_quotations|default:0 }}</strong>
+        </div>
+
+        <div class="q-stat">
+            <small>Payment Pending</small>
+            <strong id="q-pending">{{ pending_count|default:0 }}</strong>
+        </div>
+
+        <div class="q-stat">
+            <small>Paid Quotations</small>
+            <strong id="q-paid">{{ paid_count|default:0 }}</strong>
+        </div>
+
+        <div class="q-stat">
+            <small>Total Amount Paid</small>
+            <strong style="color: #166534;">N$ {{ total_paid|default:0|floatformat:2 }}</strong>
+        </div>
+
+        <div class="q-stat">
+            <small>Awaiting Payment</small>
+            <strong style="color: #b45309;">N$ {{ total_awaiting|default:0|floatformat:2 }}</strong>
+        </div>
+
+        <div class="q-stat">
+            <small>Total Quoted Value</small>
+            <strong id="q-value">N$ {{ total_quoted|default:0|floatformat:2 }}</strong>
+        </div>
+    </div>
+
+    <!-- Data Panel -->
+    <div class="q-panel">
+
+        <div class="q-panel-head">
+            <div>
+                <h2>All Quotations</h2>
+                <div class="q-muted">Search, filter, and review details for any customer quotation.</div>
+            </div>
+            <span class="q-muted" id="q-count"></span>
+        </div>
+
+        <!-- Filter Tools -->
+        <div class="q-filters">
+            <input class="q-input" id="q-search" type="search"
+                placeholder="Search client name, ID, or quote reference..." aria-label="Search quotations">
+
+            <select class="q-select" id="q-type" aria-label="Filter by type">
+                <option value="">All Types</option>
+                <option value="home care">Home Care</option>
+                <option value="appointment">Appointment</option>
+            </select>
+
+            <select class="q-select" id="q-status" aria-label="Filter by payment status">
+                <option value="">All Statuses</option>
+                <option value="pending">Payment Pending</option>
+                <option value="paid">Paid</option>
+                <option value="expired">Expired</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+
+            <button type="button" class="q-btn" id="q-reset">
+                <i class="fa fa-rotate-left"></i> Reset
+            </button>
+        </div>
+
+        <!-- Quotations Table -->
+        <div class="q-table-wrap">
+            <table class="q-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Client Name</th>
+                        <th>Service Type</th>
+                        <th>Amount</th>
+                        <th>Payment Status</th>
+                        <th>Sent At</th>
+                        <th>Deadline</th>
+                        <th>Created At</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for quotation in quotations %}
+                    <tr class="q-row"
+                        data-search="{{ quotation.pk }} {{ quotation.homecare_request.full_name|default:''|lower }} {{ quotation.consultation.first_name|default:''|lower }} {{ quotation.consultation.last_name|default:''|lower }}"
+                        data-type="{% if quotation.consultation_id %}appointment{% else %}home care{% endif %}"
+                        data-status="{{ quotation.payment_status|lower }}"
+                        data-amount="{{ quotation.amount|default:0 }}">
+
+                        <td>
+                            <a class="q-name" href="{% url 'staff:quotation_detail' quotation.pk %}">#{{ quotation.pk }}</a>
+                        </td>
+
+                        <td>
+                            <div class="q-name">
+                                {% if quotation.homecare_request %}
+                                {{ quotation.homecare_request.full_name }}
+                                {% elif quotation.consultation %}
+                                {{ quotation.consultation.first_name }} {{ quotation.consultation.last_name }}
+                                {% else %}
+                                Unassigned Client
+                                {% endif %}
+                            </div>
+                            <div class="q-ref">Reference: Quote #{{ quotation.pk }}</div>
+                        </td>
+
+                        <td>
+                            <span class="q-pill">
+                                {% if quotation.consultation_id %}
+                                Appointment
+                                {% else %}
+                                Home Care
+                                {% endif %}
+                            </span>
+                        </td>
+
+                        <td class="q-money">N$ {{ quotation.amount|default:0|floatformat:2 }}</td>
+
+                        <td>
+                            <span class="q-pill {{ quotation.payment_status|lower }}">
+                                {{ quotation.get_payment_status_display }}
+                            </span>
+                        </td>
+
+                        <td>{{ quotation.sent_at|date:"d M Y, H:i"|default:"—" }}</td>
+                        <td>{{ quotation.payment_deadline|date:"d M Y, H:i"|default:"—" }}</td>
+                        <td>{{ quotation.created_at|date:"d M Y, H:i"|default:"—" }}</td>
+
+                        <td style="text-align: right;">
+                            <div class="q-actions" style="justify-content: flex-end;">
+                                <a class="q-btn q-btn-dark" href="{% url 'staff:quotation_detail' quotation.pk %}">
+                                    <i class="fa fa-eye"></i> Details
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="q-empty">
+                                <i class="fa fa-file-invoice fa-3x" style="margin-bottom: 12px; opacity: 0.5;"></i>
+                                <h3 style="font-weight: 700; color: #1e293b;">No Quotations Found</h3>
+                                <p style="margin-bottom: 0;">Quotations created for home-care requests or appointments
+                                    will appear here.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="q-footer">
+            <span class="q-muted">All currency values are displayed in Namibian Dollars (N$).</span>
+            <span class="q-muted" id="q-visible"></span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    (function () {
+        const rows = Array.from(document.querySelectorAll('.q-row'));
+        const search = document.getElementById('q-search');
+        const type = document.getElementById('q-type');
+        const status = document.getElementById('q-status');
+
+        function filter() {
+            const query = search.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            rows.forEach(r => {
+                const matchesSearch = r.dataset.search.includes(query);
+                const matchesType = !type.value || r.dataset.type === type.value;
+                const matchesStatus = !status.value || r.dataset.status === status.value;
+
+                const isVisible = matchesSearch && matchesType && matchesStatus;
+                r.hidden = !isVisible;
+                r.style.display = isVisible ? '' : 'none';
+
+                if (isVisible) visibleCount++;
+            });
+
+            document.getElementById('q-visible').textContent = visibleCount + ' shown';
+            document.getElementById('q-count').textContent = rows.length + ' total records';
+        }
+
+        [search, type, status].forEach(element => element.addEventListener('input', filter));
+
+        document.getElementById('q-reset').addEventListener('click', () => {
+            search.value = '';
+            type.value = '';
+            status.value = '';
+            filter();
+        });
+
+        filter();
+    })();
+</script>
+{% endblock %}

@@ -6224,3 +6224,46 @@ a.action-value:hover {
         padding: 26px 20px !important;
     }
 }
+
+/* =====================================================
+   FLOATING BUTTON POSITIONS
+===================================================== */
+
+/* Scroll to top - bottom right */
+.scrollup {
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 9998 !important;
+}
+
+/* WhatsApp - above Scroll Up */
+.whatsapp-float {
+    bottom: 82px !important;
+    right: 20px !important;
+}
+
+/* Chatbot - bottom left */
+.ask-anything-float {
+    bottom: 20px !important;
+    left: 20px !important;
+    right: auto !important;
+    z-index: 9999 !important;
+}
+
+@media (max-width: 767px) {
+    .scrollup {
+        bottom: 15px !important;
+        right: 15px !important;
+    }
+
+    .whatsapp-float {
+        bottom: 75px !important;
+        right: 15px !important;
+    }
+
+    .ask-anything-float {
+        bottom: 15px !important;
+        left: 15px !important;
+        right: auto !important;
+    }
+}

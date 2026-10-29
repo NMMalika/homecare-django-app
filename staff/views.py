@@ -22,6 +22,11 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
+from django.db.models import Sum
+from decimal import Decimal
+from django.db.models import Q, Sum, Count
+from django.db.models.functions import Coalesce
+from .quotation_pdf import quotation_pdf_response
 
 
 from accounts.models import User
@@ -1718,32 +1723,80 @@ def appointments(request):
 # ============================================================
 
 
+# ============================================================
+# STAFF QUOTATION MANAGEMENT
+# ============================================================
+
+
 @admin_required
 def quotations(request):
 
+    # Fetch all quotations with related client information
     quotations_queryset = Quotation.objects.select_related(
         "homecare_request",
         "consultation",
     ).order_by("-created_at")
 
+    # Calculate financial totals from the database
+    financial_totals = Quotation.objects.aggregate(
+        total_paid=Coalesce(
+            Sum(
+                "amount",
+                filter=Q(payment_status="PAID"),
+            ),
+            Decimal("0.00"),
+        ),
+        total_awaiting=Coalesce(
+            Sum(
+                "amount",
+                filter=Q(payment_status="PENDING"),
+            ),
+            Decimal("0.00"),
+        ),
+        total_quoted=Coalesce(
+            Sum("amount"),
+            Decimal("0.00"),
+        ),
+        total_quotations=Count("id"),
+        paid_count=Count(
+            "id",
+            filter=Q(payment_status="PAID"),
+        ),
+        pending_count=Count(
+            "id",
+            filter=Q(payment_status="PENDING"),
+        ),
+    )
+
+    context = {
+        "quotations": quotations_queryset,
+        "site_settings": SiteSettings.load(),
+        # Financial summary cards
+        "total_paid": financial_totals["total_paid"],
+        "total_awaiting": financial_totals["total_awaiting"],
+        "total_quoted": financial_totals["total_quoted"],
+        # Quotation count cards
+        "total_quotations": financial_totals["total_quotations"],
+        "paid_count": financial_totals["paid_count"],
+        "pending_count": financial_totals["pending_count"],
+    }
+
     return render(
         request,
         "staff/quotations.html",
-        {
-            "quotations": quotations_queryset,
-            "site_settings": SiteSettings.load(),
-        },
+        context,
     )
 
 
-# ============================================================
-# STAFF QUOTATION DETAIL
-# ============================================================
 
+# ============================================================
+# STAFF QUOTATION DETAILS
+# ============================================================
 
 @admin_required
 def quotation_detail(request, pk):
 
+    # Fetch quotation with related patient information
     quotation = get_object_or_404(
         Quotation.objects.select_related(
             "homecare_request",
@@ -1752,14 +1805,27 @@ def quotation_detail(request, pk):
         pk=pk,
     )
 
+    # Get business details from Core SiteSettings
+    site_settings = SiteSettings.load()
+
+    # Current local date and time for the document footer
+    generated_at = timezone.localtime()
+
+    context = {
+        "quotation": quotation,
+        "site_settings": site_settings,
+        "generated_at": generated_at,
+
+        # Related patient information
+        "homecare_request": quotation.homecare_request,
+        "consultation": quotation.consultation,
+    }
+
     return render(
         request,
         "staff/quotation_detail.html",
-        {
-            "quotation": quotation,
-        },
+        context,
     )
-
 
 # ============================================================
 # PAYMENTS
@@ -4146,3 +4212,8 @@ def hero_slide_edit(request, position):
             "site_settings": SiteSettings.load(),
         },
     )
+
+
+@admin_required
+def quotation_pdf(request, pk):
+    return quotation_pdf_response(request, pk)

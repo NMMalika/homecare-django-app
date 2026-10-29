@@ -1,20 +1,31 @@
-
 {% load static %}
 
-<!-- FAQ Section Start -->
-<section class="faq-section padding-top-80 padding-bottom-80">
+<!-- =========================================================
+     HANDS-ON HEALTH
+     DYNAMIC FREQUENTLY ASKED QUESTIONS
+     SEO-FRIENDLY / RESPONSIVE / ACCESSIBLE
+========================================================= -->
+
+<section class="faq-section padding-top-80 padding-bottom-80" id="frequently-asked-questions"
+    aria-labelledby="faq-section-title">
+
     <div class="container">
 
-        <!-- Section Header -->
+        <!-- =====================================================
+             SECTION HEADER
+        ===================================================== -->
+
         <div class="section-title text-center">
+
             <div class="row">
+
                 <div class="col-md-8 col-md-offset-2 margin-bottom-40">
 
                     <span class="sub-title-badge sky-badge">
                         Got Questions?
                     </span>
 
-                    <h2>
+                    <h2 id="faq-section-title">
                         FREQUENTLY ASKED
                         <span class="color-defult">QUESTIONS</span>
                     </h2>
@@ -22,48 +33,92 @@
                     <div class="line-border-center bg-defult"></div>
 
                     <p>
-                        Find quick answers to common questions about our
-                        mobile home-based healthcare services and patient arrangements.
+                        Find answers to frequently asked questions about
+                        Hands-On Health's home-based healthcare services,
+                        care arrangements, and patient support in Namibia.
                     </p>
 
                 </div>
+
             </div>
+
         </div>
 
-        <!-- FAQ Items -->
+
+        <!-- =====================================================
+             DYNAMIC FAQ ACCORDION
+             Content supplied by staff.FAQItem
+        ===================================================== -->
+
         <div class="section-content">
+
             <div class="row">
+
                 <div class="col-md-10 col-md-offset-1">
 
                     <div class="faq-accordion" id="faqAccordion">
 
                         {% for faq in faqs %}
-                        <div class="faq-card">
 
-                            <!-- Question -->
+                        {% if faq.is_active %}
+
+                        <!-- =========================================
+                             FAQ ITEM {{ forloop.counter }}
+                        ========================================= -->
+
+                        <article class="faq-card" itemscope itemtype="https://schema.org/Question">
+
+                            <!-- QUESTION -->
+
                             <div class="faq-header" id="faqHeading{{ faq.pk }}">
-                                <button class="faq-button collapsed" type="button" data-toggle="collapse"
-                                    data-target="#faqCollapse{{ faq.pk }}" aria-expanded="false"
-                                    aria-controls="faqCollapse{{ faq.pk }}">
-                                    <span>{{ faq.question }}</span>
 
-                                    <i class="fa-solid fa-chevron-down faq-icon" aria-hidden="true"></i>
-                                </button>
+                                <h3 class="faq-question-heading">
+
+                                    <button class="faq-button collapsed" type="button" data-toggle="collapse"
+                                        data-target="#faqCollapse{{ faq.pk }}" aria-expanded="false"
+                                        aria-controls="faqCollapse{{ faq.pk }}">
+
+                                        <span itemprop="name">
+                                            {{ faq.question }}
+                                        </span>
+
+                                        <i class="fa-solid fa-chevron-down faq-icon" aria-hidden="true"></i>
+
+                                    </button>
+
+                                </h3>
+
                             </div>
 
-                            <!-- Answer -->
+
+                            <!-- ANSWER -->
+
                             <div id="faqCollapse{{ faq.pk }}" class="collapse" aria-labelledby="faqHeading{{ faq.pk }}"
                                 data-parent="#faqAccordion">
-                                <div class="faq-body">
-                                    {{ faq.answer|linebreaksbr }}
+
+                                <div class="faq-body" itemprop="acceptedAnswer" itemscope
+                                    itemtype="https://schema.org/Answer">
+
+                                    <div itemprop="text">
+                                        {{ faq.answer|linebreaksbr }}
+                                    </div>
+
                                 </div>
+
                             </div>
 
-                        </div>
+                        </article>
+
+                        {% endif %}
 
                         {% empty %}
-                        <!-- Empty State -->
+
+                        <!-- =========================================
+                             EMPTY FAQ STATE
+                        ========================================= -->
+
                         <div class="text-center faq-empty-state">
+
                             <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
 
                             <h4>No FAQs Available Yet</h4>
@@ -72,15 +127,23 @@
                                 Frequently asked questions will be available soon.
                                 Please check back later.
                             </p>
+
                         </div>
+
                         {% endfor %}
 
                     </div>
 
                 </div>
+
             </div>
+
         </div>
 
     </div>
+
 </section>
-<!-- FAQ Section End -->
+
+<!-- =========================================================
+     FAQ SECTION END
+========================================================= -->

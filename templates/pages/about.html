@@ -1,13 +1,22 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-Reviews | Hands-On Health
-{% endblock %}
+{% block title %}About Hands-On Health | Home-Based Care in Windhoek, Namibia{% endblock %}
+
+{% block meta_description %}Learn about Hands-On Health, our approach to compassionate home-based nursing, elderly care,
+recovery support and personalized patient care in Windhoek, Namibia.{% endblock %}
+
+{% block og_title %}About Hands-On Health | Home-Based Care Namibia{% endblock %}
+{% block og_description %}Discover our care philosophy and commitment to dignified, compassionate home-based healthcare
+in Windhoek and Namibia.{% endblock %}
+
+{% block twitter_title %}About Hands-On Health Namibia{% endblock %}
+{% block twitter_description %}Professional, compassionate home-based care centered on patients and families in
+Namibia.{% endblock %}
 
 {% block content %}
 
-<!-- Page Title / Hero Section -->
+<!-- About Us Page Title / Hero Section -->
 <section class="page-title style-2 text-center"
     style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; padding: 100px 0 60px; position: relative;">
     <div class="container">
@@ -31,8 +40,8 @@ Reviews | Hands-On Health
             <!-- Image Block -->
             <div class="col-md-6 col-sm-12 margin-bottom-30">
                 <div class="about-img">
-                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Warm Caregiver Holding Hands with Senior Patient"
-                        class="img-responsive"
+                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Caregiver supporting an older adult at home"
+                        loading="lazy" class="img-responsive"
                         style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 126, 163, 0.08); width: 100%;">
                 </div>
             </div>
@@ -178,7 +187,8 @@ Reviews | Hands-On Health
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h4>Safety</h4>
-                        <p>Ensuring rigorous medical standards and total security within the home environment.</p>
+                        <p>Prioritizing safe care practices and careful attention to each patient’s home environment.
+                        </p>
                     </div>
                 </div>
 
@@ -290,7 +300,7 @@ Reviews | Hands-On Health
                     </div>
 
                     <div class="cta-box-wrapper margin-top-30">
-                        <a href="#booking" class="btn-request-care-full">
+                        <a href="{% url 'homecare:request' %}" class="btn-request-care-full">
                             REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>

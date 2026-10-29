@@ -1,14 +1,28 @@
 {% extends 'base.html' %}
 
-{% load static %}
+{% load static seo_tags %}
 
-{% block title %}
-Hands-On Health Home-Based Care Service
+{% block title %}Home-Based Nursing & Care in Windhoek, Namibia | Hands-On Health{% endblock %}
+
+{% block meta_description %}Explore Hands-On Health home-based nursing, elderly care, post-operative support and
+personalised patient care in Windhoek, Namibia. Request care or ask about availability.{% endblock %}
+
+{% block og_title %}Home-Based Nursing & Care in Windhoek | Hands-On Health{% endblock %}
+{% block og_description %}Discover home-based nursing and patient support in Windhoek, Namibia, with care arrangements
+subject to availability.{% endblock %}
+
+{% block twitter_title %}Home-Based Nursing & Care in Windhoek | Hands-On Health{% endblock %}
+{% block twitter_description %}Request home-based nursing, elderly care and patient support from Hands-On Health in
+Namibia.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+{% services_jsonld request %}
+{% faq_jsonld %}
 {% endblock %}
 
 {% block content %}
 
-<!-- Paste the homepage content here -->
 <!-- Hero section -->
 <!-- Start Hero Slider -->
 
@@ -33,12 +47,14 @@ Hands-On Health Home-Based Care Service
                             <div class="icon-wrapper">
                                 <i class="fa-solid fa-house-medical"></i>
                             </div>
-                            <h5><a href="#book">Professional Care. In the Comfort of Home.</a></h5>
+                            <h5><a href="{% url 'homecare:request' %}">Professional Care. In the Comfort of Home.</a>
+                            </h5>
                             <div class="line-border-center bg-teal margin-bottom-20"></div>
                             <p>Hands-on Health brings quality home-based care directly to patients and families, helping
                                 people receive appropriate support while remaining in the comfort and dignity of their
                                 own homes.</p>
-                            <a href="{% url 'homecare:request' %}" class="btn btn-theme btn-sm btn-glow btn-glow-action">
+                            <a href="{% url 'homecare:request' %}"
+                                class="btn btn-theme btn-sm btn-glow btn-glow-action">
                                 Request Home Care <i class="fa-solid fa-hand-holding-hand ml-2"></i>
                             </a>
                         </div>
@@ -51,17 +67,16 @@ Hands-On Health Home-Based Care Service
                             <div class="icon-wrapper">
                                 <i class="fa-solid fa-comments"></i>
                             </div>
-                            <h5><a {% if site_settings.whatsapp %}href="https://wa.me/{{ site_settings.whatsapp }}" {% endif %}target="_blank">Compassionate. Professional.
-                                    Personal.</a></h5>
+                            <h5>Compassionate. Professional. Personal.</h5>
                             <div class="line-border-center bg-teal margin-bottom-20"></div>
                             <p>Get in touch with our dedicated team to discuss immediate support, ask questions, or
                                 inquire about our home nursing services.</p>
                             {% if site_settings.whatsapp %}
                             <a href="https://wa.me/{{ site_settings.whatsapp }}" target="_blank"
-                                class="btn btn-theme btn-sm btn-glow btn-glow-chat">
+                                rel="noopener noreferrer" class="btn btn-theme btn-sm btn-glow btn-glow-chat">
                                 WhatsApp Us <i class="fa-brands fa-whatsapp ml-2"></i>
-                            {% endif %}
                             </a>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -115,7 +130,8 @@ Hands-On Health Home-Based Care Service
                         <!-- Feature Highlight Box -->
                         <div class="feature-media-box">
                             <div class="media-img-wrapper">
-                                <img src="{% static 'img/nurse2.jpeg' %}" alt="Professional Nurse Assisting Patient at Home"
+                                <img src="{% static 'img/nurse2.jpeg' %}"
+                                    alt="Professional Nurse Assisting Patient at Home"
                                     class="img-responsive img-rounded">
                             </div>
                             <div class="media-body-text">
@@ -375,7 +391,7 @@ Hands-On Health Home-Based Care Service
                         </div>
                         <h5>Direct To Your Door</h5>
                         <p class="area-tagline">We come to the patient — the patient does not come to us.</p>
-                        <a href="tel:+264858154948" class="btn btn-glow-action">
+                        <a href="{% url 'homecare:request' %}" class="btn btn-glow-action">
                             REQUEST HOME CARE <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
@@ -387,160 +403,15 @@ Hands-On Health Home-Based Care Service
 </section>
 <!-- services end -->
 <!-- appointments -->
-    {% include "includes/appointments/booking_form.html" %}
+{% include "includes/appointments/booking_form.html" %}
 <!-- divider -->
-    {% include "includes/divider.html" %}
+{% include "includes/divider.html" %}
 <!-- payment options start -->
-<section class="payment-options-section bg-f8">
-    <div class="container">
-        <div class="section-title text-center">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2 margin-bottom-30">
-                    <span class="sub-title-badge sky-badge">Care Designed Around Your Needs</span>
-                    <h2>PAYMENT <span class="color-defult">OPTIONS</span></h2>
-                    <div class="line-border-center bg-defult"></div>
-                    <p>We provide professional, compassionate, and reliable care for your loved ones in the comfort of
-                        their home. Here are our flexible payment options:</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-content">
-            <div class="row payment-grid">
-                <!-- 1. Ewallet -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-mobile-screen-button"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Ewallet</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Blue Wallet -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-wallet"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Blue Wallet</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Easy Wallet -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-money-bill-transfer"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Easy Wallet</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Nedbank Deposit -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-building-columns"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Nedbank Deposit</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. Swiping -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-credit-card"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Swiping</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. Medical Aid -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-stethoscope"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Medical Aid</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 7. Cash -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-money-bill-wave"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Cash</a></h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 8. Service Fees Badge -->
-                <div class="col-md-3 col-sm-6 margin-bottom-30">
-                    <div class="practice-item-1 text-center service-fee-card">
-                        <div class="practice-icon">
-                            <i class="fa-solid fa-circle-info"></i>
-                        </div>
-                        <div class="practice-content">
-                            <h4><a href="#">Service Fees Apply</a></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cost Factors & Quote Request Block -->
-            <div class="row margin-top-20">
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="care-pricing-info-card text-center">
-                        <p class="pricing-lead-text">
-                            Because every patient has different needs, the cost of care depends on factors such as:
-                        </p>
-
-                        <div class="cost-factors-grid">
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Type of care required</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Number of hours</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Duration of care</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Level of assistance
-                                required</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Day/night requirements</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Location</span>
-                            <span class="factor-tag"><i class="fa-solid fa-check"></i> Stay-in requirements</span>
-                        </div>
-
-                        <div class="quote-action-area">
-                            <a href="#quote" class="btn btn-theme-sky btn-quote-action">
-                                Request a Care Quote <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                            <p class="quote-subtext">A detailed quotation can then be provided after discussing the
-                                patient's requirements.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
+{% include "includes/payment_options.html" %}
 <!-- payment options end -->
 <!-- Reviews section -->
 <!-- FAQ section -->
-  {% include "includes/FAQS.html" %}
+{% include "includes/FAQS.html" %}
 <!-- Contact section -->
 <!-- All other homepage sections -->
 

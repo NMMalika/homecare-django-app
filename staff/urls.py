@@ -187,6 +187,11 @@ urlpatterns = [
         views.quotation_detail,
         name="quotation_detail",
     ),
+    path(
+        "quotations/<int:pk>/pdf/",
+        views.quotation_pdf,
+        name="quotation_pdf",
+    ),
     # =========================================================
     # PAYMENTS
     # =========================================================

@@ -1,4 +1,3 @@
-
 {% extends "staff/base.html" %}
 
 {% block title %}
@@ -202,9 +201,129 @@ Quotation Details | Hands-On Health
             padding: 18px;
         }
     }
+
+    .quote-brand {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 24px 26px;
+        background: linear-gradient(110deg, #103d56, #147f88);
+        color: #fff;
+        border-radius: 16px;
+        margin-bottom: 22px
+    }
+
+    .quote-brand img {
+        width: 82px;
+        height: 82px;
+        object-fit: contain;
+        background: white;
+        border-radius: 12px;
+        padding: 7px
+    }
+
+    .quote-brand h2 {
+        margin: 0 0 5px;
+        font-size: 24px;
+        color: #fff
+    }
+
+    .quote-brand p {
+        margin: 0;
+        color: #e0f4f4
+    }
+
+    .quote-document-footer {
+        border-top: 2px solid #c8e5e5;
+        margin-top: 30px;
+        padding: 18px 4px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+        color: #526a79;
+        font-size: 12px
+    }
+
+    .quote-document-footer strong {
+        color: #16485a
+    }
+
+    @media print {
+        @page {
+            size: A4;
+            margin: 15mm
+        }
+
+        body * {
+            visibility: hidden !important
+        }
+
+        .quote-page,
+        .quote-page * {
+            visibility: visible !important
+        }
+
+        .quote-page {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            max-width: none;
+            padding: 0 !important;
+            color: #111 !important
+        }
+
+        .quote-header,
+        .quote-actions,
+        .quote-back {
+            display: none !important
+        }
+
+        .quote-brand {
+            background: #fff !important;
+            color: #163d55 !important;
+            border: 1px solid #dbe5eb;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact
+        }
+
+        .quote-brand h2,
+        .quote-brand p {
+            color: #163d55 !important
+        }
+
+        .quote-card {
+            box-shadow: none !important;
+            break-inside: avoid;
+            border-radius: 6px;
+            margin-bottom: 12px
+        }
+
+        .quote-card-header,
+        .quote-card-body {
+            padding: 13px 17px
+        }
+
+        .quote-document-footer {
+            break-inside: avoid
+        }
+    }
 </style>
 
 <div class="quote-page">
+
+
+    <!-- BUSINESS BRANDING FROM CORE SETTINGS -->
+    <div class="quote-brand">
+        {% if site_settings.logo %}<img src="{{ site_settings.logo.url }}"
+            alt="{{ site_settings.business_name }} logo">{% endif %}
+        <div>
+            <h2>{{ site_settings.business_name|default:"Hands-On Health" }}</h2>
+            {% if site_settings.tagline %}<p>{{ site_settings.tagline }}</p>{% endif %}
+            <p>OFFICIAL QUOTATION &middot; #{{ quotation.pk }}</p>
+        </div>
+    </div>
 
     <!-- HEADER -->
     <div class="quote-header">
@@ -228,6 +347,9 @@ Quotation Details | Hands-On Health
             Preview Patient Quotation
         </a>
 
+        <a href="{% url 'staff:quotation_pdf' quotation.pk %}" class="quote-btn" download>
+            <i class="fas fa-file-pdf"></i> Download PDF
+        </a>
         <button type="button" class="quote-btn" onclick="window.print()">
             <i class="fas fa-print"></i>
             Print Quotation
@@ -413,6 +535,22 @@ Quotation Details | Hands-On Health
         </div>
     </div>
     {% endif %}
+
+    <footer class="quote-document-footer">
+        <div>
+            <strong>{{ site_settings.business_name|default:"Hands-On Health" }}</strong><br>
+            {% if site_settings.address %}{{ site_settings.address|linebreaksbr }}<br>{% endif %}
+            {% if site_settings.city %}{{ site_settings.city }}{% endif %}{% if site_settings.country %}, {{
+            site_settings.country }}{% endif %}
+        </div>
+        <div>
+            {% if site_settings.phone %}Phone: {{ site_settings.phone }}<br>{% endif %}
+            {% if site_settings.whatsapp %}WhatsApp: {{ site_settings.whatsapp }}<br>{% endif %}
+            {% if site_settings.email %}Email: {{ site_settings.email }}<br>{% endif %}
+            {% if site_settings.website %}Website: {{ site_settings.website }}{% endif %}
+        </div>
+        <div>Generated: {{ generated_at|date:"d M Y, H:i T" }}<br>Quotation #{{ quotation.pk }}</div>
+    </footer>
 
 </div>
 

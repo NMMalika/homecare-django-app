@@ -1,179 +1,337 @@
-
-
-
-
-
-{% extends 'base.html' %}
-{% load static %}
+{% extends "base.html" %}
+{% load static seo_tags %}
 
 {% block title %}
-Hands-On Health Home-Based Care Service
+Home Care FAQs in Windhoek, Namibia | Hands-On Health
 {% endblock %}
+
+{% block meta_description %}
+Find answers about Hands-On Health home nursing, caregiver qualifications,
+elderly care, care plans, home healthcare costs, and payment options
+in Windhoek and across Namibia.
+{% endblock %}
+
+{% block og_title %}
+Home Healthcare FAQs | Hands-On Health Namibia
+{% endblock %}
+
+{% block og_description %}
+Get answers to common questions about home nursing, professional
+caregivers, home care arrangements, and payment options in Namibia.
+{% endblock %}
+
+{% block twitter_title %}
+Home Healthcare FAQs | Hands-On Health
+{% endblock %}
+
+{% block twitter_description %}
+Frequently asked questions about home-based healthcare
+and professional nursing services in Namibia.
+{% endblock %}
+
+{% block structured_data %}
+{% faq_jsonld %}
+{% endblock %}
+
 
 {% block content %}
 
-    <!-- Page Title / Hero Section -->
+<!-- =========================================================
+     FAQ PAGE HERO
+========================================================= -->
 
-    <!-- Page Title / Hero Section -->
-    <!-- FAQ Page Title / Header Start -->
-    <section class="page-title-faq text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
+<section class="page-title-faq text-center">
 
-                    <!-- Category Badge -->
-                    <span class="faq-hero-badge">
-                        <i class="fa-solid fa-circle-question"></i> Help &amp; Information
-                    </span>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
 
-                    <!-- Main Page Heading -->
-                    <h1 class="faq-hero-title">
-                        Frequently Asked <span class="highlight-text">Questions</span>
-                    </h1>
+                <span class="faq-hero-badge">
+                    <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+                    Help &amp; Information
+                </span>
 
-                    <!-- Subtitle / Lead Paragraph -->
-                    <p class="faq-hero-subtitle">
-                        Find clear answers regarding our home nursing procedures, care plans, caregiver qualifications,
-                        and
-                        payment processes.
-                    </p>
+                <h1 class="faq-hero-title">
+                    Frequently Asked
+                    <span class="highlight-text">Questions</span>
+                </h1>
 
-                    <!-- Breadcrumb Navigation -->
+                <p class="faq-hero-subtitle">
+                    Find clear answers about our home nursing services,
+                    personalised care plans, caregiver qualifications,
+                    patient arrangements, and payment processes
+                    in Windhoek and across Namibia.
+                </p>
+
+                <nav aria-label="Breadcrumb">
                     <ul class="custom-breadcrumb">
-                        <li><a href="index.html">Home</a></li>
-                        <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
-                        <li class="active">FAQs</li>
-                    </ul>
 
-                </div>
+                        <li>
+                            <a href="{% url 'home' %}">
+                                Home
+                            </a>
+                        </li>
+
+                        <li class="separator">
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </li>
+
+                        <li class="active" aria-current="page">
+                            FAQs
+                        </li>
+
+                    </ul>
+                </nav>
+
             </div>
         </div>
-    </section>
-    <!-- FAQ Page Title / Header End -->
+    </div>
 
-    <!-- FAQ Section Start -->
-   {% include "includes/FAQS.html" %}
-    <!-- FAQ Section End -->
-    <!-- FAQ Items Grid -->
+</section>
 
-    <!-- Ask A Question Section Start -->
-    <section class="ask-question-section padding-top-80 padding-bottom-80">
-        <div class="container">
 
-            <!-- Section Header -->
-            <div class="row text-center margin-bottom-40">
-                <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
-                    <span class="sub-title-badge sky-badge">
-                        <i class="fa-solid fa-comments"></i> Still Have Questions?
-                    </span>
-                    <h2 class="section-title-main">
-                        Ask Us <span class="highlight-text">Anything</span>
-                    </h2>
-                    <div class="accent-line-center"></div>
-                    <p class="section-lead-p">
-                        Can't find the answer you're looking for in our FAQs? Submit your question below, and our care
-                        coordinators will respond promptly.
-                    </p>
-                </div>
+<!-- =========================================================
+     DYNAMIC FAQ SECTION
+     MANAGED THROUGH STAFF DASHBOARD
+========================================================= -->
+
+{% include "includes/FAQS.html" %}
+
+
+<!-- =========================================================
+     ASK A QUESTION SECTION
+========================================================= -->
+
+<section class="ask-question-section padding-top-80 padding-bottom-80" id="ask-a-question">
+
+    <div class="container">
+
+        <!-- SECTION HEADER -->
+
+        <div class="row text-center margin-bottom-40">
+
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+
+                <span class="sub-title-badge sky-badge">
+                    <i class="fa-solid fa-comments" aria-hidden="true"></i>
+                    Still Have Questions?
+                </span>
+
+                <h2 class="section-title-main">
+                    Ask Us
+                    <span class="highlight-text">Anything</span>
+                </h2>
+
+                <div class="accent-line-center"></div>
+
+                <p class="section-lead-p">
+                    Can't find the answer you're looking for?
+                    Submit your question below and our care
+                    coordination team will get back to you.
+                </p>
+
             </div>
 
-            <!-- Ask Question Form Container -->
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
-                    <div class="ask-question-card">
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
-                            {{ message }}
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                        <form action="{% url 'staff:ask_question' %}" method="post" class="custom-medical-form">
-                            {% csrf_token %}
+        </div>
 
-                            <!-- Full Name -->
-                            <div class="form-group custom-field-group">
-                                <label class="field-label">Your Full Name <span class="required-star">*</span></label>
-                                <div class="input-icon-wrapper">
-                                    <i class="fa-regular fa-user field-icon"></i>
-                                    <input type="text" name="ask_name" class="form-control custom-input"
-                                        placeholder="e.g. Jane Doe" required>
-                                </div>
-                            </div>
 
-                            <!-- Email & Phone Number (Separated Grid) -->
-                            <div class="row">
-                                <div class="col-md-6 col-sm-6">
-                                    <div class="form-group custom-field-group">
-                                        <label class="field-label">Email Address <span
-                                                class="required-star">*</span></label>
-                                        <div class="input-icon-wrapper">
-                                            <i class="fa-regular fa-envelope field-icon"></i>
-                                            <input type="email" name="ask_email" class="form-control custom-input"
-                                                placeholder="e.g. jane@example.com" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-sm-6">
-                                    <div class="form-group custom-field-group">
-                                        <label class="field-label">Phone Number <span
-                                                class="required-star">*</span></label>
-                                        <div class="input-icon-wrapper">
-                                            <i class="fa-solid fa-phone field-icon"></i>
-                                            <input type="tel" name="ask_phone" class="form-control custom-input"
-                                                placeholder="e.g. +264 81 123 4567" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- QUESTION FORM -->
 
-                            <!-- Quick Topic Selector Tags -->
-                            <div class="form-group custom-field-group">
-                                <label class="field-label">Topic Area <span class="optional-tag">(Select one if
-                                        applicable)</span></label>
-                                <div class="topic-tags-wrapper">
-                                    <label class="topic-chip">
-                                        <input type="radio" name="question_topic" value="care-plans" checked>
-                                        <span>Care Plans &amp; Rates</span>
-                                    </label>
-                                    <label class="topic-chip">
-                                        <input type="radio" name="question_topic" value="nursing">
-                                        <span>Nursing Qualifications</span>
-                                    </label>
-                                    <label class="topic-chip">
-                                        <input type="radio" name="question_topic" value="medical-aid">
-                                        <span>Medical Aid &amp; Billing</span>
-                                    </label>
-                                    <label class="topic-chip">
-                                        <input type="radio" name="question_topic" value="general">
-                                        <span>General Enquiry</span>
-                                    </label>
-                                </div>
-                            </div>
+        <div class="row">
 
-                            <!-- Question Textarea -->
-                            <div class="form-group custom-field-group">
-                                <label class="field-label">Your Question <span class="required-star">*</span></label>
-                                <textarea name="user_question" class="form-control custom-textarea" rows="4"
-                                    placeholder="Type your question here in detail..." required></textarea>
-                            </div>
+            <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
 
-                            <!-- Submit CTA -->
-                            <div class="text-center margin-top-20">
-                                <button type="submit" class="btn btn-submit-request">
-                                    <span>Send Question</span>
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                            </div>
+                <div class="ask-question-card">
 
-                        </form>
+                    {% if messages %}
+
+                    {% for message in messages %}
+
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}"
+                        role="alert">
+
+                        {{ message }}
 
                     </div>
+
+                    {% endfor %}
+
+                    {% endif %}
+
+
+                    <form action="{% url 'staff:ask_question' %}" method="post" class="custom-medical-form">
+
+                        {% csrf_token %}
+
+
+                        <!-- FULL NAME -->
+
+                        <div class="form-group custom-field-group">
+
+                            <label for="ask_name" class="field-label">
+                                Your Full Name
+                                <span class="required-star">*</span>
+                            </label>
+
+                            <div class="input-icon-wrapper">
+
+                                <i class="fa-regular fa-user field-icon" aria-hidden="true"></i>
+
+                                <input id="ask_name" type="text" name="ask_name" class="form-control custom-input"
+                                    placeholder="e.g. Jane Doe" autocomplete="name" maxlength="150" required>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- EMAIL AND PHONE -->
+
+                        <div class="row">
+
+                            <div class="col-md-6 col-sm-6">
+
+                                <div class="form-group custom-field-group">
+
+                                    <label for="ask_email" class="field-label">
+                                        Email Address
+                                        <span class="required-star">*</span>
+                                    </label>
+
+                                    <div class="input-icon-wrapper">
+
+                                        <i class="fa-regular fa-envelope field-icon" aria-hidden="true"></i>
+
+                                        <input id="ask_email" type="email" name="ask_email"
+                                            class="form-control custom-input" placeholder="e.g. jane@example.com"
+                                            autocomplete="email" required>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6 col-sm-6">
+
+                                <div class="form-group custom-field-group">
+
+                                    <label for="ask_phone" class="field-label">
+                                        Phone Number
+                                        <span class="required-star">*</span>
+                                    </label>
+
+                                    <div class="input-icon-wrapper">
+
+                                        <i class="fa-solid fa-phone field-icon" aria-hidden="true"></i>
+
+                                        <input id="ask_phone" type="tel" name="ask_phone"
+                                            class="form-control custom-input" placeholder="e.g. +264 81 123 4567"
+                                            autocomplete="tel" required>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- QUESTION TOPIC -->
+
+                        <fieldset class="form-group custom-field-group">
+
+                            <legend class="field-label">
+                                Topic Area
+                                <span class="optional-tag">
+                                    (Select one if applicable)
+                                </span>
+                            </legend>
+
+                            <div class="topic-tags-wrapper">
+
+                                <label class="topic-chip">
+
+                                    <input type="radio" name="question_topic" value="care-plans" checked>
+
+                                    <span>Care Plans &amp; Rates</span>
+
+                                </label>
+
+
+                                <label class="topic-chip">
+
+                                    <input type="radio" name="question_topic" value="nursing">
+
+                                    <span>Nursing Qualifications</span>
+
+                                </label>
+
+
+                                <label class="topic-chip">
+
+                                    <input type="radio" name="question_topic" value="medical-aid">
+
+                                    <span>Medical Aid &amp; Billing</span>
+
+                                </label>
+
+
+                                <label class="topic-chip">
+
+                                    <input type="radio" name="question_topic" value="general">
+
+                                    <span>General Enquiry</span>
+
+                                </label>
+
+                            </div>
+
+                        </fieldset>
+
+
+                        <!-- QUESTION -->
+
+                        <div class="form-group custom-field-group">
+
+                            <label for="user_question" class="field-label">
+                                Your Question
+                                <span class="required-star">*</span>
+                            </label>
+
+                            <textarea id="user_question" name="user_question" class="form-control custom-textarea"
+                                rows="4" maxlength="3000" placeholder="Type your question here in detail..."
+                                required></textarea>
+
+                        </div>
+
+
+                        <!-- SUBMIT BUTTON -->
+
+                        <div class="text-center margin-top-20">
+
+                            <button type="submit" class="btn btn-submit-request">
+
+                                <span>Send Question</span>
+
+                                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
                 </div>
+
             </div>
 
         </div>
-    </section>
-    <!-- Ask A Question Section End -->
+
+    </div>
+
+</section>
 
 {% endblock %}

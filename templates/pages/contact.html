@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-Hands-On Health Home-Based Care Service
-{% endblock %}
+{% block title %}Contact Hands-On Health | Home Care in Windhoek, Namibia{% endblock %}
+
+{% block meta_description %}Contact Hands-On Health for home nursing, elderly care, caregiver support and personalised
+home-based healthcare in Windhoek and across Namibia. Request care or send an enquiry.{% endblock %}
+
+{% block og_title %}Contact Hands-On Health | Home Care Namibia{% endblock %}
+{% block og_description %}Speak with Hands-On Health about professional home-based care, nursing support and care
+arrangements in Namibia.{% endblock %}
+{% block twitter_title %}Contact Hands-On Health Namibia{% endblock %}
+{% block twitter_description %}Get in touch about home nursing and home-based care in Windhoek and Namibia.{% endblock%}
 
 {% block content %}
 <!-- Inner Banner Section Start -->
@@ -35,7 +42,8 @@ Hands-On Health Home-Based Care Service
             <!-- Right Full-Height Blended Image Column -->
             <div class="col-md-6 col-sm-12 hidden-xs">
                 <div class="full-height-image-wrapper">
-                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Hands-on Health Care Nurse" class="seamless-banner-img">
+                    <img src="{% static 'img/nurse1.jpeg' %}" alt="Hands-on Health Care Nurse"
+                        class="seamless-banner-img">
                     <div class="seamless-gradient-overlay"></div>
                 </div>
             </div>
@@ -101,11 +109,11 @@ Hands-On Health Home-Based Care Service
                 </div>
             </div>
 
-           
+
             <!-- Right Column: Direct Contact Methods Grid -->
             <div class="col-md-7 col-sm-12 flex-col">
                 <div class="contact-cards-grid">
-            
+
                     <!-- Phone Card -->
                     <div class="contact-card-item">
                         <div class="contact-icon-box">
@@ -114,13 +122,13 @@ Hands-On Health Home-Based Care Service
                         <div class="contact-card-content">
                             <h4>Phone Support</h4>
                             <p class="contact-label">Speak directly with our team</p>
-            
+
                             <a href="tel:{{ site_settings.phone }}" class="contact-link">
                                 {{ site_settings.phone }}
                             </a>
                         </div>
                     </div>
-            
+
                     <!-- WhatsApp Card -->
                     <div class="contact-card-item">
                         <div class="contact-icon-box whatsapp-bg">
@@ -129,14 +137,16 @@ Hands-On Health Home-Based Care Service
                         <div class="contact-card-content">
                             <h4>WhatsApp Care Line</h4>
                             <p class="contact-label">Instant messaging &amp; consultation</p>
-            
-                            <a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" rel="noopener noreferrer"
-                                class="contact-link">
+
+                            {% if site_settings.whatsapp %}
+                            <a href="https://wa.me/{{ site_settings.whatsapp|cut:' '|cut:'+' }}" target="_blank"
+                                rel="noopener noreferrer" class="contact-link">
                                 {{ site_settings.whatsapp }}
                             </a>
+                            {% else %}<span>Contact us for WhatsApp details</span>{% endif %}
                         </div>
                     </div>
-            
+
                     <!-- Email Card -->
                     <div class="contact-card-item full-width-card">
                         <div class="contact-icon-box">
@@ -147,24 +157,26 @@ Hands-On Health Home-Based Care Service
                             <p class="contact-label">
                                 Send us your detailed medical care requests or referrals
                             </p>
-            
+
                             <div class="email-links-wrapper">
                                 <a href="mailto:{{ site_settings.email }}" class="contact-link">
                                     {{ site_settings.email }}
                                 </a>
-            
-                                <span class="divider-dot">•</span>
-            
+
+                                {% if site_settings.care_email %}<span class="divider-dot">•</span>{% endif %}
+
+                                {% if site_settings.care_email %}
                                 <a href="mailto:{{ site_settings.care_email }}" class="contact-link">
                                     {{ site_settings.care_email }}
                                 </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-            
+
                 </div>
             </div>
-           
+
 
         </div>
 
@@ -242,8 +254,8 @@ Hands-On Health Home-Based Care Service
                             initial nurse consultation.</p>
                     </div>
 
-                <form action="{% url 'pages:contact' %}" method="post" class="custom-medical-form">
-                    {% csrf_token %}
+                    <form action="{% url 'pages:contact' %}" method="post" class="custom-medical-form">
+                        {% csrf_token %}
                         <div class="row">
                             <div class="col-md-6 col-sm-6">
                                 <div class="form-group custom-field-group">
@@ -286,7 +298,7 @@ Hands-On Health Home-Based Care Service
                                         <i class="fa-solid fa-notes-medical field-icon"></i>
                                         <select name="service" id="service" class="form-control custom-select" required>
                                             <option value="">Select Service Needed</option>
-                                        
+
                                             {% for category in categories %}
                                             {% for service in category.services.all %}
                                             {% if service.is_active %}
@@ -296,7 +308,7 @@ Hands-On Health Home-Based Care Service
                                             {% endif %}
                                             {% endfor %}
                                             {% endfor %}
-                                        
+
                                             <option value="other">General Enquiry</option>
                                         </select>
                                     </div>
@@ -340,8 +352,8 @@ Hands-On Health Home-Based Care Service
                     </div>
 
                     <p class="sidebar-description">
-                        Our registered nurses and professional home caregivers are on call across major urban centers in
-                        Namibia.
+                        Contact our team to discuss caregiver availability and home-care arrangements in Windhoek and
+                        other areas of Namibia.
                     </p>
 
                     <div class="info-block-item">
@@ -353,7 +365,7 @@ Hands-On Health Home-Based Care Service
 
                             <li class="highlight-item">
                                 <i class="fa-solid fa-user-nurse"></i>
-                                <span><strong>24/7</strong> In-Home Patient On-Call Support</span>
+                                <span>Care schedules and availability confirmed on enquiry</span>
                             </li>
                         </ul>
                     </div>
@@ -366,15 +378,16 @@ Hands-On Health Home-Based Care Service
                         <ul class="info-details-list">
                             <li>
                                 <i class="fa-solid fa-location-dot location-pin"></i>
-                                <span><strong>Khomas Region:</strong> Windhoek &amp; Surrounds</span>
+                                <span><strong>Windhoek:</strong> Home care subject to availability</span>
                             </li>
                             <li>
                                 <i class="fa-solid fa-location-dot location-pin"></i>
-                                <span><strong>Erongo Region:</strong> Swakopmund, Walvis Bay</span>
+                                <span><strong>Other areas:</strong> Please enquire about availability and travel
+                                    fees</span>
                             </li>
                             <li class="outreach-badge-item">
                                 <i class="fa-solid fa-circle-info"></i>
-                                <span>Special outreach available upon request</span>
+                                <span>Service arrangements are confirmed individually</span>
                             </li>
                         </ul>
                     </div>
@@ -383,8 +396,8 @@ Hands-On Health Home-Based Care Service
                     <div class="sidebar-footer-callout">
                         <i class="fa-solid fa-headset"></i>
                         <div>
-                            <strong>Need Urgent Care Assistance?</strong>
-                            <p>Call our dispatch coordinator directly via phone or WhatsApp.</p>
+                            <strong>Need to discuss care arrangements?</strong>
+                            <p>Call or message our team. For a medical emergency, contact local emergency services.</p>
                         </div>
                     </div>
 

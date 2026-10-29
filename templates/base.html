@@ -1,208 +1,274 @@
-{% load static %}
+{% load static seo_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-    <meta charset="utf-8">
+     <!-- =====================================================
+         BASIC META
+    ===================================================== -->
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta charset="utf-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <meta name="description"
-        content="{% block meta_description %}Professional home-based care and medical services in Namibia.{% endblock %}">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta name="author" content="Hands-On Health">
+     <meta name="author" content="{{ site_settings.business_name|default:'Hands-On Health' }}">
 
-    <title>
-        {% block title %}
-        {{ site_settings.business_name|default:"Hands-On Health" }}
-        {% endblock %}
-    </title>
+     <meta name="theme-color" content="#00b4d8">
 
+     <!-- =====================================================
+         DYNAMIC SEO TITLE
+         Child templates can override block title.
+    ===================================================== -->
 
-    <!-- =====================================================
+     <title>
+          {% block title %}
+          {{ site_settings.business_name|default:"Hands-On Health" }} | Home-Based Care in Namibia
+          {%endblock %}
+     </title>
+
+     <!-- =====================================================
+         DYNAMIC META DESCRIPTION
+    ===================================================== -->
+
+     <meta name="description"
+          content="{% block meta_description %}Explore professional home-based care, nursing support and healthcare services from Hands-On Health in Namibia. Contact our team for service availability.{% endblock %}">
+
+     <!-- =====================================================
+         SEARCH ENGINE INDEXING
+         Private pages should override seo_robots.
+    ===================================================== -->
+
+     <meta name="robots" content="{% block seo_robots %}index,follow,max-image-preview:large{% endblock %}">
+
+     <!-- =====================================================
+         DYNAMIC CANONICAL URL
+         Removes query parameters from canonical URLs.
+    ===================================================== -->
+
+     {% canonical_url request as page_canonical %}
+
+     {% block canonical_url %}
+     {% if page_canonical %}
+     <link rel="canonical" href="{{ page_canonical }}">
+     {% endif %}
+     {% endblock %}
+
+     <!-- =====================================================
+         OPEN GRAPH / SOCIAL SHARING
+    ===================================================== -->
+
+     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+
+     <meta property="og:site_name" content="{{ site_settings.business_name|default:'Hands-On Health' }}">
+
+     <meta property="og:locale" content="en_NA">
+
+     <meta property="og:title"
+          content="{% block og_title %}{{ site_settings.business_name|default:'Hands-On Health' }} | Home-Based Care in Namibia{% endblock %}">
+
+     <meta property="og:description"
+          content="{% block og_description %}Explore professional home-based care and healthcare support from Hands-On Health in Namibia.{% endblock %}">
+
+     {% if page_canonical %}
+     <meta property="og:url" content="{{ page_canonical }}">
+     {% endif %}
+
+     <!-- =====================================================
+         SOCIAL SHARING IMAGE
+    ===================================================== -->
+
+     {% if site_settings.logo %}
+     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}">
+     {% endif %}
+
+     <!-- =====================================================
+         TWITTER / X META
+    ===================================================== -->
+
+     <meta name="twitter:card" content="summary_large_image">
+
+     <meta name="twitter:title"
+          content="{% block twitter_title %}{{ site_settings.business_name|default:'Hands-On Health' }} | Home-Based Care in Namibia{% endblock %}">
+
+     <meta name="twitter:description"
+          content="{% block twitter_description %}Discover home-based care and healthcare support services from Hands-On Health.{% endblock %}">
+
+     {% if site_settings.logo %}
+     <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}">
+     {% endif %}
+
+     <!-- =====================================================
+         ADDITIONAL PAGE SEO
+    ===================================================== -->
+
+     {% block extra_seo %}
+     {% endblock %}
+
+     <!-- =====================================================
+         DYNAMIC BUSINESS STRUCTURED DATA
+         Uses core.SiteSettings automatically.
+    ===================================================== -->
+
+     {% business_jsonld request %}
+
+     <!-- =====================================================
+         PAGE-SPECIFIC STRUCTURED DATA
+         FAQ pages: {% templatetag openblock %} faq_jsonld {% templatetag closeblock %}
+         Services:  {% templatetag openblock %} services_jsonld request {% templatetag closeblock %}
+    ===================================================== -->
+
+     {% block structured_data %}
+     {% endblock %}
+
+     <!-- =====================================================
          BOOTSTRAP CSS
     ===================================================== -->
 
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          MAIN WEBSITE CSS
     ===================================================== -->
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
-<link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
+     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          FONT AWESOME ICONS
     ===================================================== -->
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          CHATBOT CSS
     ===================================================== -->
 
-    <link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
+     <link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          FAVICON
     ===================================================== -->
 
-    {% if site_settings.favicon %}
+     {% if site_settings.favicon %}
+     <link rel="icon" href="{{ site_settings.favicon.url }}">
+     {% else %}
+     <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+     {% endif %}
 
-    <link rel="icon" href="{{ site_settings.favicon.url }}" type="image/png">
-
-    {% else %}
-
-    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
-
-    {% endif %}
-
-
-    <!-- =====================================================
+     <!-- =====================================================
          PAGE-SPECIFIC CSS
     ===================================================== -->
 
-    {% block extra_css %}
-    {% endblock %}
+     {% block extra_css %}
+     {% endblock %}
 
 </head>
 
-
 <body>
 
-    <!-- =====================================================
+     <!-- =====================================================
          PRELOADER
     ===================================================== -->
 
-    <div class="preloader"></div>
+     <div class="preloader"></div>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          TOP BAR
     ===================================================== -->
 
-    {% include "includes/topbar.html" %}
+     {% include "includes/topbar.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          NAVIGATION
     ===================================================== -->
 
-    {% include "includes/navbar.html" %}
+     {% include "includes/navbar.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          DJANGO MESSAGES
     ===================================================== -->
 
-    {% include "includes/messages.html" %}
+     {% include "includes/messages.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          MAIN PAGE CONTENT
     ===================================================== -->
 
-    {% block content %}
-    {% endblock %}
+     {% block content %}
+     {% endblock %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          FOOTER
     ===================================================== -->
 
-    {% include "includes/footer.html" %}
+     {% include "includes/footer.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          FLOATING BUTTONS
          WhatsApp / Ask Us Anything / Scroll Up
     ===================================================== -->
 
-    {% include "includes/floating_buttons.html" %}
+     {% include "includes/floating_buttons.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          HANDS-ON HEALTH CHATBOT POPUP
     ===================================================== -->
 
-    {% include "includes/chatbot.html" %}
+     {% include "includes/chatbot.html" %}
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          JQUERY
     ===================================================== -->
 
-    <script src="{% static 'js/jquery.min.js' %}">
-    </script>
+     <script src="{% static 'js/jquery.min.js' %}"></script>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          BOOTSTRAP JAVASCRIPT
     ===================================================== -->
 
-    <script src="{% static 'js/bootstrap.min.js' %}">
-    </script>
+     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          WEBSITE PLUGINS
     ===================================================== -->
 
-    <script src="{% static 'js/bootstrap-datepicker.min.js' %}">
-    </script>
+     <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
 
-    <script src="{% static 'js/css3-animate-it.js' %}">
-    </script>
+     <script src="{% static 'js/css3-animate-it.js' %}"></script>
 
-    <script src="{% static 'js/bootstrap-dropdownhover.min.js' %}">
-    </script>
+     <script src="{% static 'js/bootstrap-dropdownhover.min.js' %}"></script>
 
-    <script src="{% static 'js/owl.carousel.min.js' %}">
-    </script>
+     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 
-    <script src="{% static 'js/gallery.js' %}">
-    </script>
+     <script src="{% static 'js/gallery.js' %}"></script>
 
-    <script src="{% static 'js/player.min.js' %}">
-    </script>
+     <script src="{% static 'js/player.min.js' %}"></script>
 
-    <script src="{% static 'js/retina.js' %}">
-    </script>
+     <script src="{% static 'js/retina.js' %}"></script>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          MAIN WEBSITE JAVASCRIPT
     ===================================================== -->
 
-    <script src="{% static 'js/script.js' %}">
-    </script>
+     <script src="{% static 'js/script.js' %}"></script>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          CHATBOT JAVASCRIPT
     ===================================================== -->
 
-    <script src="{% static 'chatbot/js/chatbot.js' %}" defer>
-    </script>
+     <script src="{% static 'chatbot/js/chatbot.js' %}" defer></script>
 
-
-    <!-- =====================================================
+     <!-- =====================================================
          PAGE-SPECIFIC JAVASCRIPT
     ===================================================== -->
 
-    {% block extra_js %}
-    {% endblock %}
+     {% block extra_js %}
+     {% endblock %}
 
 </body>
 
