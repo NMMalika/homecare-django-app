@@ -1,0 +1,98 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Weekly Caregiver Reports | Hands-On Health{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fa-solid fa-calendar-week me-2"></i>
+                Weekly Caregiver Reports
+            </h2>
+            <p class="text-muted mb-0">
+                Review weekly care summaries submitted by caregivers.
+            </p>
+        </div>
+        <a href="{% url 'staff:reports' %}" class="btn btn-outline-primary">
+            Daily Reports
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="text-muted">Total Weekly Reports</h6>
+            <h2 class="fw-bold">{{ total_reports }}</h2>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <form method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="search" name="q" value="{{ search }}" class="form-control"
+                        placeholder="Search caregiver or patient...">
+                    <button class="btn btn-primary" type="submit">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Report</th>
+                            <th>Caregiver</th>
+                            <th>Patient</th>
+                            <th>Week Start</th>
+                            <th>Week End</th>
+                            <th>Assignment</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td>
+                                <strong>#{{ report.pk }}</strong>
+                            </td>
+
+                            <td>
+                                {{ report.assignment.caregiver.name }}
+                            </td>
+
+                            <td>
+                                {{ report.assignment.homecare_request.full_name }}
+                            </td>
+
+                            <td>
+                                {{ report.week_start|date:"d M Y" }}
+                            </td>
+
+                            <td>
+                                {{ report.week_end|date:"d M Y" }}
+                            </td>
+
+                            <td>
+                                #{{ report.assignment.pk }}
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                No weekly caregiver reports found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

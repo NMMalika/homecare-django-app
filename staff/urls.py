@@ -130,6 +130,11 @@ urlpatterns = [
         views.caregiver_daily_report_delete,
         name="report_delete",
     ),
+    path(
+        "reports/weekly/",
+        views.caregiver_weekly_reports,
+        name="weekly_reports",
+    ),
     # =========================================================
     # HOME CARE REQUESTS
     # =========================================================

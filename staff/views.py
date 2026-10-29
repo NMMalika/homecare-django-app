@@ -55,6 +55,7 @@ from homecare.models import (
     CaregiverAssignment,
     CaregiverCertificate,
     CaregiverDailyReport,
+    CaregiverWeeklyReport,
     CaregiverPayment,
     CaregiverInvitation,
     HomeCareRequest,
@@ -420,6 +421,20 @@ def dashboard(request):
         "referral_count": Referral.objects.count(),
         "pending_referrals": Referral.objects.filter(status="PENDING").count(),
         "recent_referrals": recent_referrals,
+        "daily_report_count": CaregiverDailyReport.objects.count(),
+        "weekly_report_count": CaregiverWeeklyReport.objects.count(),
+        "recent_daily_reports": (
+            CaregiverDailyReport.objects.select_related(
+                "assignment__caregiver",
+                "assignment__homecare_request",
+            ).order_by("-report_date")[:5]
+        ),
+        "recent_weekly_reports": (
+            CaregiverWeeklyReport.objects.select_related(
+                "assignment__caregiver",
+                "assignment__homecare_request",
+            ).order_by("-week_start")[:5]
+        ),
     }
 
     return render(
@@ -665,9 +680,9 @@ Hands-On Health
 
             return redirect("staff:caregivers")
 
-            # ----------------------------------------------------
-        # SUSPEND APPROVED CAREGIVER
         # ----------------------------------------------------
+        # SUSPEND APPROVED CAREGIVER
+        # ---------------------------------------------------
 
         elif action == "suspend":
 
@@ -1788,7 +1803,6 @@ def quotations(request):
     )
 
 
-
 # ============================================================
 # STAFF QUOTATION DETAILS
 # ============================================================
@@ -1962,22 +1976,36 @@ def payment_detail(request, pk):
 # ============================================================
 
 
+# ============================================================
+# STAFF - CAREGIVER REPORTS MANAGEMENT
+# DAILY + WEEKLY REPORTS IN ONE DASHBOARD
+# ============================================================
+
+
 @admin_required
 def caregiver_daily_reports(request):
 
-    condition = request.GET.get(
-        "condition",
-        "",
-    ).strip()
+    # --------------------------------------------------------
+    # FILTERS
+    # --------------------------------------------------------
 
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
+    condition = request.GET.get("condition", "").strip()
 
-    reports_queryset = CaregiverDailyReport.objects.select_related(
+    search = request.GET.get("q", "").strip()
+
+    active_tab = request.GET.get("tab", "daily").strip().lower()
+
+    if active_tab not in ("daily", "weekly"):
+        active_tab = "daily"
+
+    # --------------------------------------------------------
+    # DAILY REPORTS
+    # --------------------------------------------------------
+
+    daily_reports = CaregiverDailyReport.objects.select_related(
         "assignment",
         "assignment__caregiver",
+        "assignment__caregiver__user",
         "assignment__homecare_request",
         "reviewed_by",
     ).order_by(
@@ -1985,32 +2013,126 @@ def caregiver_daily_reports(request):
         "-submitted_at",
     )
 
+    # --------------------------------------------------------
+    # WEEKLY REPORTS
+    # --------------------------------------------------------
+
+    weekly_reports = CaregiverWeeklyReport.objects.select_related(
+        "assignment",
+        "assignment__caregiver",
+        "assignment__caregiver__user",
+        "assignment__homecare_request",
+    ).order_by(
+        "-week_start",
+        "-pk",
+    )
+
+    # --------------------------------------------------------
+    # SEARCH BOTH REPORT TYPES
+    # --------------------------------------------------------
+
     if search:
 
-        reports_queryset = reports_queryset.filter(
+        search_filter = (
             Q(assignment__caregiver__name__icontains=search)
             | Q(assignment__caregiver__user__first_name__icontains=search)
             | Q(assignment__caregiver__user__last_name__icontains=search)
+            | Q(assignment__homecare_request__full_name__icontains=search)
         )
 
-    if condition:
+        daily_reports = daily_reports.filter(search_filter)
 
-        reports_queryset = reports_queryset.filter(patient_condition=condition)
+        weekly_reports = weekly_reports.filter(search_filter)
+
+    # --------------------------------------------------------
+    # PATIENT CONDITION FILTER
+    # --------------------------------------------------------
 
     condition_field = CaregiverDailyReport._meta.get_field("patient_condition")
 
     condition_choices = condition_field.choices
 
+    valid_conditions = {value for value, label in condition_choices}
+
+    if condition in valid_conditions:
+
+        daily_reports = daily_reports.filter(patient_condition=condition)
+
+        # Weekly reports use their own condition field.
+        # Apply the filter only if that field exists.
+        weekly_field_names = {
+            field.name for field in CaregiverWeeklyReport._meta.get_fields()
+        }
+
+        if "overall_condition" in weekly_field_names:
+            weekly_reports = weekly_reports.filter(overall_condition=condition)
+
+    else:
+        condition = ""
+
+    # --------------------------------------------------------
+    # DASHBOARD STATISTICS
+    # --------------------------------------------------------
+
+    daily_count = CaregiverDailyReport.objects.count()
+
+    weekly_count = CaregiverWeeklyReport.objects.count()
+
+    total_reports = daily_count + weekly_count
+
+    # Count reports awaiting review where supported
+    daily_field_names = {
+        field.name for field in CaregiverDailyReport._meta.get_fields()
+    }
+
+    weekly_field_names = {
+        field.name for field in CaregiverWeeklyReport._meta.get_fields()
+    }
+
+    unreviewed_count = 0
+
+    if "reviewed_at" in daily_field_names:
+        unreviewed_count += CaregiverDailyReport.objects.filter(
+            reviewed_at__isnull=True
+        ).count()
+
+    if "reviewed_at" in weekly_field_names:
+        unreviewed_count += CaregiverWeeklyReport.objects.filter(
+            reviewed_at__isnull=True
+        ).count()
+
+    # --------------------------------------------------------
+    # TEMPLATE CONTEXT
+    # --------------------------------------------------------
+
+    context = {
+        "site_settings": SiteSettings.load(),
+        # Daily reports
+        "daily_reports": daily_reports,
+        # Weekly reports
+        "weekly_reports": weekly_reports,
+        # Existing template compatibility
+        "reports": daily_reports,
+        # Statistics
+        "daily_count": daily_count,
+        "weekly_count": weekly_count,
+        "total_reports": total_reports,
+        "unreviewed_count": unreviewed_count,
+        # Filters
+        "condition": condition,
+        "search": search,
+        "active_tab": active_tab,
+        "condition_choices": condition_choices,
+    }
+
+    # --------------------------------------------------------
+    # RENDER COMBINED REPORTS DASHBOARD
+    # --------------------------------------------------------
+
     return render(
         request,
-        "staff/reports.html",
-        {
-            "reports": reports_queryset,
-            "condition": condition,
-            "search": search,
-            "condition_choices": condition_choices,
-            "site_settings": SiteSettings.load(),
-        },
+        "staff/caregiver_reports.html",
+        context,
     )
 
 
@@ -2132,6 +2254,41 @@ def caregiver_daily_report_delete(request, pk):
             "report": report,
             "site_settings": SiteSettings.load(),
         },
+    )
+
+# ============================================================
+# STAFF - CAREGIVER WEEKLY REPORTS
+# ============================================================
+
+
+@admin_required
+def caregiver_weekly_reports(request):
+
+    search = request.GET.get("q", "").strip()
+
+    reports = CaregiverWeeklyReport.objects.select_related(
+        "assignment",
+        "assignment__caregiver",
+        "assignment__homecare_request",
+    ).order_by("-week_start", "-pk")
+
+    if search:
+        reports = reports.filter(
+            Q(assignment__caregiver__name__icontains=search)
+            | Q(assignment__homecare_request__full_name__icontains=search)
+        )
+
+    context = {
+        "reports": reports,
+        "search": search,
+        "total_reports": reports.count(),
+        "site_settings": SiteSettings.load(),
+    }
+
+    return render(
+        request,
+        "staff/caregiver_weekly_reports.html",
+        context,
     )
 
 

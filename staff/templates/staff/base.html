@@ -138,14 +138,14 @@
 
                 <div class="nav-label">MANAGEMENT</div>
 
-                <!-- Daily Reports -->
+                <!-- Caregiver Reports -->
                 <a href="{% url 'staff:reports' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'report_add' or request.resolver_match.url_name == 'report_edit' or request.resolver_match.url_name == 'report_delete' %}active{% endif %}"
                     title="Caregiver Daily Reports">
                     <span class="nav-icon">
                         <i class="fa-solid fa-file-medical"></i>
                     </span>
-                    <span>Daily Reports</span>
+                    <span>Caregiver Reports</span>
                 </a>
 
                 <!-- Services -->
