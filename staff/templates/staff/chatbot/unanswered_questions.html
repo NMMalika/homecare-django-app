@@ -1,0 +1,525 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}Unanswered Questions | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .unanswered-dashboard-wrapper {
+        padding: 1.5rem 0 3.5rem;
+        color: #0f172a;
+    }
+
+    /* Page Header */
+    .uq-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .uq-kicker {
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #2563eb;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .uq-title {
+        font-size: 1.875rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.35rem 0;
+        color: #0f172a;
+    }
+
+    .uq-subtitle {
+        font-size: 0.9375rem;
+        color: #64748b;
+        margin: 0;
+        max-width: 720px;
+        line-height: 1.5;
+    }
+
+    /* Header Action Buttons */
+    .uq-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        height: 44px;
+        padding: 0 1.25rem;
+        border-radius: 0.625rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #334155;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+    }
+
+    .uq-action-btn:hover {
+        color: #1d4ed8;
+        border-color: #93c5fd;
+        background: #eff6ff;
+        transform: translateY(-1px);
+    }
+
+    .uq-action-btn.primary {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
+
+    .uq-action-btn.primary:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        color: #ffffff;
+        box-shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Stat Indicator Card */
+    .uq-stat-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.35rem 1.6rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+        max-width: 420px;
+        margin-bottom: 2rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .uq-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.07);
+    }
+
+    .uq-stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        display: block;
+    }
+
+    .uq-stat-value {
+        font-size: 2.125rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin: 0.25rem 0 0 0;
+        color: #b45309;
+    }
+
+    .uq-stat-icon {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 0.75rem;
+        color: #b45309;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    /* Filter Navigation Pills */
+    .uq-filter-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .uq-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        border-radius: 9999px;
+        padding: 0.55rem 1.125rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .uq-pill:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .uq-pill.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Question Cards */
+    .uq-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.6rem;
+        margin-bottom: 1.35rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .uq-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.07);
+    }
+
+    .uq-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.25rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .uq-question {
+        font-size: 1.0625rem;
+        font-weight: 800;
+        color: #0f172a;
+        overflow-wrap: anywhere;
+        margin: 0;
+        line-height: 1.45;
+    }
+
+    .uq-date {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        white-space: nowrap;
+        background: #f1f5f9;
+        padding: 0.3rem 0.65rem;
+        border-radius: 9999px;
+    }
+
+    .uq-note {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.25rem;
+        color: #475569;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+    }
+
+    .uq-note i {
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .uq-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.35rem;
+        font-size: 0.8125rem;
+        color: #64748b;
+    }
+
+    .uq-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .uq-badge.new {
+        color: #b45309;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+    }
+
+    .uq-badge.reviewed {
+        color: #1d4ed8;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+    }
+
+    .uq-badge.resolved {
+        color: #047857;
+        background: #ecfdf5;
+        border: 1px solid #d1fae5;
+    }
+
+    .uq-badge.ignored {
+        color: #64748b;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+    }
+
+    .uq-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.875rem;
+    }
+
+    .uq-btn-train {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: 40px;
+        padding: 0 1.25rem;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    .uq-btn-train:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .uq-btn-ignore {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        height: 40px;
+        padding: 0 1.25rem;
+        background: #ffffff;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .uq-btn-ignore:hover {
+        background: #fef2f2;
+        border-color: #dc2626;
+        color: #b91c1c;
+    }
+
+    /* Empty State */
+    .uq-empty {
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 4.5rem 1.5rem;
+        color: #64748b;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04);
+    }
+
+    .uq-empty-icon {
+        width: 64px;
+        height: 64px;
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin: 0 auto 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+        .uq-title {
+            font-size: 1.5rem;
+        }
+
+        .uq-card {
+            padding: 1.25rem;
+        }
+
+        .uq-card-top {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .uq-action-btn,
+        .uq-btn-train,
+        .uq-btn-ignore {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .uq-actions {
+            width: 100%;
+        }
+
+        .uq-actions form {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid unanswered-dashboard-wrapper">
+
+    <!-- Header Panel -->
+    <header class="uq-header">
+        <div>
+            <span class="uq-kicker"><i class="fa-solid fa-robot me-1"></i> Virtual Assistant / Moderation</span>
+            <h1 class="uq-title">Unanswered Questions</h1>
+            <p class="uq-subtitle">
+                Review questions the chatbot could not answer, write verified knowledge articles, and continuously
+                optimize user experience.
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a class="uq-action-btn" href="{% url 'staff:chatbot_training' %}">
+                <i class="fa-solid fa-graduation-cap"></i> Training Center
+            </a>
+            <a class="uq-action-btn primary" href="{% url 'staff:chatbot_knowledge_list' %}">
+                <i class="fa-solid fa-book-open"></i> Manage Knowledge Base
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Stat Summary Card -->
+    <div class="uq-stat-card">
+        <div>
+            <span class="uq-stat-label">Questions Needing Review</span>
+            <h2 class="uq-stat-value">{{ total_unanswered|default:0 }}</h2>
+        </div>
+        <div class="uq-stat-icon">
+            <i class="fa-solid fa-circle-question"></i>
+        </div>
+    </div>
+
+    <!-- Filter Navigation Pills -->
+    <nav class="uq-filter-nav" aria-label="Unanswered question status filters">
+        <a class="uq-pill {% if not request.GET.status or request.GET.status == 'NEW' %}active{% endif %}"
+            href="?status=NEW">
+            <i class="fa-solid fa-circle-dot"></i> New
+        </a>
+        <a class="uq-pill {% if request.GET.status == 'REVIEWED' %}active{% endif %}" href="?status=REVIEWED">
+            <i class="fa-solid fa-eye"></i> Reviewed
+        </a>
+        <a class="uq-pill {% if request.GET.status == 'RESOLVED' %}active{% endif %}" href="?status=RESOLVED">
+            <i class="fa-solid fa-circle-check"></i> Resolved
+        </a>
+        <a class="uq-pill {% if request.GET.status == 'IGNORED' %}active{% endif %}" href="?status=IGNORED">
+            <i class="fa-solid fa-ban"></i> Ignored
+        </a>
+        <a class="uq-pill {% if request.GET.status == 'ALL' %}active{% endif %}" href="?status=ALL">
+            <i class="fa-solid fa-layer-group"></i> All Unanswered
+        </a>
+    </nav>
+
+    <!-- Question Cards List -->
+    {% for item in questions %}
+    <article class="uq-card">
+        <div class="uq-card-top">
+            <h3 class="uq-question">
+                <i class="fa-solid fa-user text-primary me-2"></i>"{{ item.question }}"
+            </h3>
+            <span class="uq-date">
+                <i class="fa-regular fa-clock me-1"></i>{{ item.last_asked_at|date:'d M Y, H:i' }}
+            </span>
+        </div>
+
+        <div class="uq-note">
+            <i class="fa-solid fa-circle-info text-warning"></i>
+            <span>The chatbot did not find a reliable answer for this query. Train the assistant with a verified answer
+                to auto-respond to future visitors.</span>
+        </div>
+
+        <div class="uq-meta">
+            <span>
+                <i class="fa-solid fa-fire text-primary me-1"></i> Asked <strong>{{ item.occurrences|default:1}}</strong> time{{ item.occurrences|pluralize }}
+            </span>
+            <span class="d-inline-flex align-items-center gap-1">
+                <strong>Status:</strong>
+                {% if item.status == 'REVIEWED' %}
+                <span class="uq-badge reviewed"><i class="fa-solid fa-eye me-1"></i>Reviewed</span>
+                {% elif item.status == 'RESOLVED' %}
+                <span class="uq-badge resolved"><i class="fa-solid fa-circle-check me-1"></i>Resolved</span>
+                {% elif item.status == 'IGNORED' %}
+                <span class="uq-badge ignored"><i class="fa-solid fa-ban me-1"></i>Ignored</span>
+                {% else %}
+                <span class="uq-badge new"><i class="fa-solid fa-circle-dot me-1"></i>New</span>
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="uq-actions">
+            {% if item.status != 'RESOLVED' %}
+            <a class="uq-btn-train" href="{% url 'staff:chatbot_unanswered_train' item.pk %}">
+                <i class="fa-solid fa-graduation-cap"></i> Train / Write Correct Answer
+            </a>
+            {% else %}
+            <span class="uq-badge resolved py-2 px-3 fs-7">
+                <i class="fa-solid fa-check-circle me-1"></i> Answer Published to Knowledge Base
+            </span>
+            {% endif %}
+
+            {% if item.status != 'IGNORED' and item.status != 'RESOLVED' %}
+            <form method="post" action="{% url 'staff:chatbot_unanswered_ignore' item.pk %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="uq-btn-ignore"
+                    onclick="return confirm('Ignore this unanswered question?');">
+                    <i class="fa-solid fa-ban"></i> Ignore
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </article>
+    {% empty %}
+    <div class="uq-empty">
+        <div class="uq-empty-icon">
+            <i class="fa-regular fa-comments"></i>
+        </div>
+        <h3 class="h5 fw-bold text-slate-800 mb-1">No Unanswered Questions</h3>
+        <p class="mb-0">No unmatched visitor questions were found for the selected status filter.</p>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

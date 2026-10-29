@@ -1,0 +1,36 @@
+40 objects imported automatically (use -v 2 for details).
+
+admin.LogEntry : id, action_time, user, content_type, object_id, object_repr, action_flag, change_message
+auth.Permission : id, name, content_type, codename
+auth.Group : id, name
+contenttypes.ContentType : id, app_label, model
+sessions.Session : session_key, session_data, expire_date
+accounts.User : id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, date_joined, role, phone, is_active
+core.SiteSettings : id, business_name, tagline, email, notification_emails, phone, whatsapp, emergency_phone, address, city, country, website, facebook, instagram, linkedin, tiktok, youtube, logo, favicon, google_maps_url, google_business_url, bank_name, account_name, account_number, branch_name, payfast_enabled, payfast_payment_url, payfast_instructions, paypal_enabled, paypal_email, paypal_payment_url, paypal_instructions, payment_instructions, updated_at
+homecare.HomeCareRequest : id, full_name, phone, email, location, preferred_date, preferred_time, description, status, admin_notes, contacted_at, cancelled_at, cancelled_reason, confirmed_at, completed_at, created_at, updated_at
+homecare.HomeCareRequestAttachment : id, homecare_request, file, uploaded_at
+homecare.Referral : id, referrer_name, referrer_email, referrer_phone, referring_facility, patient_name, patient_email, patient_phone, location, additional_notes, homecare_request, status, loyalty_points_awarded, thanked_at, created_at, updated_at
+homecare.ReferralAttachment : id, referral, file, uploaded_at
+homecare.Consultation : id, first_name, last_name, email, phone, services, requested_date, requested_time, message, doctor, status, consultation_date, consultation_time, duration_minutes, booking_token, room_name, patient_access_token, doctor_access_token, patient_join_url, doctor_join_url, admin_notes, doctor_notes, created_at, updated_at
+homecare.ConsultationSlot : id, consultation, date, time, duration_minutes, is_available, is_selected, selected_at, created_at, updated_at
+homecare.ConsultationAttachment : id, consultation, file, uploaded_at
+homecare.Quotation : id, homecare_request, consultation, base_amount, transportation_fee, discount_code, discount_amount, amount, description, payment_status, access_token, sent_at, payment_deadline, paid_at, reminder_sent_at, created_at, updated_at
+homecare.QuotationItem : id, quotation, service, name, description, quantity, unit_price, line_total, order, created_at, updated_at
+homecare.Payment : id, quotation, payment_code, payment_method, amount, status, submitted_at, verified_at, verified_by, admin_notes
+homecare.Caregiver : id, user, name, professional_title, specialization, phone, email, photo, availability, preferred_working_locations, licence_number, licence_issuing_authority, licence_expiry_date, licence_document, cv, cover_letter, certificate_submitted, verification_status, verification_notes, verification_reviewed_at, verification_reviewed_by, approved_at, approved_by, rejected_at, rejected_by, is_active, created_at, updated_at
+homecare.CaregiverAssignment : id, homecare_request, caregiver, duration, custom_duration_value, custom_duration_unit, start_date, end_date, service_date, service_time, report_frequency, status, accepted_at, declined_at, completed_at, caregiver_response_note, notes, assigned_at, assigned_by
+homecare.CaregiverAssignmentHistory : id, assignment, caregiver, action, note, performed_by, created_at
+homecare.CaregiverCertificate : id, caregiver, certificate_name, certificate_number, issuing_organization, issue_date, expiry_date, document, uploaded_at, is_verified, verification_notes
+homecare.CaregiverDailyReport : id, assignment, report_date, visit_start_time, visit_end_time, patient_condition, vital_observations, care_provided, patient_progress, concerns, next_visit_date, caregiver_notes, submitted_at, updated_at, reviewed_by, reviewed_at
+homecare.CaregiverWeeklyReport : id, assignment, week_start, week_end, overall_condition, care_provided, patient_progress, concerns, recommendations, caregiver_notes, submitted_at, updated_at, reviewed_by, reviewed_at
+homecare.CaregiverPayment : id, caregiver, assignment, payment_date, service_period_start, service_period_end, amount, status, payment_reference, payment_method, notes, approved_by, paid_by, approved_at, paid_at, created_at, updated_at
+homecare.CaregiverInvitation : id, caregiver, email, token, created_at, expires_at, used_at, created_by
+services.ServiceCategory : id, name, slug, icon_class, order
+services.Service : id, category, name, slug, short_description, description, price, icon_class, image, is_active, order, created_at, updated_at
+staff.QuestionFormSettings : id, title, badge_text, description, submit_button_text, topics, is_active, updated_at
+staff.CustomerQuestion : id, name, email, phone, topic, question, status, staff_reply, replied_at, replied_by, created_at, updated_at
+staff.FAQItem : id, question, answer, display_order, is_active, created_at, updated_at
+staff.ContactEnquiry : id, name, email, phone, service, is_general_enquiry, town, message, status, staff_notes, created_at, updated_at
+testimonials.Testimonial : id, name, email, is_anonymous, photo, rating, message, status, consent_to_publish, staff_notes, submitted_by, created_at, updated_at, approved_at
+leadership.Founder : id, name, position, qualification, photo, biography_1, biography_2, biography_3, pillar_1, pillar_2, pillar_3, is_active, updated_at
+hero.HeroSlide : id, position, tagline, heading, description, image, is_active, updated_at

@@ -1,0 +1,759 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}
+Chatbot Training Center | Staff Dashboard
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .training-center-wrapper {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .page-header-box {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .header-kicker {
+        display: block;
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #2563eb;
+        margin-bottom: .25rem;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: .25rem;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: .9375rem;
+        margin-bottom: 0;
+    }
+
+    .btn-create-primary,
+    .btn-train-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: .75rem 1.25rem;
+        background: #2563eb;
+        color: white;
+        border: 0;
+        border-radius: .625rem;
+        font-size: .875rem;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(37, 99, 235, .18);
+        transition: .2s;
+    }
+
+    .btn-create-primary:hover,
+    .btn-train-action:hover {
+        background: #1d4ed8;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: .75rem 1rem;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: .625rem;
+        color: #475569;
+        text-decoration: none;
+        font-size: .875rem;
+        font-weight: 700;
+    }
+
+    .btn-secondary-action:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .stat-kpi-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, .05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        transition: .2s;
+    }
+
+    .stat-kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(15, 23, 42, .08);
+    }
+
+    .kpi-label {
+        display: block;
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #64748b;
+        margin-bottom: .35rem;
+    }
+
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.1;
+    }
+
+    .kpi-value.default {
+        color: #0f172a;
+    }
+
+    .kpi-value.warning {
+        color: #d97706;
+    }
+
+    .kpi-value.danger {
+        color: #dc2626;
+    }
+
+    .kpi-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: .75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.375rem;
+    }
+
+    .kpi-avatar.default {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .kpi-avatar.warning {
+        background: #fffbeb;
+        color: #b45309;
+    }
+
+    .kpi-avatar.danger {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .filter-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, .04);
+    }
+
+    .search-input-group {
+        position: relative;
+    }
+
+    .search-input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .form-control-custom,
+    .form-select-custom {
+        width: 100%;
+        height: 44px;
+        padding: .5rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: .625rem;
+        background: #f8fafc;
+        font-size: .875rem;
+        color: #0f172a;
+        outline: none;
+    }
+
+    .search-input-group .form-control-custom {
+        padding-left: 2.5rem;
+    }
+
+    .form-control-custom:focus,
+    .form-select-custom:focus {
+        border-color: #2563eb;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .btn-filter-action {
+        width: 100%;
+        height: 44px;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: .625rem;
+        color: #475569;
+        font-size: .875rem;
+        font-weight: 700;
+    }
+
+    .btn-filter-action:hover {
+        background: #eff6ff;
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+    .log-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, .05);
+        transition: .2s;
+    }
+
+    .log-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(15, 23, 42, .08);
+    }
+
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding-bottom: .875rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .log-question {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .log-timestamp {
+        font-size: .75rem;
+        color: #64748b;
+        font-weight: 600;
+        white-space: nowrap;
+        background: #f1f5f9;
+        padding: .35rem .75rem;
+        border-radius: 999px;
+    }
+
+    .log-answer-label {
+        display: flex;
+        align-items: center;
+        gap: .375rem;
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #64748b;
+        margin-bottom: .5rem;
+    }
+
+    .log-answer-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: .75rem;
+        padding: 1.25rem;
+        font-size: .9375rem;
+        color: #334155;
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+        overflow-wrap: anywhere;
+    }
+
+    .correct-answer-box {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: .75rem;
+        padding: 1.25rem;
+        color: #166534;
+        margin-bottom: 1.25rem;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .log-meta-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        font-size: .8125rem;
+        color: #64748b;
+    }
+
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .375rem;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: .375rem;
+        padding: .3rem .7rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 700;
+        border: 1px solid transparent;
+    }
+
+    .badge-status.source {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #dbeafe;
+    }
+
+    .badge-status.new {
+        background: #fffbeb;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    .badge-status.reviewed {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .badge-status.resolved {
+        background: #f0fdf4;
+        color: #15803d;
+        border-color: #bbf7d0;
+    }
+
+    .badge-status.ignored {
+        background: #f1f5f9;
+        color: #64748b;
+        border-color: #e2e8f0;
+    }
+
+    .badge-status.incorrect {
+        background: #fef2f2;
+        color: #b91c1c;
+        border-color: #fecaca;
+    }
+
+    .log-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .btn-mark-incorrect {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: .75rem 1rem;
+        background: white;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        font-size: .875rem;
+        font-weight: 700;
+        border-radius: .625rem;
+        cursor: pointer;
+    }
+
+    .btn-mark-incorrect:hover {
+        background: #fef2f2;
+        border-color: #dc2626;
+    }
+
+    .empty-state-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 4rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, .04);
+    }
+
+    .empty-state-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1.25rem;
+    }
+
+    @media (max-width: 767px) {
+        .training-center-wrapper {
+            padding: 1rem 0 2rem;
+        }
+
+        .page-header-title {
+            font-size: 1.5rem;
+        }
+
+        .log-card {
+            padding: 1.25rem;
+        }
+
+        .log-actions>* {
+            width: 100%;
+        }
+
+        .btn-create-primary,
+        .btn-secondary-action {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid training-center-wrapper">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header-box">
+        <div>
+            <span class="header-kicker">
+                <i class="fa-solid fa-graduation-cap me-1"></i>
+                AI Training &amp; Moderation
+            </span>
+
+            <h1 class="page-header-title">
+                Chatbot Training Center
+            </h1>
+
+            <p class="page-header-subtitle">
+                Review visitor conversations, correct inaccurate
+                responses, and publish verified chatbot knowledge.
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'staff:chatbot_unanswered' %}" class="btn-secondary-action">
+                <i class="fa-solid fa-circle-question"></i>
+                Unanswered Questions
+            </a>
+
+            <a href="{% url 'staff:chatbot_knowledge_list' %}" class="btn-create-primary">
+                <i class="fa-solid fa-book-open"></i>
+                Manage Knowledge Base
+            </a>
+        </div>
+    </div>
+
+
+    <!-- DJANGO MESSAGES -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+
+    <!-- DASHBOARD STATISTICS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-12 col-md-4">
+            <div class="stat-kpi-card">
+                <div>
+                    <span class="kpi-label">
+                        Total Conversations
+                    </span>
+                    <h2 class="kpi-value default">
+                        {{ total_questions|default:0 }}
+                    </h2>
+                </div>
+                <div class="kpi-avatar default">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="stat-kpi-card">
+                <div>
+                    <span class="kpi-label">
+                        Unanswered Queries
+                    </span>
+                    <h2 class="kpi-value warning">
+                        {{ total_unanswered|default:0 }}
+                    </h2>
+                </div>
+                <div class="kpi-avatar warning">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="stat-kpi-card">
+                <div>
+                    <span class="kpi-label">
+                        Needs Correction
+                    </span>
+                    <h2 class="kpi-value danger">
+                        {{ total_incorrect|default:0 }}
+                    </h2>
+                </div>
+                <div class="kpi-avatar danger">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH AND FILTER -->
+    <div class="filter-card">
+        <form method="get" action="{% url 'staff:chatbot_training' %}" class="row g-3 align-items-center">
+
+            <div class="col-md-7">
+                <div class="search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="search" name="q" value="{{ search }}" class="form-control-custom"
+                        placeholder="Search visitor questions or keywords...">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="status" class="form-select-custom">
+                    <option value="all" {% if status=="all" %}selected{% endif %}>
+                        All Questions
+                    </option>
+
+                    <option value="unanswered" {% if status=="unanswered" %}selected{% endif %}>
+                        Unanswered
+                    </option>
+
+                    <option value="incorrect" {% if status=="incorrect" %}selected{% endif %}>
+                        Incorrect Answers
+                    </option>
+
+                    <option value="trained" {% if status=="trained" %}selected{% endif %}>
+                        Trained
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn-filter-action">
+                    <i class="fa-solid fa-filter me-1"></i>
+                    Filter
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+
+    <!-- CONVERSATION LOGS -->
+    {% for log in logs %}
+
+    <div class="log-card">
+
+        <!-- QUESTION HEADER -->
+        <div class="log-header">
+            <h3 class="log-question">
+                <i class="fa-solid fa-user me-2 text-primary fs-6"></i>
+                "{{ log.question }}"
+            </h3>
+
+            <span class="log-timestamp">
+                <i class="fa-regular fa-clock me-1"></i>
+                {{ log.created_at|date:"d M Y, H:i" }}
+            </span>
+        </div>
+
+
+        <!-- ORIGINAL CHATBOT ANSWER -->
+        <span class="log-answer-label">
+            <i class="fa-solid fa-robot text-info"></i>
+            Original Assistant Response
+        </span>
+
+        <div class="log-answer-box">
+            {{ log.chatbot_answer|linebreaksbr }}
+        </div>
+
+
+        <!-- PUBLISHED CORRECT ANSWER -->
+        {% if log.review_status == "TRAINED" and log.staff_answer %}
+        <span class="log-answer-label" style="color:#15803d;">
+            <i class="fa-solid fa-circle-check"></i>
+            Published Correct Answer
+        </span>
+
+        <div class="correct-answer-box">
+            {{ log.staff_answer|linebreaksbr }}
+        </div>
+        {% endif %}
+
+
+        <!-- SYNCHRONIZED STATUS -->
+        <div class="log-meta-bar">
+
+            <span class="meta-item">
+                <strong>Source:</strong>
+                <span class="badge-status source">
+                    {{ log.answer_source|default:"Automated AI" }}
+                </span>
+            </span>
+
+            <span class="meta-item">
+                <strong>Question Status:</strong>
+
+                {% if log.shared_question_status == "IGNORED" %}
+                <span class="badge-status ignored">
+                    <i class="fa-solid fa-ban"></i>
+                    Ignored
+                </span>
+
+                {% elif log.shared_question_status == "RESOLVED" %}
+                <span class="badge-status resolved">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Resolved / Trained
+                </span>
+
+                {% elif log.shared_question_status == "REVIEWED" %}
+                <span class="badge-status reviewed">
+                    <i class="fa-solid fa-eye"></i>
+                    Reviewed
+                </span>
+
+                {% elif log.shared_question_status == "NEW" %}
+                <span class="badge-status new">
+                    <i class="fa-solid fa-circle-dot"></i>
+                    New
+                </span>
+
+                {% elif log.review_status == "INCORRECT" %}
+                <span class="badge-status incorrect">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Incorrect
+                </span>
+
+                {% elif log.review_status == "TRAINED" %}
+                <span class="badge-status resolved">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Trained
+                </span>
+
+                {% else %}
+                <span class="badge-status ignored">
+                    {{ log.get_review_status_display }}
+                </span>
+                {% endif %}
+            </span>
+
+            {% if log.review_status == "INCORRECT" %}
+            <span class="meta-item">
+                <span class="badge-status incorrect">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Answer Flagged Incorrect
+                </span>
+            </span>
+            {% endif %}
+
+        </div>
+
+
+        <!-- ACTION BUTTONS -->
+        <div class="log-actions">
+
+            {% if log.shared_question_status == "RESOLVED" or log.review_status == "TRAINED" %}
+            <a href="{% url 'staff:chatbot_train_answer' log.pk %}" class="btn-secondary-action">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Train Another Answer
+            </a>
+
+            {% else %}
+            <a href="{% url 'staff:chatbot_train_answer' log.pk %}" class="btn-train-action">
+                <i class="fa-solid fa-graduation-cap"></i>
+                Train / Write Correct Answer
+            </a>
+            {% endif %}
+
+            {% if log.review_status != "INCORRECT" and log.review_status != "TRAINED" %}
+            <form method="post" action="{% url 'staff:chatbot_mark_incorrect' log.pk %}">
+                {% csrf_token %}
+
+                <button type="submit" class="btn-mark-incorrect">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Mark Incorrect
+                </button>
+            </form>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state-panel">
+        <div class="empty-state-icon">
+            <i class="fa-regular fa-comments"></i>
+        </div>
+
+        <h4 class="h5 fw-bold mb-2">
+            No Chatbot Conversations Found
+        </h4>
+
+        <p class="text-muted small mb-3">
+            There are no conversations matching your selected
+            search or status criteria.
+        </p>
+
+        <a href="{% url 'staff:chatbot_training' %}" class="btn-create-primary">
+            <i class="fa-solid fa-rotate-left"></i>
+            Clear Filters
+        </a>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

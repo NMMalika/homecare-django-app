@@ -1,0 +1,41 @@
+{% load static %}
+
+<div id="hoh-chatbot" class="hoh-chatbot">
+
+   
+
+    <section id="chat-window" class="chat-window" aria-label="Hands-On Health assistant" hidden>
+        <div class="chat-header">
+            <div>
+                <strong>Hands-On Health</strong>
+                <small>Virtual Assistant</small>
+            </div>
+
+            <button type="button" id="chat-close" aria-label="Close chat">
+                &times;
+            </button>
+        </div>
+
+        <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+            <div class="chat-bubble bot">
+                Hello! Welcome to Hands-On Health.
+                How can we help you today?
+            </div>
+        </div>
+
+        <form id="chat-form" data-url="{% url 'chatbot:message' %}">
+            {% csrf_token %}
+
+            <input id="chat-input" type="text" name="message" placeholder="Type your question..." maxlength="500"
+                autocomplete="off" required>
+
+            <button id="chat-send" type="submit" aria-label="Send message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </section>
+</div>
+
+<link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
+
+<script src="{% static 'chatbot/js/chatbot.js' %}" defer></script>

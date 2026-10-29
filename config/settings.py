@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "testimonials",
     "leadership",
     "hero",
+    "chatbot",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

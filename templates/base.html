@@ -22,65 +22,184 @@
         {% endblock %}
     </title>
 
-    <!-- Bootstrap Core CSS -->
+
+    <!-- =====================================================
+         BOOTSTRAP CSS
+    ===================================================== -->
+
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
-    <!-- Custom CSS -->
+
+    <!-- =====================================================
+         MAIN WEBSITE CSS
+    ===================================================== -->
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    <!-- Responsive CSS -->
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+<link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
+
+
+    <!-- =====================================================
+         FONT AWESOME ICONS
+    ===================================================== -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Favicon -->
+    <!-- =====================================================
+         CHATBOT CSS
+    ===================================================== -->
+
+    <link rel="stylesheet" href="{% static 'chatbot/css/chatbot.css' %}">
+
+
+    <!-- =====================================================
+         FAVICON
+    ===================================================== -->
+
     {% if site_settings.favicon %}
+
     <link rel="icon" href="{{ site_settings.favicon.url }}" type="image/png">
+
     {% else %}
+
     <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
+
     {% endif %}
 
-    {% block extra_css %}{% endblock %}
+
+    <!-- =====================================================
+         PAGE-SPECIFIC CSS
+    ===================================================== -->
+
+    {% block extra_css %}
+    {% endblock %}
 
 </head>
 
+
 <body>
+
+    <!-- =====================================================
+         PRELOADER
+    ===================================================== -->
 
     <div class="preloader"></div>
 
+
+    <!-- =====================================================
+         TOP BAR
+    ===================================================== -->
+
     {% include "includes/topbar.html" %}
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ===================================================== -->
 
     {% include "includes/navbar.html" %}
 
+
+    <!-- =====================================================
+         DJANGO MESSAGES
+    ===================================================== -->
+
     {% include "includes/messages.html" %}
+
+
+    <!-- =====================================================
+         MAIN PAGE CONTENT
+    ===================================================== -->
 
     {% block content %}
     {% endblock %}
 
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
     {% include "includes/footer.html" %}
+
+
+    <!-- =====================================================
+         FLOATING BUTTONS
+         WhatsApp / Ask Us Anything / Scroll Up
+    ===================================================== -->
 
     {% include "includes/floating_buttons.html" %}
 
 
-    <!-- jQuery -->
-    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <!-- =====================================================
+         HANDS-ON HEALTH CHATBOT POPUP
+    ===================================================== -->
 
-    <!-- Bootstrap -->
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {% include "includes/chatbot.html" %}
 
-    <!-- Plugins -->
-    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
-    <script src="{% static 'js/css3-animate-it.js' %}"></script>
-    <script src="{% static 'js/bootstrap-dropdownhover.min.js' %}"></script>
-    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-    <script src="{% static 'js/gallery.js' %}"></script>
-    <script src="{% static 'js/player.min.js' %}"></script>
-    <script src="{% static 'js/retina.js' %}"></script>
 
-    <!-- Main JS -->
-    <script src="{% static 'js/script.js' %}"></script>
+    <!-- =====================================================
+         JQUERY
+    ===================================================== -->
+
+    <script src="{% static 'js/jquery.min.js' %}">
+    </script>
+
+
+    <!-- =====================================================
+         BOOTSTRAP JAVASCRIPT
+    ===================================================== -->
+
+    <script src="{% static 'js/bootstrap.min.js' %}">
+    </script>
+
+
+    <!-- =====================================================
+         WEBSITE PLUGINS
+    ===================================================== -->
+
+    <script src="{% static 'js/bootstrap-datepicker.min.js' %}">
+    </script>
+
+    <script src="{% static 'js/css3-animate-it.js' %}">
+    </script>
+
+    <script src="{% static 'js/bootstrap-dropdownhover.min.js' %}">
+    </script>
+
+    <script src="{% static 'js/owl.carousel.min.js' %}">
+    </script>
+
+    <script src="{% static 'js/gallery.js' %}">
+    </script>
+
+    <script src="{% static 'js/player.min.js' %}">
+    </script>
+
+    <script src="{% static 'js/retina.js' %}">
+    </script>
+
+
+    <!-- =====================================================
+         MAIN WEBSITE JAVASCRIPT
+    ===================================================== -->
+
+    <script src="{% static 'js/script.js' %}">
+    </script>
+
+
+    <!-- =====================================================
+         CHATBOT JAVASCRIPT
+    ===================================================== -->
+
+    <script src="{% static 'chatbot/js/chatbot.js' %}" defer>
+    </script>
+
+
+    <!-- =====================================================
+         PAGE-SPECIFIC JAVASCRIPT
+    ===================================================== -->
 
     {% block extra_js %}
     {% endblock %}

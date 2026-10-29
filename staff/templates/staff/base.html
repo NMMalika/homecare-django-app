@@ -173,6 +173,14 @@
                     </span>
                     <span>Contact Enquiries</span>
                 </a>
+                <a href="{% url 'staff:chatbot_knowledge_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'chatbot_knowledge_list' %}active{% endif %}"
+                    title="Chatbot Knowledge">
+                    <span class="nav-icon">
+                        <i class="bi bi-robot me-2"></i>
+                    </span>
+                    <span>Chatbot Knowledge</span>
+                </a>
                 <a href="{% url 'staff:testimonials' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}"
                     title="Testimonials">

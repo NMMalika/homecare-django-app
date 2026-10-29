@@ -1,0 +1,317 @@
+{% extends "staff/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .knowledge-form-wrapper {
+        padding: 1.5rem 0 3rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* Back Link & Header */
+    .btn-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 1.25rem;
+        transition: color 0.2s ease;
+    }
+
+    .btn-back-link:hover {
+        color: #2563eb;
+    }
+
+    .header-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .page-header-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .page-header-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Form Card Container */
+    .editor-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .editor-card:hover {
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    /* Form Controls Override */
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+
+    .knowledge-form-wrapper input[type="text"],
+    .knowledge-form-wrapper input[type="search"],
+    .knowledge-form-wrapper select,
+    .knowledge-form-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .knowledge-form-wrapper textarea {
+        min-height: 140px;
+        line-height: 1.6;
+    }
+
+    .knowledge-form-wrapper input[type="text"]:focus,
+    .knowledge-form-wrapper select:focus,
+    .knowledge-form-wrapper textarea:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-help-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.375rem;
+    }
+
+    .field-error {
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-top: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Checkbox / Toggle Box Container */
+    .toggle-card-field {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .toggle-label-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #0f172a;
+        display: block;
+    }
+
+    /* Action Buttons Bar */
+    .editor-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.875rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 1rem;
+    }
+
+    .btn-save-primary {
+        height: 46px;
+        padding: 0 1.75rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.625rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-save-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-secondary {
+        height: 46px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .btn-cancel-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    @media (max-width: 640px) {
+        .editor-actions-bar {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-save-primary,
+        .btn-cancel-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid knowledge-form-wrapper">
+
+    <!-- Back Navigation -->
+    <a href="{% url 'staff:chatbot_knowledge_list' %}" class="btn-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Back to Knowledge Base
+    </a>
+
+    <!-- Page Header -->
+    <div>
+        <span class="header-kicker"><i class="fa-solid fa-robot me-1"></i> Virtual Assistant</span>
+        <h1 class="page-header-title">{{ page_title }}</h1>
+        <p class="page-header-subtitle">
+            Configure prompt triggers and automated responses used by the chatbot.
+        </p>
+    </div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Editor Form Card -->
+    <div class="editor-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-3 mb-4">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            {% if field.field.widget.input_type == "checkbox" %}
+            <!-- Custom Toggle Wrapper for Checkbox Fields -->
+            <div class="toggle-card-field">
+                <div>
+                    <span class="toggle-label-title">{{ field.label }}</span>
+                    {% if field.help_text %}
+                    <div class="form-help-text mt-0">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-check form-switch m-0 fs-5">
+                    {{ field }}
+                </div>
+            </div>
+            {% if field.errors %}
+            {% for error in field.errors %}
+            <div class="field-error mb-3"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+            {% endfor %}
+            {% endif %}
+
+            {% else %}
+            <!-- Standard Inputs (Text, Textarea, Select) -->
+            <div class="form-group-custom">
+                <label class="form-group-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                <div class="form-help-text">
+                    {{ field.help_text }}
+                </div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                <div class="field-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Action Buttons -->
+            <div class="editor-actions-bar">
+                <button type="submit" class="btn-save-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Article
+                </button>
+
+                <a href="{% url 'staff:chatbot_knowledge_list' %}" class="btn-cancel-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

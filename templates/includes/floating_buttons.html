@@ -1,42 +1,99 @@
+<!-- =====================================================
+     FLOATING BUTTONS - HANDS-ON HEALTH
+===================================================== -->
 
 
 <!-- Dynamic Floating WhatsApp Button -->
 {% if site_settings.whatsapp %}
 <a href="https://wa.me/{{ site_settings.whatsapp }}" class="whatsapp-float" target="_blank" rel="noopener noreferrer"
     aria-label="Chat on WhatsApp">
-
     <i class="fa-brands fa-whatsapp"></i>
-
 </a>
 {% endif %}
 
 
-<!-- Ask Us Anything Floating Button -->
-<a href="#" class="ask-anything-float" aria-label="Ask Us Anything" style="position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background-color: #00b4d8;
-          color: #ffffff;
-          padding: 10px 18px;
-          border-radius: 30px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-          z-index: 999;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
-          font-weight: 600;
-          font-size: 14px;">
+<!-- =====================================================
+     ASK US ANYTHING - CHATBOT BUTTON
+===================================================== -->
 
+<a href="#chat-window" id="chat-toggle" class="ask-anything-float" aria-label="Ask Us Anything"
+    aria-controls="chat-window" aria-expanded="false" style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #00b4d8;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+    ">
     <i class="fa-solid fa-comments"></i>
     <span>Ask Us Anything</span>
-
 </a>
 
 
-<!-- Scroll Up Button -->
+<!-- =====================================================
+     SCROLL UP BUTTON
+===================================================== -->
+
 <a href="#" class="scrollup" aria-label="Scroll Up">
-
     <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
-
 </a>
+
+
+<!-- =====================================================
+     CHATBOT TOGGLE SCRIPT
+===================================================== -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const chatToggle = document.getElementById("chat-toggle");
+        const chatWindow = document.getElementById("chat-window");
+        const chatClose = document.getElementById("chat-close");
+
+        if (!chatToggle || !chatWindow) {
+            return;
+        }
+
+        function setChatOpen(open) {
+            chatWindow.hidden = !open;
+
+            chatToggle.setAttribute(
+                "aria-expanded",
+                String(open)
+            );
+
+            if (open) {
+                const chatInput = document.getElementById("chat-input");
+
+                if (chatInput) {
+                    chatInput.focus();
+                }
+            }
+        }
+
+        chatToggle.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            setChatOpen(chatWindow.hidden);
+
+        });
+
+        if (chatClose) {
+            chatClose.addEventListener("click", function () {
+                setChatOpen(false);
+            });
+        }
+
+    });
+</script>

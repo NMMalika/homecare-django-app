@@ -302,18 +302,91 @@ urlpatterns = [
         name="testimonial_moderate",
     ),
     path(
-    "about-us/",
-    views.about_us_edit,
-    name="about_us_edit",
-),
+        "about-us/",
+        views.about_us_edit,
+        name="about_us_edit",
+    ),
     path(
-    "hero-slides/",
-    views.hero_slides,
-    name="hero_slides",
-),
-path(
-    "hero-slides/<int:position>/",
-    views.hero_slide_edit,
-    name="hero_slide_edit",
-),
+        "hero-slides/",
+        views.hero_slides,
+        name="hero_slides",
+    ),
+    path(
+        "hero-slides/<int:position>/",
+        views.hero_slide_edit,
+        name="hero_slide_edit",
+    ),
+]
+
+from . import chatbot_views
+
+urlpatterns += [
+    path(
+        "chatbot/knowledge/",
+        chatbot_views.chatbot_knowledge_list,
+        name="chatbot_knowledge_list",
+    ),
+    path(
+        "chatbot/knowledge/add/",
+        chatbot_views.chatbot_knowledge_create,
+        name="chatbot_knowledge_create",
+    ),
+    path(
+        "chatbot/knowledge/<int:pk>/edit/",
+        chatbot_views.chatbot_knowledge_edit,
+        name="chatbot_knowledge_edit",
+    ),
+    path(
+        "chatbot/knowledge/<int:pk>/toggle/",
+        chatbot_views.chatbot_knowledge_toggle,
+        name="chatbot_knowledge_toggle",
+    ),
+    path(
+        "chatbot/knowledge/<int:pk>/delete/",
+        chatbot_views.chatbot_knowledge_delete,
+        name="chatbot_knowledge_delete",
+    ),
+]
+from . import chatbot_unanswered_views
+
+urlpatterns += [
+    path(
+        "chatbot/unanswered/",
+        chatbot_unanswered_views.unanswered_questions,
+        name="chatbot_unanswered",
+    ),
+    path(
+        "chatbot/unanswered/<int:pk>/train/",
+        chatbot_unanswered_views.chatbot_unanswered_train,
+        name="chatbot_unanswered_train",
+    ),
+    path(
+        "chatbot/unanswered/<int:pk>/ignore/",
+        chatbot_unanswered_views.chatbot_unanswered_ignore,
+        name="chatbot_unanswered_ignore",
+    ),
+    path(
+        "chatbot/unanswered/<int:pk>/status/",
+        chatbot_unanswered_views.update_unanswered_status,
+        name="chatbot_unanswered_status",
+    ),
+]
+from . import chatbot_training_views
+
+urlpatterns += [
+    path(
+        "chatbot/training/",
+        chatbot_training_views.chatbot_training,
+        name="chatbot_training",
+    ),
+    path(
+        "chatbot/training/<int:pk>/incorrect/",
+        chatbot_training_views.chatbot_mark_incorrect,
+        name="chatbot_mark_incorrect",
+    ),
+    path(
+        "chatbot/training/<int:pk>/answer/",
+        chatbot_training_views.chatbot_train_answer,
+        name="chatbot_train_answer",
+    ),
 ]

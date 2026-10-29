@@ -28,6 +28,7 @@ urlpatterns = [
     path("services/", include("services.urls")),
     path( "caregiver/",include("caregivers.urls"),),
     path( "staff/", include("staff.urls"),),
+    path("chatbot/", include("chatbot.urls")),
 
 ]
 
