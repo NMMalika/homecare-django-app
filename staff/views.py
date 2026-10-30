@@ -1807,6 +1807,7 @@ def quotations(request):
 # STAFF QUOTATION DETAILS
 # ============================================================
 
+
 @admin_required
 def quotation_detail(request, pk):
 
@@ -1829,7 +1830,6 @@ def quotation_detail(request, pk):
         "quotation": quotation,
         "site_settings": site_settings,
         "generated_at": generated_at,
-
         # Related patient information
         "homecare_request": quotation.homecare_request,
         "consultation": quotation.consultation,
@@ -1840,6 +1840,7 @@ def quotation_detail(request, pk):
         "staff/quotation_detail.html",
         context,
     )
+
 
 # ============================================================
 # PAYMENTS
@@ -2256,6 +2257,7 @@ def caregiver_daily_report_delete(request, pk):
         },
     )
 
+
 # ============================================================
 # STAFF - CAREGIVER WEEKLY REPORTS
 # ============================================================
@@ -2293,85 +2295,78 @@ def caregiver_weekly_reports(request):
 
 
 # ============================================================
-# CAREGIVER PAYMENTS
+# CAREGIVER PAYMENTS - STAFF MANAGEMENT
 # ============================================================
 
 
 @admin_required
 def caregiver_payments(request):
-
-    current_status = request.GET.get(
-        "status",
-        "",
-    ).strip()
-
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
 
     payments_queryset = CaregiverPayment.objects.select_related(
         "caregiver",
         "assignment",
+        "assignment__caregiver",
         "assignment__homecare_request",
-    ).order_by("-created_at")
+    ).order_by("-created_at", "-pk")
 
     if search:
-
         payments_queryset = payments_queryset.filter(
             Q(caregiver__name__icontains=search)
             | Q(caregiver__user__first_name__icontains=search)
             | Q(caregiver__user__last_name__icontains=search)
             | Q(caregiver__user__email__icontains=search)
+            | Q(assignment__homecare_request__full_name__icontains=search)
         )
 
-    if current_status:
-
+    status_choices = CaregiverPayment._meta.get_field("status").choices
+    valid_statuses = {value for value, _ in status_choices}
+    if current_status in valid_statuses:
         payments_queryset = payments_queryset.filter(status=current_status)
+    else:
+        current_status = ""
 
-    status_field = CaregiverPayment._meta.get_field("status")
-
-    status_choices = status_field.choices
+    assignments = CaregiverAssignment.objects.select_related(
+        "caregiver", "homecare_request"
+    ).order_by("-assigned_at")
 
     return render(
         request,
         "staff/caregiver_payments.html",
         {
             "payments": payments_queryset,
+            "assignments": assignments,
             "current_status": current_status,
             "search": search,
             "status_choices": status_choices,
+            "can_approve_payments": "APPROVED" in valid_statuses,
             "site_settings": SiteSettings.load(),
         },
     )
 
 
-# ============================================================
-# ADD CAREGIVER PAYMENT
-# ============================================================
-
-
 @admin_required
+@require_http_methods(["GET", "POST"])
 def caregiver_payment_add(request):
+    form = CaregiverPaymentForm(request.POST or None)
 
-    if request.method == "POST":
-
-        form = CaregiverPaymentForm(request.POST)
-
-        if form.is_valid():
-
-            form.save()
-
+    if request.method == "POST" and form.is_valid():
+        payment = form.save(commit=False)
+        if not payment.assignment_id:
+            form.add_error("assignment", "Please select a caregiver assignment.")
+        else:
+            payment.caregiver = payment.assignment.caregiver
+            payment.status = CaregiverPayment.Status.PENDING
+            with transaction.atomic():
+                payment.save()
+                form.save_m2m()
             messages.success(
                 request,
-                "Caregiver payment created successfully.",
+                "Caregiver payment created for the selected assignment. "
+                "It is pending staff approval.",
             )
-
             return redirect("staff:caregiver_payments")
-
-    else:
-
-        form = CaregiverPaymentForm()
 
     return render(
         request,
@@ -2384,42 +2379,75 @@ def caregiver_payment_add(request):
     )
 
 
-# ============================================================
-# EDIT CAREGIVER PAYMENT
-# ============================================================
+@admin_required
+@require_http_methods(["POST"])
+def caregiver_payment_approve(request, pk):
+    valid_statuses = {
+        value for value, _ in CaregiverPayment._meta.get_field("status").choices
+    }
+    if "APPROVED" not in valid_statuses:
+        messages.error(
+            request,
+            "The CaregiverPayment model needs an APPROVED status before "
+            "staff can approve payments separately from disbursement.",
+        )
+        return redirect("staff:caregiver_payments")
+
+    with transaction.atomic():
+        payment = get_object_or_404(
+            CaregiverPayment.objects.select_for_update().select_related(
+                "assignment", "caregiver"
+            ),
+            pk=pk,
+        )
+        if payment.status != CaregiverPayment.Status.PENDING:
+            messages.warning(request, "Only pending payments can be approved.")
+            return redirect("staff:caregiver_payments")
+        if (
+            not payment.assignment_id
+            or payment.assignment.caregiver_id != payment.caregiver_id
+        ):
+            messages.error(request, "Payment caregiver does not match assignment.")
+            return redirect("staff:caregiver_payments")
+
+        payment.status = "APPROVED"
+        payment.save(update_fields=["status"])
+
+    messages.success(
+        request,
+        f"Payment #{payment.pk} approved for {payment.caregiver.name}. "
+        "It is now available on the caregiver dashboard.",
+    )
+    return redirect("staff:caregiver_payments")
 
 
 @admin_required
+@require_http_methods(["GET", "POST"])
 def caregiver_payment_edit(request, pk):
+    payment = get_object_or_404(CaregiverPayment, pk=pk)
+    form = CaregiverPaymentForm(request.POST or None, instance=payment)
 
-    payment = get_object_or_404(
-        CaregiverPayment,
-        pk=pk,
-    )
-
-    if request.method == "POST":
-
-        form = CaregiverPaymentForm(
-            request.POST,
-            instance=payment,
-        )
-
-        if form.is_valid():
-
-            form.save()
-
-            messages.success(
+    if request.method == "POST" and form.is_valid():
+        updated = form.save(commit=False)
+        if not updated.assignment_id:
+            form.add_error("assignment", "Please select a caregiver assignment.")
+        elif payment.status != CaregiverPayment.Status.PENDING:
+            # Do not silently change approved/paid financial records.
+            messages.error(
                 request,
-                "Caregiver payment updated successfully.",
+                "Only pending payments can be edited. Contact an administrator "
+                "to handle corrections to approved or paid payments.",
             )
-
             return redirect("staff:caregiver_payments")
-
-    else:
-
-        form = CaregiverPaymentForm(
-            instance=payment,
-        )
+        else:
+            updated.caregiver = updated.assignment.caregiver
+            # Editing cannot approve or mark a payment paid.
+            updated.status = CaregiverPayment.Status.PENDING
+            with transaction.atomic():
+                updated.save()
+                form.save_m2m()
+            messages.success(request, "Pending caregiver payment updated.")
+            return redirect("staff:caregiver_payments")
 
     return render(
         request,
@@ -2433,28 +2461,20 @@ def caregiver_payment_edit(request, pk):
     )
 
 
-# ============================================================
-# DELETE CAREGIVER PAYMENT
-# ============================================================
-
-
 @admin_required
+@require_http_methods(["GET", "POST"])
 def caregiver_payment_delete(request, pk):
-
-    payment = get_object_or_404(
-        CaregiverPayment,
-        pk=pk,
-    )
+    payment = get_object_or_404(CaregiverPayment, pk=pk)
 
     if request.method == "POST":
-
+        if payment.status != CaregiverPayment.Status.PENDING:
+            messages.error(
+                request,
+                "Approved or paid payments cannot be deleted from this screen.",
+            )
+            return redirect("staff:caregiver_payments")
         payment.delete()
-
-        messages.success(
-            request,
-            "Caregiver payment deleted successfully.",
-        )
-
+        messages.success(request, "Pending caregiver payment deleted.")
         return redirect("staff:caregiver_payments")
 
     return render(

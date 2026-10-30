@@ -115,7 +115,13 @@
                             <td>
 
                                 <div class="fw-semibold">
-                                    {{ assignment.homecare_request.patient_name }}
+                                    <div class="fw-semibold">
+                                        {{ assignment.homecare_request.full_name|default:"Patient not available" }}
+                                    </div>
+                                    
+                                    <small class="text-muted">
+                                        {{ assignment.homecare_request.location|default:"Location not specified" }}
+                                    </small>
                                 </div>
 
                             </td>

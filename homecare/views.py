@@ -3059,9 +3059,7 @@ def caregiver_assignment_accept(request, pk):
         update_fields=[
             "status",
             "accepted_at",
-            "declined_at",
-            "caregiver_response_note",
-            "updated_at",
+            
         ]
     )
 
@@ -3178,7 +3176,7 @@ def caregiver_assignment_decline(request, pk):
 @require_http_methods(["POST"])
 def caregiver_assignment_start(request, pk):
     """
-    Start an accepted assignment.
+    Start an accepted caregiver assignment.
     """
 
     caregiver, assignment = _get_caregiver_assignment(
@@ -3186,6 +3184,7 @@ def caregiver_assignment_start(request, pk):
         pk,
     )
 
+    # Only accepted assignments can be started.
     if assignment.status != CaregiverAssignment.Status.ACCEPTED:
 
         messages.warning(
@@ -3198,18 +3197,15 @@ def caregiver_assignment_start(request, pk):
             pk=assignment.pk,
         )
 
+    # Change assignment status to IN_PROGRESS.
     assignment.status = CaregiverAssignment.Status.IN_PROGRESS
 
-    assignment.save(
-        update_fields=[
-            "status",
-            "updated_at",
-        ]
-    )
+    # Save only fields that exist in CaregiverAssignment.
+    assignment.save(update_fields=["status"])
 
     messages.success(
         request,
-        "Assignment started. You can now submit daily reports.",
+        "Assignment started successfully. You can now submit daily reports.",
     )
 
     return redirect(

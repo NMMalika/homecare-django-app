@@ -233,6 +233,11 @@ urlpatterns = [
         views.caregiver_payment_delete,
         name="caregiver_payment_delete",
     ),
+    path(
+        "caregiver-payments/<int:pk>/approve/",
+        views.caregiver_payment_approve,
+        name="caregiver_payment_approve",
+    ),
     # =========================================================
     # SERVICES
     # =========================================================

@@ -453,6 +453,91 @@ Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }
     </div>
 
 
+
+    <!-- =========================================================
+         MY PAYMENTS - APPROVED AND PAID ONLY
+    ========================================================== -->
+    <section id="payments" class="card border-0 shadow-sm mb-4 caregiver-panel">
+        <div class="card-header bg-white border-0 p-4 pb-3">
+            <span class="caregiver-eyebrow d-block mb-1">Earnings</span>
+            <h3 class="fw-bold mb-1 text-slate-800"><i class="bi bi-wallet2 me-2 text-primary"></i>My Payments</h3>
+            <p class="text-muted small mb-0">Approved payments linked to your care assignments. Approval does not mean
+                funds have been transferred.</p>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="payment-summary-card">
+                        <div class="small text-muted fw-semibold mb-2">Approved + Paid</div>
+                        <h4 class="fw-bold mb-1">N$ {{ approved_total|floatformat:2 }}</h4>
+                        <small class="text-muted">{{ approved_payment_count }} payment record{{
+                            approved_payment_count|pluralize }}</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="payment-summary-card">
+                        <div class="small text-muted fw-semibold mb-2">Approved, Awaiting Transfer</div>
+                        <h4 class="fw-bold text-warning-emphasis mb-1">N$ {{ awaiting_payment_total|floatformat:2 }}
+                        </h4>
+                        <small class="text-muted">Not yet marked paid</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="payment-summary-card">
+                        <div class="small text-muted fw-semibold mb-2">Marked Paid</div>
+                        <h4 class="fw-bold text-success mb-1">N$ {{ paid_total|floatformat:2 }}</h4>
+                        <small class="text-muted">Recorded as disbursed by staff</small>
+                    </div>
+                </div>
+            </div>
+            {% if approved_payments %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Payment</th>
+                            <th>Assignment</th>
+                            <th>Patient</th>
+                            <th>Amount</th>
+                            <th>Service Period</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in approved_payments %}
+                        <tr>
+                            <td class="fw-semibold">#{{ payment.pk }}</td>
+                            <td>#{{ payment.assignment.pk }}</td>
+                            <td>{{ payment.assignment.homecare_request.full_name|default:"—" }}</td>
+                            <td class="fw-bold">N$ {{ payment.amount|floatformat:2 }}</td>
+                            <td>
+                                {{ payment.service_period_start|date:"d M Y"|default:"—" }}
+                                – {{ payment.service_period_end|date:"d M Y"|default:"—" }}
+                            </td>
+                            <td>
+                                {% if payment.status == "PAID" %}
+                                <span
+                                    class="badge rounded-pill bg-success-subtle text-success-emphasis px-3 py-2">Paid</span>
+                                {% else %}
+                                <span
+                                    class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">Approved</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-wallet2 display-5 d-block mb-3 opacity-50"></i>
+                <h5 class="fw-semibold">No approved payments yet</h5>
+                <p class="small mb-0">Payments will appear here after staff approval.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
     <!-- =========================================================
          PROFILE SUMMARY CARD
     ========================================================== -->
@@ -512,6 +597,7 @@ Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }
 
 </div>
 
+{% endblock %}
 
 <!-- =========================================================
      DASHBOARD STYLING
@@ -519,6 +605,14 @@ Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }
 
 {% block extra_css %}
 <style>
+    .payment-summary-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.85rem;
+        padding: 1.25rem;
+        height: 100%;
+    }
+
     .caregiver-dashboard-wrapper {
         max-width: 1550px;
         margin: 0 auto;
@@ -721,6 +815,4 @@ Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }
         );
     }
 </script>
-{% endblock %}
-
 {% endblock %}

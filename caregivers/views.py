@@ -11,6 +11,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
+from homecare.models import CaregiverPayment
+from django.db.models import Sum
+from decimal import Decimal
 
 from accounts.models import User
 
@@ -689,11 +692,25 @@ Hands-On Health Registration System
 # CAREGIVER DASHBOARD
 # ============================================================
 
+# ============================================================
+# CAREGIVER DASHBOARD
+# ASSIGNMENTS + APPROVED PAYMENTS
+# ============================================================
+
+
 @login_required
 def caregiver_dashboard(request):
     """
-    Display the logged-in caregiver's assignments and statistics.
+    Display the logged-in caregiver's:
+    - Assignments
+    - Assignment statistics
+    - Approved caregiver payments
+    - Payment totals and history
     """
+
+    # --------------------------------------------------------
+    # CHECK USER ROLE
+    # --------------------------------------------------------
 
     if getattr(request.user, "role", None) != User.Role.CAREGIVER:
         messages.error(
@@ -701,6 +718,10 @@ def caregiver_dashboard(request):
             "Only caregiver accounts can access this dashboard.",
         )
         return redirect("caregivers:login")
+
+    # --------------------------------------------------------
+    # GET LOGGED-IN CAREGIVER
+    # --------------------------------------------------------
 
     caregiver = _get_caregiver_for_user(request.user)
 
@@ -711,24 +732,30 @@ def caregiver_dashboard(request):
         )
         return redirect("caregivers:login")
 
-    # Recheck approval and activation in case the account was
-    # suspended or changed after the user logged in.
+    # --------------------------------------------------------
+    # VERIFY ACCOUNT APPROVAL
+    # --------------------------------------------------------
+
     if (
         not request.user.is_active
         or not caregiver.is_active
-        or caregiver.verification_status
-        != Caregiver.VerificationStatus.APPROVED
+        or caregiver.verification_status != Caregiver.VerificationStatus.APPROVED
     ):
         logout(request)
+
         messages.warning(
             request,
             "Your caregiver account is not currently approved and active.",
         )
+
         return redirect("caregivers:login")
 
+    # --------------------------------------------------------
+    # CAREGIVER ASSIGNMENTS
+    # --------------------------------------------------------
+
     assignments = list(
-        CaregiverAssignment.objects
-        .filter(caregiver=caregiver)
+        CaregiverAssignment.objects.filter(caregiver=caregiver)
         .select_related("homecare_request")
         .order_by("-assigned_at", "-id")
     )
@@ -738,6 +765,7 @@ def caregiver_dashboard(request):
     completed_count = 0
 
     for assignment in assignments:
+
         status = str(assignment.status).upper()
 
         if status in ("PENDING", "PENDING_ACCEPTANCE"):
@@ -749,16 +777,80 @@ def caregiver_dashboard(request):
         elif status == "COMPLETED":
             completed_count += 1
 
+    # --------------------------------------------------------
+    # PAYMENT STATUS CONFIGURATION
+    # --------------------------------------------------------
+
+    # Only show statuses actually defined in the payment model.
+    valid_statuses = {value for value, label in CaregiverPayment.Status.choices}
+
+    visible_statuses = [
+        status for status in ("APPROVED", "PAID") if status in valid_statuses
+    ]
+
+    # --------------------------------------------------------
+    # CAREGIVER PAYMENT HISTORY
+    # --------------------------------------------------------
+
+    approved_payments = (
+        CaregiverPayment.objects.filter(
+            caregiver=caregiver,
+            status__in=visible_statuses,
+            assignment__caregiver=caregiver,
+        )
+        .select_related(
+            "assignment",
+            "assignment__homecare_request",
+        )
+        .order_by("-created_at", "-pk")
+    )
+
+    # --------------------------------------------------------
+    # PAYMENT STATISTICS
+    # --------------------------------------------------------
+
+    approved_payment_count = approved_payments.count()
+
+    approved_total = approved_payments.aggregate(total=Sum("amount"))[
+        "total"
+    ] or Decimal("0.00")
+
+    paid_payments = approved_payments.filter(status="PAID")
+
+    paid_total = paid_payments.aggregate(total=Sum("amount"))["total"] or Decimal(
+        "0.00"
+    )
+
+    awaiting_payment_total = approved_payments.filter(status="APPROVED").aggregate(
+        total=Sum("amount")
+    )["total"] or Decimal("0.00")
+
+    recent_payments = approved_payments[:5]
+
+    # --------------------------------------------------------
+    # DASHBOARD CONTEXT
+    # --------------------------------------------------------
+
+    context = {
+        "caregiver": caregiver,
+        # Assignments
+        "assignments": assignments,
+        "pending_count": pending_count,
+        "active_count": active_count,
+        "completed_count": completed_count,
+        # Payments
+        "approved_payments": approved_payments,
+        "recent_payments": recent_payments,
+        "approved_payment_count": approved_payment_count,
+        "approved_total": approved_total,
+        "paid_total": paid_total,
+        "awaiting_payment_total": awaiting_payment_total,
+    }
+
     return render(
         request,
         "caregivers/dashboard.html",
-        {
-            "caregiver": caregiver,
-            "assignments": assignments,
-            "pending_count": pending_count,
-            "active_count": active_count,
-            "completed_count": completed_count,
-        },
+        context,
     )
 
 

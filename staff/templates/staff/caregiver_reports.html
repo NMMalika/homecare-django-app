@@ -449,8 +449,8 @@
                         </td>
                         <td>{{ report.week_start|date:"d M Y" }} – {{ report.week_end|date:"d M Y" }}</td>
                         <td>
-                            <span class="cr-pill {{ report.overall_condition|lower }}">{{
-                                report.get_overall_condition_display }}</span>
+                            <span class="cr-pill {{ report.overall_condition|lower }}">
+                                {{ report.get_overall_condition_display }}</span>
                         </td>
                         <td>
                             {% if report.reviewed_at %}
@@ -514,12 +514,10 @@
                         </td>
                         <td>
                             {{ report.report_date|date:"d M Y" }}
-                            <div class="cr-muted">{{ report.visit_start_time|time:"H:i"|default:"—" }} – {{
-                                report.visit_end_time|time:"H:i"|default:"—" }}</div>
+                            <div class="cr-muted">{{ report.visit_start_time|time:"H:i"|default:"—" }} – {{ report.visit_end_time|time:"H:i"|default:"—" }}</div>
                         </td>
                         <td>
-                            <span class="cr-pill {{ report.patient_condition|lower }}">{{
-                                report.get_patient_condition_display }}</span>
+                            <span class="cr-pill {{ report.patient_condition|lower }}">{{ report.get_patient_condition_display }}</span>
                         </td>
                         <td>
                             {% if report.reviewed_at %}
