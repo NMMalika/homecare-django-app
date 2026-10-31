@@ -1,0 +1,789 @@
+
+{% extends "staff/base.html" %}
+
+{% block title %}
+Home Care Request Details | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* =========================================================
+       PAGE HEADER
+       ========================================================= */
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .detail-subtitle {
+        color: #64748b;
+        font-size: .875rem;
+        margin-top: .35rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    /* =========================================================
+       QUOTATION ACTION BUTTONS
+       ========================================================= */
+    .quotation-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        padding: .65rem 1rem;
+        border-radius: .5rem;
+        text-decoration: none;
+        font-size: .85rem;
+        font-weight: 700;
+        transition: all .2s ease;
+        border: 1px solid transparent;
+    }
+
+    .create-quotation-btn {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .create-quotation-btn:hover {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+    }
+
+    .view-quotation-btn {
+        background: #ecfdf5;
+        color: #047857;
+        border-color: #a7f3d0;
+    }
+
+    .view-quotation-btn:hover {
+        background: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+    }
+
+    /* =========================================================
+       PAGE LAYOUT
+       ========================================================= */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .detail-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+    }
+
+    .detail-card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .detail-card-body {
+        padding: 1.25rem;
+    }
+
+    /* =========================================================
+       INFORMATION GRID
+       ========================================================= */
+    .detail-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .detail-label {
+        display: block;
+        font-size: .7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: .35rem;
+        letter-spacing: .04em;
+    }
+
+    .detail-value {
+        color: #1e293b;
+        font-size: .9rem;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+    }
+
+    .detail-value a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .detail-value a:hover {
+        text-decoration: underline;
+    }
+
+    /* =========================================================
+       CARE DESCRIPTION
+       ========================================================= */
+    .description-section {
+        margin-top: 1.5rem;
+        padding: 1.15rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #0284c7;
+        border-radius: .65rem;
+    }
+
+    .description-heading {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        color: #0f172a;
+        font-size: .85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: .75rem;
+    }
+
+    .detail-description {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.8;
+        color: #334155;
+        font-size: .9rem;
+        margin: 0;
+    }
+
+    .description-empty {
+        color: #94a3b8;
+        font-style: italic;
+        font-size: .875rem;
+    }
+
+    /* =========================================================
+       SERVICE TAGS
+       ========================================================= */
+    .service-tag {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: .4rem .7rem;
+        border-radius: .4rem;
+        font-size: .8rem;
+        font-weight: 600;
+        margin: .2rem;
+    }
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+    .status-badge {
+        display: inline-block;
+        padding: .4rem .85rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 700;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .status-NEW,
+    .status-ASSIGNED {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .status-CONTACTED,
+    .status-QUOTED,
+    .status-PAYMENT_PENDING {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-PAYMENT_RECEIVED,
+    .status-CONFIRMED {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-COMPLETED {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-CANCELLED {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* =========================================================
+       ATTACHMENTS
+       ========================================================= */
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: .85rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .attachment-item:last-child {
+        border-bottom: none;
+    }
+
+    .attachment-name {
+        font-size: .85rem;
+        font-weight: 600;
+        color: #334155;
+        overflow-wrap: anywhere;
+    }
+
+    .attachment-date {
+        font-size: .75rem;
+        color: #94a3b8;
+        margin-top: .2rem;
+    }
+
+    .attachment-actions {
+        display: flex;
+        gap: .4rem;
+        flex-shrink: 0;
+    }
+
+    .attachment-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .45rem .65rem;
+        border-radius: .4rem;
+        text-decoration: none;
+        font-size: .75rem;
+        font-weight: 600;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .attachment-btn:hover {
+        background: #dbeafe;
+    }
+
+    .attachment-empty {
+        text-align: center;
+        color: #94a3b8;
+        padding: 1.5rem;
+        font-size: .875rem;
+    }
+
+    /* =========================================================
+       ADMIN NOTES
+       ========================================================= */
+    .notes-box {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        padding: 1rem;
+        border-radius: .65rem;
+        color: #78350f;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: .875rem;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       RESPONSIVE DESIGN
+       ========================================================= */
+    @media(max-width: 850px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media(max-width: 550px) {
+        .detail-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-header {
+            align-items: flex-start;
+        }
+
+        .header-actions {
+            width: 100%;
+        }
+
+        .header-actions a {
+            flex: 1;
+        }
+
+        .attachment-item {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .attachment-actions {
+            width: 100%;
+        }
+
+        .detail-title {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<!-- =========================================================
+     PAGE HEADER
+     ========================================================= -->
+<div class="detail-header">
+
+    <div>
+        <h1 class="detail-title">
+            Home Care Request #{{ homecare_request.pk }}
+        </h1>
+
+        <p class="detail-subtitle">
+            Complete patient request information and supporting documents.
+        </p>
+    </div>
+
+    <div class="header-actions">
+
+        <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary">
+
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Requests
+        </a>
+
+        <a href="{% url 'staff:homecare_request_edit' homecare_request.pk %}" class="btn btn-primary">
+
+            <i class="fa-solid fa-pen"></i>
+            Edit Request
+        </a>
+
+        {% if homecare_request.quotation %}
+
+        <a href="{% url 'staff:quotation_detail' homecare_request.quotation.pk %}"
+            class="quotation-action view-quotation-btn">
+
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            View Quotation
+        </a>
+
+        {% else %}
+
+        <a href="{% url 'homecare:create_quotation' homecare_request.pk %}"
+            class="quotation-action create-quotation-btn">
+
+            <i class="fa-solid fa-file-circle-plus"></i>
+            Create Quotation
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="detail-grid">
+
+    <!-- =====================================================
+         MAIN DETAILS
+         ===================================================== -->
+    <div>
+
+        <!-- PATIENT INFORMATION -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-user-injured"></i>
+                Patient Information
+            </div>
+
+            <div class="detail-card-body">
+
+                <div class="detail-info-grid">
+
+                    <div>
+                        <span class="detail-label">Full Name</span>
+
+                        <div class="detail-value">
+                            {{ homecare_request.full_name|default:"Not provided" }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Phone Number</span>
+
+                        <div class="detail-value">
+                            {% if homecare_request.phone %}
+                            <a href="tel:{{ homecare_request.phone }}">
+                                {{ homecare_request.phone }}
+                            </a>
+                            {% else %}
+                            Not provided
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Email Address</span>
+
+                        <div class="detail-value">
+                            {% if homecare_request.email %}
+                            <a href="mailto:{{ homecare_request.email }}">
+                                {{ homecare_request.email }}
+                            </a>
+                            {% else %}
+                            Not provided
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Patient Location</span>
+
+                        <div class="detail-value">
+                            {{ homecare_request.location|default:"Not provided" }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CARE REQUIREMENTS -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-house-medical"></i>
+                Care Requirements
+            </div>
+
+            <div class="detail-card-body">
+
+                <!-- REQUESTED SERVICES -->
+                <div>
+                    <span class="detail-label">Requested Services</span>
+
+                    {% for service in homecare_request.services.all %}
+
+                    <span class="service-tag">
+                        {{ service.name }}
+                    </span>
+
+                    {% empty %}
+
+                    <span class="detail-value">
+                        No services selected.
+                    </span>
+
+                    {% endfor %}
+                </div>
+
+                <!-- PREFERRED SCHEDULE -->
+                <div class="detail-info-grid" style="margin-top:1.5rem;">
+
+                    <div>
+                        <span class="detail-label">Preferred Date</span>
+
+                        <div class="detail-value">
+                            {% if homecare_request.preferred_date %}
+                            {{ homecare_request.preferred_date|date:"d M Y" }}
+                            {% else %}
+                            Not specified
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="detail-label">Preferred Time</span>
+
+                        <div class="detail-value">
+                            {% if homecare_request.preferred_time %}
+                            {{ homecare_request.preferred_time|time:"H:i" }}
+                            {% else %}
+                            Not specified
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FULL CARE DESCRIPTION -->
+                <div class="description-section">
+
+                    <div class="description-heading">
+                        <i class="fa-solid fa-notes-medical"></i>
+                        Description of Care Required
+                    </div>
+
+                    {% if homecare_request.description %}
+
+                    <p class="detail-description">{{ homecare_request.description }}</p>
+
+                    {% else %}
+
+                    <p class="description-empty">
+                        No care description was provided for this request.
+                    </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SUPPORTING ATTACHMENTS -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-paperclip"></i>
+                Supporting Attachments
+
+                <span style="float:right; color:#64748b; font-size:.8rem;">
+                    {{ attachments|length }}
+                    file{{ attachments|length|pluralize }}
+                </span>
+            </div>
+
+            <div class="detail-card-body">
+
+                {% for attachment in attachments %}
+
+                {% if attachment.file %}
+
+                <div class="attachment-item">
+
+                    <div>
+                        <div class="attachment-name">
+                            <i class="fa-solid fa-file" style="color:#2563eb;"></i>
+
+                            {{ attachment.file.name|cut:"homecare/attachments/" }}
+                        </div>
+
+                        <div class="attachment-date">
+                            Uploaded:
+                            {{ attachment.uploaded_at|date:"d M Y, H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="attachment-actions">
+
+                        <a href="{{ attachment.file.url }}" target="_blank" rel="noopener noreferrer"
+                            class="attachment-btn">
+
+                            <i class="fa-solid fa-eye"></i>
+                            View
+                        </a>
+
+                        <a href="{{ attachment.file.url }}" download class="attachment-btn">
+
+                            <i class="fa-solid fa-download"></i>
+                            Download
+                        </a>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+                {% empty %}
+
+                <div class="attachment-empty">
+
+                    <i class="fa-solid fa-folder-open" style="font-size:2rem; display:block; margin-bottom:.6rem;">
+                    </i>
+
+                    No supporting attachments were uploaded for this request.
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+    <div>
+
+        <!-- REQUEST STATUS -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-circle-info"></i>
+                Request Status
+            </div>
+
+            <div class="detail-card-body">
+
+                <span class="status-badge status-{{ homecare_request.status }}">
+                    {{ homecare_request.get_status_display }}
+                </span>
+
+                <hr style="border:0; border-top:1px solid #e2e8f0; margin:1rem 0;">
+
+                <div style="margin-bottom:1rem;">
+                    <span class="detail-label">Request Number</span>
+
+                    <div class="detail-value">
+                        #{{ homecare_request.pk }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1rem;">
+                    <span class="detail-label">Submitted On</span>
+
+                    <div class="detail-value">
+                        {{ homecare_request.created_at|date:"d M Y, H:i" }}
+                    </div>
+                </div>
+
+                <div>
+                    <span class="detail-label">Last Updated</span>
+
+                    <div class="detail-value">
+                        {{ homecare_request.updated_at|date:"d M Y, H:i" }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- QUOTATION SUMMARY -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Quotation
+            </div>
+
+            <div class="detail-card-body">
+
+                {% if homecare_request.quotation %}
+
+                <p style="font-size:.875rem; color:#047857; font-weight:600;">
+                    <i class="fa-solid fa-circle-check"></i>
+                    A quotation has already been created for this request.
+                </p>
+
+                <a href="{% url 'staff:quotation_detail' homecare_request.quotation.pk %}"
+                    class="quotation-action view-quotation-btn" style="width:100%; box-sizing:border-box;">
+
+                    <i class="fa-solid fa-eye"></i>
+                    View Quotation
+                </a>
+
+                {% else %}
+
+                <p style="font-size:.875rem; color:#64748b; line-height:1.6;">
+                    No quotation has been created for this home care request yet.
+                </p>
+
+                <a href="{% url 'homecare:create_quotation' homecare_request.pk %}"
+                    class="quotation-action create-quotation-btn" style="width:100%; box-sizing:border-box;">
+
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    Create Quotation
+                </a>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- ADMINISTRATIVE NOTES -->
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-clipboard"></i>
+                Administrative Notes
+            </div>
+
+            <div class="detail-card-body">
+
+                {% if homecare_request.admin_notes %}
+
+                <div class="notes-box">
+                    {{ homecare_request.admin_notes }}
+                </div>
+
+                {% else %}
+
+                <p style="color:#94a3b8; font-size:.85rem;">
+                    No administrative notes have been added.
+                </p>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- CANCELLATION INFORMATION -->
+        {% if homecare_request.cancelled_at %}
+
+        <div class="detail-card">
+
+            <div class="detail-card-header">
+                <i class="fa-solid fa-ban"></i>
+                Cancellation Information
+            </div>
+
+            <div class="detail-card-body">
+
+                <div class="detail-label">
+                    Cancelled On
+                </div>
+
+                <p class="detail-value">
+                    {{ homecare_request.cancelled_at|date:"d M Y, H:i" }}
+                </p>
+
+                <div class="detail-label">
+                    Cancellation Reason
+                </div>
+
+                <p class="detail-description">
+                    {{ homecare_request.cancelled_reason|default:"No reason provided." }}
+                </p>
+
+            </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

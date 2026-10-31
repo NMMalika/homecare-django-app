@@ -46,12 +46,10 @@
                             All Assignments
                         </option>
 
-                        {% for value,label in status_choices %}
-
-                        <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
                             {{ label }}
                         </option>
-
                         {% endfor %}
 
                     </select>
@@ -136,7 +134,7 @@
 
                             <td>
 
-                                {% if assignment.status == "PENDING_ACCEPTANCE" %}
+                                {% if assignment.status == "PENDING" or assignment.status == "PENDING_ACCEPTANCE" %}
 
                                 <span class="badge bg-warning text-dark">
                                     Pending Acceptance

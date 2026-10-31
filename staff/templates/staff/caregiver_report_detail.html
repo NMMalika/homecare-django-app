@@ -1,0 +1,312 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+
+{% block title %}{{ report_type|title }} Report #{{ report.pk }} | Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hoh-report-wrapper {
+        max-width: 1080px;
+        margin: 1.5rem auto 4rem;
+        padding: 0 1rem;
+        color: #0f172a;
+    }
+
+    /* Toolbar Actions */
+    .hoh-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .hoh-btn-back {
+        height: 42px;
+        padding: 0 1.25rem;
+        border-radius: 0.625rem;
+        background: #ffffff;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .hoh-btn-back:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .hoh-btn-pdf {
+        height: 42px;
+        padding: 0 1.25rem;
+        border-radius: 0.625rem;
+        background: #2563eb;
+        color: #ffffff;
+        border: none;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
+
+    .hoh-btn-pdf:hover {
+        background: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Main Card Container */
+    .hoh-report-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+    }
+
+    /* Brand Header */
+    .hoh-brand {
+        padding: 2rem 2.25rem;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 3px solid #2563eb;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .hoh-brand img {
+        max-width: 140px;
+        max-height: 80px;
+        object-fit: contain;
+    }
+
+    .hoh-brand-kicker {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #2563eb;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .hoh-brand h1 {
+        font-size: 1.625rem;
+        font-weight: 800;
+        margin: 0;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+    }
+
+    .hoh-brand p {
+        margin: 0.25rem 0 0;
+        color: #64748b;
+        font-size: 0.9375rem;
+        font-weight: 500;
+    }
+
+    /* Report Content Sections */
+    .hoh-section {
+        padding: 2rem 2.25rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .hoh-section:last-of-type {
+        border-bottom: none;
+    }
+
+    .hoh-section-title {
+        font-size: 1.0625rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding-bottom: 0.625rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    /* Fields Grid */
+    .hoh-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem 2rem;
+    }
+
+    .hoh-field-box {
+        background-color: #f8fafc;
+        border: 1px solid #f1f5f9;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .hoh-field-label {
+        display: block;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.375rem;
+    }
+
+    .hoh-field-value {
+        color: #1e293b;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        white-space: pre-line;
+        line-height: 1.6;
+    }
+
+    /* Footer Banner */
+    .hoh-footer {
+        padding: 1.5rem 2.25rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.8125rem;
+    }
+
+    .hoh-footer-item {
+        display: inline-block;
+        margin-right: 1.5rem;
+        margin-top: 0.375rem;
+    }
+
+    @media (max-width: 768px) {
+        .hoh-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .hoh-section,
+        .hoh-brand,
+        .hoh-footer {
+            padding: 1.25rem;
+        }
+    }
+
+    @media print {
+
+        .hoh-toolbar,
+        .sidebar,
+        .navbar {
+            display: none !important;
+        }
+
+        .hoh-report-wrapper {
+            margin: 0;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .hoh-report-card {
+            box-shadow: none;
+            border: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hoh-report-wrapper">
+
+    <!-- Top Action Toolbar -->
+    <div class="hoh-toolbar">
+        <a class="hoh-btn-back" href="{% url 'staff:reports' %}?tab={{ report_type }}">
+            <i class="fas fa-arrow-left me-1"></i> Back to Reports
+        </a>
+        <a class="hoh-btn-pdf" href="{% url 'staff:caregiver_report_pdf' report_type report.pk %}">
+            <i class="fas fa-file-pdf me-1"></i> Download PDF
+        </a>
+    </div>
+
+    <!-- Report Document Card -->
+    <article class="hoh-report-card">
+
+        <!-- Brand Header -->
+        <header class="hoh-brand">
+            {% if site.logo %}<img src="{{ site.logo.url }}" alt="{{ site_name }} logo">{% endif %}
+            <div>
+                <span class="hoh-brand-kicker">Care Delivery Documentation</span>
+                <h1>{{ site_name }}</h1>
+                <p>{{ report_type|title }} Care Report · Reference #{{ report.pk }}</p>
+            </div>
+        </header>
+
+        <!-- Patient Section -->
+        <section class="hoh-section">
+            <h2 class="hoh-section-title">
+                <i class="fas fa-user-injured text-primary"></i> Patient Details
+            </h2>
+            <div class="hoh-fields">
+                {% for label, value in patient_rows %}
+                <div class="hoh-field-box">
+                    <span class="hoh-field-label">{{ label }}</span>
+                    <div class="hoh-field-value">{{ value|default:'Not provided' }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Caregiver & Assignment Section -->
+        <section class="hoh-section">
+            <h2 class="hoh-section-title">
+                <i class="fas fa-user-nurse text-primary"></i> Caregiver &amp; Assignment Details
+            </h2>
+            <div class="hoh-fields">
+                {% for label, value in caregiver_rows %}
+                <div class="hoh-field-box">
+                    <span class="hoh-field-label">{{ label }}</span>
+                    <div class="hoh-field-value">{{ value|default:'Not provided' }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Report Observations Section -->
+        <section class="hoh-section">
+            <h2 class="hoh-section-title">
+                <i class="fas fa-notes-medical text-primary"></i> Care Report Details
+            </h2>
+            <div class="hoh-fields">
+                {% for label, value in report_rows %}
+                <div class="hoh-field-box">
+                    <span class="hoh-field-label">{{ label }}</span>
+                    <div class="hoh-field-value">{{ value|default:'Not provided' }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Footer Info -->
+        <footer class="hoh-footer">
+            <strong class="text-slate-800">{{ site_name }} Confidential Healthcare Record</strong>
+            <div>
+                {% for label, value in contacts %}
+                <span class="hoh-footer-item"><strong>{{ label }}:</strong> {{ value }}</span>
+                {% endfor %}
+            </div>
+        </footer>
+
+    </article>
+
+</div>
+{% endblock %}

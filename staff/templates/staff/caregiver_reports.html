@@ -1,570 +1,1085 @@
 {% extends "staff/base.html" %}
+
 {% load static %}
+
+
 
 {% block title %}Caregiver Reports | Hands-On Health{% endblock %}
 
+
+
 {% block extra_css %}
+
 <style>
     .cr-page {
+
         max-width: 1500px;
+
         margin: auto;
+
         padding: 24px 18px;
+
         color: #183047;
+
     }
+
+
 
     .cr-hero {
+
         background: linear-gradient(120deg, #123c55, #237e96);
+
         color: #fff;
+
         padding: 30px;
+
         border-radius: 20px;
+
         display: flex;
+
         justify-content: space-between;
+
         gap: 20px;
+
         flex-wrap: wrap;
+
         align-items: center;
+
         box-shadow: 0 10px 25px -5px rgba(18, 60, 85, 0.2);
+
     }
+
+
 
     .cr-hero h1 {
+
         font-size: 27px;
+
         font-weight: 800;
+
         color: #fff;
+
         margin: 0 0 8px;
+
     }
+
+
 
     .cr-hero p {
+
         margin: 0;
+
         color: #d8eff4;
+
     }
+
+
 
     .cr-stats {
+
         display: grid;
+
         grid-template-columns: repeat(4, minmax(0, 1fr));
+
         gap: 15px;
+
         margin: 20px 0;
+
     }
+
+
 
     .cr-stat {
+
         background: white;
+
         border: 1px solid #e4eaf0;
+
         border-radius: 16px;
+
         padding: 20px;
+
         box-shadow: 0 4px 15px rgba(18, 51, 75, 0.04);
+
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+
     }
+
+
 
     .cr-stat:hover {
+
         transform: translateY(-2px);
+
         box-shadow: 0 8px 20px rgba(18, 51, 75, 0.08);
+
     }
+
+
 
     .cr-stat small {
+
         color: #63758a;
+
         font-weight: 700;
+
         text-transform: uppercase;
+
         font-size: 11px;
+
         letter-spacing: .06em;
+
         display: block;
+
     }
+
+
 
     .cr-stat strong {
+
         display: block;
+
         font-size: 28px;
+
         margin-top: 6px;
+
         color: #163d55;
+
         font-weight: 800;
+
         line-height: 1.1;
+
     }
+
+
 
     .cr-panel {
+
         background: #fff;
+
         border: 1px solid #e2e8f0;
+
         border-radius: 18px;
+
         overflow: hidden;
+
         box-shadow: 0 10px 25px -5px rgba(21, 51, 74, 0.05);
+
     }
+
+
 
     .cr-panel-header {
+
         padding: 22px 24px;
+
         display: flex;
+
         align-items: center;
+
         justify-content: space-between;
+
         gap: 12px;
+
         flex-wrap: wrap;
+
         border-bottom: 1px solid #e8edf2;
+
     }
+
+
 
     .cr-panel-header h2 {
+
         font-size: 19px;
+
         font-weight: 800;
+
         margin: 0;
+
         color: #1c3b52;
+
     }
+
+
 
     .cr-tabs {
+
         display: flex;
+
         gap: 8px;
+
         padding: 16px 24px 18px;
+
         flex-wrap: wrap;
+
         background: #f9fbfd;
+
         border-bottom: 1px solid #e8edf2;
+
     }
+
+
 
     .cr-tab {
+
         padding: 10px 16px;
+
         border: 1px solid #d7e6ec;
+
         border-radius: 10px;
+
         background: #ffffff;
+
         color: #34576b;
+
         text-decoration: none;
+
         font-weight: 700;
+
         font-size: 13px;
+
         transition: all 0.2s ease;
+
     }
+
+
 
     .cr-tab:hover {
+
         background: #f1f5f9;
+
         color: #1d4ed8;
+
     }
+
+
 
     .cr-tab.active {
+
         background: #14627c;
+
         color: #fff;
+
         border-color: #14627c;
+
         box-shadow: 0 2px 5px rgba(20, 98, 124, 0.2);
+
     }
+
+
 
     .cr-filter {
+
         padding: 18px 24px;
+
         background: #f8fbfc;
+
         display: flex;
+
         gap: 10px;
+
         flex-wrap: wrap;
+
         border-bottom: 1px solid #e8edf2;
+
         align-items: center;
+
     }
+
+
 
     .cr-filter input,
+
     .cr-filter select {
+
         border: 1px solid #cbd5e1;
+
         border-radius: 10px;
+
         padding: 10px 14px;
+
         background: white;
+
         min-width: 180px;
+
         color: #213b4f;
+
         font-size: 14px;
+
         outline: none;
+
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
     }
+
+
 
     .cr-filter input:focus,
+
     .cr-filter select:focus {
+
         border-color: #237e96;
+
         box-shadow: 0 0 0 3px rgba(35, 126, 150, 0.12);
+
     }
+
+
 
     .cr-filter input {
+
         flex: 1;
+
         min-width: 240px;
+
     }
+
+
 
     .cr-btn {
+
         display: inline-flex;
+
         align-items: center;
+
         justify-content: center;
+
         gap: 8px;
+
         border-radius: 10px;
+
         padding: 10px 16px;
+
         text-decoration: none;
+
         border: 0;
+
         background: #14627c;
+
         color: #fff;
+
         font-weight: 700;
+
         font-size: 14px;
+
         cursor: pointer;
+
         transition: all 0.2s ease;
+
     }
+
+
 
     .cr-btn:hover {
+
         background: #104e62;
+
     }
+
+
 
     .cr-btn-light {
+
         background: #e6f5fa;
+
         color: #13556d;
+
         border: 1px solid #c9e4ec;
+
     }
+
+
 
     .cr-btn-light:hover {
+
         background: #d5edf4;
+
     }
+
+
 
     .cr-table-wrap {
+
         overflow-x: auto;
+
     }
+
+
 
     .cr-table {
+
         width: 100%;
+
         border-collapse: collapse;
+
         min-width: 980px;
+
     }
+
+
 
     .cr-table th {
+
         background: #f8fafc;
+
         text-align: left;
+
         text-transform: uppercase;
+
         font-size: 11px;
+
         letter-spacing: .06em;
+
         color: #64778b;
+
         padding: 15px 18px;
+
         border-bottom: 1px solid #e2e8f0;
+
     }
+
+
 
     .cr-table td {
+
         padding: 16px 18px;
+
         border-top: 1px solid #edf1f5;
+
         font-size: 13px;
+
         vertical-align: top;
+
     }
+
+
 
     .cr-table tbody tr:hover {
+
         background: #f8fafc;
+
     }
+
+
 
     .cr-primary {
+
         font-weight: 750;
+
         color: #1a3a50;
+
     }
+
+
 
     .cr-muted {
+
         font-size: 12px;
+
         color: #718096;
+
     }
+
+
 
     .cr-pill {
+
         display: inline-flex;
+
         padding: 5px 10px;
+
         border-radius: 20px;
+
         background: #e6f1f5;
+
         color: #1e6074;
+
         font-weight: 800;
+
         font-size: 11px;
+
         white-space: nowrap;
+
     }
+
+
 
     .cr-pill.urgent,
+
     .cr-pill.deteriorating {
+
         background: #fee2e2;
+
         color: #991b1b;
+
     }
+
+
 
     .cr-pill.stable {
+
         background: #e0f2fe;
+
         color: #0369a1;
+
     }
+
+
 
     .cr-pill.improving {
+
         background: #dcfce7;
+
         color: #166534;
+
     }
+
+
 
     .cr-pill.reviewed {
+
         background: #dcfce7;
+
         color: #166534;
+
     }
+
+
 
     .cr-pill.waiting {
+
         background: #fef3c7;
+
         color: #92400e;
+
     }
+
+
 
     .cr-detail {
+
         margin-top: 6px;
+
     }
+
+
 
     .cr-detail summary {
+
         cursor: pointer;
+
         font-weight: 700;
+
         color: #14627c;
+
     }
+
+
 
     .cr-detail summary:hover {
+
         color: #104e62;
+
     }
+
+
 
     .cr-detail div {
+
         margin: 8px 0 0;
+
         line-height: 1.6;
+
         white-space: normal;
+
         overflow-wrap: anywhere;
+
         color: #334155;
+
     }
+
+
 
     .cr-empty {
+
         text-align: center;
+
         color: #6c8190;
+
         padding: 60px 20px !important;
+
     }
+
+
 
     .cr-foot {
+
         padding: 16px 24px;
+
         border-top: 1px solid #e7edf2;
+
         color: #718096;
+
         font-size: 12px;
+
         background: #f8fafc;
+
     }
+
+
 
     @media (max-width: 900px) {
+
         .cr-stats {
+
             grid-template-columns: repeat(2, 1fr);
+
         }
+
     }
+
+
 
     @media (max-width: 550px) {
+
         .cr-page {
+
             padding: 12px;
+
         }
+
+
 
         .cr-hero {
+
             padding: 22px;
+
         }
+
+
 
         .cr-hero h1 {
+
             font-size: 22px;
+
         }
+
+
 
         .cr-stat {
+
             padding: 14px;
+
         }
+
+
 
         .cr-stat strong {
+
             font-size: 23px;
+
         }
+
+
 
         .cr-filter input,
+
         .cr-filter select,
+
         .cr-filter button {
+
             width: 100%;
+
         }
+
     }
 </style>
+
 {% endblock %}
 
+
+
 {% block content %}
+
 <div class="cr-page">
+
     <header class="cr-hero">
+
         <div>
+
             <div style="font-size: 11px; letter-spacing: 0.12em; font-weight: 800; opacity: 0.8;">CARE DELIVERY /
+
                 QUALITY ASSURANCE</div>
+
             <h1><i class="fas fa-notes-medical"></i> Caregiver Reports</h1>
+
             <p>Monitor daily care notes and weekly patient progress from one centralized workspace.</p>
+
         </div>
+
         <a class="cr-btn cr-btn-light" href="{% url 'staff:dashboard' %}">
+
             <i class="fas fa-arrow-left"></i> Dashboard
+
         </a>
+
     </header>
 
+
+
     <section class="cr-stats" aria-label="Report statistics">
+
         <div class="cr-stat">
+
             <small>All Reports</small>
+
             <strong>{{ total_reports }}</strong>
+
         </div>
+
         <div class="cr-stat">
+
             <small>Daily Reports</small>
+
             <strong>{{ daily_count }}</strong>
+
         </div>
+
         <div class="cr-stat">
+
             <small>Weekly Reports</small>
+
             <strong>{{ weekly_count }}</strong>
+
         </div>
+
         <div class="cr-stat">
+
             <small>Awaiting Review</small>
+
             <strong style="color: #b45309;">{{ unreviewed_count }}</strong>
+
         </div>
+
     </section>
 
+
+
     <section class="cr-panel">
+
         <div class="cr-panel-header">
+
             <div>
+
                 <h2>Caregiver Report Register</h2>
+
                 <div class="cr-muted">Search by caregiver or patient and expand any report to view comprehensive care
+
                     observations.</div>
+
             </div>
+
             <span class="cr-pill">{% if active_tab == 'weekly' %}Weekly View{% else %}Daily View{% endif %}</span>
+
         </div>
 
+
+
         <nav class="cr-tabs" aria-label="Report type">
+
             <a class="cr-tab {% if active_tab == 'daily' %}active{% endif %}"
-                href="?tab=daily&amp;q={{ search|urlencode }}&amp;condition={{ condition|urlencode }}">
+                href="?tab=daily&q={{ search|urlencode }}&condition={{ condition|urlencode }}">
+
                 <i class="far fa-calendar"></i> Daily Reports ({{ daily_count }})
+
             </a>
+
             <a class="cr-tab {% if active_tab == 'weekly' %}active{% endif %}"
-                href="?tab=weekly&amp;q={{ search|urlencode }}&amp;condition={{ condition|urlencode }}">
+                href="?tab=weekly&q={{ search|urlencode }}&condition={{ condition|urlencode }}">
+
                 <i class="fas fa-calendar-week"></i> Weekly Reports ({{ weekly_count }})
+
             </a>
+
         </nav>
 
+
+
         <form method="get" class="cr-filter">
+
             <input type="hidden" name="tab" value="{{ active_tab }}">
+
             <input type="search" name="q" value="{{ search }}" placeholder="Search caregiver or patient name..."
                 aria-label="Search caregiver or patient">
 
+
+
             <select name="condition" aria-label="Patient condition">
+
                 <option value="">All Conditions</option>
+
                 {% for value, label in condition_choices %}
-                <option value="{{ value }}" {% if condition == value %}selected{% endif %}>{{ label }}</option>
+
+                <option value="{{ value }}" {% if condition ==  value %}selected{% endif %}>{{ label }}</option>
+
                 {% endfor %}
+
             </select>
 
+
+
             <button type="submit" class="cr-btn">
+
                 <i class="fas fa-search"></i> Filter
+
             </button>
+
             <a class="cr-btn cr-btn-light" href="?tab={{ active_tab }}">Reset</a>
+
         </form>
 
+
+
         <div class="cr-table-wrap">
+
             {% if active_tab == 'weekly' %}
+
             <table class="cr-table">
+
                 <thead>
+
                     <tr>
+
                         <th>Report ID</th>
+
                         <th>Caregiver / Patient</th>
+
                         <th>Reporting Period</th>
+
                         <th>Condition</th>
+
                         <th>Review Status</th>
+
                         <th>Care Summary</th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     {% for report in weekly_reports %}
+
                     <tr>
+
                         <td>
+
                             <span class="cr-primary">#{{ report.pk }}</span>
+
                             <div class="cr-muted">{{ report.submitted_at|date:"d M Y, H:i" }}</div>
+
                         </td>
+
                         <td>
+
                             <div class="cr-primary">{{ report.assignment.caregiver.name }}</div>
+
                             <div class="cr-muted">{{ report.assignment.homecare_request.full_name }}</div>
+
                             <div class="cr-muted">Assignment #{{ report.assignment_id }}</div>
+
                         </td>
+
                         <td>{{ report.week_start|date:"d M Y" }} – {{ report.week_end|date:"d M Y" }}</td>
+
                         <td>
+
                             <span class="cr-pill {{ report.overall_condition|lower }}">
+
                                 {{ report.get_overall_condition_display }}</span>
+
                         </td>
+
                         <td>
+
                             {% if report.reviewed_at %}
+
                             <span class="cr-pill reviewed">Reviewed</span>
+
                             <div class="cr-muted">{{ report.reviewed_at|date:"d M Y" }}</div>
+
                             {% else %}
+
                             <span class="cr-pill waiting">Awaiting Review</span>
+
                             {% endif %}
+
                         </td>
+
                         <td>
-                            <details class="cr-detail">
-                                <summary>View report details</summary>
-                                <div><b>Care provided:</b> {{ report.care_provided|linebreaksbr }}</div>
-                                <div><b>Patient progress:</b> {{ report.patient_progress|linebreaksbr }}</div>
-                                {% if report.concerns %}
-                                <div><b>Concerns:</b> {{ report.concerns|linebreaksbr }}</div>
-                                {% endif %}
-                                {% if report.recommendations %}
-                                <div><b>Recommendations:</b> {{ report.recommendations|linebreaksbr }}</div>
-                                {% endif %}
-                                {% if report.caregiver_notes %}
-                                <div><b>Caregiver notes:</b> {{ report.caregiver_notes|linebreaksbr }}</div>
-                                {% endif %}
-                            </details>
+
+                            <a class="cr-btn" href="{% url 'staff:caregiver_report_detail' 'weekly' report.pk %}"><i
+                                    class="fas fa-eye"></i> View Details</a>
+                            <a class="cr-btn cr-btn-light"
+                                href="{% url 'staff:caregiver_report_pdf' 'weekly' report.pk %}"><i
+                                    class="fas fa-file-pdf"></i> Download PDF</a>
+
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
+
                         <td colspan="6" class="cr-empty">
+
                             <i class="fas fa-folder-open fa-2x" style="margin-bottom: 10px; opacity: 0.5;"></i>
+
                             <h3 style="font-weight: 700; color: #1e293b; font-size: 16px;">No Weekly Reports Found</h3>
+
                             <p style="margin-bottom: 0;">No weekly reports match your search or filter criteria.</p>
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
             {% else %}
+
             <table class="cr-table">
+
                 <thead>
+
                     <tr>
+
                         <th>Report ID</th>
+
                         <th>Caregiver / Patient</th>
-                        <th>Visit Date &amp; Time</th>
+
+                        <th>Visit Date & Time</th>
+
                         <th>Condition</th>
+
                         <th>Review Status</th>
+
                         <th>Care Summary</th>
+
                     </tr>
+
                 </thead>
+
                 <tbody>
+
                     {% for report in daily_reports %}
+
                     <tr>
+
                         <td>
+
                             <span class="cr-primary">#{{ report.pk }}</span>
+
                             <div class="cr-muted">{{ report.submitted_at|date:"d M Y, H:i" }}</div>
+
                         </td>
+
                         <td>
+
                             <div class="cr-primary">{{ report.assignment.caregiver.name }}</div>
+
                             <div class="cr-muted">{{ report.assignment.homecare_request.full_name }}</div>
+
                             <div class="cr-muted">Assignment #{{ report.assignment_id }}</div>
+
                         </td>
+
                         <td>
+
                             {{ report.report_date|date:"d M Y" }}
+
                             <div class="cr-muted">{{ report.visit_start_time|time:"H:i"|default:"—" }} – {{ report.visit_end_time|time:"H:i"|default:"—" }}</div>
+
                         </td>
+
                         <td>
-                            <span class="cr-pill {{ report.patient_condition|lower }}">{{ report.get_patient_condition_display }}</span>
+
+                            <span class="cr-pill {{ report.patient_condition|lower }}">
+                                {{ report.get_patient_condition_display }}</span>
+
                         </td>
+
                         <td>
+
                             {% if report.reviewed_at %}
+
                             <span class="cr-pill reviewed">Reviewed</span>
+
                             <div class="cr-muted">{{ report.reviewed_at|date:"d M Y" }}</div>
+
                             {% else %}
+
                             <span class="cr-pill waiting">Awaiting Review</span>
+
                             {% endif %}
+
                         </td>
+
                         <td>
-                            <details class="cr-detail">
-                                <summary>View report details</summary>
-                                <div><b>Care provided:</b> {{ report.care_provided|linebreaksbr }}</div>
-                                <div><b>Patient progress:</b> {{ report.patient_progress|linebreaksbr }}</div>
-                                {% if report.vital_observations %}
-                                <div><b>Vital observations:</b> {{ report.vital_observations|linebreaksbr }}</div>
-                                {% endif %}
-                                {% if report.concerns %}
-                                <div><b>Concerns:</b> {{ report.concerns|linebreaksbr }}</div>
-                                {% endif %}
-                                {% if report.next_visit_date %}
-                                <div><b>Next visit:</b> {{ report.next_visit_date|date:"d M Y" }}</div>
-                                {% endif %}
-                                {% if report.caregiver_notes %}
-                                <div><b>Caregiver notes:</b> {{ report.caregiver_notes|linebreaksbr }}</div>
-                                {% endif %}
-                            </details>
+
+                            <a class="cr-btn" href="{% url 'staff:caregiver_report_detail' 'daily' report.pk %}"><i
+                                    class="fas fa-eye"></i> View Details</a>
+                            <a class="cr-btn cr-btn-light"
+                                href="{% url 'staff:caregiver_report_pdf' 'daily' report.pk %}"><i
+                                    class="fas fa-file-pdf"></i> Download PDF</a>
+
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
+
                         <td colspan="6" class="cr-empty">
+
                             <i class="fas fa-folder-open fa-2x" style="margin-bottom: 10px; opacity: 0.5;"></i>
+
                             <h3 style="font-weight: 700; color: #1e293b; font-size: 16px;">No Daily Reports Found</h3>
+
                             <p style="margin-bottom: 0;">No daily reports match your search or filter criteria.</p>
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
             {% endif %}
+
         </div>
 
+
+
         <div class="cr-foot">
+
             Reports are read directly from caregiver submission logs. Review status reflects the existing database
+
             records.
+
         </div>
+
     </section>
+
 </div>
+
 {% endblock %}

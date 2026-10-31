@@ -7,7 +7,7 @@ Home Care Requests | Hands-On Health
 {% block content %}
 
 <style>
-    /* Professional Home Care Requests Page Styling */
+    /* PAGE HEADER */
     .app-header {
         display: flex;
         justify-content: space-between;
@@ -38,7 +38,7 @@ Home Care Requests | Hands-On Health
         margin-top: 0.25rem;
     }
 
-    /* Filter Panel Styling */
+    /* FILTER PANEL */
     .filter-panel {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -84,7 +84,7 @@ Home Care Requests | Hands-On Health
 
     .custom-control:focus {
         border-color: #2563eb;
-        background-color: #fff;
+        background-color: #ffffff;
     }
 
     .filter-btns {
@@ -92,7 +92,7 @@ Home Care Requests | Hands-On Health
         gap: 0.5rem;
     }
 
-    /* Content Card & Table */
+    /* CONTENT CARD AND TABLE */
     .content-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -157,7 +157,7 @@ Home Care Requests | Hands-On Health
         background-color: #f8fafc;
     }
 
-    /* Service Tags */
+    /* SERVICE TAGS */
     .service-tag {
         display: inline-block;
         padding: 0.15rem 0.5rem;
@@ -169,7 +169,7 @@ Home Care Requests | Hands-On Health
         margin: 0.125rem 0.125rem 0.125rem 0;
     }
 
-    /* Status Badges */
+    /* STATUS BADGES */
     .badge-status {
         display: inline-flex;
         align-items: center;
@@ -210,49 +210,204 @@ Home Care Requests | Hands-On Health
         color: #475569;
     }
 
-    /* Action Buttons */
+    /* ACTION BUTTONS */
     .action-group {
         display: flex;
         justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
         gap: 0.375rem;
     }
 
     .icon-action-btn {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 0.375rem;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: #64748b;
-        background: transparent;
-        border: 1px solid transparent;
-        transition: all 0.15s ease;
+        gap: 0.4rem;
+        padding: 0.375rem 0.65rem;
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
         text-decoration: none;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
     }
 
-    .icon-action-btn:hover {
+    .icon-action-btn.view-request {
+        background: #ecfdf5;
+        color: #047857;
+        border-color: #a7f3d0;
+    }
+
+    .icon-action-btn.view-request:hover {
+        background: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+    }
+
+    .icon-action-btn.view-request i {
+        color: #059669;
+    }
+
+    .icon-action-btn.view-quotation {
         background: #f1f5f9;
-        color: #0f172a;
+        color: #334155;
         border-color: #cbd5e1;
     }
 
-    .icon-action-btn.danger:hover {
-        background: #fee2e2;
-        color: #dc2626;
-        border-color: #fca5a5;
+    .icon-action-btn.view-quotation:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+        border-color: #94a3b8;
+    }
+
+    .icon-action-btn.view-quotation i {
+        color: #2563eb;
+    }
+
+    .icon-action-btn.create-quotation {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .icon-action-btn.create-quotation:hover {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+    }
+
+    .icon-action-btn.create-quotation i {
+        color: #2563eb;
+    }
+
+    /* PAGINATION */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .pagination-info {
+        color: #64748b;
+        font-size: 0.8125rem;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.25rem;
+        height: 2.25rem;
+        padding: 0 0.65rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.45rem;
+        color: #475569;
+        background: #ffffff;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .pagination a:hover {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    .pagination .current {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+    }
+
+    .pagination .disabled {
+        color: #cbd5e1;
+        background: #f8fafc;
+        cursor: not-allowed;
+    }
+
+    .pagination .ellipsis {
+        border: none;
+        background: transparent;
+        min-width: 1.5rem;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+        .app-header {
+            flex-direction: column;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+        }
+
+        .filter-panel {
+            padding: 1rem;
+        }
+
+        .filter-field {
+            min-width: 100%;
+        }
+
+        .filter-btns {
+            width: 100%;
+        }
+
+        .filter-btns .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .card-top {
+            padding: 1rem;
+        }
+
+        .professional-table th,
+        .professional-table td {
+            padding: 0.75rem;
+        }
+
+        .pagination-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1rem;
+        }
+
+        .pagination {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 
-<!-- =========================================================
-     PAGE HEADER
-     ========================================================= -->
+<!-- PAGE HEADER -->
 <div class="app-header">
     <div>
         <div class="app-kicker">Home Care Operations</div>
         <h1 class="app-title">Home Care Requests</h1>
-        <p class="app-subtitle">Manage patient requests for home-based healthcare services seamlessly.</p>
+        <p class="app-subtitle">
+            Manage patient requests for home-based healthcare services seamlessly.
+        </p>
     </div>
+
     <div>
         <a href="{% url 'staff:homecare_request_add' %}" class="btn btn-primary"
             style="display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.625rem 1.25rem; font-weight: 600; border-radius: 0.5rem; text-decoration: none;">
@@ -262,23 +417,22 @@ Home Care Requests | Hands-On Health
     </div>
 </div>
 
-<!-- =========================================================
-     FILTERS
-     ========================================================= -->
+<!-- FILTERS -->
 <div class="filter-panel">
     <form method="get" class="filter-grid">
+
         <div class="filter-field" style="flex: 2;">
-            <label>Search Records</label>
-            <input type="text" name="q" value="{{ search }}" class="custom-control"
-                placeholder="Search by patient name, phone, or email...">
+            <label for="search-records">Search Records</label>
+            <input type="text" id="search-records" name="q" value="{{ search }}" class="custom-control"
+                placeholder="Search by patient name, phone, email, or location...">
         </div>
 
         <div class="filter-field">
-            <label>Status Filter</label>
-            <select name="status" class="custom-control">
+            <label for="status-filter">Status Filter</label>
+            <select name="status" id="status-filter" class="custom-control">
                 <option value="">All statuses</option>
                 {% for value, label in status_choices %}
-                <option value="{{ value }}" {% if current_status == value %} selected {% endif %}>
+                <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
                     {{ label }}
                 </option>
                 {% endfor %}
@@ -291,25 +445,29 @@ Home Care Requests | Hands-On Health
                 <i class="fa-solid fa-filter"></i>
                 <span>Filter</span>
             </button>
+
             <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary"
                 style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none;">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span>Reset</span>
             </a>
         </div>
+
     </form>
 </div>
 
-<!-- =========================================================
-     REQUESTS TABLE
-     ========================================================= -->
+<!-- REQUESTS TABLE -->
 <div class="content-card">
 
     <div class="card-top">
         <div>
             <h2>Request Records</h2>
-            <span>{{ homecare_requests|length }} request{{ homecare_requests|length|pluralize }} found</span>
+            <span>
+                {{ page_obj.paginator.count }}
+                request{{ page_obj.paginator.count|pluralize }} found
+            </span>
         </div>
+
         <a href="{% url 'staff:homecare_request_add' %}" class="btn btn-secondary"
             style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; border-radius: 0.5rem; text-decoration: none; font-weight: 500;">
             <i class="fa-solid fa-house-medical"></i>
@@ -330,18 +488,22 @@ Home Care Requests | Hands-On Health
                     <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for item in homecare_requests %}
                 <tr>
+
                     <!-- PATIENT -->
                     <td>
                         <strong style="display: block; color: #0f172a; font-weight: 600;">
                             {{ item.full_name }}
                         </strong>
+
                         {% if item.location %}
                         <small
                             style="display: inline-flex; align-items: center; gap: 0.25rem; color: #64748b; font-size: 0.75rem; margin-top: 0.125rem;">
-                            <i class="fa-solid fa-location-dot"></i> {{ item.location }}
+                            <i class="fa-solid fa-location-dot"></i>
+                            {{ item.location }}
                         </small>
                         {% endif %}
                     </td>
@@ -351,12 +513,15 @@ Home Care Requests | Hands-On Health
                         {% if item.phone %}
                         <div
                             style="font-weight: 500; color: #334155; display: inline-flex; align-items: center; gap: 0.375rem;">
-                            <i class="fa-solid fa-phone" style="color: #94a3b8; font-size: 0.75rem;"></i> {{ item.phone}}
+                            <i class="fa-solid fa-phone" style="color: #94a3b8; font-size: 0.75rem;"></i>
+                            {{ item.phone }}
                         </div>
                         {% endif %}
+
                         {% if item.email %}
                         <small style="display: block; color: #64748b; font-size: 0.75rem; margin-top: 0.125rem;">
-                            <i class="fa-solid fa-envelope" style="color: #94a3b8;"></i> {{ item.email }}
+                            <i class="fa-solid fa-envelope" style="color: #94a3b8;"></i>
+                            {{ item.email }}
                         </small>
                         {% endif %}
                     </td>
@@ -364,23 +529,26 @@ Home Care Requests | Hands-On Health
                     <!-- SERVICES -->
                     <td>
                         {% for service in item.services.all %}
-                        <span class="service-tag">
-                            {{ service.name }}
-                        </span>
+                        <span class="service-tag">{{ service.name }}</span>
                         {% empty %}
-                        <span style="color: #94a3b8; font-style: italic;">No service selected</span>
+                        <span style="color: #94a3b8; font-style: italic;">
+                            No service selected
+                        </span>
                         {% endfor %}
                     </td>
 
-                    <!-- PREFERRED DATE -->
+                    <!-- PREFERRED SCHEDULE -->
                     <td style="white-space: nowrap;">
                         {% if item.preferred_date %}
                         <div style="font-weight: 500; color: #334155;">
                             {{ item.preferred_date|date:"d M Y" }}
                         </div>
                         {% else %}
-                        <span style="color: #94a3b8; font-style: italic;">Not specified</span>
+                        <span style="color: #94a3b8; font-style: italic;">
+                            Not specified
+                        </span>
                         {% endif %}
+
                         {% if item.preferred_time %}
                         <small style="display: block; color: #64748b; font-size: 0.75rem;">
                             {{ item.preferred_time|time:"H:i" }}
@@ -392,40 +560,25 @@ Home Care Requests | Hands-On Health
                     <td style="white-space: nowrap;">
                         {% if item.status == "NEW" %}
                         <span class="badge-status badge-new">
-                            <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> New
+                            <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i>
+                            New
                         </span>
                         {% elif item.status == "CONTACTED" %}
-                        <span class="badge-status badge-contacted">
-                            Contacted
-                        </span>
+                        <span class="badge-status badge-contacted">Contacted</span>
                         {% elif item.status == "QUOTED" %}
-                        <span class="badge-status badge-default">
-                            Quoted
-                        </span>
+                        <span class="badge-status badge-default">Quoted</span>
                         {% elif item.status == "PAYMENT_PENDING" %}
-                        <span class="badge-status badge-contacted">
-                            Payment Pending
-                        </span>
+                        <span class="badge-status badge-contacted">Payment Pending</span>
                         {% elif item.status == "PAYMENT_RECEIVED" %}
-                        <span class="badge-status badge-confirmed">
-                            Payment Received
-                        </span>
+                        <span class="badge-status badge-confirmed">Payment Received</span>
                         {% elif item.status == "CONFIRMED" %}
-                        <span class="badge-status badge-confirmed">
-                            Confirmed
-                        </span>
+                        <span class="badge-status badge-confirmed">Confirmed</span>
                         {% elif item.status == "ASSIGNED" %}
-                        <span class="badge-status badge-new">
-                            Assigned
-                        </span>
+                        <span class="badge-status badge-new">Assigned</span>
                         {% elif item.status == "COMPLETED" %}
-                        <span class="badge-status badge-completed">
-                            Completed
-                        </span>
+                        <span class="badge-status badge-completed">Completed</span>
                         {% elif item.status == "CANCELLED" %}
-                        <span class="badge-status badge-cancelled">
-                            Cancelled
-                        </span>
+                        <span class="badge-status badge-cancelled">Cancelled</span>
                         {% else %}
                         <span class="badge-status badge-default">
                             {{ item.get_status_display }}
@@ -437,92 +590,41 @@ Home Care Requests | Hands-On Health
                     <td style="font-size: 0.75rem; color: #64748b; white-space: nowrap;">
                         {% if item.created_at %}
                         <span>{{ item.created_at|date:"d M Y" }}</span>
-                        <span style="display: block; color: #94a3b8;">{{ item.created_at|time:"H:i" }}</span>
+                        <span style="display: block; color: #94a3b8;">
+                            {{ item.created_at|time:"H:i" }}
+                        </span>
                         {% endif %}
                     </td>
 
-            <!-- ACTIONS -->
-            <!-- ACTIONS -->
-            <td style="text-align: right; white-space: nowrap;">
-                <div class="action-group">
-            
-                    {% if item.quotation %}
-            
-                <!-- VIEW EXISTING QUOTATION - STAFF VERSION -->
-                <a href="{% url 'staff:quotation_detail' item.quotation.pk %}" class="icon-action-btn view-quotation"
-                    title="View Staff Quotation">
-                
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>View Quotation</span>
-                
-                </a>
-            
-                    {% else %}
-            
-                    <!-- CREATE NEW QUOTATION -->
-                    <a href="{% url 'homecare:create_quotation' item.pk %}" class="icon-action-btn create-quotation"
-                        title="Create Quotation">
-            
-                        <i class="fa-solid fa-file-circle-plus"></i>
-                        <span>Create Quotation</span>
-            
-                    </a>
-            
-                    {% endif %}
-            
-                </div>
-            </td>
-            
-            <style>
-                /* Premium Action Button Styling */
-                .icon-action-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.375rem 0.75rem;
-                    border-radius: 0.5rem;
-                    font-size: 0.8125rem;
-                    font-weight: 600;
-                    text-decoration: none;
-                    transition: all 0.2s ease;
-                    border: 1px solid transparent;
-                }
-            
-                /* View Quotation Style (Subtle / Professional Slate) */
-                .icon-action-btn.view-quotation {
-                    background: #f1f5f9;
-                    color: #334155;
-                    border-color: #cbd5e1;
-                }
-            
-                .icon-action-btn.view-quotation:hover {
-                    background: #e2e8f0;
-                    color: #0f172a;
-                    border-color: #94a3b8;
-                }
-            
-                .icon-action-btn.view-quotation i {
-                    color: #2563eb;
-                }
-            
-                /* Create Quotation Style (Vibrant / Action Blue) */
-                .icon-action-btn.create-quotation {
-                    background: #eff6ff;
-                    color: #1d4ed8;
-                    border-color: #bfdbfe;
-                }
-            
-                .icon-action-btn.create-quotation:hover {
-                    background: #dbeafe;
-                    color: #1e40af;
-                    border-color: #93c5fd;
-                }
-            
-                .icon-action-btn.create-quotation i {
-                    color: #2563eb;
-                }
-            </style>
+                    <!-- ACTIONS -->
+                    <td style="text-align: right; white-space: nowrap;">
+                        <div class="action-group">
+
+                            <a href="{% url 'staff:homecare_request_detail' item.pk %}"
+                                class="icon-action-btn view-request" title="View Full Request Details"
+                                aria-label="View request details">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>View</span>
+                            </a>
+
+                            {% if item.quotation %}
+                            <a href="{% url 'staff:quotation_detail' item.quotation.pk %}"
+                                class="icon-action-btn view-quotation" title="View Staff Quotation">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                <span>View Quotation</span>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'homecare:create_quotation' item.pk %}"
+                                class="icon-action-btn create-quotation" title="Create Quotation">
+                                <i class="fa-solid fa-file-circle-plus"></i>
+                                <span>Create Quotation</span>
+                            </a>
+                            {% endif %}
+
+                        </div>
+                    </td>
                 </tr>
+
                 {% empty %}
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 3.5rem 1rem;">
@@ -530,11 +632,15 @@ Home Care Requests | Hands-On Health
                             style="width: 3rem; height: 3rem; border-radius: 50%; background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.25rem;">
                             <i class="fa-solid fa-house-medical"></i>
                         </div>
-                        <h3 style="font-size: 1rem; font-weight: 600; color: #0f172a; margin: 0 0 0.25rem 0;">No home
-                            care requests found</h3>
+
+                        <h3 style="font-size: 1rem; font-weight: 600; color: #0f172a; margin: 0 0 0.25rem 0;">
+                            No home care requests found
+                        </h3>
+
                         <p style="font-size: 0.875rem; color: #64748b; margin: 0 auto 1.25rem auto; max-width: 300px;">
                             There are currently no requests matching your search or status filters.
                         </p>
+
                         <a href="{% url 'staff:homecare_request_add' %}" class="btn btn-primary"
                             style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; text-decoration: none;">
                             <i class="fa-solid fa-plus"></i>
@@ -546,6 +652,70 @@ Home Care Requests | Hands-On Health
             </tbody>
         </table>
     </div>
+
+    <!-- PAGINATION -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-wrapper">
+
+        <div class="pagination-info">
+            Showing <strong>{{ page_obj.start_index }}</strong>
+            to <strong>{{ page_obj.end_index }}</strong>
+            of <strong>{{ page_obj.paginator.count }}</strong> requests
+        </div>
+
+        <nav class="pagination" aria-label="Home care request pagination">
+
+            {% if page_obj.has_previous %}
+            <a href="?page=1&amp;q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}" title="First page"
+                aria-label="First page">
+                <i class="fa-solid fa-angles-left"></i>
+            </a>
+
+            <a href="?page={{ page_obj.previous_page_number }}&amp;q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}"
+                title="Previous page" aria-label="Previous page">
+                <i class="fa-solid fa-angle-left"></i>
+            </a>
+            {% else %}
+            <span class="disabled"><i class="fa-solid fa-angles-left"></i></span>
+            <span class="disabled"><i class="fa-solid fa-angle-left"></i></span>
+            {% endif %}
+
+            {% with lower=page_obj.number|add:"-2" upper=page_obj.number|add:"2" %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <span class="current" aria-current="page">{{ num }}</span>
+            {% elif num >= lower and num <= upper %} <a
+                href="?page={{ num }}&amp;q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}">
+                {{ num }}
+                </a>
+                {% endif %}
+                {% endfor %}
+                {% endwith %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&amp;q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}"
+                    title="Next page" aria-label="Next page">
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+
+                <a href="?page={{ page_obj.paginator.num_pages }}&amp;q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}"
+                    title="Last page" aria-label="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+                {% else %}
+                <span class="disabled"><i class="fa-solid fa-angle-right"></i></span>
+                <span class="disabled"><i class="fa-solid fa-angles-right"></i></span>
+                {% endif %}
+
+        </nav>
+    </div>
+    {% elif page_obj.paginator.count > 0 %}
+    <div class="pagination-wrapper">
+        <div class="pagination-info">
+            Showing all <strong>{{ page_obj.paginator.count }}</strong> requests
+        </div>
+    </div>
+    {% endif %}
 
 </div>
 

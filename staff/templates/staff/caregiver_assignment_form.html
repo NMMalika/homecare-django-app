@@ -781,7 +781,7 @@ New Caregiver Assignment | Hands-On Health
                     </div>
 
 
-    <!-- ==================================================
+                    <!-- ==================================================
      ASSIGNMENT DURATION
      ================================================== -->
 
@@ -815,7 +815,7 @@ New Caregiver Assignment | Hands-On Health
                     </div>
 
 
-     <!-- ==================================================
+                    <!-- ==================================================
      CUSTOM DURATION AMOUNT
      ================================================== -->
 
@@ -848,7 +848,7 @@ New Caregiver Assignment | Hands-On Health
                     {% endif %}
 
 
-    <!-- ==================================================
+                    <!-- ==================================================
      CUSTOM DURATION UNIT
      ================================================== -->
 
@@ -880,7 +880,7 @@ New Caregiver Assignment | Hands-On Health
                     {% endif %}
 
 
-     <!-- ==================================================
+                    <!-- ==================================================
      ASSIGNMENT START DATE
      ================================================== -->
 
@@ -908,7 +908,7 @@ New Caregiver Assignment | Hands-On Health
                     </div>
 
 
-     <!-- ==================================================
+                    <!-- ==================================================
      ASSIGNMENT END DATE
      ================================================== -->
 
@@ -935,7 +935,7 @@ New Caregiver Assignment | Hands-On Health
 
                     </div>
 
-    <!-- ==================================================
+                    <!-- ==================================================
      REPORT FREQUENCY
      ================================================== -->
 
@@ -1050,142 +1050,115 @@ New Caregiver Assignment | Hands-On Health
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const durationField = document.getElementById("id_duration");
-        const startDateField = document.getElementById("id_start_date");
-        const endDateField = document.getElementById("id_end_date");
+        const startField = document.getElementById("id_start_date");
+        const endField = document.getElementById("id_end_date");
+        const amountField = document.getElementById("id_custom_duration_value");
+        const unitField = document.getElementById("id_custom_duration_unit");
+        const amountWrapper = document.getElementById("custom-duration-value-wrapper");
+        const unitWrapper = document.getElementById("custom-duration-unit-wrapper");
 
-        const customValueField =
-            document.getElementById("id_custom_duration_value");
+        if (!durationField || !startField || !endField) return;
 
-        const customUnitField =
-            document.getElementById("id_custom_duration_unit");
-
-        const customValueWrapper =
-            document.getElementById("custom-duration-value-wrapper");
-
-        const customUnitWrapper =
-            document.getElementById("custom-duration-unit-wrapper");
-
-        if (!durationField || !startDateField || !endDateField) {
-            return;
+        function parseDate(value) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return null;
+            const [year, month, day] = value.split("-").map(Number);
+            const date = new Date(year, month - 1, day, 12);
+            if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+            return date;
         }
 
         function formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const day = String(date.getDate()).padStart(2, "0");
-            return `${year}-${month}-${day}`;
+            return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
         }
 
-        function parseDate(value) {
-            if (!value) return null;
-
-            const parts = value.split("-").map(Number);
-            if (parts.length !== 3 || parts.some(Number.isNaN)) {
-                return null;
-            }
-
-            return new Date(parts[0], parts[1] - 1, parts[2]);
-        }
-
-        function addMonths(date, months) {
+        function addDays(date, days) {
             const result = new Date(date);
-            const originalDay = result.getDate();
-
-            result.setDate(1);
-            result.setMonth(result.getMonth() + months);
-
-            const lastDay = new Date(
-                result.getFullYear(),
-                result.getMonth() + 1,
-                0
-            ).getDate();
-
-            result.setDate(Math.min(originalDay, lastDay));
+            result.setDate(result.getDate() + days);
             return result;
         }
 
+        function addMonths(date, count) {
+            const target = new Date(date.getFullYear(), date.getMonth() + count, 1, 12);
+            const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0, 12).getDate();
+            target.setDate(Math.min(date.getDate(), lastDay));
+            return target;
+        }
+
+        function selectedKind(field) {
+            if (!field) return "";
+            const option = field.options ? field.options[field.selectedIndex] : null;
+            const combined = ((field.value || "") + " " + (option ? option.text : "")).toUpperCase();
+            if (/CUSTOM|OTHER/.test(combined)) return "custom";
+            if (/MONTH/.test(combined)) return "month";
+            if (/WEEK/.test(combined)) return "week";
+            if (/DAY/.test(combined)) return "day";
+            return "";
+        }
+
+        function unitKind() {
+            if (!unitField) return "";
+            const option = unitField.options ? unitField.options[unitField.selectedIndex] : null;
+            const combined = ((unitField.value || "") + " " + (option ? option.text : "")).toUpperCase();
+            if (/MONTH/.test(combined)) return "month";
+            if (/WEEK/.test(combined)) return "week";
+            if (/DAY/.test(combined)) return "day";
+            return "";
+        }
+
         function updateCustomFields() {
-            const isCustom = durationField.value === "CUSTOM";
-
-            if (customValueWrapper) {
-                customValueWrapper.style.display = isCustom ? "" : "none";
-            }
-
-            if (customUnitWrapper) {
-                customUnitWrapper.style.display = isCustom ? "" : "none";
-            }
-
-            if (customValueField) {
-                customValueField.disabled = !isCustom;
-            }
-
-            if (customUnitField) {
-                customUnitField.disabled = !isCustom;
-            }
-
-            // Allow manual end-date selection only for custom duration.
-            endDateField.readOnly = !isCustom;
-
-            if (isCustom) {
-                endDateField.removeAttribute("readonly");
-            } else {
-                endDateField.setAttribute("readonly", "readonly");
-            }
+            const custom = selectedKind(durationField) === "custom";
+            if (amountWrapper) amountWrapper.style.display = custom ? "" : "none";
+            if (unitWrapper) unitWrapper.style.display = custom ? "" : "none";
+            if (amountField) amountField.disabled = !custom;
+            if (unitField) unitField.disabled = !custom;
+            // End date is always calculated; the server must independently validate it.
+            endField.readOnly = true;
         }
 
         function calculateEndDate() {
-            const duration = durationField.value;
-
-            // For custom durations, staff choose the end date manually.
-            if (duration === "CUSTOM") {
+            const start = parseDate(startField.value);
+            const duration = selectedKind(durationField);
+            if (!start || !duration) {
+                endField.value = "";
                 return;
             }
 
-            const startDate = parseDate(startDateField.value);
-
-            if (!startDate) {
-                endDateField.value = "";
-                return;
+            let count = 1;
+            let kind = duration;
+            if (duration === "custom") {
+                count = amountField ? Number(amountField.value) : NaN;
+                kind = unitKind();
+                if (!Number.isSafeInteger(count) || count < 1 || !kind) {
+                    endField.value = "";
+                    return;
+                }
             }
 
-            let endDate = new Date(startDate);
-
-            if (duration === "ONE_DAY") {
-                // One inclusive day.
-                endDate = new Date(startDate);
-
-            } else if (duration === "ONE_WEEK") {
-                endDate.setDate(endDate.getDate() + 6);
-
-            } else if (duration === "ONE_MONTH") {
-                endDate = addMonths(startDate, 1);
-                endDate.setDate(endDate.getDate() - 1);
-
-            } else {
-                endDateField.value = "";
+            let end;
+            if (kind === "day") end = addDays(start, count - 1);
+            else if (kind === "week") end = addDays(start, count * 7 - 1);
+            else if (kind === "month") end = addDays(addMonths(start, count), -1);
+            else {
+                endField.value = "";
                 return;
             }
-
-            endDateField.value = formatDate(endDate);
+            endField.value = formatDate(end);
         }
 
-        durationField.addEventListener("change", function () {
+        function refresh() {
             updateCustomFields();
             calculateEndDate();
-        });
-
-        startDateField.addEventListener("change", calculateEndDate);
-
-        if (customValueField) {
-            customValueField.addEventListener("input", calculateEndDate);
         }
 
-        if (customUnitField) {
-            customUnitField.addEventListener("change", calculateEndDate);
+        durationField.addEventListener("change", refresh);
+        startField.addEventListener("change", calculateEndDate);
+        startField.addEventListener("input", calculateEndDate);
+        if (amountField) {
+            amountField.addEventListener("input", calculateEndDate);
+            amountField.addEventListener("change", calculateEndDate);
         }
-
-        updateCustomFields();
-        calculateEndDate();
+        if (unitField) unitField.addEventListener("change", calculateEndDate);
+        refresh();
     });
 </script>
 

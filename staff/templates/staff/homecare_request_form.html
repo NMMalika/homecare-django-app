@@ -1,427 +1,1024 @@
 {% extends "staff/base.html" %}
+{% load static %}
 
-{% block title %}
-{{ title }} | Hands-On Health
-{% endblock %}
-
+{% block title %}{{ title }} | Hands-On Health{% endblock %}
 
 {% block content %}
+<style>
+    .homecare-form-wrapper {
+        max-width: 1000px;
+        margin: 1.5rem auto 3.5rem;
+        padding: 0 1rem;
+        color: #0f172a;
+    }
 
-<div class="page-header">
+    .page-header-box {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-    <div>
+    .header-kicker {
+        font-size: .75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: #2563eb;
+        display: block;
+        margin-bottom: .25rem;
+    }
 
-        <div class="page-kicker">
-            HOME CARE
+    .page-title {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 .25rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: .9375rem;
+        margin: 0;
+    }
+
+    .btn-back-link,
+    .btn-cancel-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        color: #475569;
+        font-size: .875rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        padding: .7rem 1.125rem;
+        border-radius: .625rem;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, .04);
+    }
+
+    .card-header-title {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 .25rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .card-header-subtitle {
+        font-size: .8125rem;
+        color: #64748b;
+        display: block;
+        margin-bottom: 1.25rem;
+        padding-bottom: .75rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem 1.5rem;
+    }
+
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .field-label {
+        display: block;
+        font-size: .8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #334155;
+        margin-bottom: .4rem;
+    }
+
+    .field-required {
+        color: #dc2626;
+    }
+
+    .homecare-form-wrapper input[type=text],
+    .homecare-form-wrapper input[type=email],
+    .homecare-form-wrapper input[type=tel],
+    .homecare-form-wrapper input[type=date],
+    .homecare-form-wrapper input[type=time],
+    .homecare-form-wrapper input[type=search],
+    .homecare-form-wrapper input[type=file],
+    .homecare-form-wrapper select,
+    .homecare-form-wrapper textarea {
+        width: 100%;
+        padding: .75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: .625rem;
+        background: #f8fafc;
+        font-size: .875rem;
+        color: #0f172a;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .homecare-form-wrapper textarea {
+        min-height: 110px;
+        line-height: 1.5;
+    }
+
+    .homecare-form-wrapper input:focus,
+    .homecare-form-wrapper select:focus,
+    .homecare-form-wrapper textarea:focus {
+        border-color: #2563eb;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .field-help-text {
+        font-size: .75rem;
+        color: #64748b;
+        margin-top: .375rem;
+        display: block;
+    }
+
+    .field-error-msg {
+        color: #dc2626;
+        font-size: .8125rem;
+        font-weight: 600;
+        margin-top: .375rem;
+    }
+
+    .form-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+
+    .btn-submit-primary,
+    .service-add-btn {
+        padding: .8rem 1.4rem;
+        background: #2563eb;
+        color: #fff;
+        font-size: .875rem;
+        font-weight: 700;
+        border: 0;
+        border-radius: .625rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        cursor: pointer;
+    }
+
+    .btn-submit-primary:hover,
+    .service-add-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .service-picker-controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+        gap: .65rem;
+        align-items: center;
+    }
+
+    .selected-services-box {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #dbeafe;
+        border-radius: .75rem;
+        background: #f8fafc;
+    }
+
+    .selected-services-box strong {
+        color: #1e3a8a;
+        font-size: .875rem;
+    }
+
+    .selected-services-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-top: .75rem;
+    }
+
+    .service-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        padding: .45rem .65rem;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: .5rem;
+        font-size: .82rem;
+        color: #1e40af;
+    }
+
+    .service-chip button {
+        background: transparent;
+        border: 0;
+        color: #b91c1c;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .native-services-field {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    /* Attachment upload area */
+    .attachment-upload-box {
+        border: 2px dashed #bfdbfe;
+        background: #f8fafc;
+        border-radius: .875rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: .2s ease;
+    }
+
+    .attachment-upload-box:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+    }
+
+    .attachment-upload-icon {
+        font-size: 2rem;
+        color: #2563eb;
+        margin-bottom: .65rem;
+    }
+
+    .attachment-upload-box input[type=file] {
+        max-width: 100%;
+        margin-top: .75rem;
+        background: #fff;
+        text-align: left;
+    }
+
+    .attachment-file-name {
+        margin-top: .75rem;
+        font-size: .8125rem;
+        color: #1e40af;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    @media(max-width:700px) {
+
+        .form-grid,
+        .service-picker-controls {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions-bar {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-submit-primary,
+        .btn-cancel-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .form-card {
+            padding: 1.25rem;
+        }
+    }
+    .service-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.service-search-wrapper input {
+    width: 100%;
+}
+
+.service-suggestions {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: .625rem;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, .12);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.service-suggestions.show {
+    display: block;
+}
+
+.service-suggestion-item {
+    padding: .75rem 1rem;
+    cursor: pointer;
+    font-size: .875rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.service-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.service-suggestion-item:hover,
+.service-suggestion-item.active {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.service-suggestion-item i {
+    color: #2563eb;
+}
+
+.service-no-results {
+    padding: .85rem 1rem;
+    color: #64748b;
+    font-size: .8125rem;
+}
+
+.service-search-hint {
+    font-size: .75rem;
+    color: #64748b;
+    margin-top: .4rem;
+}
+</style>
+
+<div class="container-fluid homecare-form-wrapper">
+
+    <div class="page-header-box">
+        <div>
+            <span class="header-kicker">
+                <i class="fa-solid fa-house-medical"></i>
+                Home Care Operations
+            </span>
+
+            <h1 class="page-title">{{ title }}</h1>
+
+            <p class="page-subtitle">
+                {% if homecare_request %}
+                Update patient details, requirements, and administration status.
+                {% else %}
+                Record a new patient home care request in the system.
+                {% endif %}
+            </p>
         </div>
 
-        <h1>
-            {{ title }}
-        </h1>
-
-        <p>
-            {% if homecare_request %}
-            Update the patient's home care request.
-            {% else %}
-            Create a new home care request for a patient.
-            {% endif %}
-        </p>
-
-    </div>
-
-
-    <div>
-
-        <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary">
-
+        <a href="{% url 'staff:homecare_requests' %}" class="btn-back-link">
             <i class="fa-solid fa-arrow-left"></i>
-
             Back to Requests
-
         </a>
-
     </div>
 
-</div>
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
 
+        <!-- PATIENT INFORMATION -->
+        <div class="form-card">
 
-<form method="post" enctype="multipart/form-data">
+            <h2 class="card-header-title">
+                <i class="fa-solid fa-user text-primary"></i>
+                Patient Information
+            </h2>
 
-    {% csrf_token %}
+            <span class="card-header-subtitle">
+                Contact details and complete residence location for home visits
+            </span>
 
+            <div class="form-grid">
 
-    <!-- =====================================================
-         PATIENT INFORMATION
-         ===================================================== -->
+                <div>
+                    <label for="{{ form.full_name.id_for_label }}" class="field-label">
+                        Full Name <span class="field-required">*</span>
+                    </label>
 
-    <div class="card">
+                    {{ form.full_name }}
 
-        <div class="card-header">
+                    {% for error in form.full_name.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
 
-            <div>
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" class="field-label">
+                        Phone Number <span class="field-required">*</span>
+                    </label>
 
-                <h2>
-                    <i class="fa-solid fa-user"></i>
-                    Patient Information
-                </h2>
+                    {{ form.phone }}
 
-                <span>
-                    Patient contact and location details
-                </span>
+                    {% for error in form.phone.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
 
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="field-label">
+                        Email Address <span class="field-required">*</span>
+                    </label>
+
+                    {{ form.email }}
+
+                    {% for error in form.email.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-full">
+                    <label for="{{ form.location.id_for_label }}" class="field-label">
+                        Patient Location / Full Home Address
+                        <span class="field-required">*</span>
+                    </label>
+
+                    {{ form.location }}
+
+                    <span class="field-help-text">
+                        Enter the patient's town, estate, suburb, street, house number,
+                        nearest landmark, and directions for the caregiver.
+                        Example: Kisumu, Milimani Estate, near XYZ Hospital.
+                    </span>
+
+                    {% for error in form.location.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CARE REQUIREMENTS -->
+        <div class="form-card">
+
+            <h2 class="card-header-title">
+                <i class="fa-solid fa-hand-holding-medical text-primary"></i>
+                Care Requirements
+            </h2>
+
+            <span class="card-header-subtitle">
+                Requested services, preferred visit schedule, and specific instructions
+            </span>
+
+            <div class="form-grid">
+<div class="form-group-full" id="service-picker">
+
+    <label class="field-label" for="service-search">
+        Requested Services
+    </label>
+
+    <div class="service-picker-controls">
+
+        <!-- SEARCH AUTOCOMPLETE -->
+        <div class="service-search-wrapper">
+
+            <input id="service-search" type="search" placeholder="Type to search services..." autocomplete="off">
+
+            <div id="service-suggestions" class="service-suggestions">
             </div>
 
         </div>
 
-
-        <div class="form-grid">
-
-
-            <div class="form-group">
-
-                <label for="{{ form.full_name.id_for_label }}">
-                    Full Name
-                    <span class="required">*</span>
-                </label>
-
-                {{ form.full_name }}
-
-                {% if form.full_name.errors %}
-
-                <div class="field-error">
-                    {{ form.full_name.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="{{ form.phone.id_for_label }}">
-                    Phone Number
-                    <span class="required">*</span>
-                </label>
-
-                {{ form.phone }}
-
-                {% if form.phone.errors %}
-
-                <div class="field-error">
-                    {{ form.phone.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="{{ form.email.id_for_label }}">
-                    Email Address
-                </label>
-
-                {{ form.email }}
-
-                {% if form.email.errors %}
-
-                <div class="field-error">
-                    {{ form.email.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="{{ form.city.id_for_label }}">
-                    City / Town
-                </label>
-
-                {{ form.city }}
-
-                {% if form.city.errors %}
-
-                <div class="field-error">
-                    {{ form.city.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group full-width">
-
-                <label for="{{ form.address.id_for_label }}">
-                    Home Address
-                </label>
-
-                {{ form.address }}
-
-                {% if form.address.errors %}
-
-                <div class="field-error">
-                    {{ form.address.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SERVICE INFORMATION
-         ===================================================== -->
-
-    <div class="card">
-
-        <div class="card-header">
-
-            <div>
-
-                <h2>
-                    <i class="fa-solid fa-hand-holding-medical"></i>
-                    Care Requirements
-                </h2>
-
-                <span>
-                    Select the services requested by the patient
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="form-grid">
-
-
-            <div class="form-group full-width">
-
-                <label for="{{ form.services.id_for_label }}">
-
-                    Services
-
-                </label>
-
-                {{ form.services }}
-
-                <small class="form-help">
-
-                    Hold Ctrl/Cmd to select multiple services.
-
-                </small>
-
-                {% if form.services.errors %}
-
-                <div class="field-error">
-                    {{ form.services.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="{{ form.preferred_date.id_for_label }}">
-
-                    Preferred Date
-
-                </label>
-
-                {{ form.preferred_date }}
-
-                {% if form.preferred_date.errors %}
-
-                <div class="field-error">
-                    {{ form.preferred_date.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="{{ form.preferred_time.id_for_label }}">
-
-                    Preferred Time
-
-                </label>
-
-                {{ form.preferred_time }}
-
-                {% if form.preferred_time.errors %}
-
-                <div class="field-error">
-                    {{ form.preferred_time.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group full-width">
-
-                <label for="{{ form.description.id_for_label }}">
-
-                    Patient Requirements / Description
-
-                </label>
-
-                {{ form.description }}
-
-                {% if form.description.errors %}
-
-                <div class="field-error">
-                    {{ form.description.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         ADMINISTRATION
-         ===================================================== -->
-
-    <div class="card">
-
-        <div class="card-header">
-
-            <div>
-
-                <h2>
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    Administration
-                </h2>
-
-                <span>
-                    Internal processing information
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="form-grid">
-
-
-            <div class="form-group">
-
-                <label for="{{ form.status.id_for_label }}">
-                    Request Status
-                </label>
-
-                {{ form.status }}
-
-                {% if form.status.errors %}
-
-                <div class="field-error">
-                    {{ form.status.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="form-group full-width">
-
-                <label for="{{ form.admin_notes.id_for_label }}">
-
-                    Admin Notes
-
-                </label>
-
-                {{ form.admin_notes }}
-
-                {% if form.admin_notes.errors %}
-
-                <div class="field-error">
-                    {{ form.admin_notes.errors }}
-                </div>
-
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         NON-FIELD ERRORS
-         ===================================================== -->
-
-    {% if form.non_field_errors %}
-
-    <div class="card">
-
-        <div class="field-error">
-
-            {{ form.non_field_errors }}
-
-        </div>
-
-    </div>
-
-    {% endif %}
-
-
-    <!-- =====================================================
-         FORM ACTIONS
-         ===================================================== -->
-
-    <div class="form-footer">
-
-        <a href="{% url 'staff:homecare_requests' %}" class="btn btn-secondary">
-
-            <i class="fa-solid fa-xmark"></i>
-
-            Cancel
-
-        </a>
-
-
-        <button type="submit" class="btn btn-primary">
-
-            <i class="fa-solid fa-floppy-disk"></i>
-
-            {% if homecare_request %}
-
-            Save Changes
-
-            {% else %}
-
-            Create Home Care Request
-
-            {% endif %}
-
+        <!-- NORMAL DROPDOWN -->
+        <select id="service-choice" aria-label="Choose a service">
+            <option value="">Browse all services</option>
+        </select>
+
+        <!-- ADD BUTTON -->
+        <button type="button" id="add-service" class="service-add-btn">
+            <i class="fa-solid fa-plus"></i>
+            Add Service
         </button>
 
     </div>
 
-</form>
+    <span class="field-help-text">
+        Search by typing or browse the dropdown. Select a service and click Add Service.
+    </span>
 
+    <!-- SELECTED SERVICES -->
+    <div class="selected-services-box">
+
+        <strong>
+            Services added (<span id="service-count">0</span>)
+        </strong>
+
+        <div id="selected-services-list" class="selected-services-list" aria-live="polite">
+        </div>
+
+        <p id="services-empty" class="field-help-text">
+            No services selected yet.
+        </p>
+
+    </div>
+
+    <!-- ORIGINAL DJANGO FIELD -->
+    <div class="native-services-field">
+        {{ form.services }}
+    </div>
+
+    {% for error in form.services.errors %}
+    <div class="field-error-msg">{{ error }}</div>
+    {% endfor %}
+
+</div>
+                <div>
+                    <label for="{{ form.preferred_date.id_for_label }}" class="field-label">
+                        Preferred Date <span class="field-required">*</span>
+                    </label>
+
+                    {{ form.preferred_date }}
+
+                    {% for error in form.preferred_date.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div>
+                    <label for="{{ form.preferred_time.id_for_label }}" class="field-label">
+                        Preferred Time <span class="field-required">*</span>
+                    </label>
+
+                    {{ form.preferred_time }}
+
+                    {% for error in form.preferred_time.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-full">
+                    <label for="{{ form.description.id_for_label }}" class="field-label">
+                        Patient Requirements / Notes
+                        <span class="field-required">*</span>
+                    </label>
+
+                    {{ form.description }}
+
+                    <span class="field-help-text">
+                        Describe the patient's care needs, medical support required,
+                        mobility needs, and any important instructions.
+                    </span>
+
+                    {% for error in form.description.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ATTACHMENTS -->
+        <div class="form-card">
+
+            <h2 class="card-header-title">
+                <i class="fa-solid fa-paperclip text-primary"></i>
+                Supporting Attachments
+            </h2>
+
+            <span class="card-header-subtitle">
+                Upload relevant patient documents to support the home care request
+            </span>
+
+            <div class="attachment-upload-box">
+
+                <div class="attachment-upload-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+
+                <strong>Upload Patient Documents</strong>
+
+                <p class="field-help-text">
+                    Select referral letters, prescriptions, medical reports,
+                    or other supporting documents.
+                </p>
+
+                <input type="file" name="attachment" id="id_attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+
+                <div id="attachment-file-name" class="attachment-file-name">
+                    No file selected.
+                </div>
+
+                <span class="field-help-text">
+                    Accepted formats: PDF, JPG, PNG, DOC, DOCX.
+                    Avoid uploading documents that are not relevant to the patient's care.
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- ADMINISTRATION -->
+        <div class="form-card">
+
+            <h2 class="card-header-title">
+                <i class="fa-solid fa-clipboard-check text-primary"></i>
+                Administration
+            </h2>
+
+            <span class="card-header-subtitle">
+                Internal processing status and staff notes
+            </span>
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="field-label">
+                        Request Status
+                    </label>
+
+                    {{ form.status }}
+
+                    {% for error in form.status.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group-full">
+                    <label for="{{ form.admin_notes.id_for_label }}" class="field-label">
+                        Admin Notes
+                    </label>
+
+                    {{ form.admin_notes }}
+
+                    {% for error in form.admin_notes.errors %}
+                    <div class="field-error-msg">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3 mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- FORM ACTIONS -->
+        <div class="form-actions-bar">
+
+            <a href="{% url 'staff:homecare_requests' %}" class="btn-cancel-secondary">
+                <i class="fa-solid fa-xmark"></i>
+                Cancel
+            </a>
+
+            <button type="submit" class="btn-submit-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                {% if homecare_request %}
+                Save Changes
+                {% else %}
+                Create Request
+                {% endif %}
+            </button>
+
+        </div>
+
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const original = document.getElementById('id_services');
+        const search = document.getElementById('service-search');
+        const suggestions = document.getElementById('service-suggestions');
+        const dropdown = document.getElementById('service-choice');
+        const addButton = document.getElementById('add-service');
+
+        const list = document.getElementById('selected-services-list');
+        const count = document.getElementById('service-count');
+        const empty = document.getElementById('services-empty');
+
+        if (!original || !search || !suggestions || !dropdown ||
+            !addButton || !list) {
+            console.error('Service selector elements are missing.');
+            return;
+        }
+
+        const options = Array.from(original.options).filter(
+            option => option.value
+        );
+
+        let currentMatches = [];
+        let activeIndex = -1;
+
+        // Populate the normal dropdown.
+        function populateDropdown() {
+
+            const previousValue = dropdown.value;
+
+            dropdown.replaceChildren(
+                new Option('Browse all services', '')
+            );
+
+            options.forEach(option => {
+
+                if (!option.selected) {
+                    dropdown.add(
+                        new Option(option.text, option.value)
+                    );
+                }
+
+            });
+
+            if (
+                Array.from(dropdown.options).some(
+                    option => option.value === previousValue
+                )
+            ) {
+                dropdown.value = previousValue;
+            }
+        }
+
+
+        // Display autocomplete suggestions.
+        function showSuggestions() {
+
+            const query = search.value.trim().toLowerCase();
+
+            suggestions.replaceChildren();
+
+            currentMatches = [];
+            activeIndex = -1;
+
+            currentMatches = options.filter(option => {
+
+                return !option.selected &&
+                    option.text.toLowerCase().includes(query);
+
+            });
+
+            if (!currentMatches.length) {
+
+                const message = document.createElement('div');
+
+                message.className = 'service-no-results';
+                message.textContent = 'No matching services found.';
+
+                suggestions.appendChild(message);
+                suggestions.classList.add('show');
+
+                return;
+            }
+
+            currentMatches.slice(0, 50).forEach(option => {
+
+                const item = document.createElement('div');
+
+                item.className = 'service-suggestion-item';
+                item.setAttribute('role', 'option');
+
+                const name = document.createElement('span');
+                name.textContent = option.text;
+
+                const icon = document.createElement('i');
+                icon.className = 'fa-solid fa-plus';
+
+                item.append(name, icon);
+
+                item.addEventListener('click', function () {
+                    addService(option);
+                });
+
+                suggestions.appendChild(item);
+
+            });
+
+            if (currentMatches.length > 50) {
+
+                const message = document.createElement('div');
+
+                message.className = 'service-no-results';
+                message.textContent =
+                    'Showing 50 results. Type more to narrow your search.';
+
+                suggestions.appendChild(message);
+            }
+
+            suggestions.classList.add('show');
+        }
+
+
+        // Close autocomplete suggestions.
+        function closeSuggestions() {
+
+            suggestions.classList.remove('show');
+            suggestions.replaceChildren();
+
+            activeIndex = -1;
+        }
+
+
+        // Add a service to Django's original multiple-select field.
+        function addService(option) {
+
+            if (!option || option.selected) return;
+
+            option.selected = true;
+
+            original.dispatchEvent(
+                new Event('change', { bubbles: true })
+            );
+
+            search.value = '';
+            dropdown.value = '';
+
+            closeSuggestions();
+
+            refreshSelectedServices();
+
+            search.focus();
+        }
+
+
+        // Render selected services as removable chips.
+        function refreshSelectedServices() {
+
+            list.replaceChildren();
+
+            const selected = options.filter(option => option.selected);
+
+            selected.forEach(option => {
+
+                const chip = document.createElement('span');
+                chip.className = 'service-chip';
+
+                const name = document.createElement('span');
+                name.textContent = option.text;
+
+                const remove = document.createElement('button');
+
+                remove.type = 'button';
+                remove.textContent = '×';
+                remove.setAttribute(
+                    'aria-label',
+                    'Remove ' + option.text
+                );
+
+                remove.addEventListener('click', function () {
+
+                    option.selected = false;
+
+                    original.dispatchEvent(
+                        new Event('change', { bubbles: true })
+                    );
+
+                    refreshSelectedServices();
+
+                });
+
+                chip.append(name, remove);
+                list.appendChild(chip);
+
+            });
+
+            if (count) {
+                count.textContent = selected.length;
+            }
+
+            if (empty) {
+                empty.hidden = selected.length > 0;
+            }
+
+            populateDropdown();
+        }
+
+
+        // Search as the user types.
+        search.addEventListener('input', showSuggestions);
+
+
+        // Open suggestions when the search field receives focus.
+        search.addEventListener('focus', showSuggestions);
+
+
+        // Add selected dropdown service.
+        addButton.addEventListener('click', function () {
+
+            const selectedValue = dropdown.value;
+
+            if (!selectedValue) {
+
+                search.focus();
+                return;
+            }
+
+            const option = options.find(
+                option => option.value === selectedValue
+            );
+
+            addService(option);
+        });
+
+
+        // Keyboard navigation for autocomplete.
+        search.addEventListener('keydown', function (event) {
+
+            const items = suggestions.querySelectorAll(
+                '.service-suggestion-item'
+            );
+
+            if (event.key === 'ArrowDown' && items.length) {
+
+                event.preventDefault();
+
+                activeIndex = Math.min(
+                    activeIndex + 1,
+                    items.length - 1
+                );
+
+                updateActiveItem(items);
+            }
+
+            else if (event.key === 'ArrowUp' && items.length) {
+
+                event.preventDefault();
+
+                activeIndex = Math.max(activeIndex - 1, 0);
+
+                updateActiveItem(items);
+            }
+
+            else if (event.key === 'Enter' && activeIndex >= 0) {
+
+                event.preventDefault();
+
+                addService(currentMatches[activeIndex]);
+            }
+
+            else if (event.key === 'Escape') {
+
+                closeSuggestions();
+            }
+
+        });
+
+
+        // Highlight active suggestion.
+        function updateActiveItem(items) {
+
+            items.forEach((item, index) => {
+
+                item.classList.toggle(
+                    'active',
+                    index === activeIndex
+                );
+
+                item.setAttribute(
+                    'aria-selected',
+                    index === activeIndex ? 'true' : 'false'
+                );
+
+            });
+
+            if (items[activeIndex]) {
+                items[activeIndex].scrollIntoView({
+                    block: 'nearest'
+                });
+            }
+        }
+
+
+        // Close suggestions when clicking outside.
+        document.addEventListener('click', function (event) {
+
+            if (!event.target.closest('.service-search-wrapper')) {
+                closeSuggestions();
+            }
+
+        });
+
+
+        // Keep everything synchronised.
+        original.addEventListener('change', refreshSelectedServices);
+
+
+        // Initialise the selector, including existing selections.
+        refreshSelectedServices();
+
+    });
+</script>
 {% endblock %}

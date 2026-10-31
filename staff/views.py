@@ -13,6 +13,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import transaction
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -27,6 +28,7 @@ from decimal import Decimal
 from django.db.models import Q, Sum, Count
 from django.db.models.functions import Coalesce
 from .quotation_pdf import quotation_pdf_response
+from django.core.paginator import Paginator
 
 
 from accounts.models import User
@@ -883,60 +885,47 @@ Hands-On Health
 
 @admin_required
 def caregiver_assignments(request):
-
-    current_status = request.GET.get(
-        "status",
-        "",
-    )
-
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
+    """Paginated assignment directory with preserved search/status filters."""
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
 
     assignments_queryset = (
         CaregiverAssignment.objects.select_related(
-            "caregiver",
-            "homecare_request",
-            "assigned_by",
+            "caregiver", "homecare_request", "assigned_by"
         )
-        .prefetch_related(
-            "homecare_request__services",
-        )
-        .order_by(
-            "-assigned_at",
-        )
+        .prefetch_related("homecare_request__services")
+        .order_by("-assigned_at", "-pk")
     )
 
-    # --------------------------------------------------------
-    # SEARCH
-    # --------------------------------------------------------
-
     if search:
-
         assignments_queryset = assignments_queryset.filter(
             Q(caregiver__name__icontains=search)
             | Q(caregiver__user__first_name__icontains=search)
             | Q(caregiver__user__last_name__icontains=search)
             | Q(caregiver__user__email__icontains=search)
-        )
+            | Q(homecare_request__full_name__icontains=search)
+        ).distinct()
 
-    # --------------------------------------------------------
-    # STATUS FILTER
-    # --------------------------------------------------------
-
-    if current_status:
-
+    valid_statuses = {value for value, _ in CaregiverAssignment.Status.choices}
+    if current_status in valid_statuses:
         assignments_queryset = assignments_queryset.filter(status=current_status)
+    else:
+        current_status = ""
+
+    paginator = Paginator(assignments_queryset, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
     return render(
         request,
         "staff/assignments.html",
         {
-            "assignments": assignments_queryset,
+            "assignments": page_obj,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "is_paginated": page_obj.has_other_pages(),
             "current_status": current_status,
             "search": search,
-            "status_choices": (CaregiverAssignment.Status.choices),
+            "status_choices": CaregiverAssignment.Status.choices,
             "site_settings": SiteSettings.load(),
         },
     )
@@ -962,6 +951,24 @@ def caregiver_assignment_add(request):
             pk=request_id,
         )
 
+    # A home-care request already linked to an assignment must be
+    # managed through Edit, not assigned a second time.
+    assigned_request_ids = CaregiverAssignment.objects.values_list(
+        "homecare_request_id", flat=True
+    )
+    available_requests = HomeCareRequest.objects.exclude(pk__in=assigned_request_ids)
+
+    if (
+        selected_request
+        and not available_requests.filter(pk=selected_request.pk).exists()
+    ):
+        messages.warning(
+            request,
+            "This home-care request is already assigned. Use Edit on its "
+            "existing assignment to make changes.",
+        )
+        return redirect("staff:assignments")
+
     # ========================================================
     # POST
     # ========================================================
@@ -972,6 +979,8 @@ def caregiver_assignment_add(request):
             request.POST,
             homecare_request=selected_request,
         )
+        if "homecare_request" in form.fields:
+            form.fields["homecare_request"].queryset = available_requests
 
         # ----------------------------------------------------
         # DEBUG / VALIDATION
@@ -1018,6 +1027,18 @@ def caregiver_assignment_add(request):
                 with transaction.atomic():
 
                     assignment = form.save(commit=False)
+
+                    if CaregiverAssignment.objects.filter(
+                        homecare_request_id=(
+                            selected_request.pk
+                            if selected_request
+                            else assignment.homecare_request_id
+                        )
+                    ).exists():
+                        raise ValueError(
+                            "This request already has an assignment. "
+                            "Please use Edit on the existing assignment."
+                        )
 
                     # ------------------------------------------------
                     # KEEP SELECTED HOME CARE REQUEST
@@ -1203,6 +1224,8 @@ def caregiver_assignment_add(request):
             initial=initial,
             homecare_request=selected_request,
         )
+        if "homecare_request" in form.fields:
+            form.fields["homecare_request"].queryset = available_requests
 
     # ========================================================
     # REQUESTED SERVICES
@@ -1278,16 +1301,13 @@ def caregiver_assignment_edit(request, pk):
                     # PENDING ACCEPTANCE
                     # ------------------------------------------------
 
-                    assignment.status = CaregiverAssignment.Status.PENDING
-
-                    # ------------------------------------------------
-                    # RESET CAREGIVER RESPONSE
-                    # ------------------------------------------------
-
-                    assignment.accepted_at = None
-                    assignment.declined_at = None
-                    assignment.completed_at = None
-                    assignment.caregiver_response_note = ""
+                    caregiver_changed = original_caregiver.pk != assignment.caregiver_id
+                    if caregiver_changed:
+                        assignment.status = CaregiverAssignment.Status.PENDING
+                        assignment.accepted_at = None
+                        assignment.declined_at = None
+                        assignment.completed_at = None
+                        assignment.caregiver_response_note = ""
 
                     # ------------------------------------------------
                     # SAVE
@@ -1316,10 +1336,8 @@ def caregiver_assignment_edit(request, pk):
 
                 try:
 
-                    send_caregiver_assignment_email(
-                        request,
-                        assignment,
-                    )
+                    if caregiver_changed:
+                        send_caregiver_assignment_email(request, assignment)
 
                     # Determine whether it was a reassignment.
                     if original_caregiver.pk != assignment.caregiver.pk:
@@ -1339,10 +1357,8 @@ def caregiver_assignment_edit(request, pk):
                         messages.success(
                             request,
                             (
-                                "Caregiver assignment updated "
-                                "successfully and a new assignment "
-                                f"notification has been sent to "
-                                f"{assignment.caregiver.email}."
+                                "Caregiver assignment updated successfully. "
+                                "Its existing progress/status was preserved."
                             ),
                         )
 
@@ -1427,48 +1443,48 @@ def caregiver_assignment_delete(request, pk):
 
 @admin_required
 def homecare_requests(request):
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
 
-    current_status = request.GET.get(
-        "status",
-        "",
-    ).strip()
-
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
-
-    requests_queryset = HomeCareRequest.objects.prefetch_related("services").order_by(
-        "-created_at"
+    requests_queryset = (
+        HomeCareRequest.objects
+        .prefetch_related("services")
+        .order_by("-created_at")
     )
 
+    # Search requests
     if search:
-
         requests_queryset = requests_queryset.filter(
             Q(full_name__icontains=search)
             | Q(phone__icontains=search)
             | Q(email__icontains=search)
-            | Q(address__icontains=search)
-            | Q(city__icontains=search)
+            | Q(location__icontains=search)
         )
 
+    # Filter by status
     if current_status:
+        requests_queryset = requests_queryset.filter(
+            status=current_status
+        )
 
-        requests_queryset = requests_queryset.filter(status=current_status)
+    # Pagination: 10 requests per page
+    paginator = Paginator(requests_queryset, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(
         request,
         "staff/homecare_requests.html",
         {
-            "homecare_requests": requests_queryset,
+            "homecare_requests": page_obj,
+            "page_obj": page_obj,
+            "paginator": paginator,
             "current_status": current_status,
             "search": search,
-            "status_choices": (HomeCareRequest.Status.choices),
+            "status_choices": HomeCareRequest.Status.choices,
             "site_settings": SiteSettings.load(),
         },
     )
-
-
 # ============================================================
 # ADD HOME CARE REQUEST
 # ============================================================
@@ -1519,6 +1535,31 @@ def homecare_request_add(request):
     )
 
 
+# ============================================================
+# HOME CARE REQUEST DETAILS
+# ============================================================
+
+@admin_required
+def homecare_request_detail(request, pk):
+
+    homecare_request = get_object_or_404(
+        HomeCareRequest.objects
+        .prefetch_related(
+            "services",
+            "attachments",
+        ),
+        pk=pk,
+    )
+
+    return render(
+        request,
+        "staff/homecare_request_detail.html",
+        {
+            "homecare_request": homecare_request,
+            "attachments": homecare_request.attachments.all(),
+            "site_settings": SiteSettings.load(),
+        },
+    )
 # ============================================================
 # EDIT HOME CARE REQUEST
 # ============================================================
@@ -2300,17 +2341,87 @@ def caregiver_weekly_reports(request):
 
 
 @admin_required
+@require_http_methods(["GET", "POST"])
 def caregiver_payments(request):
+    """Create pending caregiver payments and list records for staff approval."""
+    from datetime import date
+    from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+    if request.method == "POST":
+        assignment_id = request.POST.get("assignment", "").strip()
+        method = request.POST.get("calculation_method", "FIXED").strip()
+        start_raw = request.POST.get("service_period_start", "").strip()
+        end_raw = request.POST.get("service_period_end", "").strip()
+
+        try:
+            assignment = CaregiverAssignment.objects.select_related("caregiver").get(
+                pk=int(assignment_id)
+            )
+            if method == "FIXED":
+                amount = Decimal(request.POST.get("fixed_amount", ""))
+            elif method == "PERCENT":
+                base = Decimal(request.POST.get("base_amount", ""))
+                rate_raw = request.POST.get("percentage", "")
+                rate = Decimal(
+                    request.POST.get("custom_percentage", "")
+                    if rate_raw == "custom"
+                    else rate_raw
+                )
+                if not (Decimal("0") < rate <= Decimal("100")) or base <= 0:
+                    raise ValueError(
+                        "Percentage must be between 0 and 100 and base amount must be positive."
+                    )
+                amount = base * rate / Decimal("100")
+            else:
+                raise ValueError("Invalid calculation method.")
+
+            if not amount.is_finite() or amount <= 0:
+                raise ValueError("Payment amount must be greater than zero.")
+            amount = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            if amount >= Decimal("10000000000"):
+                raise ValueError("Payment amount is too large.")
+
+            start_date = date.fromisoformat(start_raw) if start_raw else None
+            end_date = date.fromisoformat(end_raw) if end_raw else None
+            if start_date and end_date and end_date < start_date:
+                raise ValueError("Period end cannot be before period start.")
+
+            period = request.POST.get("period", "DAILY")
+            if period not in ("DAILY", "WEEKLY", "MONTHLY"):
+                raise ValueError("Invalid payment period.")
+            notes = request.POST.get("notes", "").strip()
+            calculation_note = f"Calculation period: {period}. Method: {method}."
+            with transaction.atomic():
+                payment = CaregiverPayment.objects.create(
+                    assignment=assignment,
+                    caregiver=assignment.caregiver,
+                    amount=amount,
+                    status=CaregiverPayment.Status.PENDING,
+                    service_period_start=start_date,
+                    service_period_end=end_date,
+                    notes=f"{calculation_note}\n{notes}".strip(),
+                )
+            messages.success(
+                request,
+                f"Payment #{payment.pk} saved as pending. You can approve it below.",
+            )
+            return redirect("staff:caregiver_payments")
+        except (ValueError, InvalidOperation, TypeError, OverflowError) as exc:
+            messages.error(request, f"Could not save payment: {exc}")
+        except (
+            CaregiverAssignment.DoesNotExist,
+            CaregiverAssignment.MultipleObjectsReturned,
+        ):
+            messages.error(request, "Please select a valid caregiver assignment.")
+
     current_status = request.GET.get("status", "").strip()
     search = request.GET.get("q", "").strip()
-
     payments_queryset = CaregiverPayment.objects.select_related(
         "caregiver",
         "assignment",
         "assignment__caregiver",
         "assignment__homecare_request",
     ).order_by("-created_at", "-pk")
-
     if search:
         payments_queryset = payments_queryset.filter(
             Q(caregiver__name__icontains=search)
@@ -2319,18 +2430,15 @@ def caregiver_payments(request):
             | Q(caregiver__user__email__icontains=search)
             | Q(assignment__homecare_request__full_name__icontains=search)
         )
-
     status_choices = CaregiverPayment._meta.get_field("status").choices
     valid_statuses = {value for value, _ in status_choices}
     if current_status in valid_statuses:
         payments_queryset = payments_queryset.filter(status=current_status)
     else:
         current_status = ""
-
     assignments = CaregiverAssignment.objects.select_related(
         "caregiver", "homecare_request"
     ).order_by("-assigned_at")
-
     return render(
         request,
         "staff/caregiver_payments.html",
@@ -2411,7 +2519,9 @@ def caregiver_payment_approve(request, pk):
             return redirect("staff:caregiver_payments")
 
         payment.status = "APPROVED"
-        payment.save(update_fields=["status"])
+        payment.approved_by = request.user
+        payment.approved_at = timezone.now()
+        payment.save(update_fields=["status", "approved_by", "approved_at"])
 
     messages.success(
         request,
@@ -2425,6 +2535,9 @@ def caregiver_payment_approve(request, pk):
 @require_http_methods(["GET", "POST"])
 def caregiver_payment_edit(request, pk):
     payment = get_object_or_404(CaregiverPayment, pk=pk)
+    if request.method == "POST" and payment.status != CaregiverPayment.Status.PENDING:
+        messages.error(request, "Only pending payments can be edited.")
+        return redirect("staff:caregiver_payments")
     form = CaregiverPaymentForm(request.POST or None, instance=payment)
 
     if request.method == "POST" and form.is_valid():
@@ -4394,3 +4507,278 @@ def hero_slide_edit(request, position):
 @admin_required
 def quotation_pdf(request, pk):
     return quotation_pdf_response(request, pk)
+
+
+# ============================================================
+# CAREGIVER REPORT DETAIL AND BRANDED PDF DOWNLOAD
+# ============================================================
+
+from io import BytesIO
+from xml.sax.saxutils import escape
+
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
+
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    Image,
+    KeepTogether,
+)
+
+
+def _care_report(request, report_type, pk):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+    # Match the custom staff admin role used by Hands-On Health.
+    if not (
+        request.user.is_superuser or getattr(request.user, "role", None) == "ADMIN"
+    ):
+        raise PermissionDenied
+
+    if report_type not in ("daily", "weekly"):
+        raise Http404("Unknown report type")
+
+    model_name = (
+        "CaregiverDailyReport" if report_type == "daily" else "CaregiverWeeklyReport"
+    )
+    model = apps.get_model("homecare", model_name)
+    report = get_object_or_404(
+        model.objects.select_related(
+            "assignment", "assignment__caregiver", "assignment__homecare_request"
+        ),
+        pk=pk,
+    )
+    assignment = report.assignment
+    patient = assignment.homecare_request
+    caregiver = assignment.caregiver
+
+    site = SiteSettings.load()
+
+    def value(obj, *names):
+        for name in names:
+            val = getattr(obj, name, None)
+            if val is not None and val != "":
+                return val
+        return None
+
+    patient_rows = [
+        ("Patient name", value(patient, "full_name", "patient_name")),
+        ("Phone", value(patient, "phone", "phone_number")),
+        ("Email", value(patient, "email")),
+        ("Location", value(patient, "location")),
+    ]
+    caregiver_rows = [
+        ("Caregiver name", value(caregiver, "name", "full_name")),
+        ("Phone", value(caregiver, "phone", "phone_number")),
+        ("Email", value(caregiver, "email")),
+        ("Assignment ID", assignment.pk),
+        ("Assignment status", assignment.get_status_display()),
+        ("Assigned on", value(assignment, "assigned_at")),
+    ]
+    if report_type == "daily":
+        report_rows = [
+            ("Report date", value(report, "report_date")),
+            ("Visit start", value(report, "visit_start_time")),
+            ("Visit end", value(report, "visit_end_time")),
+            ("Patient condition", report.get_patient_condition_display()),
+            ("Vital signs / observations", value(report, "vital_observations")),
+            ("Care provided", value(report, "care_provided")),
+            ("Patient progress", value(report, "patient_progress")),
+            ("Concerns / issues", value(report, "concerns")),
+            ("Caregiver notes", value(report, "caregiver_notes")),
+            ("Next visit date", value(report, "next_visit_date")),
+        ]
+    else:
+        report_rows = [
+            ("Week start", value(report, "week_start")),
+            ("Week end", value(report, "week_end")),
+            ("Overall condition", report.get_overall_condition_display()),
+            ("Care provided", value(report, "care_provided")),
+            ("Patient progress", value(report, "patient_progress")),
+            ("Concerns / issues", value(report, "concerns")),
+            ("Recommendations", value(report, "recommendations")),
+            ("Caregiver notes", value(report, "caregiver_notes")),
+        ]
+    report_rows.extend(
+        [
+            ("Submitted at", value(report, "submitted_at")),
+            ("Reviewed at", value(report, "reviewed_at")),
+        ]
+    )
+
+    site_name = (
+        value(site, "business_name", "site_name", "account_name") or "Hands-On Health"
+    )
+    contacts = [
+        ("Phone", value(site, "phone", "phone_number")),
+        ("Email", value(site, "email")),
+        ("Address", value(site, "address", "location")),
+        ("WhatsApp", value(site, "whatsapp")),
+    ]
+    return {
+        "report": report,
+        "report_type": report_type,
+        "patient_rows": patient_rows,
+        "caregiver_rows": caregiver_rows,
+        "report_rows": report_rows,
+        "site": site,
+        "site_name": site_name,
+        "contacts": [(k, str(v)) for k, v in contacts if v],
+    }
+
+
+@login_required
+def caregiver_report_detail(request, report_type, pk):
+    context = _care_report(request, report_type, pk)
+    return render(request, "staff/caregiver_report_detail.html", context)
+
+
+@login_required
+def caregiver_report_pdf(request, report_type, pk):
+    context = _care_report(request, report_type, pk)
+    buffer = BytesIO()
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=(595.28, 841.89),
+        leftMargin=42,
+        rightMargin=42,
+        topMargin=45,
+        bottomMargin=70,
+        title=f"{report_type.title()} Care Report #{pk}",
+    )
+    styles = getSampleStyleSheet()
+    styles.add(
+        ParagraphStyle(
+            name="HOHTitle",
+            parent=styles["Title"],
+            fontSize=17,
+            leading=21,
+            textColor=colors.HexColor("#123c55"),
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="HOHSection",
+            parent=styles["Heading2"],
+            fontSize=11,
+            leading=15,
+            spaceBefore=14,
+            spaceAfter=7,
+            textColor=colors.HexColor("#14627c"),
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="HOHValue",
+            parent=styles["BodyText"],
+            fontSize=9,
+            leading=13,
+            spaceAfter=0,
+            wordWrap="CJK",
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="HOHLabel",
+            parent=styles["BodyText"],
+            fontSize=9,
+            leading=13,
+            textColor=colors.HexColor("#526579"),
+        )
+    )
+    story = []
+    site = context["site"]
+    logo = getattr(site, "logo", None)
+    if logo:
+        try:
+            with logo.open("rb") as f:
+                raw = f.read()
+            from reportlab.lib.utils import ImageReader
+
+            img_reader = ImageReader(BytesIO(raw))
+            width, height = img_reader.getSize()
+            scale = min(125 / width, 55 / height)
+            story.append(
+                Image(BytesIO(raw), width=width * scale, height=height * scale)
+            )
+            story.append(Spacer(1, 8))
+        except Exception:
+            pass
+    story.append(Paragraph(escape(context["site_name"]), styles["HOHTitle"]))
+    story.append(
+        Paragraph(f"{report_type.title()} Care Report — #{pk}", styles["Heading2"])
+    )
+    story.append(Spacer(1, 12))
+
+    def add_section(title, rows):
+        story.append(Paragraph(title, styles["HOHSection"]))
+        cells = []
+        for key, val in rows:
+            shown = "Not provided" if val is None or val == "" else str(val)
+            cells.append(
+                [
+                    Paragraph(escape(str(key)), styles["HOHLabel"]),
+                    Paragraph(escape(shown).replace("\n", "<br/>"), styles["HOHValue"]),
+                ]
+            )
+        t = Table(cells, colWidths=[145, 365], hAlign="LEFT", repeatRows=0)
+        t.setStyle(
+            TableStyle(
+                [
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+                    ("TOPPADDING", (0, 0), (-1, -1), 8),
+                    ("LINEBELOW", (0, 0), (-1, -2), 0.35, colors.HexColor("#e3eaf0")),
+                    (
+                        "ROWBACKGROUNDS",
+                        (0, 0),
+                        (-1, -1),
+                        [colors.white, colors.HexColor("#f8fafc")],
+                    ),
+                ]
+            )
+        )
+        story.append(t)
+
+    add_section("Patient Details", context["patient_rows"])
+    add_section("Caregiver & Assignment", context["caregiver_rows"])
+    add_section("Care Report", context["report_rows"])
+
+    footer = "   |   ".join(f"{k}: {v}" for k, v in context["contacts"])
+
+    def draw_footer(canvas, doc):
+        canvas.saveState()
+        canvas.setStrokeColor(colors.HexColor("#cbd5e1"))
+        canvas.line(42, 55, 553, 55)
+        canvas.setFont("Helvetica", 7.5)
+        canvas.setFillColor(colors.HexColor("#526579"))
+        # Wrap footer to avoid clipping on narrower pages.
+        from reportlab.lib.utils import simpleSplit
+
+        for idx, line in enumerate(
+            simpleSplit(footer or context["site_name"], "Helvetica", 7.5, 505)[:3]
+        ):
+            canvas.drawString(44, 42 - idx * 10, line)
+        canvas.drawRightString(552, 16, f"Page {doc.page}")
+        canvas.restoreState()
+
+    document.build(story, onFirstPage=draw_footer, onLaterPages=draw_footer)
+    buffer.seek(0)
+    return FileResponse(
+        buffer,
+        as_attachment=True,
+        filename=f"caregiver_{report_type}_report_{pk}.pdf",
+        content_type="application/pdf",
+    )

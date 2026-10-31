@@ -135,6 +135,16 @@ urlpatterns = [
         views.caregiver_weekly_reports,
         name="weekly_reports",
     ),
+    path(
+        "caregiver-reports/<str:report_type>/<int:pk>/",
+        views.caregiver_report_detail,
+        name="caregiver_report_detail",
+    ),
+    path(
+        "caregiver-reports/<str:report_type>/<int:pk>/pdf/",
+        views.caregiver_report_pdf,
+        name="caregiver_report_pdf",
+    ),
     # =========================================================
     # HOME CARE REQUESTS
     # =========================================================
@@ -158,6 +168,11 @@ urlpatterns = [
         views.homecare_request_delete,
         name="homecare_request_delete",
     ),
+    path(
+    "homecare/<int:pk>/",
+    views.homecare_request_detail,
+    name="homecare_request_detail",
+),
     # =========================================================
     # REFERRALS
     # =========================================================

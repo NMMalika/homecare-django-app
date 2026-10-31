@@ -1,0 +1,260 @@
+{% extends 'staff/base.html' %}
+{% load static %}
+
+{% block title %}{{ title|default:"Edit Caregiver Payment" }} | Hands-On Health{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cp-edit-wrapper {
+        max-width: 960px;
+        margin: 1.5rem auto 3.5rem;
+        padding: 0 1rem;
+        color: #0f172a;
+    }
+
+    /* Back Link & Header */
+    .cp-btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        padding: 0.5rem 1rem;
+        border-radius: 0.625rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        transition: all 0.2s ease;
+    }
+
+    .cp-btn-back:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .cp-kicker {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #2563eb;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .cp-title {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.25rem;
+    }
+
+    .cp-subtitle {
+        color: #64748b;
+        font-size: 0.9375rem;
+        margin: 0;
+    }
+
+    /* Form Card Container */
+    .cp-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+    }
+
+    /* Form Inputs Customization */
+    .cp-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #334155;
+        margin-bottom: 0.4rem;
+    }
+
+    .cp-edit-wrapper input[type="text"],
+    .cp-edit-wrapper input[type="number"],
+    .cp-edit-wrapper input[type="date"],
+    .cp-edit-wrapper select,
+    .cp-edit-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.625rem;
+        background-color: #f8fafc;
+        font-size: 0.875rem;
+        color: #0f172a;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .cp-edit-wrapper textarea {
+        min-height: 120px;
+        line-height: 1.5;
+    }
+
+    .cp-edit-wrapper input:focus,
+    .cp-edit-wrapper select:focus,
+    .cp-edit-wrapper textarea:focus {
+        border-color: #2563eb;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.375rem;
+    }
+
+    .text-danger-custom {
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-top: 0.375rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Action Buttons */
+    .cp-btn-primary {
+        height: 44px;
+        padding: 0 1.5rem;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.625rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .cp-btn-primary:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.3);
+    }
+
+    .cp-btn-secondary {
+        height: 44px;
+        padding: 0 1.25rem;
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.625rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .cp-btn-secondary:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cp-edit-wrapper">
+
+    <!-- Header Section -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="cp-kicker"><i class="fa-solid fa-calculator me-1"></i> Finance &amp; Compensation</span>
+            <h1 class="cp-title">{{ title|default:"Edit Caregiver Payment" }}</h1>
+            <p class="cp-subtitle">Update the pending payment record details for the assigned caregiver.</p>
+        </div>
+        <a href="{% url 'staff:caregiver_payments' %}" class="cp-btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Back to Payments
+        </a>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="cp-card">
+
+        {% if payment %}
+        <div class="alert alert-info rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="fa-solid fa-circle-info fs-5"></i>
+            <div>
+                <strong>Caregiver:</strong> {{ payment.caregiver.name }}
+                <span class="mx-2 text-muted">|</span>
+                <strong>Current Status:</strong> {{ payment.get_status_display }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger rounded-3 mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% if payment and payment.status != 'PENDING' %}
+        <div class="alert alert-warning rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="fa-solid fa-lock fs-5"></i>
+            <div>Only pending payments can be edited. This payment record is currently read-only.</div>
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-4">
+                {% for field in form %}
+                <div class="col-12 {% if field.name == 'notes' %}col-lg-12{% else %}col-lg-6{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="cp-label">
+                        {{ field.label }} {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                    <div class="text-danger-custom">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Action Buttons Bar -->
+            <div class="d-flex flex-wrap align-items-center gap-3 mt-4 pt-4 border-top">
+                {% if not payment or payment.status == 'PENDING' %}
+                <button type="submit" class="cp-btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                </button>
+                {% endif %}
+
+                <a href="{% url 'staff:caregiver_payments' %}" class="cp-btn-secondary">
+                    <i class="fa-solid fa-xmark"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -470,8 +470,8 @@ Caregiver Dashboard | {{ site_settings.business_name|default:"Hands-On Health" }
                     <div class="payment-summary-card">
                         <div class="small text-muted fw-semibold mb-2">Approved + Paid</div>
                         <h4 class="fw-bold mb-1">N$ {{ approved_total|floatformat:2 }}</h4>
-                        <small class="text-muted">{{ approved_payment_count }} payment record{{
-                            approved_payment_count|pluralize }}</small>
+                        <small class="text-muted">{{ approved_payment_count }} payment record
+                            {{ approved_payment_count|pluralize }}</small>
                     </div>
                 </div>
                 <div class="col-md-4">
