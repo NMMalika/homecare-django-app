@@ -13,68 +13,31 @@ we can support you.
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'homecare/css/homecare.css' %}">
-<style>
-    .selected-services-container {
-        min-height: 48px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .service-badge {
-        background-color: #0d6efd;
-        color: #ffffff;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .service-badge .remove-btn {
-        cursor: pointer;
-        opacity: 0.8;
-        font-weight: bold;
-        line-height: 1;
-    }
-
-    .service-badge .remove-btn:hover {
-        opacity: 1;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
 
 <section class="page-title-section">
+    <div class="container homecare-hero-content">
+        <span class="homecare-hero-label">
+            <i class="fa-solid fa-heart-pulse"></i>
+            HANDS-ON HEALTH | HOME-BASED CARE
+        </span>
 
-    <div class="container">
+        <h1>Request Home Care</h1>
 
-        <div class="row">
+        <p>
+            Compassionate, professional healthcare delivered to your doorstep.
+            Tell us what care you need and our team will help arrange the
+            right support for your loved one.
+        </p>
 
-            <div class="col-md-12 text-center">
-
-                <h1>
-                    Request Home Care
-                </h1>
-
-                <p>
-                    Tell us what care you need and when you would
-                    prefer our team to visit.
-                </p>
-
-            </div>
-
+        <div class="homecare-hero-trust">
+            <span><i class="fa-solid fa-shield-heart"></i> Patient-Centred Care</span>
+            <span><i class="fa-solid fa-user-nurse"></i> Professional Support</span>
+            <span><i class="fa-solid fa-house-medical"></i> Care at Home</span>
         </div>
-
     </div>
-
 </section>
 
 
@@ -91,9 +54,12 @@ we can support you.
 
                 <div class="booking-info">
 
-                    <h3>
-                        Professional Care at Home
-                    </h3>
+                    <div class="booking-info-heading">
+                        <span class="booking-info-icon"><i class="fa-solid fa-house-medical"></i></span>
+                        <h3>
+                            Professional Care<br>at Home
+                        </h3>
+                    </div>
 
                     <p>
 
@@ -145,10 +111,11 @@ we can support you.
                 <div class="booking-form-wrapper">
 
                     <div class="section-title">
-
-                        <h2>
-                            Request Home Care
-                        </h2>
+                        <div class="form-title-ribbon">
+                            <span class="form-title-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+                            <h2>
+                                Request Home Care</h2>
+                        </div>
 
                         <p>
                             Please provide the information below.
@@ -445,12 +412,10 @@ we can support you.
 
                             <div class="col-md-12">
 
-                                <button type="submit" class="btn btn-primary">
-
-                                    <i class="fa-solid fa-calendar-check"></i>
-
-                                    Submit Home Care Request
-
+                                <button type="submit" class="btn btn-primary homecare-submit-btn">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Submit Home Care Request</span>
+                                    <i class="fa-solid fa-chevron-right submit-arrow"></i>
                                 </button>
 
                             </div>
@@ -527,9 +492,19 @@ we can support you.
             badge.className = "service-badge";
             badge.dataset.value = value;
             badge.dataset.isCustom = isCustom;
-            badge.innerHTML = `${label} <span class="remove-btn">&times;</span>`;
+            const badgeText = document.createElement("span");
+            badgeText.textContent = label;
 
-            badge.querySelector(".remove-btn").addEventListener("click", function () {
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "remove-btn";
+            removeButton.setAttribute("aria-label", `Remove ${label}`);
+            removeButton.textContent = "×";
+
+            badge.appendChild(badgeText);
+            badge.appendChild(removeButton);
+
+            removeButton.addEventListener("click", function () {
                 if (isCustom) {
                     customServicesArray = customServicesArray.filter(item => item !== value);
                     customInput.value = customServicesArray.join(",");

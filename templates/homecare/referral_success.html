@@ -1,290 +1,507 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Referral Submitted - Hands-On Health{% endblock %}
+{% block title %}Referral Successfully Submitted | Hands-On Health{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Page Container */
+    /* ==========================================
+   HANDS-ON HEALTH — REFERRAL SUCCESS
+========================================== */
+
     .referral-success-section {
-        background-color: #f8fafc;
-        min-height: 85vh;
-        display: flex;
-        align-items: center;
-        padding: 3rem 1rem;
+        position: relative;
+        overflow: hidden;
+        min-height: 90vh;
+        padding: 65px 15px;
+        background:
+            radial-gradient(circle at 5% 20%, rgba(19, 166, 139, .12), transparent 27%),
+            radial-gradient(circle at 95% 80%, rgba(8, 121, 189, .13), transparent 30%),
+            linear-gradient(135deg, #f1f8fd, #ffffff 55%, #eef9f8);
     }
 
-    /* Main Card */
-    .success-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 1.25rem;
-        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
-        max-width: 680px;
-        margin: 0 auto;
-        padding: 2.5rem 2rem;
-    }
-
-    @media (min-width: 768px) {
-        .success-card {
-            padding: 3.5rem 3rem;
-        }
-    }
-
-    /* Checkmark Hero Icon */
-    .success-icon-badge {
-        width: 80px;
-        height: 80px;
-        background-color: #ecfdf5;
-        color: #059669;
+    /* Decorative background elements */
+    .referral-success-section::before,
+    .referral-success-section::after {
+        content: "";
+        position: absolute;
         border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.25rem;
-        box-shadow: 0 0 0 10px #f0fdf4;
-        margin-bottom: 1.5rem;
+        pointer-events: none;
     }
 
-    /* Partner Pill */
+    .referral-success-section::before {
+        width: 300px;
+        height: 300px;
+        border: 45px solid rgba(8, 121, 189, .045);
+        top: -130px;
+        left: -100px;
+    }
+
+    .referral-success-section::after {
+        width: 250px;
+        height: 250px;
+        border: 35px solid rgba(19, 166, 139, .05);
+        bottom: -100px;
+        right: -70px;
+    }
+
+    .referral-success-section .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Main card */
+    .success-card {
+        max-width: 850px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, .97);
+        border: 1px solid rgba(216, 231, 242, .9);
+        border-radius: 24px;
+        padding: 45px 48px;
+        box-shadow:
+            0 25px 70px rgba(15, 53, 87, .09),
+            0 5px 15px rgba(15, 53, 87, .035);
+        text-align: center;
+    }
+
+    /* Success icon */
+    .success-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 23px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(145deg, #e3faf1, #f2fffa);
+        box-shadow: 0 0 0 10px rgba(19, 166, 139, .07);
+    }
+
+    .success-icon-wrapper i {
+        font-size: 43px;
+        color: #13a68b;
+    }
+
+    /* Badge */
     .partner-pill {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        background-color: #f0fdf4;
-        color: #166534;
-        border: 1px solid #bbf7d0;
-        padding: 0.35rem 1rem;
+        gap: 9px;
+        padding: 9px 19px;
         border-radius: 50px;
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
+        background: #e9faf4;
+        border: 1px solid #b9edda;
+        color: #087e68;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 19px;
     }
 
-    /* Timeline Section */
+    .success-card h1 {
+        color: #12365b;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -.8px;
+        margin: 0 0 15px;
+    }
+
+    .success-card h1 span {
+        color: #13a68b;
+    }
+
+    .success-description {
+        max-width: 670px;
+        margin: 0 auto;
+        color: #60758b;
+        font-size: 16px;
+        line-height: 1.85;
+    }
+
+    /* Timeline */
     .next-steps-container {
-        background-color: #f8fafc;
-        border: 1px solid #f1f5f9;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        margin: 2rem 0;
+        background: linear-gradient(135deg, #f3f8fd, #f8fcff);
+        border: 1px solid #e1edf7;
+        border-radius: 17px;
+        padding: 25px 27px;
+        margin: 32px 0 23px;
         text-align: left;
+    }
+
+    .steps-heading {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: #12365b;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+    }
+
+    .steps-heading i {
+        color: #13a68b;
+        font-size: 19px;
     }
 
     .step-item {
         display: flex;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 17px;
         position: relative;
+        padding-bottom: 23px;
     }
 
-    .step-item:not(:last-child) {
-        padding-bottom: 1.25rem;
+    .step-item:last-child {
+        padding-bottom: 0;
     }
 
-    /* Connecting vertical line between steps */
     .step-item:not(:last-child)::after {
-        content: '';
+        content: "";
         position: absolute;
-        top: 28px;
-        left: 15px;
         width: 2px;
-        height: calc(100% - 20px);
-        background-color: #e2e8f0;
+        top: 39px;
+        bottom: 4px;
+        left: 18px;
+        background: linear-gradient(#1686c0, #c7e8e8);
     }
 
     .step-badge {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: #ffffff;
-        border: 2px solid #cbd5e1;
-        color: #475569;
-        font-weight: 700;
-        font-size: 0.875rem;
+        position: relative;
+        z-index: 1;
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
-        z-index: 1;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #c9dce9;
+        color: #315573;
+        font-size: 14px;
+        font-weight: 800;
     }
 
     .step-item.active .step-badge {
-        border-color: #2563eb;
-        background-color: #2563eb;
-        color: #ffffff;
+        background: linear-gradient(135deg, #0879bd, #13a68b);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 5px 12px rgba(8, 121, 189, .2);
     }
 
-    /* Notice Box */
+    .step-content {
+        padding-top: 2px;
+    }
+
+    .step-title {
+        color: #173c5e;
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .step-description {
+        color: #718399;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* Notice */
     .notice-box {
-        background-color: #eff6ff;
-        border-left: 4px solid #2563eb;
-        border-radius: 0.5rem;
-        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 21px;
+        margin: 24px 0 30px;
+        background: linear-gradient(110deg, #eaf5ff, #f0f9ff);
+        border: 1px solid #d3e9fa;
+        border-radius: 13px;
         text-align: left;
-        margin-bottom: 2.25rem !important;
-        /* Explicit bottom spacing to prevent touching buttons */
     }
 
-    /* Buttons Container & Styling */
+    .notice-icon {
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #fff;
+        background: #0879bd;
+        font-size: 19px;
+    }
+
+    .notice-text {
+        color: #48647e;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .notice-text strong {
+        color: #0879bd;
+    }
+
+    /* Buttons */
     .button-group {
         display: flex;
-        gap: 1.25rem;
-        width: 100%;
-        margin-top: 1rem;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
     }
 
-    .btn-custom-primary,
-    .btn-custom-secondary {
-        flex: 1;
+    .btn-custom {
+        min-width: 215px;
+        padding: 15px 23px;
+        border-radius: 50px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
-        padding: 0.875rem 1.25rem;
-        border-radius: 0.625rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        text-align: center;
+        gap: 11px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none !important;
+        transition: all .25s ease;
     }
 
     .btn-custom-primary {
-        background-color: #2563eb;
-        color: #ffffff;
-        border: none;
+        color: #fff !important;
+        background: linear-gradient(135deg, #0879bd, #075c99);
+        box-shadow: 0 8px 20px rgba(8, 121, 189, .2);
     }
 
     .btn-custom-primary:hover {
-        background-color: #1d4ed8;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        color: #fff !important;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(8, 121, 189, .28);
     }
 
     .btn-custom-secondary {
-        background-color: #ffffff;
-        color: #334155;
-        border: 1px solid #cbd5e1;
+        color: #0879bd !important;
+        background: #fff;
+        border: 1.5px solid #0879bd;
     }
 
     .btn-custom-secondary:hover {
-        background-color: #f8fafc;
-        border-color: #94a3b8;
-        color: #0f172a;
+        color: #fff !important;
+        background: #0879bd;
+        transform: translateY(-3px);
     }
 
-    @media (max-width: 575.98px) {
+    .btn-custom i {
+        font-size: 17px;
+    }
+
+    /* Footer support */
+    .support-footer {
+        border-top: 1px solid #edf2f7;
+        margin-top: 30px;
+        padding-top: 21px;
+        color: #718399;
+        font-size: 13px;
+    }
+
+    .support-footer a {
+        color: #0879bd;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .support-footer a:hover {
+        color: #13a68b;
+        text-decoration: underline;
+    }
+
+    /* Mobile */
+    @media(max-width:767px) {
+        .referral-success-section {
+            padding: 35px 12px;
+        }
+
+        .success-card {
+            padding: 32px 20px;
+            border-radius: 18px;
+        }
+
+        .success-card h1 {
+            font-size: 26px;
+        }
+
+        .success-description {
+            font-size: 14px;
+        }
+
+        .next-steps-container {
+            padding: 20px 15px;
+        }
+
+        .step-description {
+            font-size: 12px;
+        }
+
         .button-group {
             flex-direction: column;
+        }
+
+        .btn-custom {
+            width: 100%;
+        }
+
+        .notice-box {
+            align-items: flex-start;
+            padding: 15px;
+        }
+    }
+
+    @media(prefers-reduced-motion: reduce) {
+        .btn-custom {
+            transition: none;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
 <section class="referral-success-section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-12 text-center">
+            <div class="col-12">
 
                 <div class="success-card">
 
-                    <!-- Checkmark Icon -->
-                    <div class="success-icon-badge">
+                    <!-- SUCCESS ICON -->
+                    <div class="success-icon-wrapper">
                         <i class="fa-solid fa-check"></i>
                     </div>
 
-                    <!-- Partner Pill Badge -->
-                    <div class="mb-3">
+                    <!-- REFERRAL STATUS -->
+                    <div>
                         <span class="partner-pill">
-                            <i class="fa-solid fa-handshake"></i> Partner Referral Received
+                            <i class="fa-solid fa-handshake"></i>
+                            Partner Referral Received
                         </span>
                     </div>
 
-                    <!-- Main Heading -->
-                    <h1 class="h3 fw-bold text-slate-800 mb-2">
-                        Thank You for Your Referral!
+                    <!-- HEADING -->
+                    <h1>
+                        Thank You <span>for Your Referral!</span>
                     </h1>
 
-                    <p class="text-secondary fs-6 mb-0 px-md-3">
-                        We have successfully logged your patient details. Our care management team is now reviewing the
-                        file to prepare a personalized care quotation.
+                    <p class="success-description">
+                        Your referral has been successfully received.
+                        Thank you for trusting Hands-On Health with your
+                        patient's care. Our care management team is now
+                        reviewing the details to prepare a personalised
+                        care quotation.
                     </p>
 
-                    <!-- What Happens Next - Vertical Flow -->
+                    <!-- NEXT STEPS -->
                     <div class="next-steps-container">
-                        <div
-                            class="fw-bold text-slate-800 small text-uppercase tracking-wider mb-3 d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-route text-primary"></i> Next Steps Process
+
+                        <div class="steps-heading">
+                            <i class="fa-solid fa-route"></i>
+                            What Happens Next?
                         </div>
 
-                        <div class="d-flex flex-column">
+                        <div>
 
-                            <!-- Step 1 -->
+                            <!-- STEP 1 -->
                             <div class="step-item active">
                                 <div class="step-badge">1</div>
-                                <div>
-                                    <div class="fw-bold text-slate-800 small">Care Assessment & Quotation</div>
-                                    <div class="text-muted small">Our clinical leads evaluate medical needs and assemble
-                                        a custom care proposal.</div>
+                                <div class="step-content">
+                                    <div class="step-title">
+                                        Care Assessment & Quotation
+                                    </div>
+                                    <div class="step-description">
+                                        Our clinical team reviews the patient's
+                                        needs and prepares a personalised
+                                        care proposal.
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Step 2 -->
+                            <!-- STEP 2 -->
                             <div class="step-item">
                                 <div class="step-badge">2</div>
-                                <div>
-                                    <div class="fw-bold text-slate-800 small">Patient Contact & Consultation</div>
-                                    <div class="text-muted small">We reach out to the patient or family to review plans
-                                        and confirm start dates.</div>
+                                <div class="step-content">
+                                    <div class="step-title">
+                                        Patient Contact & Consultation
+                                    </div>
+                                    <div class="step-description">
+                                        We contact the patient or their family
+                                        to discuss the proposed care plan,
+                                        answer questions and agree on the
+                                        next steps.
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Step 3 -->
+                            <!-- STEP 3 -->
                             <div class="step-item">
                                 <div class="step-badge">3</div>
-                                <div>
-                                    <div class="fw-bold text-slate-800 small">Service Confirmation</div>
-                                    <div class="text-muted small">Once care begins, you will receive an official
-                                        notification confirming enrollment.</div>
+                                <div class="step-content">
+                                    <div class="step-title">
+                                        Service Confirmation
+                                    </div>
+                                    <div class="step-description">
+                                        Once arrangements are finalised,
+                                        you will receive confirmation
+                                        regarding the patient's care service.
+                                    </div>
                                 </div>
                             </div>
 
                         </div>
                     </div>
 
-                    <!-- Notice Box -->
+                    <!-- URGENT CARE NOTICE -->
                     <div class="notice-box">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fa-solid fa-circle-info text-primary fs-5 flex-shrink-0"></i>
-                            <div class="small text-slate-700">
-                                Need urgent care dispatch? For immediate transfers, call our 24/7 care desk directly.
-                            </div>
+                        <div class="notice-icon">
+                            <i class="fa-solid fa-info"></i>
+                        </div>
+
+                        <div class="notice-text">
+                            <strong>Need urgent care assistance?</strong>
+                            For immediate transfers or urgent care
+                            coordination, please contact our care desk
+                            directly.
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- ACTION BUTTONS -->
                     <div class="button-group">
-                        <a href="{% url 'homecare:referral' %}" class="btn-custom-secondary">
-                            <i class="fa-solid fa-user-plus"></i> Refer Another Patient
+
+                        <a href="{% url 'homecare:referral' %}" class="btn-custom btn-custom-secondary">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Refer Another Patient
                         </a>
-                        <a href="{% url 'home' %}" class="btn-custom-primary">
-                            <i class="fa-solid fa-house"></i> Return to Home
+
+                        <a href="{% url 'home' %}" class="btn-custom btn-custom-primary">
+                            <i class="fa-solid fa-house"></i>
+                            Return to Home
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+                    <!-- SUPPORT -->
+                    <div class="support-footer">
+                        <i class="fa-solid fa-headset"></i>
+                        Questions or need assistance?
+                        <a href="{% url 'home' %}#contact">
+                            Contact Hands-On Health
                         </a>
                     </div>
 
-                </div>
-
-                <!-- Footer Support Link -->
-                <div class="mt-4">
-                    <p class="small text-muted mb-0">
-                        Questions? <a href="#" class="text-primary text-decoration-none fw-semibold">Contact Partner
-                            Support</a>
-                    </p>
                 </div>
 
             </div>
         </div>
     </div>
 </section>
+
 {% endblock %}

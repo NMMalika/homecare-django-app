@@ -1,6 +1,7 @@
 from functools import wraps
 import logging
 import secrets
+import copy
 from datetime import timedelta
 from django.conf import settings as django_settings
 from django.conf import settings
@@ -65,6 +66,7 @@ from homecare.models import (
     Payment,
     Quotation,
     Referral,
+    ReferralRewardTransaction,
 )
 
 from homecare.views import (
@@ -1659,27 +1661,29 @@ def homecare_request_delete(request, pk):
 
 @admin_required
 def referrals(request):
+    # =====================================================
+    # SEARCH AND STATUS FILTERS
+    # =====================================================
+    current_status = request.GET.get("status", "").strip()
+    search = request.GET.get("q", "").strip()
 
-    current_status = request.GET.get(
-        "status",
-        "",
-    ).strip()
-
-    search = request.GET.get(
-        "q",
-        "",
-    ).strip()
-
+    # =====================================================
+    # REFERRAL STATISTICS
+    # These counts cover ALL referrals, not just this page.
+    # =====================================================
     total_referrals = Referral.objects.count()
 
     pending_referrals = Referral.objects.filter(
-        status="PENDING",
+        status="PENDING"
     ).count()
 
     completed_referrals = Referral.objects.filter(
-        status="COMPLETED",
+        status="COMPLETED"
     ).count()
 
+    # =====================================================
+    # BASE QUERYSET
+    # =====================================================
     referrals_queryset = (
         Referral.objects.select_related(
             "homecare_request",
@@ -1688,13 +1692,13 @@ def referrals(request):
             "services_needed",
             "attachments",
         )
-        .order_by(
-            "-created_at",
-        )
+        .order_by("-created_at", "-pk")
     )
 
+    # =====================================================
+    # SEARCH
+    # =====================================================
     if search:
-
         referrals_queryset = referrals_queryset.filter(
             Q(referrer_name__icontains=search)
             | Q(referrer_email__icontains=search)
@@ -1705,14 +1709,31 @@ def referrals(request):
             | Q(patient_phone__icontains=search)
         ).distinct()
 
+    # =====================================================
+    # STATUS FILTER
+    # =====================================================
     if current_status:
-
         referrals_queryset = referrals_queryset.filter(
             status=current_status,
         )
 
+    # =====================================================
+    # PAGINATION
+    # Display 10 referrals per page.
+    # get_page() safely handles invalid page numbers.
+    # =====================================================
+    paginator = Paginator(referrals_queryset, 10)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    # =====================================================
+    # TEMPLATE CONTEXT
+    # =====================================================
     context = {
-        "referrals": referrals_queryset,
+        "referrals": page_obj.object_list,
+        "page_obj": page_obj,
+        "paginator": paginator,
         "total_referrals": total_referrals,
         "pending_referrals": pending_referrals,
         "completed_referrals": completed_referrals,
@@ -1736,44 +1757,56 @@ def referrals(request):
 
 @admin_required
 def appointments(request):
+    current_status = request.GET.get("status", "").strip()
 
-    current_status = request.GET.get(
-        "status",
-        "",
+    appointment_id = request.GET.get("appointment", "").strip()
+
+    # Start with the consultation records.
+    appointments_queryset = (
+        Consultation.objects
+        .select_related("doctor")
+        .order_by("-created_at")
     )
 
-    appointment_id = request.GET.get(
-        "appointment",
-        "",
-    ).strip()
-
-    appointments_queryset = Consultation.objects.select_related("doctor").order_by(
-        "-created_at"
-    )
-
+    # Apply the status filter before pagination.
     if current_status:
+        valid_statuses = {
+            value for value, label in Consultation.Status.choices
+        }
 
-        appointments_queryset = appointments_queryset.filter(status=current_status)
+        if current_status in valid_statuses:
+            appointments_queryset = appointments_queryset.filter(
+                status=current_status
+            )
+        else:
+            current_status = ""
 
-    if appointment_id:
+    # Optionally show one selected consultation.
+    if appointment_id and appointment_id.isdigit():
+        appointments_queryset = appointments_queryset.filter(
+            pk=appointment_id
+        )
 
-        if appointment_id.isdigit():
+    # Paginate the filtered queryset: 10 consultations per page.
+    paginator = Paginator(appointments_queryset, 10)
 
-            appointments_queryset = appointments_queryset.filter(pk=appointment_id)
+    page_number = request.GET.get("page")
+    appointments_page = paginator.get_page(page_number)
 
     return render(
         request,
         "staff/appointments.html",
         {
-            "appointments": appointments_queryset,
+            "appointments": appointments_page,
+            "page_obj": appointments_page,
+            "paginator": paginator,
+            "is_paginated": appointments_page.has_other_pages(),
             "current_status": current_status,
             "selected_appointment_id": appointment_id,
-            "status_choices": (Consultation.Status.choices),
+            "status_choices": Consultation.Status.choices,
             "site_settings": SiteSettings.load(),
         },
     )
-
-
 # ============================================================
 # QUOTATIONS
 # ============================================================
@@ -1786,14 +1819,31 @@ def appointments(request):
 
 @admin_required
 def quotations(request):
+    """
+    Display quotations with pagination and financial summary.
+    """
 
-    # Fetch all quotations with related client information
+    # =====================================================
+    # FETCH ALL QUOTATIONS
+    # =====================================================
     quotations_queryset = Quotation.objects.select_related(
         "homecare_request",
         "consultation",
     ).order_by("-created_at")
 
-    # Calculate financial totals from the database
+    # =====================================================
+    # PAGINATION
+    # =====================================================
+    paginator = Paginator(quotations_queryset, 10)
+
+    page_number = request.GET.get("page")
+
+    page_obj = paginator.get_page(page_number)
+
+    # =====================================================
+    # FINANCIAL TOTALS
+    # These totals cover ALL quotations, not just this page.
+    # =====================================================
     financial_totals = Quotation.objects.aggregate(
         total_paid=Coalesce(
             Sum(
@@ -1824,8 +1874,13 @@ def quotations(request):
         ),
     )
 
+    # =====================================================
+    # PAGE CONTEXT
+    # =====================================================
     context = {
-        "quotations": quotations_queryset,
+        "quotations": page_obj.object_list,
+        "page_obj": page_obj,
+        "paginator": paginator,
         "site_settings": SiteSettings.load(),
         # Financial summary cards
         "total_paid": financial_totals["total_paid"],
@@ -1890,9 +1945,25 @@ def quotation_detail(request, pk):
 
 @admin_required
 def payments(request):
+    """
+    Display and manage payments using Django Admin's ChangeList,
+    while rendering the custom Hands-On Health staff template.
+    """
 
-    payment_admin = admin.site._registry[Payment]
+    # Get the registered Payment ModelAdmin.
+    payment_admin = admin.site._registry.get(Payment)
 
+    if payment_admin is None:
+        raise LookupError("Payment model is not registered with Django Admin.")
+
+    # Create a separate copy to avoid modifying the shared
+    # PaymentAdmin instance.
+    staff_payment_admin = copy.copy(payment_admin)
+
+    # Use the custom staff payments template.
+    staff_payment_admin.change_list_template = "staff/payments.html"
+
+    # Additional context for the staff template.
     extra_context = {
         "opts": Payment._meta,
         "app_label": Payment._meta.app_label,
@@ -1900,20 +1971,11 @@ def payments(request):
         "site_settings": SiteSettings.load(),
     }
 
-    original_template = payment_admin.change_list_template
-
-    payment_admin.change_list_template = "staff/payments.html"
-
-    try:
-
-        return payment_admin.changelist_view(
-            request,
-            extra_context=extra_context,
-        )
-
-    finally:
-
-        payment_admin.change_list_template = original_template
+    # Render the Django Admin ChangeList using the staff template.
+    return staff_payment_admin.changelist_view(
+        request,
+        extra_context=extra_context,
+    )
 
 
 # ============================================================
@@ -4781,4 +4843,257 @@ def caregiver_report_pdf(request, report_type, pk):
         as_attachment=True,
         filename=f"caregiver_{report_type}_report_{pk}.pdf",
         content_type="application/pdf",
+    )
+
+
+@admin_required
+@require_http_methods(["GET", "POST"])
+def referral_rewards(request):
+    """
+    Manage consolidated referral reward balances and issue rewards.
+
+    One referrer account is identified by email address.
+    One point is worth N$1.00.
+    """
+
+    # ---------------------------------------------------------
+    # ISSUE A REWARD
+    # ---------------------------------------------------------
+    if request.method == "POST":
+
+        referrer_email = request.POST.get("referrer_email", "").strip().lower()
+
+        try:
+            points_requested = int(request.POST.get("points", "0"))
+        except (TypeError, ValueError):
+            points_requested = 0
+
+        notes = request.POST.get("notes", "").strip()
+
+        if not referrer_email:
+            messages.error(
+                request,
+                "The referrer's email address is missing.",
+            )
+            return redirect("staff:referral_rewards")
+
+        if points_requested < 1:
+            messages.error(
+                request,
+                "Enter a valid number of points to issue.",
+            )
+            return redirect("staff:referral_rewards")
+
+        try:
+            with transaction.atomic():
+
+                # Lock all referrals belonging to this referrer.
+                referrer_referrals = list(
+                    Referral.objects.select_for_update()
+                    .filter(referrer_email__iexact=referrer_email)
+                    .order_by("-created_at")
+                )
+
+                if not referrer_referrals:
+                    messages.error(
+                        request,
+                        "No referrals were found for this referrer.",
+                    )
+                    return redirect("staff:referral_rewards")
+
+                # Calculate all points earned across referrals.
+                total_earned = sum(
+                    referral.loyalty_points_awarded or 0
+                    for referral in referrer_referrals
+                )
+
+                # Calculate all previously redeemed points.
+                total_redeemed = (
+                    ReferralRewardTransaction.objects.filter(
+                        referrer_email__iexact=referrer_email
+                    ).aggregate(total=Sum("points_redeemed"))["total"]
+                    or 0
+                )
+
+                available_points = total_earned - total_redeemed
+
+                if available_points <= 0:
+                    messages.error(
+                        request,
+                        "This referrer has no available reward points.",
+                    )
+                    return redirect("staff:referral_rewards")
+
+                if points_requested > available_points:
+                    messages.error(
+                        request,
+                        (
+                            f"Only {available_points} points are "
+                            "currently available for this referrer."
+                        ),
+                    )
+                    return redirect("staff:referral_rewards")
+
+                # Use the most recent referral for contact details.
+                latest_referral = referrer_referrals[0]
+
+                # Create the reward transaction.
+                reward = ReferralRewardTransaction.objects.create(
+                    referrer_name=latest_referral.referrer_name,
+                    referrer_email=referrer_email,
+                    referrer_phone=latest_referral.referrer_phone,
+                    points_redeemed=points_requested,
+                    issued_by=request.user,
+                    notes=notes,
+                )
+
+                # Prepare notification details.
+                recipient_email = referrer_email
+                recipient_name = latest_referral.referrer_name
+                reward_amount = reward.reward_amount
+                transaction_reference = str(reward.transaction_reference)
+
+                # Send the notification only after the database commits.
+                transaction.on_commit(
+                    lambda: send_mail(
+                        subject="Your Hands-On Health Referral Reward",
+                        message=(
+                            f"Dear {recipient_name},\n\n"
+                            "Thank you for referring patients to "
+                            "Hands-On Health.\n\n"
+                            "We are pleased to inform you that your "
+                            "referral reward has been issued.\n\n"
+                            f"Points issued: {points_requested}\n"
+                            f"Reward value: N$ {reward_amount:,.2f}\n"
+                            f"Transaction reference: "
+                            f"{transaction_reference}\n\n"
+                            "Thank you for your continued partnership "
+                            "and trust in Hands-On Health.\n\n"
+                            "Kind regards,\n"
+                            "Hands-On Health"
+                        ),
+                        from_email=django_settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[recipient_email],
+                        fail_silently=True,
+                    )
+                )
+
+            messages.success(
+                request,
+                (
+                    f"Successfully issued {points_requested} points "
+                    f"(N$ {reward_amount:,.2f}) to {recipient_name}."
+                ),
+            )
+
+        except Exception:
+            logger.exception(
+                "Failed to issue referral reward to %s",
+                referrer_email,
+            )
+
+            messages.error(
+                request,
+                "An error occurred while issuing the reward. "
+                "Please check the server logs.",
+            )
+
+        return redirect("staff:referral_rewards")
+
+    # ---------------------------------------------------------
+    # BUILD CONSOLIDATED REFERRER ACCOUNTS
+    # ---------------------------------------------------------
+
+    all_referrals = Referral.objects.exclude(referrer_email="").order_by("-created_at")
+
+    accounts = {}
+
+    for referral in all_referrals:
+
+        email = referral.referrer_email.strip().lower()
+
+        if not email:
+            continue
+
+        if email not in accounts:
+            accounts[email] = {
+                "name": referral.referrer_name,
+                "email": email,
+                "phone": referral.referrer_phone,
+                "earned": 0,
+                "referral_count": 0,
+                "latest_referral": referral.created_at,
+            }
+
+        accounts[email]["earned"] += referral.loyalty_points_awarded or 0
+
+        accounts[email]["referral_count"] += 1
+
+        if not accounts[email]["phone"] and referral.referrer_phone:
+            accounts[email]["phone"] = referral.referrer_phone
+
+    # ---------------------------------------------------------
+    # CALCULATE REDEEMED AND AVAILABLE BALANCES
+    # ---------------------------------------------------------
+
+    reward_accounts = []
+
+    for email, account in accounts.items():
+
+        redeemed = (
+            ReferralRewardTransaction.objects.filter(
+                referrer_email__iexact=email
+            ).aggregate(total=Sum("points_redeemed"))["total"]
+            or 0
+        )
+
+        available = max(
+            account["earned"] - redeemed,
+            0,
+        )
+
+        account["redeemed"] = redeemed
+        account["available"] = available
+
+        # One point = N$1.00.
+        account["available_value"] = Decimal(str(available)).quantize(Decimal("0.01"))
+
+        reward_accounts.append(account)
+
+    reward_accounts.sort(
+        key=lambda item: item["available"],
+        reverse=True,
+    )
+
+    # ---------------------------------------------------------
+    # REWARD SUMMARY
+    # ---------------------------------------------------------
+
+    total_earned = sum(account["earned"] for account in reward_accounts)
+
+    total_redeemed = sum(account["redeemed"] for account in reward_accounts)
+
+    total_available = sum(account["available"] for account in reward_accounts)
+
+    # ---------------------------------------------------------
+    # REWARD TRANSACTION HISTORY
+    # ---------------------------------------------------------
+
+    reward_history = ReferralRewardTransaction.objects.select_related(
+        "issued_by"
+    ).order_by("-issued_at", "-id",)[:100]
+
+    context = {
+        "reward_accounts": reward_accounts,
+        "reward_history": reward_history,
+        "total_referrers": len(reward_accounts),
+        "total_earned": total_earned,
+        "total_redeemed": total_redeemed,
+        "total_available": total_available,
+    }
+
+    return render(
+        request,
+        "staff/referral_rewards.html",
+        context,
     )

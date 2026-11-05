@@ -1,3 +1,4 @@
+
 {% extends "staff/base.html" %}
 {% load static %}
 
@@ -49,6 +50,8 @@
         font-weight: 700;
         border: 1px solid #c9e4ec;
         transition: all 0.2s ease;
+        cursor: pointer;
+        font-size: 13px;
     }
 
     .q-btn:hover {
@@ -264,13 +267,73 @@
     }
 
     .q-footer {
-        padding: 16px 24px;
+        padding: 18px 24px;
         border-top: 1px solid #e7edf2;
         display: flex;
         justify-content: space-between;
-        gap: 10px;
+        align-items: center;
+        gap: 15px;
         flex-wrap: wrap;
         background: #f8fafc;
+    }
+
+    .q-footer-info {
+        color: #718096;
+        font-size: 13px;
+    }
+
+    .q-footer-info strong {
+        color: #183047;
+    }
+
+    .q-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .q-page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 9px 13px;
+        border: 1px solid #dbe3ec;
+        border-radius: 8px;
+        color: #102a43;
+        background: white;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .q-page-link:hover {
+        background: #102a43;
+        border-color: #102a43;
+        color: white;
+    }
+
+    .q-page-link.disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+
+    .q-page-current {
+        color: #475569;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 5px;
+        white-space: nowrap;
+    }
+
+    .q-no-results {
+        display: none;
+        text-align: center;
+        padding: 35px 20px;
+        color: #718096;
     }
 
     @media (max-width: 1200px) {
@@ -283,6 +346,15 @@
         .q-stats {
             grid-template-columns: repeat(2, 1fr);
         }
+
+        .q-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .q-pagination {
+            justify-content: flex-start;
+        }
     }
 
     @media (max-width: 600px) {
@@ -294,13 +366,38 @@
             padding: 22px;
         }
 
+        .q-hero h1 {
+            font-size: 23px;
+        }
+
         .q-stats {
             grid-template-columns: 1fr;
             gap: 10px;
         }
+
+        .q-filters {
+            padding: 15px;
+        }
+
+        .q-input {
+            min-width: 100%;
+        }
+
+        .q-select {
+            flex: 1;
+        }
+
+        .q-pagination {
+            gap: 5px;
+        }
+
+        .q-page-link {
+            padding: 8px 10px;
+        }
     }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="q-wrap">
@@ -308,64 +405,87 @@
     <!-- Hero Header -->
     <div class="q-hero">
         <div>
-            <div style="opacity: 0.8; font-size: 11px; letter-spacing: 0.12em; font-weight: 800;">FINANCE / QUOTATIONS
+            <div style="opacity: 0.8; font-size: 11px; letter-spacing: 0.12em; font-weight: 800;">
+                FINANCE / QUOTATIONS
             </div>
-            <h1><i class="fa fa-file-invoice-dollar" aria-hidden="true"></i> Quotation Management</h1>
+
+            <h1>
+                <i class="fa fa-file-invoice-dollar" aria-hidden="true"></i>
+                Quotation Management
+            </h1>
+
             <p>Track home-care and appointment quotations in one unified workspace.</p>
         </div>
+
         <a class="q-btn" href="{% url 'staff:homecare_requests' %}">
-            <i class="fa fa-plus"></i> New from Home Care
+            <i class="fa fa-plus"></i>
+            New from Home Care
         </a>
     </div>
 
+
     <!-- Stat Metrics Grid -->
     <div class="q-stats">
+
         <div class="q-stat">
             <small>Total Quotations</small>
-            <strong id="q-total">{{ total_quotations|default:0 }}</strong>
+            <strong>{{ total_quotations|default:0 }}</strong>
         </div>
 
         <div class="q-stat">
             <small>Payment Pending</small>
-            <strong id="q-pending">{{ pending_count|default:0 }}</strong>
+            <strong>{{ pending_count|default:0 }}</strong>
         </div>
 
         <div class="q-stat">
             <small>Paid Quotations</small>
-            <strong id="q-paid">{{ paid_count|default:0 }}</strong>
+            <strong>{{ paid_count|default:0 }}</strong>
         </div>
 
         <div class="q-stat">
             <small>Total Amount Paid</small>
-            <strong style="color: #166534;">N$ {{ total_paid|default:0|floatformat:2 }}</strong>
+            <strong style="color: #166534;">
+                N$ {{ total_paid|default:0|floatformat:2 }}
+            </strong>
         </div>
 
         <div class="q-stat">
             <small>Awaiting Payment</small>
-            <strong style="color: #b45309;">N$ {{ total_awaiting|default:0|floatformat:2 }}</strong>
+            <strong style="color: #b45309;">
+                N$ {{ total_awaiting|default:0|floatformat:2 }}
+            </strong>
         </div>
 
         <div class="q-stat">
             <small>Total Quoted Value</small>
-            <strong id="q-value">N$ {{ total_quoted|default:0|floatformat:2 }}</strong>
+            <strong>
+                N$ {{ total_quoted|default:0|floatformat:2 }}
+            </strong>
         </div>
+
     </div>
 
-    <!-- Data Panel -->
+
+    <!-- Quotations Data Panel -->
     <div class="q-panel">
 
         <div class="q-panel-head">
             <div>
                 <h2>All Quotations</h2>
-                <div class="q-muted">Search, filter, and review details for any customer quotation.</div>
+                <div class="q-muted">
+                    Search, filter, and review customer quotations.
+                </div>
             </div>
+
             <span class="q-muted" id="q-count"></span>
         </div>
 
-        <!-- Filter Tools -->
+
+        <!-- Client-side Filter Tools -->
         <div class="q-filters">
-            <input class="q-input" id="q-search" type="search"
-                placeholder="Search client name, ID, or quote reference..." aria-label="Search quotations">
+
+            <input class="q-input" id="q-search" type="search" placeholder="Search client name or quotation ID..."
+                aria-label="Search quotations">
 
             <select class="q-select" id="q-type" aria-label="Filter by type">
                 <option value="">All Types</option>
@@ -382,13 +502,18 @@
             </select>
 
             <button type="button" class="q-btn" id="q-reset">
-                <i class="fa fa-rotate-left"></i> Reset
+                <i class="fa fa-rotate-left"></i>
+                Reset
             </button>
+
         </div>
+
 
         <!-- Quotations Table -->
         <div class="q-table-wrap">
+
             <table class="q-table">
+
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -403,42 +528,62 @@
                     </tr>
                 </thead>
 
-                <tbody>
+
+                <tbody id="q-table-body">
+
                     {% for quotation in quotations %}
+
                     <tr class="q-row"
                         data-search="{{ quotation.pk }} {{ quotation.homecare_request.full_name|default:''|lower }} {{ quotation.consultation.first_name|default:''|lower }} {{ quotation.consultation.last_name|default:''|lower }}"
                         data-type="{% if quotation.consultation_id %}appointment{% else %}home care{% endif %}"
-                        data-status="{{ quotation.payment_status|lower }}"
-                        data-amount="{{ quotation.amount|default:0 }}">
+                        data-status="{{ quotation.payment_status|lower }}">
 
                         <td>
-                            <a class="q-name" href="{% url 'staff:quotation_detail' quotation.pk %}">#{{ quotation.pk }}</a>
+                            <a class="q-name" href="{% url 'staff:quotation_detail' quotation.pk %}">
+                                #{{ quotation.pk }}
+                            </a>
                         </td>
+
 
                         <td>
                             <div class="q-name">
+
                                 {% if quotation.homecare_request %}
                                 {{ quotation.homecare_request.full_name }}
+
                                 {% elif quotation.consultation %}
-                                {{ quotation.consultation.first_name }} {{ quotation.consultation.last_name }}
+                                {{ quotation.consultation.first_name }}
+                                {{ quotation.consultation.last_name }}
+
                                 {% else %}
                                 Unassigned Client
                                 {% endif %}
+
                             </div>
-                            <div class="q-ref">Reference: Quote #{{ quotation.pk }}</div>
+
+                            <div class="q-ref">
+                                Reference: Quote #{{ quotation.pk }}
+                            </div>
                         </td>
+
 
                         <td>
                             <span class="q-pill">
+
                                 {% if quotation.consultation_id %}
                                 Appointment
                                 {% else %}
                                 Home Care
                                 {% endif %}
+
                             </span>
                         </td>
 
-                        <td class="q-money">N$ {{ quotation.amount|default:0|floatformat:2 }}</td>
+
+                        <td class="q-money">
+                            N$ {{ quotation.amount|default:0|floatformat:2 }}
+                        </td>
+
 
                         <td>
                             <span class="q-pill {{ quotation.payment_status|lower }}">
@@ -446,79 +591,242 @@
                             </span>
                         </td>
 
-                        <td>{{ quotation.sent_at|date:"d M Y, H:i"|default:"—" }}</td>
-                        <td>{{ quotation.payment_deadline|date:"d M Y, H:i"|default:"—" }}</td>
-                        <td>{{ quotation.created_at|date:"d M Y, H:i"|default:"—" }}</td>
+
+                        <td>
+                            {{ quotation.sent_at|date:"d M Y, H:i"|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ quotation.payment_deadline|date:"d M Y, H:i"|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ quotation.created_at|date:"d M Y, H:i"|default:"—" }}
+                        </td>
+
 
                         <td style="text-align: right;">
                             <div class="q-actions" style="justify-content: flex-end;">
+
                                 <a class="q-btn q-btn-dark" href="{% url 'staff:quotation_detail' quotation.pk %}">
-                                    <i class="fa fa-eye"></i> Details
+                                    <i class="fa fa-eye"></i>
+                                    Details
                                 </a>
+
                             </div>
                         </td>
+
                     </tr>
+
                     {% empty %}
+
                     <tr>
                         <td colspan="9">
                             <div class="q-empty">
                                 <i class="fa fa-file-invoice fa-3x" style="margin-bottom: 12px; opacity: 0.5;"></i>
-                                <h3 style="font-weight: 700; color: #1e293b;">No Quotations Found</h3>
-                                <p style="margin-bottom: 0;">Quotations created for home-care requests or appointments
-                                    will appear here.</p>
+
+                                <h3 style="font-weight: 700; color: #1e293b;">
+                                    No Quotations Found
+                                </h3>
+
+                                <p style="margin-bottom: 0;">
+                                    Quotations created for home-care requests or appointments
+                                    will appear here.
+                                </p>
                             </div>
                         </td>
                     </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
 
+
+        <!-- No Results From Search -->
+        <div class="q-no-results" id="q-no-results">
+            <i class="fa fa-search fa-2x" style="opacity: 0.4;"></i>
+
+            <h3>No Matching Quotations</h3>
+
+            <p>Try changing your search or filters.</p>
+        </div>
+
+
+        <!-- Footer and Pagination -->
         <div class="q-footer">
-            <span class="q-muted">All currency values are displayed in Namibian Dollars (N$).</span>
-            <span class="q-muted" id="q-visible"></span>
+
+            <div class="q-footer-info">
+                Showing
+                <strong>{{ page_obj.start_index|default:0 }}</strong>
+                –
+                <strong>{{ page_obj.end_index|default:0 }}</strong>
+                of
+                <strong>{{ page_obj.paginator.count|default:0 }}</strong>
+                quotations
+
+                <div style="margin-top: 5px;">
+                    All currency values are displayed in Namibian Dollars (N$).
+                </div>
+
+                <div id="q-visible" style="margin-top: 5px;"></div>
+            </div>
+
+
+            {% if page_obj.paginator.num_pages > 1 %}
+
+            <nav class="q-pagination" aria-label="Quotation pagination">
+
+                {% if page_obj.has_previous %}
+
+                <a href="?page=1" class="q-page-link" title="First page">
+                    <i class="fa fa-angles-left"></i>
+                    First
+                </a>
+
+                <a href="?page={{ page_obj.previous_page_number }}" class="q-page-link" title="Previous page">
+                    <i class="fa fa-angle-left"></i>
+                    Previous
+                </a>
+
+                {% else %}
+
+                <span class="q-page-link disabled">
+                    <i class="fa fa-angles-left"></i>
+                    First
+                </span>
+
+                <span class="q-page-link disabled">
+                    <i class="fa fa-angle-left"></i>
+                    Previous
+                </span>
+
+                {% endif %}
+
+
+                <span class="q-page-current">
+                    Page {{ page_obj.number }}
+                    of {{ page_obj.paginator.num_pages }}
+                </span>
+
+
+                {% if page_obj.has_next %}
+
+                <a href="?page={{ page_obj.next_page_number }}" class="q-page-link" title="Next page">
+                    Next
+                    <i class="fa fa-angle-right"></i>
+                </a>
+
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="q-page-link" title="Last page">
+                    Last
+                    <i class="fa fa-angles-right"></i>
+                </a>
+
+                {% else %}
+
+                <span class="q-page-link disabled">
+                    Next
+                    <i class="fa fa-angle-right"></i>
+                </span>
+
+                <span class="q-page-link disabled">
+                    Last
+                    <i class="fa fa-angles-right"></i>
+                </span>
+
+                {% endif %}
+
+            </nav>
+
+            {% endif %}
+
         </div>
 
     </div>
+
 </div>
 
+
+<!-- Search and Filter JavaScript -->
 <script>
     (function () {
-        const rows = Array.from(document.querySelectorAll('.q-row'));
-        const search = document.getElementById('q-search');
-        const type = document.getElementById('q-type');
-        const status = document.getElementById('q-status');
+        "use strict";
 
-        function filter() {
+        const rows = Array.from(document.querySelectorAll(".q-row"));
+
+        const search = document.getElementById("q-search");
+        const type = document.getElementById("q-type");
+        const status = document.getElementById("q-status");
+        const reset = document.getElementById("q-reset");
+
+        const visibleLabel = document.getElementById("q-visible");
+        const countLabel = document.getElementById("q-count");
+        const noResults = document.getElementById("q-no-results");
+
+        function filterQuotations() {
+
             const query = search.value.trim().toLowerCase();
+
             let visibleCount = 0;
 
-            rows.forEach(r => {
-                const matchesSearch = r.dataset.search.includes(query);
-                const matchesType = !type.value || r.dataset.type === type.value;
-                const matchesStatus = !status.value || r.dataset.status === status.value;
+            rows.forEach(function (row) {
 
-                const isVisible = matchesSearch && matchesType && matchesStatus;
-                r.hidden = !isVisible;
-                r.style.display = isVisible ? '' : 'none';
+                const searchText = row.dataset.search || "";
+                const rowType = row.dataset.type || "";
+                const rowStatus = row.dataset.status || "";
 
-                if (isVisible) visibleCount++;
+                const matchesSearch = searchText.includes(query);
+
+                const matchesType =
+                    !type.value || rowType === type.value;
+
+                const matchesStatus =
+                    !status.value || rowStatus === status.value;
+
+                const visible =
+                    matchesSearch && matchesType && matchesStatus;
+
+                row.style.display = visible ? "" : "none";
+
+                if (visible) {
+                    visibleCount++;
+                }
+
             });
 
-            document.getElementById('q-visible').textContent = visibleCount + ' shown';
-            document.getElementById('q-count').textContent = rows.length + ' total records';
+            visibleLabel.textContent =
+                visibleCount + " quotations visible on this page";
+
+            countLabel.textContent =
+                visibleCount + " of " + rows.length + " records shown";
+
+            noResults.style.display =
+                rows.length > 0 && visibleCount === 0 ? "block" : "none";
         }
 
-        [search, type, status].forEach(element => element.addEventListener('input', filter));
 
-        document.getElementById('q-reset').addEventListener('click', () => {
-            search.value = '';
-            type.value = '';
-            status.value = '';
-            filter();
+        search.addEventListener("input", filterQuotations);
+        type.addEventListener("change", filterQuotations);
+        status.addEventListener("change", filterQuotations);
+
+
+        reset.addEventListener("click", function () {
+
+            search.value = "";
+            type.value = "";
+            status.value = "";
+
+            filterQuotations();
+
         });
 
-        filter();
+
+        filterQuotations();
+
     })();
 </script>
+
 {% endblock %}

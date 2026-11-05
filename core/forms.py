@@ -61,6 +61,9 @@ class SiteSettingsForm(forms.ModelForm):
 
             # GENERAL PAYMENT INSTRUCTIONS
             "payment_instructions",
+             # REFERRAL LOYALTY POINTS
+            "referral_points_amount_unit",
+            "referral_points_per_unit",
         ]
 
         widgets = {
@@ -188,6 +191,23 @@ class SiteSettingsForm(forms.ModelForm):
                     "to clients on quotations and payment pages..."
                 ),
             }),
+                        # REFERRAL LOYALTY POINTS
+            "referral_points_amount_unit": forms.NumberInput(
+                attrs={
+                    "min": "0.01",
+                    "step": "0.01",
+                    "placeholder": "100.00",
+                }
+            ),
+            
+            "referral_points_per_unit": forms.NumberInput(
+                attrs={
+                    "min": "0",
+                    "step": "1",
+                    "placeholder": "1",
+                }
+            ),
+            
         }
 
         labels = {
@@ -208,6 +228,8 @@ class SiteSettingsForm(forms.ModelForm):
             "paypal_instructions": "PayPal Payment Instructions",
 
             "payment_instructions": "General Payment Instructions",
+             "referral_points_amount_unit": "Payment Amount per Points Unit",
+            "referral_points_per_unit": "Points Earned per Unit",
         }
 
         help_texts = {
@@ -242,6 +264,14 @@ class SiteSettingsForm(forms.ModelForm):
             "paypal_instructions": (
                 "Instructions displayed to patients choosing "
                 "PayPal as their payment method."
+            ),
+                        "referral_points_amount_unit": (
+                "How much a client must pay to earn one points unit. "
+                "For example, 100 means one points unit for every 100 paid."
+            ),
+            "referral_points_per_unit": (
+                "How many points the referrer earns for each complete "
+                "payment amount unit. For example, 1 means one point."
             ),
         }
 
@@ -320,3 +350,13 @@ class SiteSettingsForm(forms.ModelForm):
         )
 
         return cleaned_data
+    
+    def clean_referral_points_amount_unit(self):
+        amount = self.cleaned_data.get("referral_points_amount_unit")
+
+        if amount is None or amount <= 0:
+            raise ValidationError(
+                "The referral payment amount must be greater than zero."
+            )
+
+        return amount

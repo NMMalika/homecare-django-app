@@ -1,939 +1,763 @@
 {% extends "staff/base.html" %}
 {% load static i18n admin_list %}
 
-{% block title %}
-Payments - Hands-On Health Staff
-{% endblock %}
+{% block title %}Payment Management | Hands-On Health{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
 
 <style>
-    /* ============================================================
-       HANDS-ON HEALTH
-       PROFESSIONAL PAYMENTS WORKSPACE
-       ============================================================ */
-
     .payments-wrapper {
-        max-width: 1500px;
+        width: 100%;
+        max-width: 1600px;
         margin: 0 auto;
-        padding-bottom: 3rem;
+        padding-bottom: 3.5rem;
+        color: #0f172a;
     }
 
+    /* HEADER */
     .payments-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .payments-heading {
+        display: flex;
         align-items: flex-start;
-        margin-bottom: 2rem;
         gap: 1rem;
     }
 
-    .payments-kicker {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #2563eb;
-        margin-bottom: 0.25rem;
+    .payments-icon {
+        width: 52px;
+        height: 52px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
-        gap: 0.375rem;
+        justify-content: center;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 1rem;
+        font-size: 1.25rem;
+        border: 1px solid #dbeafe;
+    }
+
+    .payments-kicker {
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.25rem;
+        display: block;
     }
 
     .payments-title {
+        margin: 0;
+        color: #0f172a;
         font-size: 1.875rem;
         font-weight: 800;
-        color: #0f172a;
-        margin: 0 0 0.25rem 0;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
     }
 
     .payments-subtitle {
-        font-size: 0.875rem;
+        margin: 0.35rem 0 0;
         color: #64748b;
-        margin: 0;
+        font-size: 0.9375rem;
+        line-height: 1.5;
     }
 
-    /* ============================================================
-       CHANGE LIST
-       ============================================================ */
+    .payments-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.75rem 1.25rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
 
+    .payments-count strong {
+        color: #0f172a;
+        font-size: 1.125rem;
+        font-weight: 800;
+    }
+
+    /* CHANGE LIST */
     #changelist {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
         width: 100%;
         background: transparent !important;
-        border: none !important;
+        border: 0 !important;
         padding: 0 !important;
     }
 
     #changelist-form-container {
-        flex: 1;
-        overflow-x: auto;
-        background: #ffffff;
+        width: 100%;
+        min-width: 0;
+        padding: 1.75rem !important;
+        background: #fff;
         border: 1px solid #e2e8f0;
         border-radius: 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-        padding: 1.5rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+        overflow: hidden;
     }
 
-    /* ============================================================
-       FILTERS
-       ============================================================ */
-
+    /* FILTERS */
     .filters-dropdown-bar {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 1rem;
-        padding: 1.25rem 1.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
         display: flex;
         flex-wrap: wrap;
-        gap: 1.25rem;
         align-items: flex-end;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04);
     }
 
     .filter-group-dropdown {
         display: flex;
         flex-direction: column;
-        gap: 0.375rem;
-        min-width: 220px;
-        flex: 1;
+        gap: 0.4rem;
+        flex: 1 1 200px;
+        min-width: 180px;
     }
 
     .filter-group-dropdown label {
+        color: #334155;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #475569;
     }
 
     .filter-group-dropdown select {
-        padding: 0.625rem 0.875rem;
+        width: 100%;
+        min-height: 44px;
+        padding: 0.5rem 2.25rem 0.5rem 0.875rem;
         border: 1px solid #cbd5e1;
-        border-radius: 0.5rem;
+        border-radius: 0.625rem;
+        background: #f8fafc;
+        color: #0f172a;
         font-size: 0.875rem;
-        background-color: #f8fafc;
-        color: #1e293b;
         outline: none;
-        transition:
-            border-color 0.2s,
-            background-color 0.2s,
-            box-shadow 0.2s;
         cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
     }
 
     .filter-group-dropdown select:focus {
         border-color: #2563eb;
-        background-color: #ffffff;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
     .filter-actions-bar {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding-bottom: 2px;
+        min-height: 44px;
     }
 
     .btn-filter-clear {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #dc2626;
-        text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 0.375rem;
-        background: #fef2f2;
-        padding: 0.625rem 1rem;
-        border-radius: 0.5rem;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        padding: 0 1rem;
         border: 1px solid #fecaca;
-        transition: background-color 0.2s;
-        height: 42px;
+        border-radius: 0.625rem;
+        background: #fef2f2;
+        color: #dc2626;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-decoration: none;
         white-space: nowrap;
+        transition: all 0.2s;
     }
 
     .btn-filter-clear:hover {
         background: #fee2e2;
+        color: #b91c1c;
     }
 
-    /* ============================================================
-       SEARCH TOOLBAR
-       ============================================================ */
-
+    /* SEARCH */
     #toolbar {
-        background: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 0.75rem !important;
-        padding: 1.25rem 1.5rem !important;
-        margin-bottom: 1.5rem !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         gap: 1rem;
         flex-wrap: wrap;
+        width: 100%;
+        margin: 0 0 1.25rem !important;
+        padding: 1rem 1.25rem !important;
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important;
+        box-sizing: border-box;
     }
 
     #changelist-search {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        width: 100%;
-        max-width: 550px;
+        gap: 0.625rem;
         position: relative;
+        width: 100%;
+        max-width: 600px;
     }
 
-    #changelist-search label {
-        display: none !important;
-    }
-
+    #changelist-search label,
     #changelist-search img {
         display: none !important;
     }
 
-    #searchbar {
-        flex: 1;
-        padding: 0.625rem 1rem 0.625rem 2.5rem !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 0.5rem !important;
-        font-size: 0.875rem !important;
-        background-color: #ffffff !important;
-        color: #1e293b !important;
-        outline: none !important;
-        transition:
-            border-color 0.2s,
-            box-shadow 0.2s !important;
-        height: 42px !important;
-    }
-
-    #searchbar:focus {
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
-    }
-
     #changelist-search::before {
         content: "\f002";
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
         position: absolute;
-        left: 0.875rem;
+        left: 1rem;
         top: 50%;
         transform: translateY(-50%);
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
         color: #94a3b8;
         font-size: 0.875rem;
         pointer-events: none;
     }
 
-    #changelist-search input[type="submit"] {
-        background: #2563eb !important;
-        border: none !important;
-        border-radius: 0.5rem !important;
-        color: #ffffff !important;
-        font-weight: 600 !important;
+    #searchbar {
+        flex: 1;
+        min-width: 120px;
+        height: 44px !important;
+        padding: 0.5rem 0.875rem 0.5rem 2.625rem !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 0.625rem !important;
+        background: #fff !important;
+        color: #0f172a !important;
         font-size: 0.875rem !important;
+        outline: none !important;
+        box-shadow: none !important;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    #searchbar:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    #changelist-search input[type="submit"] {
+        height: 44px !important;
         padding: 0 1.25rem !important;
-        cursor: pointer !important;
-        height: 42px !important;
-        transition:
-            background-color 0.2s,
-            transform 0.1s !important;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        border: 0 !important;
+        border-radius: 0.625rem !important;
+        background: #2563eb !important;
+        color: #fff !important;
+        font-size: 0.875rem !important;
+        font-weight: 700 !important;
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        transition: background-color 0.2s;
     }
 
     #changelist-search input[type="submit"]:hover {
         background: #1d4ed8 !important;
     }
 
-    #changelist-search input[type="submit"]:active {
-        transform: scale(0.98);
-    }
-
-    /* ============================================================
-       RESULTS TABLE
-       ============================================================ */
-
+    /* TABLE */
     .results {
-        border-radius: 0.75rem;
+        width: 100%;
+        margin: 0 0 1.25rem !important;
         border: 1px solid #e2e8f0;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: #fff;
     }
 
     .results table {
         width: 100%;
-        border-collapse: collapse;
-        background: #ffffff;
+        min-width: 1150px;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+        background: #fff;
     }
 
-    .results th {
+    .results thead th {
+        padding: 1rem 1.125rem !important;
         background: #f8fafc !important;
-        font-weight: 700 !important;
-        font-size: 0.75rem !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
         color: #475569 !important;
-        padding: 0.875rem 1rem !important;
         border-bottom: 1px solid #e2e8f0 !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+        white-space: nowrap;
         text-align: left;
     }
 
-    .results td {
-        padding: 0.875rem 1rem !important;
+    .results tbody td {
+        padding: 1.125rem !important;
+        background: #fff;
+        color: #334155 !important;
         border-bottom: 1px solid #f1f5f9 !important;
         font-size: 0.875rem !important;
-        color: #1e293b !important;
-        vertical-align: middle;
+        line-height: 1.5;
+        vertical-align: middle !important;
     }
 
-    .results tbody tr {
-        transition: background-color 0.15s ease;
-    }
-
-    .results tbody tr:hover {
-        background-color: #f8fafc;
+    .results tbody tr:hover td {
+        background: #f8fafc !important;
     }
 
     .results tbody tr:last-child td {
-        border-bottom: none;
+        border-bottom: 0 !important;
     }
 
-    /* ============================================================
-       ACTION BUTTON FIX
-       ============================================================ */
+    .results td a {
+        font-weight: 600;
+        color: #2563eb;
+        text-decoration: none;
+    }
 
-    .results td.field-verification_action,
-    .results td:last-child {
+    .results td a:hover {
+        text-decoration: underline;
+    }
+
+    .results td input[type="checkbox"],
+    .actions input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: #2563eb;
+        cursor: pointer;
+    }
+
+    .results td.field-verification_action {
+        min-width: 210px;
         white-space: nowrap !important;
     }
 
-    .results td.field-verification_action div,
-    .results td:last-child div {
+    .results td.field-verification_action div {
         display: inline-flex !important;
         align-items: center !important;
         gap: 0.5rem !important;
         flex-wrap: nowrap !important;
     }
 
-    .results td .button,
-    .results td span,
-    .results td a.button {
+    .results td.field-verification_action a,
+    .results td.field-verification_action span {
         white-space: nowrap !important;
+        box-sizing: border-box;
+    }
+
+    .results td.field-verification_action a.button {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        line-height: 1.2 !important;
+        min-height: 34px;
         margin: 0 !important;
-        box-sizing: border-box !important;
+        padding: 0.35rem 0.75rem !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 0.5rem !important;
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        transition: all 0.2s;
     }
 
-    /* ============================================================
-       ADMIN ACTIONS
-       ============================================================ */
+    .results td.field-verification_action a.button:hover {
+        background: #2563eb !important;
+        color: #fff !important;
+        border-color: #2563eb !important;
+    }
 
+    /* BULK ACTIONS */
     .actions {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0 0 1.25rem !important;
+        padding: 0.875rem 1rem !important;
         background: #f8fafc !important;
         border: 1px solid #e2e8f0 !important;
         border-radius: 0.75rem !important;
-        padding: 0.875rem 1rem !important;
-        margin-bottom: 1.5rem !important;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+        color: #475569;
+        font-size: 0.8125rem;
     }
 
     .actions select {
-        padding: 0.375rem 0.75rem !important;
+        min-height: 38px;
+        padding: 0.375rem 2.25rem 0.375rem 0.75rem !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 0.5rem !important;
-        font-size: 0.875rem !important;
-        background-color: #ffffff !important;
-        color: #1e293b !important;
-        outline: none !important;
+        background: #fff !important;
+        color: #0f172a !important;
+        font-size: 0.8125rem !important;
     }
 
     .actions button.button {
-        background: #f1f5f9 !important;
+        min-height: 38px;
+        padding: 0.375rem 1rem !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 0.5rem !important;
+        background: #fff !important;
         color: #334155 !important;
-        font-weight: 600 !important;
         font-size: 0.8125rem !important;
-        padding: 0.375rem 0.875rem !important;
+        font-weight: 700 !important;
         cursor: pointer;
         transition: all 0.2s;
     }
 
     .actions button.button:hover {
-        background: #e2e8f0 !important;
-        color: #0f172a;
+        background: #eff6ff !important;
+        border-color: #93c5fd !important;
+        color: #1d4ed8 !important;
     }
 
-    /* ============================================================
-       PAGINATION
-       ============================================================ */
+    /* PAGINATION */
+    .payments-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding: 1.25rem 0.5rem 0.25rem;
+        border-top: 1px solid #e2e8f0;
+    }
 
-    .paginator {
-        font-size: 0.875rem;
+    .pagination-counter {
         color: #64748b;
-        padding: 0.5rem 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .pagination-counter strong {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .custom-paginator-links {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.375rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
-    .paginator a {
-        background: #f1f5f9;
-        color: #334155;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        text-decoration: none;
-        font-weight: 600;
+    .custom-paginator-links a,
+    .custom-paginator-links span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        min-width: 38px;
+        padding: 0 0.75rem;
         border: 1px solid #cbd5e1;
-        transition: background-color 0.2s;
-    }
-
-    .paginator a:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-    }
-
-    .paginator .this-page {
-        background: #2563eb;
-        color: #ffffff;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #475569;
+        font-size: 0.8125rem;
         font-weight: 600;
-        border: 1px solid #2563eb;
+        text-decoration: none;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+        transition: all 0.15s ease;
     }
 
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
+    .custom-paginator-links a:hover {
+        background: #eff6ff;
+        border-color: #93c5fd;
+        color: #1d4ed8;
+    }
+
+    .custom-paginator-links .active-page {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    /* PROFESSIONAL SHOW ALL BUTTON */
+    .custom-paginator-links .showall-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #f8fafc;
+        color: #2563eb;
+        border-color: #cbd5e1;
+        font-weight: 700;
+        padding: 0 1rem;
+    }
+
+    .custom-paginator-links .showall-btn:hover {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #93c5fd;
+    }
+
+    /* EMPTY RESULTS */
+    #changelist .results .empty {
+        padding: 3rem 1.25rem !important;
+        color: #64748b !important;
+        text-align: center;
+        font-size: 0.875rem;
+    }
 
     @media (max-width: 768px) {
-
         .payments-wrapper {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
-        }
-
-        .payments-header {
-            flex-direction: column;
+            padding-left: 10px;
+            padding-right: 10px;
         }
 
         .payments-title {
             font-size: 1.5rem;
         }
 
+        .payments-count {
+            width: 100%;
+            justify-content: center;
+        }
+
         #changelist-form-container {
-            padding: 1rem;
+            padding: 1rem !important;
         }
 
         .filters-dropdown-bar {
-            flex-direction: column;
-            align-items: stretch;
+            padding: 1rem;
+            gap: 0.75rem;
         }
 
         .filter-group-dropdown {
+            flex: 1 1 100%;
             min-width: 100%;
+        }
+
+        #toolbar {
+            padding: 0.75rem !important;
         }
 
         #changelist-search {
             max-width: 100%;
         }
 
-        .results {
-            overflow-x: auto;
+        #changelist-search input[type="submit"] {
+            padding: 0 0.875rem !important;
         }
 
-        .results table {
-            min-width: 900px;
+        .payments-pagination {
+            flex-direction: column;
+            align-items: flex-start;
         }
     }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="payments-wrapper">
 
-    <!-- ========================================================
-         PAGE HEADER
-         ======================================================== -->
-
+    <!-- PAGE HEADER -->
     <div class="payments-header">
-
-        <div>
-
-            <div class="payments-kicker">
+        <div class="payments-heading">
+            <div class="payments-icon">
                 <i class="fa-solid fa-wallet"></i>
-                Financial Operations
             </div>
-
-            <h1 class="payments-title">
-                Payment Management
-            </h1>
-
-            <p class="payments-subtitle">
-                View, monitor, and verify all customer transaction
-                records and payment statuses.
-            </p>
-
+            <div>
+                <span class="payments-kicker">Financial Operations</span>
+                <h1 class="payments-title">Payment Management</h1>
+                <p class="payments-subtitle">Review transactions, verify submitted payments, and manage financial
+                    records seamlessly.</p>
+            </div>
         </div>
 
+        <div class="payments-count">
+            <i class="fa-solid fa-receipt text-primary"></i>
+            <strong>{{ cl.result_count }}</strong> payment{{ cl.result_count|pluralize }}
+        </div>
     </div>
 
-
-    <!-- ========================================================
-         DJANGO ADMIN CHANGE LIST
-         ======================================================== -->
-
+    <!-- DJANGO ADMIN CHANGE LIST -->
     <div id="changelist" class="module{% if cl.has_filters %} filtered{% endif %}">
 
-        <!-- ====================================================
-             TOP FILTERS
-             ==================================================== -->
-
+        <!-- FILTERS -->
         {% if cl.has_filters %}
-
         <div class="filters-dropdown-bar">
-
             {% for spec in cl.filter_specs %}
-
             <div class="filter-group-dropdown">
-
-                <label>
-                    {{ spec.title }}
-                </label>
-
-                <select onchange="if (this.value) window.location.href = this.value;">
-
-                    <option value="">
-                        All {{ spec.title }}
-                    </option>
-
+                <label>{{ spec.title }}</label>
+                <select aria-label="Filter by {{ spec.title }}"
+                    onchange="if (this.value) window.location.href = this.value;">
                     {% for choice in spec.choices %}
-
-                    <option value="{{ choice.query_string }}" {% if choice.selected %}selected{% endif %}>
-                        {{ choice.display }}
-                    </option>
-
+                    <option value="{{ choice.query_string }}" {% if choice.selected %}selected{% endif %}>{{
+                        choice.display }}</option>
                     {% endfor %}
-
                 </select>
-
             </div>
-
             {% endfor %}
 
-
             {% if cl.has_active_filters %}
-
             <div class="filter-actions-bar">
-
                 <a href="{{ cl.clear_all_filters_qs }}" class="btn-filter-clear">
-                    &#10006;
-                    {% translate "Clear filters" %}
+                    <i class="fa-solid fa-xmark"></i> Clear filters
                 </a>
-
             </div>
-
             {% endif %}
-
         </div>
-
         {% endif %}
 
-
-        <!-- ====================================================
-             MAIN CONTENT
-             ==================================================== -->
-
+        <!-- TABLE AND SEARCH -->
         <div id="changelist-form-container">
-
             {% block search %}
-
             {% search_form cl %}
-
             {% endblock %}
 
-
             <form id="changelist-form" method="post" novalidate>
-
                 {% csrf_token %}
 
-
                 {% if cl.formset %}
-
-                <div>
-                    {{ cl.formset.management_form }}
-                </div>
-
+                {{ cl.formset.management_form }}
                 {% endif %}
 
-
+                <!-- TOP BULK ACTIONS -->
                 {% if action_form and actions_on_top and cl.show_admin_actions %}
-
                 {% admin_actions %}
-
                 {% endif %}
 
-
+                <!-- PAYMENT RESULTS -->
                 {% result_list cl %}
 
-
-                <!-- ====================================================
-                     PAYMENT ACTION URL CORRECTIONS
-                     ==================================================== -->
-
+                <!-- STAFF ACTION URL CORRECTIONS -->
                 <script>
-                    document.addEventListener(
-                        "DOMContentLoaded",
-                        function () {
-
-                            /*
-                             * ------------------------------------------------
-                             * STAFF PAYMENT VERIFY URL
-                             * ------------------------------------------------
-                             */
-
-                            const staffVerifyPattern =
-                                "{% url 'staff:payment_verify' 0 %}";
-
-
-                            /*
-                             * ------------------------------------------------
-                             * STAFF APPOINTMENTS URL
-                             * ------------------------------------------------
-                             */
-
-                            const staffAppointmentsUrl =
-                                "{% url 'staff:appointments' %}";
-
-
-                            /*
-                             * ------------------------------------------------
-                             * STAFF ASSIGNMENT ADD URL
-                             *
-                             * IMPORTANT:
-                             * The URL pattern in staff/urls.py is:
-                             *
-                             * name="assignment_add"
-                             *
-                             * NOT:
-                             *
-                             * name="caregiver_assignment_add"
-                             * ------------------------------------------------
-                             */
-
-                            const staffAssignmentAddPattern =
-                                 "{% url 'staff:caregiver_assignment_add' %}";
-
-
-                            
-                           
-                            const staffAssignmentEditPattern =
-                                "{% url 'staff:caregiver_assignment_edit' 0 %}";
-
-
-                            /*
-                             * ------------------------------------------------
-                             * PROCESS EVERY PAYMENT ROW
-                             * ------------------------------------------------
-                             */
-
-                            document.querySelectorAll(
-                                "#changelist .results tbody tr"
-                            ).forEach(
-                                function (row) {
-
-                                    const actionCell =
-                                        row.querySelector(
-                                            "td.field-verification_action"
-                                        );
-
-
-                                    if (!actionCell) {
-                                        return;
-                                    }
-
-
-                                    /*
-                                     * ------------------------------------------------
-                                     * PAYMENT ID
-                                     * ------------------------------------------------
-                                     */
-
-                                    const selected =
-                                        row.querySelector(
-                                            'input[name="_selected_action"]'
-                                        );
-
-
-                                    const paymentId =
-                                        selected
-                                            ? selected.value
-                                            : "";
-
-
-                                    /*
-                                     * ------------------------------------------------
-                                     * VERIFY PAYMENT
-                                     * ------------------------------------------------
-                                     */
-
-                                    const verifyLink =
-                                        actionCell.querySelector(
-                                            "a.button"
-                                        );
-
-
-                                    if (
-                                        verifyLink &&
-                                        verifyLink.textContent
-                                            .trim()
-                                            .includes("VERIFY") &&
-                                        paymentId
-                                    ) {
-
-                                        verifyLink.href =
-                                            staffVerifyPattern.replace(
-                                                /0(?=\/verify\/?$)/,
-                                                paymentId
-                                            );
-
-
-                                        verifyLink.removeAttribute(
-                                            "target"
-                                        );
-
-
-                                        verifyLink.title =
-                                            "Verify payment";
-
-                                    }
-
-
-                                    /*
-                                     * ------------------------------------------------
-                                     * VIEW APPOINTMENT
-                                     * ------------------------------------------------
-                                     */
-
-                                    const appointmentLink =
-                                        Array.from(
-                                            actionCell.querySelectorAll(
-                                                "a.button"
-                                            )
-                                        ).find(
-                                            function (link) {
-
-                                                return link.textContent
-                                                    .trim()
-                                                    .includes(
-                                                        "VIEW APPOINTMENT"
-                                                    );
-
-                                            }
-                                        );
-
-
-                                    if (appointmentLink) {
-
-                                        /*
-                                         * Existing Django Admin URL:
-                                         *
-                                         * /admin/homecare/consultation/12/change/
-                                         */
-
-                                        const match =
-                                            appointmentLink.href.match(
-                                                /\/consultation\/(\d+)\/change\/?$/
-                                            );
-
-
-                                        if (match) {
-
-                                            appointmentLink.href =
-                                                staffAppointmentsUrl +
-                                                "?appointment=" +
-                                                encodeURIComponent(
-                                                    match[1]
-                                                );
-
-
-                                            appointmentLink.removeAttribute(
-                                                "target"
-                                            );
-
-
-                                            appointmentLink.title =
-                                                "View appointment";
-
-                                        }
-
-                                    }
-
-
-                                    /*
-                                     * ------------------------------------------------
-                                     * ASSIGN CAREGIVER
-                                     * ------------------------------------------------
-                                     */
-
-                                    const assignLink =
-                                        Array.from(
-                                            actionCell.querySelectorAll(
-                                                "a.button"
-                                            )
-                                        ).find(
-                                            function (link) {
-
-                                                return link.textContent
-                                                    .trim()
-                                                    .includes(
-                                                        "ASSIGN CAREGIVER"
-                                                    );
-
-                                            }
-                                        );
-
-
-                                    if (assignLink) {
-
-                                        /*
-                                         * Existing Django Admin URL:
-                                         *
-                                         * /admin/homecare/caregiverassignment/add/
-                                         * ?homecare_request=7
-                                         */
-
-                                        const url =
-                                            new URL(
-                                                assignLink.href,
-                                                window.location.origin
-                                            );
-
-
-                                        const homeCareRequestId =
-                                            url.searchParams.get(
-                                                "homecare_request"
-                                            );
-
-
-                                        if (homeCareRequestId) {
-
-                                            assignLink.href =
-                                                staffAssignmentAddPattern +
-                                                "?homecare_request=" +
-                                                encodeURIComponent(
-                                                    homeCareRequestId
-                                                );
-
-
-                                            assignLink.removeAttribute(
-                                                "target"
-                                            );
-
-
-                                            assignLink.title =
-                                                "Assign caregiver";
-
-                                        }
-
-                                    }
-
-
-                                    /*
-                                     * ------------------------------------------------
-                                     * CAREGIVER ASSIGNED
-                                     * ------------------------------------------------
-                                     */
-
-                                    const assignedLink =
-                                        Array.from(
-                                            actionCell.querySelectorAll(
-                                                "a.button"
-                                            )
-                                        ).find(
-                                            function (link) {
-
-                                                return link.textContent
-                                                    .trim()
-                                                    .includes(
-                                                        "CAREGIVER ASSIGNED"
-                                                    );
-
-                                            }
-                                        );
-
-
-                                    if (assignedLink) {
-
-                                        /*
-                                         * Existing Django Admin URL:
-                                         *
-                                         * /admin/homecare/caregiverassignment/5/change/
-                                         *
-                                         * Open the existing staff assignment edit form.
-                                         */
-
-                                        const match =
-                                            assignedLink.href.match(
-                                                /\/caregiverassignment\/(\d+)\/change\/?$/
-                                            );
-
-
-                                        if (match) {
-
-                                            assignedLink.href =
-                                                staffAssignmentEditPattern.replace(
-                                                    /0(?=\/edit\/?$)/,
-                                                    match[1]
-                                                );
-
-
-                                            assignedLink.removeAttribute(
-                                                "target"
-                                            );
-
-
-                                            assignedLink.title =
-                                                "View caregiver assignment";
-
-                                        }
-
-                                    }
-
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const staffVerifyPattern = "{% url 'staff:payment_verify' 0 %}";
+                        const staffAppointmentsUrl = "{% url 'staff:appointments' %}";
+                        const staffAssignmentAddPattern = "{% url 'staff:assignment_add' %}";
+                        const staffAssignmentEditPattern = "{% url 'staff:caregiver_assignment_edit' 0 %}";
+
+                        document.querySelectorAll("#changelist .results tbody tr").forEach(function (row) {
+                            const actionCell = row.querySelector("td.field-verification_action");
+                            if (!actionCell) return;
+
+                            const selected = row.querySelector('input[name="_selected_action"]');
+                            const paymentId = selected ? selected.value : "";
+
+                            /* VERIFY PAYMENT */
+                            const verifyLink = Array.from(actionCell.querySelectorAll("a.button")).find(function (link) {
+                                return link.textContent.trim().includes("VERIFY");
+                            });
+
+                            if (verifyLink && paymentId) {
+                                verifyLink.href = staffVerifyPattern.replace(/0(?=\/verify\/?$)/, paymentId);
+                                verifyLink.removeAttribute("target");
+                                verifyLink.title = "Verify payment";
+                            }
+
+                            /* VIEW APPOINTMENT */
+                            const appointmentLink = Array.from(actionCell.querySelectorAll("a.button")).find(function (link) {
+                                return link.textContent.trim().includes("VIEW APPOINTMENT");
+                            });
+
+                            if (appointmentLink) {
+                                const match = appointmentLink.href.match(/\/consultation\/(\d+)\/change\/?$/);
+                                if (match) {
+                                    appointmentLink.href = staffAppointmentsUrl + "?appointment=" + encodeURIComponent(match[1]);
+                                    appointmentLink.removeAttribute("target");
+                                    appointmentLink.title = "View appointment";
                                 }
-                            );
+                            }
 
-                        }
-                    );
+                            /* ASSIGN CAREGIVER */
+                            const assignLink = Array.from(actionCell.querySelectorAll("a.button")).find(function (link) {
+                                return link.textContent.trim().includes("ASSIGN CAREGIVER");
+                            });
+
+                            if (assignLink) {
+                                const url = new URL(assignLink.href, window.location.origin);
+                                const requestId = url.searchParams.get("homecare_request");
+                                if (requestId) {
+                                    assignLink.href = staffAssignmentAddPattern + "?homecare_request=" + encodeURIComponent(requestId);
+                                    assignLink.removeAttribute("target");
+                                    assignLink.title = "Assign caregiver";
+                                }
+                            }
+
+                            /* VIEW EXISTING ASSIGNMENT */
+                            const assignedLink = Array.from(actionCell.querySelectorAll("a.button")).find(function (link) {
+                                return link.textContent.trim().includes("CAREGIVER ASSIGNED");
+                            });
+
+                            if (assignedLink) {
+                                const match = assignedLink.href.match(/\/caregiverassignment\/(\d+)\/change\/?$/);
+                                if (match) {
+                                    assignedLink.href = staffAssignmentEditPattern.replace(/0(?=\/edit\/?$)/, match[1]);
+                                    assignedLink.removeAttribute("target");
+                                    assignedLink.title = "View caregiver assignment";
+                                }
+                            }
+                        });
+                    });
                 </script>
 
-
-                <!-- ====================================================
-                     BOTTOM ADMIN ACTIONS
-                     ==================================================== -->
-
+                <!-- BOTTOM BULK ACTIONS -->
                 {% if action_form and actions_on_bottom and cl.show_admin_actions %}
-
                 {% admin_actions %}
-
                 {% endif %}
 
+                <!-- CLEAN CUSTOM PAGINATION -->
+                {% if cl.result_count and cl.paginator.num_pages > 1 %}
+                <div class="payments-pagination">
+                    <div class="pagination-counter">
+                        Total records: <strong>{{ cl.result_count }}</strong> payments
+                    </div>
 
-                <!-- ====================================================
-                     PAGINATION
-                     ==================================================== -->
+                    <div class="custom-paginator-links">
+                        {% if cl.paginator.num_pages %}
+                        {% for i in cl.paginator.page_range %}
+                        {% if cl.page_num == i %}
+                        <span class="active-page">{{ i }}</span>
+                        {% else %}
+                        <a href="?{{ cl.params.urlencode }}&p={{ i }}">{{ i }}</a>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
 
-                {% pagination cl %}
+                        {% if show_all_url %}
+                        <a href="{{ show_all_url }}" class="showall-btn">
+                            <i class="fa-solid fa-list-ul me-1"></i> Show all
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% elif cl.result_count %}
+                <div class="payments-pagination">
+                    <div class="pagination-counter">
+                        Showing all <strong>{{ cl.result_count }}</strong> payment records
+                    </div>
+                </div>
+                {% else %}
+                <div class="payments-pagination">
+                    <div class="pagination-counter">
+                        No payment records found.
+                    </div>
+                </div>
+                {% endif %}
 
             </form>
-
         </div>
 
     </div>
 
 </div>
-
 {% endblock %}

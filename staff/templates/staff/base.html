@@ -1,7 +1,6 @@
 {% load static %}
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -9,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#102A43">
 
-    ```
     <title>{% block title %}Hands-On Health{% endblock %}</title>
 
     <!-- Font Awesome -->
@@ -19,15 +17,570 @@
     <link rel="stylesheet" href="{% static 'staff/css/dashboard.css' %}">
 
     {% block extra_css %}{% endblock %}
-    ```
 
+    <!-- Notification Badge Styling -->
+    <style>
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 21px;
+            height: 21px;
+            padding: 0 6px;
+            margin-left: auto;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .nav-badge.badge-warning {
+            background: #d97706;
+        }
+
+        .nav-badge.badge-success {
+            background: #15803d;
+        }
+
+        .nav-badge:empty {
+            display: none;
+        }
+
+        .nav-item>span:not(.nav-icon) {
+            min-width: 0;
+        }
+
+        .nav-item .nav-icon {
+            flex-shrink: 0;
+        }
+        <style>
+    /* =========================================
+       PREMIUM STAFF TOPBAR
+    ========================================= */
+
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 82px;
+        padding: 14px 28px;
+        background: #ffffff;
+        border-bottom: 1px solid #e8eef4;
+        box-shadow: 0 3px 12px rgba(16, 42, 67, 0.035);
+        position: relative;
+        z-index: 50;
+    }
+
+    .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    .topbar-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .topbar-kicker {
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
+
+    .topbar-title {
+        color: #102a43;
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+    }
+
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    /* =========================================
+       NAMIBIA CLOCK
+    ========================================= */
+
+    .namibia-clock {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 15px;
+        background: #f5f8fc;
+        border: 1px solid #e6edf5;
+        border-radius: 13px;
+    }
+
+    .clock-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: #e4eefb;
+        color: #174a7c;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .clock-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .clock-date {
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .clock-time-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    .clock-time {
+        color: #102a43;
+        font-size: 15px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.5px;
+    }
+
+    .clock-timezone {
+        padding: 3px 5px;
+        border-radius: 4px;
+        background: #dbeafe;
+        color: #174a7c;
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+    }
+
+    .topbar-divider {
+        width: 1px;
+        height: 42px;
+        background: #e2e8f0;
+    }
+
+    /* =========================================
+       PROFILE DROPDOWN
+    ========================================= */
+
+    .profile-dropdown {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .profile-trigger {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 7px 10px;
+        border: 1px solid transparent;
+        border-radius: 13px;
+        background: transparent;
+        cursor: pointer;
+        color: #102a43;
+        text-align: left;
+        transition: background 0.2s ease, border-color 0.2s ease;
+        font: inherit;
+    }
+
+    .profile-trigger:hover,
+    .profile-trigger[aria-expanded="true"] {
+        background: #f5f8fc;
+        border-color: #e6edf5;
+    }
+
+    .profile-avatar,
+    .profile-menu-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: linear-gradient(135deg, #102a43, #2563a6);
+        color: #ffffff;
+        font-size: 17px;
+        font-weight: 800;
+        box-shadow: 0 4px 10px rgba(16, 42, 67, 0.15);
+    }
+
+    .profile-text {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-width: 180px;
+    }
+
+    .profile-text strong {
+        color: #102a43;
+        font-size: 12px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .profile-text small {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #64748b;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .online-indicator {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #16a34a;
+        box-shadow: 0 0 0 3px #dcfce7;
+    }
+
+    .profile-chevron {
+        margin-left: 4px;
+        color: #64748b;
+        font-size: 11px;
+        transition: transform 0.2s ease;
+    }
+
+    .profile-trigger[aria-expanded="true"] .profile-chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown panel */
+
+    .profile-menu {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: 300px;
+        padding: 10px;
+        background: #ffffff;
+        border: 1px solid #e5edf5;
+        border-radius: 16px;
+        box-shadow: 0 18px 50px rgba(15, 42, 67, 0.16);
+        z-index: 1000;
+        animation: profileMenuIn 0.18s ease-out;
+    }
+
+    .profile-menu[hidden] {
+        display: none !important;
+    }
+
+    @keyframes profileMenuIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-menu-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 10px;
+        min-width: 0;
+    }
+
+    .profile-menu-avatar {
+        width: 46px;
+        height: 46px;
+    }
+
+    .profile-menu-header > div {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .profile-menu-header strong {
+        color: #102a43;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-menu-header small {
+        color: #64748b;
+        font-size: 11px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-menu-divider {
+        height: 1px;
+        margin: 7px 3px;
+        background: #edf2f7;
+    }
+
+    .profile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 10px;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: background 0.18s ease;
+    }
+
+    .profile-menu-item:hover {
+        background: #f4f7fb;
+    }
+
+    .menu-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    .password-icon {
+        background: #e8f1ff;
+        color: #245b96;
+    }
+
+    .logout-icon {
+        background: #fff0f0;
+        color: #dc2626;
+    }
+
+    .menu-item-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .menu-item-text strong {
+        color: #102a43;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .menu-item-text small {
+        color: #64748b;
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .menu-item-arrow {
+        color: #94a3b8;
+        font-size: 10px;
+    }
+
+    .logout-menu-item:hover {
+        background: #fff5f5;
+    }
+
+    .logout-menu-item:hover .menu-item-text strong,
+    .logout-menu-item:hover .menu-item-arrow {
+        color: #dc2626;
+    }
+
+    /* =========================================
+       RESPONSIVE TOPBAR
+    ========================================= */
+
+    @media (max-width: 1050px) {
+        .topbar {
+            padding: 13px 18px;
+            gap: 12px;
+        }
+
+        .topbar-actions {
+            gap: 12px;
+        }
+
+        .profile-text {
+            max-width: 130px;
+        }
+
+        .namibia-clock {
+            padding: 8px 10px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .topbar {
+            min-height: 70px;
+            padding: 10px 12px;
+            gap: 8px;
+        }
+
+        .topbar-left {
+            gap: 9px;
+        }
+
+        .topbar-kicker {
+            font-size: 8px;
+            letter-spacing: 1.2px;
+        }
+
+        .topbar-title {
+            font-size: 14px;
+        }
+
+        .topbar-actions {
+            gap: 8px;
+        }
+
+        .namibia-clock {
+            gap: 7px;
+            padding: 7px;
+            border-radius: 10px;
+        }
+
+        .clock-icon {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+        }
+
+        .clock-date {
+            font-size: 10px;
+        }
+
+        .clock-time {
+            font-size: 12px;
+        }
+
+        .clock-time-row {
+            gap: 4px;
+        }
+
+        .clock-timezone {
+            display: none;
+        }
+
+        .topbar-divider {
+            height: 30px;
+        }
+
+        .profile-trigger {
+            gap: 5px;
+            padding: 4px;
+        }
+
+        .profile-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .profile-text {
+            display: none;
+        }
+
+        .profile-chevron {
+            margin-left: 2px;
+            font-size: 9px;
+        }
+
+        .profile-menu {
+            width: min(300px, calc(100vw - 24px));
+            right: 0;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .topbar {
+            padding: 9px 8px;
+        }
+
+        .topbar-left {
+            gap: 6px;
+        }
+
+        .topbar-title {
+            font-size: 12px;
+        }
+
+        .topbar-kicker {
+            font-size: 7px;
+        }
+
+        .topbar-actions {
+            gap: 5px;
+        }
+
+        .namibia-clock {
+            padding: 6px;
+        }
+
+        .clock-icon {
+            display: none;
+        }
+
+        .clock-date {
+            font-size: 9px;
+        }
+
+        .clock-time {
+            font-size: 11px;
+        }
+
+        .topbar-divider {
+            display: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .profile-menu,
+        .profile-chevron,
+        .profile-trigger,
+        .profile-menu-item {
+            animation: none;
+            transition: none;
+        }
+    }
+</style>
+    </style>
 </head>
 
 <body>
 
     <div class="app-shell">
 
-        ```
         <!-- Mobile Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -45,7 +598,7 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="Staff navigation">
 
                 <div class="nav-label">OVERVIEW</div>
 
@@ -54,9 +607,16 @@
                     class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
                     title="Dashboard">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-gauge-high"></i>
+                        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
                     </span>
                     <span>Dashboard</span>
+
+                    {% if notify_total %}
+                    <span class="nav-badge" title="{{ notify_total }} outstanding notifications"
+                        aria-label="{{ notify_total }} outstanding notifications">
+                        {{ notify_total }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <div class="nav-label">OPERATIONS</div>
@@ -66,13 +626,15 @@
                     class="nav-item {% if request.resolver_match.url_name == 'caregivers' or request.resolver_match.url_name == 'caregiver_add' or request.resolver_match.url_name == 'caregiver_verify' or request.resolver_match.url_name == 'caregiver_send_invitation' %}active{% endif %}"
                     title="Caregiver Management">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-user-nurse"></i>
+                        <i class="fa-solid fa-user-nurse" aria-hidden="true"></i>
                     </span>
-
                     <span>Caregivers</span>
 
-                    {% if pending_caregivers %}
-                    <span class="nav-badge">{{ pending_caregivers }}</span>
+                    {% if notify_caregivers %}
+                    <span class="nav-badge" title="{{ notify_caregivers }} caregivers awaiting verification"
+                        aria-label="{{ notify_caregivers }} caregivers awaiting verification">
+                        {{ notify_caregivers }}
+                    </span>
                     {% endif %}
                 </a>
 
@@ -81,9 +643,16 @@
                     class="nav-item {% if 'homecare' in request.resolver_match.url_name %}active{% endif %}"
                     title="Home Care Requests">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-house-medical"></i>
+                        <i class="fa-solid fa-house-medical" aria-hidden="true"></i>
                     </span>
                     <span>Home Care</span>
+
+                    {% if notify_homecare %}
+                    <span class="nav-badge" title="{{ notify_homecare }} new home care requests"
+                        aria-label="{{ notify_homecare }} new home care requests">
+                        {{ notify_homecare }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <!-- Appointments -->
@@ -91,9 +660,16 @@
                     class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}"
                     title="Appointments">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-calendar-check"></i>
+                        <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
                     </span>
                     <span>Appointments</span>
+
+                    {% if notify_appointments %}
+                    <span class="nav-badge" title="{{ notify_appointments }} pending appointments"
+                        aria-label="{{ notify_appointments }} pending appointments">
+                        {{ notify_appointments }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <!-- Referrals -->
@@ -101,9 +677,16 @@
                     class="nav-item {% if request.resolver_match.url_name == 'referrals' %}active{% endif %}"
                     title="Referral Management">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-user-plus"></i>
+                        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
                     </span>
                     <span>Referrals</span>
+
+                    {% if notify_referrals %}
+                    <span class="nav-badge" title="{{ notify_referrals }} pending referrals"
+                        aria-label="{{ notify_referrals }} pending referrals">
+                        {{ notify_referrals }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <!-- Quotations -->
@@ -111,9 +694,16 @@
                     class="nav-item {% if request.resolver_match.url_name == 'quotations' %}active{% endif %}"
                     title="Quotations">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
                     </span>
                     <span>Quotations</span>
+
+                    {% if notify_quotations %}
+                    <span class="nav-badge" title="{{ notify_quotations }} quotations awaiting payment"
+                        aria-label="{{ notify_quotations }} quotations awaiting payment">
+                        {{ notify_quotations }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <!-- Payments -->
@@ -121,9 +711,16 @@
                     class="nav-item {% if request.resolver_match.url_name == 'payments' or request.resolver_match.url_name == 'payment_verify' %}active{% endif %}"
                     title="Payments">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-credit-card"></i>
+                        <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
                     </span>
                     <span>Payments</span>
+
+                    {% if notify_payments %}
+                    <span class="nav-badge" title="{{ notify_payments }} payments awaiting verification"
+                        aria-label="{{ notify_payments }} payments awaiting verification">
+                        {{ notify_payments }}
+                    </span>
+                    {% endif %}
                 </a>
 
                 <!-- Assignments -->
@@ -131,91 +728,153 @@
                     class="nav-item {% if request.resolver_match.url_name == 'assignments' or request.resolver_match.url_name == 'caregiver_assignments' or request.resolver_match.url_name == 'caregiver_assignment_add' or request.resolver_match.url_name == 'assignment_add' or request.resolver_match.url_name == 'caregiver_assignment_edit' or request.resolver_match.url_name == 'assignment_edit' or request.resolver_match.url_name == 'caregiver_assignment_delete' or request.resolver_match.url_name == 'assignment_delete' %}active{% endif %}"
                     title="Caregiver Assignments">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-people-arrows"></i>
+                        <i class="fa-solid fa-people-arrows" aria-hidden="true"></i>
                     </span>
                     <span>Assignments</span>
-                </a>
 
-                <div class="nav-label">MANAGEMENT</div>
+                    {% if notify_assignments %}
+                    <span class="nav-badge" title="{{ notify_assignments }} assignments awaiting attention"
+                        aria-label="{{ notify_assignments }} assignments awaiting attention">
+                        {{ notify_assignments }}
+                    </span>
+                    {% endif %}
+                </a>
 
                 <!-- Caregiver Reports -->
                 <a href="{% url 'staff:reports' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'reports' or request.resolver_match.url_name == 'report_add' or request.resolver_match.url_name == 'report_edit' or request.resolver_match.url_name == 'report_delete' %}active{% endif %}"
-                    title="Caregiver Daily Reports">
+                    title="Caregiver Daily and Weekly Reports">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-file-medical"></i>
+                        <i class="fa-solid fa-file-medical" aria-hidden="true"></i>
                     </span>
                     <span>Caregiver Reports</span>
-                </a>
 
-                <!-- Services -->
-                <a href="{% url 'staff:services' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'services' or request.resolver_match.url_name == 'service_add' or request.resolver_match.url_name == 'service_edit' or request.resolver_match.url_name == 'service_delete' %}active{% endif %}"
-                    title="Healthcare Services">
-                    <span class="nav-icon">
-                        <i class="fa-solid fa-hand-holding-medical"></i>
+                    {% if notify_reports %}
+                    <span class="nav-badge" title="{{ notify_reports }} caregiver reports awaiting review"
+                        aria-label="{{ notify_reports }} caregiver reports awaiting review">
+                        {{ notify_reports }}
                     </span>
-                    <span>Services</span>
+                    {% endif %}
                 </a>
-                <a href="{% url 'staff:questions_dashboard' %}"
-                    class="nav-item {% if 'question' in request.resolver_match.url_name or 'faq' in request.resolver_match.url_name %}active{% endif %}"
-                    title="Customer Questions">
-                    <span class="nav-icon">
-                        <i class="fa-solid fa-comments"></i>
-                    </span>
-                    <span>Frequently Asked Questions</span>
-                </a>
-                <a href="{% url 'staff:contact_enquiries' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'contact_enquiries' %}active{% endif %}"
-                    title="Contact Enquiries">
-                    <span class="nav-icon">
-                        <i class="fa-solid fa-envelope"></i>
-                    </span>
-                    <span>Contact Enquiries</span>
-                </a>
-                <a href="{% url 'staff:chatbot_knowledge_list' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'chatbot_knowledge_list' %}active{% endif %}"
-                    title="Chatbot Knowledge">
-                    <span class="nav-icon">
-                        <i class="bi bi-robot me-2"></i>
-                    </span>
-                    <span>Chatbot Knowledge</span>
-                </a>
-                <a href="{% url 'staff:testimonials' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}"
-                    title="Testimonials">
-                    <span class="nav-icon">
-                        <i class="fa-solid fa-comments"></i>
-                    </span>
-                    <span>Testimonials</span>
-                </a>
-                <a href="{% url 'staff:about_us_edit' %}"
-                    class="nav-item {% if request.resolver_match.url_name == 'about_us_edit' %}active{% endif %}" title="About Us">
-                    <span class="nav-icon">
-                        <i class="fa-solid fa-info-circle"></i>
-                    </span>
-                    <span>About Us</span>
-                </a>
-            <!-- Hero Section Management -->
-            <a href="{% url 'staff:hero_slides' %}"
-                class="nav-item {% if 'hero_slide' in request.resolver_match.url_name or request.resolver_match.url_name == 'hero_slides' %}active{% endif %}"
-                title="Manage Home Page Hero Slides">
-            
-                <span class="nav-icon">
-                    <i class="fa-solid fa-images"></i>
-                </span>
-            
-                <span>Hero Section</span>
-            </a>
 
                 <!-- Caregiver Payments -->
                 <a href="{% url 'staff:caregiver_payments' %}"
                     class="nav-item {% if request.resolver_match.url_name == 'caregiver_payments' or request.resolver_match.url_name == 'caregiver_payment_add' or request.resolver_match.url_name == 'caregiver_payment_edit' or request.resolver_match.url_name == 'caregiver_payment_delete' %}active{% endif %}"
                     title="Caregiver Payments">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
                     </span>
                     <span>Caregiver Payments</span>
+
+                    {% if notify_caregiver_payments %}
+                    <span class="nav-badge"
+                        title="{{ notify_caregiver_payments }} caregiver payments awaiting processing"
+                        aria-label="{{ notify_caregiver_payments }} caregiver payments awaiting processing">
+                        {{ notify_caregiver_payments }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <div class="nav-label">MANAGEMENT</div>
+
+                <!-- Customer Questions and FAQs -->
+                <a href="{% url 'staff:questions_dashboard' %}"
+                    class="nav-item {% if 'question' in request.resolver_match.url_name or 'faq' in request.resolver_match.url_name %}active{% endif %}"
+                    title="Customer Questions and FAQs">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-comments" aria-hidden="true"></i>
+                    </span>
+                    <span>Frequently Asked Questions</span>
+
+                    {% if notify_questions %}
+                    <span class="nav-badge" title="{{ notify_questions }} customer questions awaiting a reply"
+                        aria-label="{{ notify_questions }} customer questions awaiting a reply">
+                        {{ notify_questions }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <!-- Contact Enquiries -->
+                <a href="{% url 'staff:contact_enquiries' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'contact_enquiries' %}active{% endif %}"
+                    title="Contact Enquiries">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                    </span>
+                    <span>Contact Enquiries</span>
+
+                    {% if notify_contacts %}
+                    <span class="nav-badge" title="{{ notify_contacts }} contact enquiries awaiting resolution"
+                        aria-label="{{ notify_contacts }} contact enquiries awaiting resolution">
+                        {{ notify_contacts }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <!-- Chatbot Knowledge -->
+                <a href="{% url 'staff:chatbot_knowledge_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'chatbot_knowledge_list' %}active{% endif %}"
+                    title="Chatbot Knowledge">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-robot" aria-hidden="true"></i>
+                    </span>
+                    <span>Chatbot Knowledge</span>
+
+                    {% if notify_chatbot %}
+                    <span class="nav-badge" title="{{ notify_chatbot }} unanswered chatbot questions"
+                        aria-label="{{ notify_chatbot }} unanswered chatbot questions">
+                        {{ notify_chatbot }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <!-- Testimonials -->
+                <a href="{% url 'staff:testimonials' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}"
+                    title="Testimonials">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    </span>
+                    <span>Testimonials</span>
+
+                    {% if notify_testimonials %}
+                    <span class="nav-badge" title="{{ notify_testimonials }} testimonials awaiting moderation"
+                        aria-label="{{ notify_testimonials }} testimonials awaiting moderation">
+                        {{ notify_testimonials }}
+                    </span>
+                    {% endif %}
+                </a>
+
+                <div class="nav-label">WEBSITE UPDATES</div>
+
+                <!-- Services -->
+                <a href="{% url 'staff:services' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'services' or request.resolver_match.url_name == 'service_add' or request.resolver_match.url_name == 'service_edit' or request.resolver_match.url_name == 'service_delete' %}active{% endif %}"
+                    title="Healthcare Services">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-hand-holding-medical" aria-hidden="true"></i>
+                    </span>
+                    <span>Services</span>
+                </a>
+
+                <!-- About Us -->
+                <a href="{% url 'staff:about_us_edit' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'about_us_edit' %}active{% endif %}"
+                    title="About Us">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    </span>
+                    <span>About Us</span>
+                </a>
+
+                <!-- Hero Section Management -->
+                <a href="{% url 'staff:hero_slides' %}"
+                    class="nav-item {% if 'hero_slide' in request.resolver_match.url_name or request.resolver_match.url_name == 'hero_slides' %}active{% endif %}"
+                    title="Manage Home Page Hero Slides">
+                    <span class="nav-icon">
+                        <i class="fa-solid fa-images" aria-hidden="true"></i>
+                    </span>
+                    <span>Hero Section</span>
                 </a>
 
                 <div class="nav-label">SYSTEM</div>
@@ -225,7 +884,7 @@
                     class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
                     title="System Settings">
                     <span class="nav-icon">
-                        <i class="fa-solid fa-sliders"></i>
+                        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
                     </span>
                     <span>Settings</span>
                 </a>
@@ -245,14 +904,13 @@
                         <strong>
                             {{ request.user.get_full_name|default:request.user.username }}
                         </strong>
-
                         <span>Health Admin</span>
                     </div>
 
                 </div>
 
                 <a href="{% url 'staff:logout' %}" class="logout-link" title="Sign out">
-                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
                     <span>Sign out</span>
                 </a>
 
@@ -265,57 +923,142 @@
 
             <!-- Top Bar -->
             <header class="topbar">
-
-                <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation"
-                    aria-controls="sidebar" aria-expanded="false" title="Open navigation">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-
-                <div class="topbar-heading">
-                    <span class="topbar-kicker">ADMINISTRATION</span>
-                    <span class="topbar-title">Hands-On Health</span>
+            
+                <!-- Left: Mobile Menu and Branding -->
+                <div class="topbar-left">
+                    <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation" aria-controls="sidebar"
+                        aria-expanded="false" title="Open navigation">
+                        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                    </button>
+            
+                    <div class="topbar-heading">
+                        <span class="topbar-kicker">ADMINISTRATION</span>
+                        <span class="topbar-title">Hands-On Health</span>
+                    </div>
                 </div>
-
+            
+                <!-- Right: Namibia Date, Time and Profile -->
                 <div class="topbar-actions">
-
-                    <div class="status-indicator">
-                        <span></span>
-                        <span>System operational</span>
+            
+                    <!-- Namibia Local Date and Time -->
+                    <div class="namibia-clock" aria-label="Namibia local date and time">
+                        <div class="clock-icon">
+                            <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+                        </div>
+            
+                        <div class="clock-details">
+                            <span id="namibiaDate" class="clock-date">
+                                Loading date...
+                            </span>
+            
+                            <span class="clock-time-row">
+                                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                <time id="namibiaTime" class="clock-time">
+                                    --:--:--
+                                </time>
+                                <span class="clock-timezone">NAMIBIA</span>
+                            </span>
+                        </div>
                     </div>
-
-                    <div class="topbar-user">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span>
-                            {{ request.user.get_full_name|default:request.user.username }}
-                        </span>
+            
+                    <!-- Divider -->
+                    <span class="topbar-divider" aria-hidden="true"></span>
+            
+                    <!-- Administrator Profile Dropdown -->
+                    <div class="profile-dropdown" id="profileDropdown">
+            
+                        <button type="button" class="profile-trigger" id="profileTrigger" aria-expanded="false"
+                            aria-controls="profileMenu" aria-haspopup="true">
+            
+                            <span class="profile-avatar">
+                                {{ request.user.get_full_name|default:request.user.username|first|upper }}
+                            </span>
+            
+                            <span class="profile-text">
+                                <strong>
+                                    {{ request.user.get_full_name|default:request.user.username }}
+                                </strong>
+                                <small>
+                                    <span class="online-indicator"></span>
+                                    Health Administrator
+                                </small>
+                            </span>
+            
+                            <i class="fa-solid fa-chevron-down profile-chevron" aria-hidden="true"></i>
+                        </button>
+            
+                        <!-- Dropdown Menu -->
+                        <div class="profile-menu" id="profileMenu" hidden>
+            
+                            <div class="profile-menu-header">
+                                <span class="profile-menu-avatar">
+                                    {{ request.user.get_full_name|default:request.user.username|first|upper }}
+                                </span>
+            
+                                <div>
+                                    <strong>
+                                        {{ request.user.get_full_name|default:request.user.username }}
+                                    </strong>
+                                    <small>{{ request.user.email|default:request.user.username }}</small>
+                                </div>
+                            </div>
+            
+                            <div class="profile-menu-divider"></div>
+            
+                            <a href="{% url 'staff:change_password' %}" class="profile-menu-item">
+                                <span class="menu-item-icon password-icon">
+                                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                                </span>
+            
+                                <span class="menu-item-text">
+                                    <strong>Change Password</strong>
+                                    <small>Update your account security</small>
+                                </span>
+            
+                                <i class="fa-solid fa-chevron-right menu-item-arrow" aria-hidden="true"></i>
+                            </a>
+            
+                            <div class="profile-menu-divider"></div>
+            
+                            <a href="{% url 'staff:logout' %}" class="profile-menu-item logout-menu-item">
+                                <span class="menu-item-icon logout-icon">
+                                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                                </span>
+            
+                                <span class="menu-item-text">
+                                    <strong>Sign Out</strong>
+                                    <small>End your administrator session</small>
+                                </span>
+            
+                                <i class="fa-solid fa-chevron-right menu-item-arrow" aria-hidden="true"></i>
+                            </a>
+            
+                        </div>
                     </div>
-
+            
                 </div>
-
+            
             </header>
-
             <!-- Django Messages -->
             {% if messages %}
             <div class="messages-container" role="status" aria-live="polite">
-
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
 
                     {% if 'success' in message.tags %}
-                    <i class="fa-solid fa-circle-check"></i>
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                     {% elif 'error' in message.tags %}
-                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                     {% elif 'warning' in message.tags %}
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                     {% else %}
-                    <i class="fa-solid fa-circle-info"></i>
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     {% endif %}
 
                     <span>{{ message }}</span>
 
                 </div>
                 {% endfor %}
-
             </div>
             {% endif %}
 
@@ -325,12 +1068,10 @@
             </section>
 
         </main>
-       
 
     </div>
 
     <!-- Mobile Sidebar JavaScript -->
-
     <script>
         (function () {
             "use strict";
@@ -347,6 +1088,8 @@
                 sidebar.classList.add("open");
                 overlay.classList.add("active");
                 mobileMenu.setAttribute("aria-expanded", "true");
+                mobileMenu.setAttribute("aria-label", "Close navigation");
+                mobileMenu.setAttribute("title", "Close navigation");
                 document.body.classList.add("sidebar-open");
             }
 
@@ -354,6 +1097,8 @@
                 sidebar.classList.remove("open");
                 overlay.classList.remove("active");
                 mobileMenu.setAttribute("aria-expanded", "false");
+                mobileMenu.setAttribute("aria-label", "Open navigation");
+                mobileMenu.setAttribute("title", "Open navigation");
                 document.body.classList.remove("sidebar-open");
             }
 
@@ -368,7 +1113,7 @@
             mobileMenu.addEventListener("click", toggleSidebar);
             overlay.addEventListener("click", closeSidebar);
 
-            document.querySelectorAll(".sidebar .nav-item, .sidebar .logout-link")
+            sidebar.querySelectorAll(".nav-item, .logout-link")
                 .forEach(function (link) {
                     link.addEventListener("click", function () {
                         if (window.innerWidth <= 768) {
@@ -389,10 +1134,115 @@
                 }
             });
         })();
+
+    (function () {
+        "use strict";
+
+        /* =========================================
+           NAMIBIA LIVE CLOCK
+           Uses Africa/Windhoek regardless of
+           the visitor's computer time zone.
+        ========================================= */
+
+        const dateElement = document.getElementById("namibiaDate");
+        const timeElement = document.getElementById("namibiaTime");
+
+        function updateNamibiaClock() {
+            if (!dateElement || !timeElement) {
+                return;
+            }
+
+            try {
+                const now = new Date();
+
+                dateElement.textContent = new Intl.DateTimeFormat("en-NA", {
+                    timeZone: "Africa/Windhoek",
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }).format(now);
+
+                timeElement.textContent = new Intl.DateTimeFormat("en-NA", {
+                    timeZone: "Africa/Windhoek",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false
+                }).format(now);
+
+                timeElement.dateTime = now.toISOString();
+
+            } catch (error) {
+                dateElement.textContent = "Namibia local date";
+                timeElement.textContent = "--:--:--";
+                console.error("Unable to display the Namibia clock:", error);
+            }
+        }
+
+        updateNamibiaClock();
+        window.setInterval(updateNamibiaClock, 1000);
+
+
+        /* =========================================
+           PROFILE DROPDOWN
+        ========================================= */
+
+        const dropdown = document.getElementById("profileDropdown");
+        const trigger = document.getElementById("profileTrigger");
+        const menu = document.getElementById("profileMenu");
+
+        if (!dropdown || !trigger || !menu) {
+            return;
+        }
+
+        function openProfileMenu() {
+            menu.hidden = false;
+            trigger.setAttribute("aria-expanded", "true");
+        }
+
+        function closeProfileMenu(returnFocus) {
+            menu.hidden = true;
+            trigger.setAttribute("aria-expanded", "false");
+
+            if (returnFocus) {
+                trigger.focus();
+            }
+        }
+
+        function toggleProfileMenu() {
+            if (menu.hidden) {
+                openProfileMenu();
+            } else {
+                closeProfileMenu(false);
+            }
+        }
+
+        trigger.addEventListener("click", toggleProfileMenu);
+
+        document.addEventListener("click", function (event) {
+            if (!dropdown.contains(event.target)) {
+                closeProfileMenu(false);
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !menu.hidden) {
+                closeProfileMenu(true);
+            }
+        });
+
+        menu.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                closeProfileMenu(false);
+            });
+        });
+
+    })();
+
     </script>
 
     <!-- Page-Specific JavaScript -->
-
     {% block extra_js %}{% endblock %}
 
 </body>

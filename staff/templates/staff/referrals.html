@@ -1,3 +1,4 @@
+
 {% extends "staff/base.html" %}
 
 {% block title %}
@@ -63,7 +64,8 @@ Referral Management | Hands-On Health
         display: flex;
         align-items: center;
         gap: 1.25rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02),
+            0 2px 4px -1px rgba(0, 0, 0, 0.01);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -113,7 +115,8 @@ Referral Management | Hands-On Health
         border-radius: 1rem;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02),
+            0 2px 4px -1px rgba(0, 0, 0, 0.01);
     }
 
     .referral-filter-form {
@@ -208,6 +211,7 @@ Referral Management | Hands-On Health
         text-decoration: none;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         font-size: 0.875rem;
         font-weight: 600;
         transition: all 0.2s;
@@ -223,7 +227,8 @@ Referral Management | Hands-On Health
         border: 1px solid #e2e8f0;
         border-radius: 1rem;
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02),
+            0 2px 4px -1px rgba(0, 0, 0, 0.01);
     }
 
     .referrals-card-header {
@@ -394,6 +399,7 @@ Referral Management | Hands-On Health
         border-radius: 0.375rem;
         font-size: 0.8125rem;
         border: 1px solid #ede9fe;
+        white-space: nowrap;
     }
 
     .referral-date {
@@ -442,6 +448,78 @@ Referral Management | Hands-On Health
         font-size: 13px;
     }
 
+    /* PAGINATION */
+    .referral-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 18px 24px;
+        border-top: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .referral-pagination-info {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .referral-pagination-info strong {
+        color: #0f172a;
+    }
+
+    .referral-pagination-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .referral-page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 36px;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .referral-page-link:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .referral-page-link.active {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .referral-page-link.disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .referral-page-current {
+        padding: 8px 10px;
+        color: #0f172a;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
     @media (max-width: 900px) {
         .referral-stats {
             grid-template-columns: 1fr;
@@ -466,6 +544,27 @@ Referral Management | Hands-On Health
         .referral-filter-button,
         .referral-reset-button {
             width: 100%;
+            box-sizing: border-box;
+        }
+
+        .referrals-card-header {
+            padding: 1rem;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .referral-pagination {
+            align-items: stretch;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .referral-pagination-controls {
+            justify-content: center;
+        }
+
+        .referral-page-link {
+            padding: 8px 10px;
         }
     }
 </style>
@@ -476,12 +575,28 @@ Referral Management | Hands-On Health
     <div class="referrals-header">
         <div>
             <div class="referrals-kicker">
-                <i class="fa-solid fa-share-nodes"></i> Partnership & Growth
+                <i class="fa-solid fa-share-nodes"></i>
+                Partnership &amp; Growth
             </div>
+    
             <h1>Referral Management</h1>
+    
             <p>
-                Manage patient referrals, track attribution statuses, and monitor loyalty incentives.
+                Manage patient referrals, track attribution statuses,
+                and monitor loyalty incentives.
             </p>
+        </div>
+    
+        <div>
+            <a href="{% url 'staff:referral_rewards' %}"
+             class="referral-filter-button"
+                style="height: 46px; text-decoration: none; white-space: nowrap;">
+    
+                <i class="fa-solid fa-gift"></i>
+                Manage Referral Rewards
+    
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         </div>
     </div>
 
@@ -504,7 +619,6 @@ Referral Management | Hands-On Health
             </div>
         </div>
 
-
         <div class="referral-stat">
             <div class="referral-stat-icon" style="background: #fff7ed; color: #c2410c;">
                 <i class="fa-solid fa-clock"></i>
@@ -521,7 +635,6 @@ Referral Management | Hands-On Health
             </div>
         </div>
 
-
         <div class="referral-stat">
             <div class="referral-stat-icon" style="background: #ecfdf5; color: #047857;">
                 <i class="fa-solid fa-circle-check"></i>
@@ -533,15 +646,14 @@ Referral Management | Hands-On Health
                 </span>
 
                 <span class="referral-stat-label">
-                    Completed & Paid
+                    Completed &amp; Paid
                 </span>
             </div>
         </div>
 
     </div>
 
-
-    <!-- FILTERS -->
+    <!-- SEARCH AND FILTERS -->
     <div class="referral-toolbar">
 
         <form method="get" action="{% url 'staff:referrals' %}" class="referral-filter-form">
@@ -550,32 +662,23 @@ Referral Management | Hands-On Health
                 <i class="fa-solid fa-magnifying-glass"></i>
 
                 <input type="text" name="q" value="{{ search }}"
-                    placeholder="Search referrer, patient, phone, email or facility...">
+                    placeholder="Search referrer, patient, phone, email or facility..." aria-label="Search referrals">
             </div>
 
-
-            <select name="status" class="referral-status-select">
-
-                <option value="">
-                    All Statuses
-                </option>
+            <select name="status" class="referral-status-select" aria-label="Filter referrals by status">
+                <option value="">All Statuses</option>
 
                 {% for value, label in status_choices %}
-
                 <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
                     {{ label }}
                 </option>
-
                 {% endfor %}
-
             </select>
-
 
             <button type="submit" class="referral-filter-button">
                 <i class="fa-solid fa-filter"></i>
                 Filter Records
             </button>
-
 
             <a href="{% url 'staff:referrals' %}" class="referral-reset-button">
                 Reset
@@ -585,22 +688,24 @@ Referral Management | Hands-On Health
 
     </div>
 
-
-    <!-- REFERRALS TABLE -->
+    <!-- REFERRAL RECORDS -->
     <div class="referrals-card">
 
         <div class="referrals-card-header">
-
             <h2>
-                <i class="fa-solid fa-list-check"></i> Referral Records
+                <i class="fa-solid fa-list-check"></i>
+                Referral Records
             </h2>
 
             <span>
-                Showing {{ referrals|length }} record{{ referrals|length|pluralize }}
+                {% if page_obj.paginator.count %}
+                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                of {{ page_obj.paginator.count }} matching record{{ page_obj.paginator.count|pluralize }}
+                {% else %}
+                No matching records
+                {% endif %}
             </span>
-
         </div>
-
 
         {% if referrals %}
 
@@ -610,46 +715,33 @@ Referral Management | Hands-On Health
 
                 <thead>
                     <tr>
-
                         <th>#</th>
-
                         <th>Referrer</th>
-
                         <th>Patient</th>
-
                         <th>Services Needed</th>
-
                         <th>Status</th>
-
                         <th>Home Care</th>
-
                         <th>Loyalty Points</th>
-
                         <th>Created Date</th>
-
                     </tr>
                 </thead>
-
 
                 <tbody>
 
                     {% for referral in referrals %}
-
                     <tr>
 
-                        <!-- INDEX NUMBER -->
+                        <!-- ROW NUMBER -->
                         <td>
                             <span class="referral-index">
-                                {{ forloop.counter }}
+                                {{ page_obj.start_index|add:forloop.counter0 }}
                             </span>
                         </td>
 
-
                         <!-- REFERRER -->
                         <td>
-
                             <div class="person-name">
-                                {{ referral.referrer_name }}
+                                {{ referral.referrer_name|default:"Not provided" }}
                             </div>
 
                             {% if referral.referrer_email %}
@@ -672,50 +764,45 @@ Referral Management | Hands-On Health
                                 {{ referral.referring_facility }}
                             </div>
                             {% endif %}
-
                         </td>
 
+                        <!-- PATIENT -->
+                        <td>
+                            <div class="person-name">
+                                {{ referral.patient_name|default:"Patient name not provided" }}
+                            </div>
 
-                        
-                    <!-- PATIENT -->
-                    <td>
-                        <div class="person-name">
-                            {{ referral.patient_name|default:"Patient name not provided" }}
-                        </div>
-                    
-                        {% if referral.patient_email %}
-                        <div class="person-detail">
-                            <i class="fa-solid fa-envelope"></i>
-                            {{ referral.patient_email }}
-                        </div>
-                        {% endif %}
-                    
-                        {% if referral.patient_phone %}
-                        <div class="person-detail">
-                            <i class="fa-solid fa-phone"></i>
-                            {{ referral.patient_phone }}
-                        </div>
-                        {% endif %}
-                    
-                        {% if referral.homecare_request %}
-                        {% if referral.homecare_request.location %}
-                        <div class="person-detail">
-                            <i class="fa-solid fa-location-dot"></i>
-                            {{ referral.homecare_request.location }}
-                        </div>
-                        {% endif %}
-                    
-                        {% if referral.homecare_request.description %}
-                        <div class="person-detail">
-                            <i class="fa-solid fa-notes-medical"></i>
-                            {{ referral.homecare_request.description|truncatechars:100|linebreaksbr }}
-                        </div>
-                        {% endif %}
-                        {% endif %}
-                    </td>
+                            {% if referral.patient_email %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                {{ referral.patient_email }}
+                            </div>
+                            {% endif %}
 
+                            {% if referral.patient_phone %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ referral.patient_phone }}
+                            </div>
+                            {% endif %}
 
-                      
+                            {% if referral.homecare_request %}
+                            {% if referral.homecare_request.location %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-location-dot"></i>
+                                {{ referral.homecare_request.location }}
+                            </div>
+                            {% endif %}
+
+                            {% if referral.homecare_request.description %}
+                            <div class="person-detail">
+                                <i class="fa-solid fa-notes-medical"></i>
+                                {{ referral.homecare_request.description|truncatechars:100|linebreaksbr }}
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                        </td>
+
                         <!-- SERVICES -->
                         <td>
                             <div class="services-list">
@@ -731,36 +818,27 @@ Referral Management | Hands-On Health
                             </div>
                         </td>
 
-
                         <!-- STATUS -->
                         <td>
-
                             {% if referral.status == "PENDING" %}
-
                             <span class="status-badge status-pending">
                                 <i class="fa-solid fa-clock"></i>
                                 &nbsp;Pending Payment
                             </span>
 
                             {% elif referral.status == "COMPLETED" %}
-
                             <span class="status-badge status-completed">
                                 <i class="fa-solid fa-check"></i>
-                                &nbsp;Completed & Paid
+                                &nbsp;Completed &amp; Paid
                             </span>
 
                             {% else %}
-
                             <span class="status-badge">
                                 {{ referral.get_status_display }}
                             </span>
-
                             {% endif %}
-
                         </td>
 
-
-                        <!-- HOME CARE -->
                         <!-- HOME CARE -->
                         <td>
                             {% if referral.homecare_request %}
@@ -768,14 +846,14 @@ Referral Management | Hands-On Health
                                 <i class="fa-solid fa-link"></i>
                                 Linked
                             </span>
-                        
+
                             <div class="person-detail">
                                 Ref: {{ referral.homecare_request.pk }}
                             </div>
-                        
+
                             <div class="person-detail">
                                 Status:
-                                {{ referral.homecare_request.get_status_display|default:referral.homecare_request.status|default:"Not set" }}
+                                {{referral.homecare_request.get_status_display|default:referral.homecare_request.status|default:"Not  set" }}
                             </div>
                             {% else %}
                             <span class="homecare-not-linked">
@@ -786,17 +864,13 @@ Referral Management | Hands-On Health
 
                         <!-- LOYALTY POINTS -->
                         <td>
-
                             <span class="points">
-                                {{ referral.loyalty_points_awarded }} pts
+                                {{ referral.loyalty_points_awarded|default:0 }} pts
                             </span>
-
                         </td>
 
-
-                        <!-- CREATED -->
+                        <!-- CREATED DATE -->
                         <td class="referral-date">
-
                             <div class="referral-date-main">
                                 {{ referral.created_at|date:"d M Y" }}
                             </div>
@@ -804,11 +878,9 @@ Referral Management | Hands-On Health
                             <div class="referral-date-time">
                                 {{ referral.created_at|date:"H:i" }}
                             </div>
-
                         </td>
 
                     </tr>
-
                     {% endfor %}
 
                 </tbody>
@@ -816,6 +888,93 @@ Referral Management | Hands-On Health
             </table>
 
         </div>
+
+        <!-- PAGINATION -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="referral-pagination">
+
+            <div class="referral-pagination-info">
+                Showing
+                <strong>{{ page_obj.start_index }}</strong>–<strong>{{ page_obj.end_index }}</strong>
+                of
+                <strong>{{ page_obj.paginator.count }}</strong>
+                referrals
+            </div>
+
+            <nav class="referral-pagination-controls" aria-label="Referral pagination">
+
+                <!-- FIRST PAGE -->
+                {% if page_obj.has_previous %}
+                <a class="referral-page-link"
+                    href="?q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}&amp;page=1"
+                    aria-label="First page" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
+                    First
+                </a>
+
+                <a class="referral-page-link"
+                    href="?q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}&amp;page={{ page_obj.previous_page_number }}"
+                    aria-label="Previous page">
+                    <i class="fa-solid fa-angle-left"></i>
+                    Previous
+                </a>
+                {% else %}
+                <span class="referral-page-link disabled">
+                    <i class="fa-solid fa-angles-left"></i>
+                    First
+                </span>
+
+                <span class="referral-page-link disabled">
+                    <i class="fa-solid fa-angle-left"></i>
+                    Previous
+                </span>
+                {% endif %}
+
+                <!-- NEARBY PAGE NUMBERS -->
+                {% for page_number in page_obj.paginator.page_range %}
+                {% if page_number == page_obj.number %}
+                <span class="referral-page-link active" aria-current="page">
+                    {{ page_number }}
+                </span>
+                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %} <a
+                    class="referral-page-link"
+                    href="?q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}&amp;page={{ page_number }}"
+                    aria-label="Page {{ page_number }}">
+                    {{ page_number }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- NEXT PAGE -->
+                    {% if page_obj.has_next %}
+                    <a class="referral-page-link"
+                        href="?q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}&amp;page={{ page_obj.next_page_number }}"
+                        aria-label="Next page">
+                        Next
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+
+                    <a class="referral-page-link"
+                        href="?q={{ search|urlencode }}&amp;status={{ current_status|urlencode }}&amp;page={{ page_obj.paginator.num_pages }}"
+                        aria-label="Last page" title="Last page">
+                        Last
+                        <i class="fa-solid fa-angles-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="referral-page-link disabled">
+                        Next
+                        <i class="fa-solid fa-angle-right"></i>
+                    </span>
+
+                    <span class="referral-page-link disabled">
+                        Last
+                        <i class="fa-solid fa-angles-right"></i>
+                    </span>
+                    {% endif %}
+
+            </nav>
+        </div>
+        {% endif %}
 
         {% else %}
 
@@ -825,9 +984,7 @@ Referral Management | Hands-On Health
                 <i class="fa-solid fa-user-plus"></i>
             </div>
 
-            <h3>
-                No referrals found
-            </h3>
+            <h3>No referrals found</h3>
 
             <p>
                 No referral records match your current search or filter criteria.

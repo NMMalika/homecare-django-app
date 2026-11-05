@@ -2197,3 +2197,142 @@ class CaregiverInvitation(models.Model):
             f"Caregiver invitation - "
             f"{self.email}"
         )
+
+# ============================================================
+# REFERRAL REWARD TRANSACTIONS
+# ============================================================
+
+
+class ReferralRewardTransaction(models.Model):
+    """
+    Records rewards manually issued to referrers by staff.
+
+    A referrer may have multiple referrals, but all earned
+    points are combined using the referrer's email address.
+
+    Reward conversion:
+        1 point = N$1.00
+
+    Each record represents an actual reward issued.
+    """
+
+    transaction_reference = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+    )
+
+    # --------------------------------------------------------
+    # REFERRER DETAILS
+    # --------------------------------------------------------
+
+    referrer_name = models.CharField(
+        max_length=255,
+    )
+
+    referrer_email = models.EmailField(
+        db_index=True,
+    )
+
+    referrer_phone = models.CharField(
+        max_length=50,
+        blank=True,
+    )
+
+    # --------------------------------------------------------
+    # REWARD DETAILS
+    # --------------------------------------------------------
+
+    points_redeemed = models.PositiveIntegerField(
+        help_text="Number of referral points issued as a reward.",
+    )
+
+    reward_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Monetary value of the points issued in Namibian dollars.",
+    )
+
+    currency = models.CharField(
+        max_length=10,
+        default="N$",
+        editable=False,
+    )
+
+    # --------------------------------------------------------
+    # STAFF WHO ISSUED THE REWARD
+    # --------------------------------------------------------
+
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referral_rewards_issued",
+        help_text="Staff member who issued this reward.",
+    )
+
+    # --------------------------------------------------------
+    # ISSUE DETAILS
+    # --------------------------------------------------------
+
+    notes = models.TextField(
+        blank=True,
+        help_text="Optional notes about the reward issued.",
+    )
+
+    issued_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+    )
+
+    # --------------------------------------------------------
+    # MODEL SETTINGS
+    # --------------------------------------------------------
+
+    class Meta:
+        ordering = ["-issued_at", "-id"]
+
+        verbose_name = "Referral Reward Transaction"
+
+        verbose_name_plural = "Referral Reward Transactions"
+
+        indexes = [
+            models.Index(
+                fields=["referrer_email", "-issued_at"],
+                name="ref_reward_email_date_idx",
+            ),
+        ]
+
+    # --------------------------------------------------------
+    # SAVE
+    # --------------------------------------------------------
+
+    def save(self, *args, **kwargs):
+
+        if not self.points_redeemed or self.points_redeemed < 1:
+            raise ValidationError("At least one referral point must be redeemed.")
+
+        # Normalize email so that the same referrer is
+        # consistently identified across multiple referrals.
+        self.referrer_email = self.referrer_email.strip().lower()
+
+        # One referral point equals N$1.00.
+        self.reward_amount = Decimal(str(self.points_redeemed)).quantize(
+            Decimal("0.01")
+        )
+
+        super().save(*args, **kwargs)
+
+    # --------------------------------------------------------
+    # STRING REPRESENTATION
+    # --------------------------------------------------------
+
+    def __str__(self):
+
+        return (
+            f"Reward for {self.referrer_name} - "
+            f"{self.points_redeemed} points "
+            f"(N$ {self.reward_amount:,.2f})"
+        )

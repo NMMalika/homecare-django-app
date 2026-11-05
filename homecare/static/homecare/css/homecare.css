@@ -1,284 +1,549 @@
-/* ==========================================================================
-   Home Care Page Styles
-   File: homecare/static/homecare/css/homecare.css
-   ========================================================================== */
+/* ============================================================
+   HANDS-ON HEALTH | REQUEST HOME CARE
+   Premium reference-inspired design
+   Replace homecare/css/homecare.css with this complete file.
+============================================================ */
 
-/* --- Layout & Section Structure --- */
-.page-title-section {
-    background-color: #f4f7f6;
-    padding: 60px 0 40px;
-    border-bottom: 1px solid #e9ecef;
+:root {
+    --hc-navy: #073b5b;
+    --hc-navy-deep: #052d49;
+    --hc-blue: #087da5;
+    --hc-teal: #08b99b;
+    --hc-teal-dark: #078c80;
+    --hc-ink: #123f61;
+    --hc-muted: #61778b;
+    --hc-border: #dce8f1;
+    --hc-soft: #eef8fc;
+    --hc-white: #ffffff;
 }
 
-.page-title-section h1 {
-    color: #1a252f;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.page-title-section p {
-    color: #6c757d;
-    font-size: 1.125rem;
-    max-width: 600px;
-    margin: 0 auto;
+/* Page foundation */
+body {
+    background: #eef8fc;
 }
 
 .section-padding {
-    padding: 60px 0;
+    position: relative;
+    padding: 38px 0 75px;
+    background:
+        radial-gradient(ellipse at 8% 45%, rgba(188, 231, 248, .55), transparent 34%),
+        radial-gradient(ellipse at 90% 85%, rgba(189, 244, 235, .45), transparent 35%),
+        linear-gradient(180deg, #f4fbff 0%, #eaf7fc 100%);
 }
 
-/* --- Left Column: Booking Info Sidebar --- */
+.section-padding>.container {
+    position: relative;
+    z-index: 1;
+}
+
+.section-padding>.container>.row {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   HERO — dark left panel with healthcare image on the right
+============================================================ */
+.page-title-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    padding: 65px 0 48px !important;
+    text-align: left !important;
+    border: 0 !important;
+    background-color: var(--hc-navy-deep) !important;
+    background-image:
+        linear-gradient(90deg,
+            rgba(3, 48, 75, 1) 0%,
+            rgba(4, 62, 91, .98) 38%,
+            rgba(4, 69, 96, .82) 54%,
+            rgba(4, 69, 96, .12) 76%,
+            rgba(4, 69, 96, 0) 100%),
+        url("https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=2000&q=88") !important;
+    background-size: cover !important;
+    background-position: center 42% !important;
+    background-repeat: no-repeat !important;
+}
+
+.page-title-section::before,
+.page-title-section::after {
+    content: none !important;
+}
+
+.page-title-section .container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.homecare-hero-content {
+    max-width: 1500px;
+}
+
+.homecare-hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 20px 11px 14px;
+    margin-bottom: 13px;
+    border-radius: 40px;
+    color: #fff !important;
+    background: linear-gradient(100deg, #08b99b, #0786b4);
+    font-size: .88rem;
+    font-weight: 800;
+    letter-spacing: .25px;
+    box-shadow: 0 7px 22px rgba(0, 0, 0, .16);
+}
+
+.homecare-hero-label i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #078b83;
+    background: #fff;
+    font-size: 1.15rem;
+}
+
+.page-title-section h1 {
+    max-width: 800px;
+    margin: 0 0 13px !important;
+    color: #fff !important;
+    font-size: clamp(2.6rem, 5.1vw, 4.65rem) !important;
+    font-weight: 850 !important;
+    letter-spacing: -2px;
+    line-height: 1.06 !important;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, .15);
+}
+
+.page-title-section p {
+    max-width: 720px;
+    margin: 0 !important;
+    color: rgba(255, 255, 255, .95) !important;
+    font-size: clamp(1rem, 1.5vw, 1.28rem) !important;
+    font-weight: 500;
+    line-height: 1.55 !important;
+    text-align: left;
+}
+
+.homecare-hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 17px 25px;
+    margin-top: 25px;
+}
+
+.homecare-hero-trust span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: .98rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.homecare-hero-trust span+span {
+    padding-left: 24px;
+    border-left: 2px solid rgba(255, 255, 255, .75);
+}
+
+.homecare-hero-trust i {
+    color: #12d2bd;
+    font-size: 1.75rem;
+}
+
+/* ============================================================
+   LEFT INFORMATION CARD
+============================================================ */
 .booking-info {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    position: relative;
     height: 100%;
+    overflow: hidden;
+    padding: 30px 28px;
+    border: 1px solid rgba(220, 238, 247, .95);
+    border-radius: 25px;
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 0 12px 35px rgba(16, 76, 110, .09);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.booking-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 42px rgba(16, 76, 110, .13);
+}
+
+.booking-info::before {
+    content: none;
+}
+
+.booking-info-heading {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    margin: 0 0 23px;
+}
+
+.booking-info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 88px;
+    width: 88px;
+    height: 78px;
+    color: #079b88;
+    font-size: 3.3rem;
 }
 
 .booking-info h3 {
-    color: #0d6efd;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 16px;
+    margin: 0 !important;
+    color: var(--hc-ink) !important;
+    font-size: clamp(1.25rem, 1.8vw, 1.65rem) !important;
+    font-weight: 850 !important;
+    line-height: 1.25 !important;
 }
 
 .booking-info p {
-    color: #4a5568;
-    line-height: 1.6;
-    margin-bottom: 24px;
+    margin: 0 0 22px !important;
+    color: #234866 !important;
+    font-size: 1.02rem !important;
+    line-height: 1.65 !important;
 }
 
 .booking-info ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .booking-info ul li {
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: #2d3748;
-    font-weight: 500;
-    margin-bottom: 16px;
+    gap: 13px;
+    margin: 0 0 14px !important;
+    color: #173f60 !important;
+    font-size: .98rem !important;
+    font-weight: 650 !important;
+    line-height: 1.45;
+}
+
+.booking-info ul li:last-child {
+    margin-bottom: 0 !important;
 }
 
 .booking-info ul li i {
-    color: #198754;
-    background-color: #e8f5e9;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.875rem;
-    flex-shrink: 0;
+    flex: 0 0 31px;
+    width: 31px;
+    height: 31px;
+    border-radius: 50%;
+    color: #fff !important;
+    background: linear-gradient(135deg, #13d6a7, #00a98e);
+    font-size: .9rem;
+    box-shadow: 0 4px 10px rgba(0, 178, 145, .2);
 }
 
-/* --- Right Column: Booking Form Wrapper --- */
+/* ============================================================
+   FORM CARD AND TOP GRADIENT RIBBON
+============================================================ */
 .booking-form-wrapper {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 40px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    padding: 0 30px 28px;
+    border: 1px solid #d9eaf4;
+    border-radius: 27px;
+    background: rgba(255, 255, 255, .98);
+    box-shadow: 0 14px 38px rgba(16, 76, 110, .12);
+}
+
+.booking-form-wrapper::before {
+    content: none;
 }
 
 .booking-form-wrapper .section-title {
-    margin-bottom: 30px;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0 -30px 14px;
+    padding: 0;
+    border: 0;
+    text-align: left;
+}
+
+.form-title-ribbon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-height: 67px;
+    width: 88%;
+    padding: 8px 30px;
+    border-radius: 0 0 40px 0;
+    color: #fff;
+    background: linear-gradient(105deg, #063d5c 0%, #075c75 48%, #00a98f 100%);
+}
+
+.form-title-ribbon::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -39px;
+    width: 70px;
+    height: 100%;
+    border-radius: 0 0 38px 0;
+    background: #00a98f;
+    transform: skewX(-28deg);
+    z-index: -1;
+}
+
+.form-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    margin-top: 1px;
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(0, 152, 177, .35);
+    font-size: 2rem;
 }
 
 .booking-form-wrapper .section-title h2 {
-    color: #1e293b;
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 6px;
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: clamp(1.35rem, 2vw, 1.75rem) !important;
+    font-weight: 850 !important;
+    letter-spacing: -.5px;
 }
 
-.booking-form-wrapper .section-title p {
-    color: #64748b;
-    margin: 0;
+.booking-form-wrapper .section-title>p {
+    margin: 0 !important;
+    padding: 12px 20px 4px;
+    color: #174466 !important;
+    font-size: .98rem !important;
+    line-height: 1.5;
+    text-align: center;
 }
 
-/* --- Form Controls & Labels --- */
-.form-group label {
-    font-weight: 600;
-    color: #334155;
-    margin-bottom: 8px;
+/* Form layout */
+#homeCareForm {
+    padding-top: 2px;
+}
+
+#homeCareForm>.row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+#homeCareForm>.row>[class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px !important;
+}
+
+.form-group label,
+#homeCareForm .form-label {
     display: block;
+    margin-bottom: 7px !important;
+    color: #123f61 !important;
+    font-size: .96rem !important;
+    font-weight: 750 !important;
 }
 
-.form-control,
-.form-select {
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.95rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+/* Inputs, selects and textareas */
+#homeCareForm .form-control,
+#homeCareForm .form-select,
+#homeCareForm input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#homeCareForm select:not([multiple]),
+#homeCareForm textarea {
+    display: block;
+    width: 100% !important;
+    min-height: 51px;
+    padding: 12px 16px !important;
+    border: 1.5px solid #d5e2ed !important;
+    border-radius: 15px !important;
     outline: none;
+    color: #193f5d !important;
+    background: #fbfdff !important;
+    box-shadow: none !important;
+    font-size: .96rem !important;
+    line-height: 1.4;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
-/* --- Dynamic Service Search Row & Input Alignment --- */
+#homeCareForm .form-control::placeholder,
+#homeCareForm input::placeholder,
+#homeCareForm textarea::placeholder {
+    color: #93a8c2 !important;
+    opacity: 1;
+}
+
+#homeCareForm .form-control:hover,
+#homeCareForm .form-select:hover,
+#homeCareForm input:hover,
+#homeCareForm textarea:hover {
+    border-color: #a8c9d9 !important;
+    background: #fff !important;
+}
+
+#homeCareForm .form-control:focus,
+#homeCareForm .form-select:focus,
+#homeCareForm input:focus,
+#homeCareForm textarea:focus {
+    border-color: #08ae9b !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 4px rgba(8, 174, 155, .12) !important;
+}
+
+#homeCareForm textarea.form-control,
+#homeCareForm textarea {
+    min-height: 115px;
+    resize: vertical;
+}
+
+#homeCareForm input[type="file"] {
+    min-height: auto !important;
+    padding: 10px !important;
+    background: #f8fcff !important;
+}
+
+#homeCareForm input[type="file"]::file-selector-button {
+    margin: -3px 12px -3px -3px;
+    padding: 9px 13px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: #087d91;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#homeCareForm small.text-danger {
+    display: block;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+/* Service search and add button */
 .service-input-wrapper {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: stretch;
+    gap: 10px;
     width: 100%;
+    margin-bottom: 10px !important;
 }
 
 .service-search-field {
-    flex: 1;
-    height: 48px;
-    padding: 0.65rem 1rem;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
-    transition: all 0.2s ease-in-out;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: 51px;
+    padding: 12px 16px;
+    border: 1.5px solid #d5e2ed;
+    border-radius: 15px;
+    color: #193f5d;
+    background: #fbfdff;
+    font-size: .96rem;
+    transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 .service-search-field:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #08ae9b;
     outline: 0;
+    box-shadow: 0 0 0 4px rgba(8, 174, 155, .12);
 }
 
-/* --- Premium Add Button Styling --- */
 .btn-add-service {
-    height: 48px;
-    padding: 0 1.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #ffffff;
-    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: 100px;
+    height: 51px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 14px;
+    color: #fff !important;
+    background: linear-gradient(110deg, #075477, #08ae91);
+    box-shadow: 0 5px 14px rgba(8, 100, 119, .16);
+    font-weight: 750;
     cursor: pointer;
-    white-space: nowrap;
+    transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .btn-add-service:hover {
-    color: #ffffff;
-    background: linear-gradient(135deg, #1172ff 0%, #0a58ca 100%);
-    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(8, 100, 119, .22);
 }
 
-.btn-add-service:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.4), 0 6px 16px rgba(13, 110, 253, 0.35);
-}
-
-.btn-add-service:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
-}
-
-.btn-add-service i {
-    transition: transform 0.25s ease;
-}
-
-.btn-add-service:hover i {
-    transform: rotate(90deg);
-}
-
-/* --- Selected Services Container & Badges --- */
+/* Selected service badges */
 .selected-services-container {
-    min-height: 58px;
-    background-color: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    padding: 10px 14px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
     align-items: center;
-    margin-top: 12px;
+    gap: 8px;
+    min-height: 55px;
+    margin-top: 9px;
+    padding: 11px 13px;
+    border: 1px dashed #a7d8d0;
+    border-radius: 14px;
+    background: #f5fcfa;
 }
 
 .service-badge {
-    background: #eef2ff;
-    color: #1e40af;
-    border: 1px solid #c7d2fe;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-    animation: badgePop 0.2s ease-out;
+    padding: 7px 10px 7px 13px;
+    border: 1px solid #b9e8dc;
+    border-radius: 30px;
+    color: #087b68;
+    background: #e6f8f2;
+    font-size: .85rem;
+    font-weight: 750;
+    animation: hcBadgeIn .2s ease-out;
 }
 
 .service-badge .remove-btn {
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 21px;
+    height: 21px;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
-    background-color: rgba(30, 64, 175, 0.1);
-    color: #1e40af;
-    font-size: 14px;
+    color: #087b68;
+    background: rgba(8, 124, 104, .1);
+    font-size: 16px;
     line-height: 1;
-    transition: all 0.15s ease;
+    cursor: pointer;
 }
 
 .service-badge .remove-btn:hover {
-    background-color: #ef4444;
-    color: #ffffff;
+    color: #fff;
+    background: #dc3545;
 }
 
-/* --- Form Buttons & Alerts --- */
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-weight: 600;
-    font-size: 1rem;
-    width: 100%;
-    transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-    transform: translateY(-1px);
-}
-
-.alert-info {
-    background-color: #eff6ff;
-    border: 1px solid #bfdbfe;
-    color: #1e40af;
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-size: 0.9rem;
-}
-
-/* Completely Hide Django's Raw Select Output */
-select[multiple],
-.visually-hidden {
+/* Keep Django's native multi-select available to the form but visually hidden. */
+#homeCareForm .visually-hidden,
+#homeCareForm select[multiple] {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;
@@ -290,11 +555,60 @@ select[multiple],
     border: 0 !important;
 }
 
-/* Keyframe Animations */
-@keyframes badgePop {
+/* Privacy notice */
+#homeCareForm .alert-info {
+    margin: 7px 0 17px;
+    padding: 13px 16px;
+    border: 1px solid #cce8ef;
+    border-left: 4px solid #08ae9b;
+    border-radius: 12px;
+    color: #174766;
+    background: #f0f9fc;
+    font-size: .9rem;
+    line-height: 1.6;
+}
+
+/* Submit button */
+#homeCareForm .homecare-submit-btn,
+#homeCareForm button[type="submit"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: min(100%, 600px);
+    min-height: 59px;
+    margin: 2px auto 0;
+    padding: 14px 25px;
+    border: 0 !important;
+    border-radius: 40px !important;
+    color: #fff !important;
+    background: linear-gradient(105deg, #087da8 0%, #07516e 38%, #00a98f 100%) !important;
+    box-shadow: 0 7px 17px rgba(5, 91, 117, .22);
+    font-size: 1.04rem !important;
+    font-weight: 800 !important;
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+#homeCareForm .homecare-submit-btn:hover,
+#homeCareForm button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 23px rgba(5, 91, 117, .28);
+    filter: brightness(1.06);
+}
+
+#homeCareForm .homecare-submit-btn>i:first-child {
+    font-size: 1.35rem;
+}
+
+#homeCareForm .submit-arrow {
+    font-size: .95rem;
+}
+
+/* Animation */
+@keyframes hcBadgeIn {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: scale(.92);
     }
 
     to {
@@ -303,18 +617,238 @@ select[multiple],
     }
 }
 
-/* --- Responsive Layout Adjustments --- */
-@media (max-width: 767.98px) {
+/* ============================================================
+   TABLET
+============================================================ */
+@media (max-width: 991.98px) {
+    .page-title-section {
+        min-height: 390px;
+        padding: 65px 0 45px !important;
+        background-position: 58% center !important;
+    }
+
+    .page-title-section h1 {
+        font-size: clamp(2.5rem, 6vw, 3.8rem) !important;
+    }
+
+    .homecare-hero-trust {
+        gap: 14px 18px;
+    }
+
+    .homecare-hero-trust span {
+        font-size: .9rem;
+    }
+
     .booking-info {
-        margin-bottom: 30px;
+        height: auto;
+        margin-bottom: 22px;
     }
 
     .booking-form-wrapper {
-        padding: 24px;
+        height: auto;
     }
 
-    .service-input-wrapper {
-        flex-direction: row;
+    .section-padding {
+        padding-top: 30px;
     }
 }
 
+/* ============================================================
+   MOBILE
+============================================================ */
+@media (max-width: 767.98px) {
+    .page-title-section {
+        min-height: auto;
+        padding: 58px 0 43px !important;
+        background-image:
+            linear-gradient(90deg, rgba(3, 48, 75, .96), rgba(4, 62, 91, .82)),
+            url("https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=85") !important;
+        background-position: center !important;
+    }
+
+    .homecare-hero-label {
+        gap: 8px;
+        padding: 8px 13px 8px 9px;
+        font-size: .72rem;
+    }
+
+    .homecare-hero-label i {
+        width: 27px;
+        height: 27px;
+        font-size: 1rem;
+    }
+
+    .page-title-section h1 {
+        margin-top: 4px !important;
+        font-size: clamp(2.25rem, 10vw, 3.15rem) !important;
+        letter-spacing: -1.2px;
+    }
+
+    .page-title-section p {
+        font-size: .98rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .homecare-hero-trust {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 21px;
+    }
+
+    .homecare-hero-trust span {
+        font-size: .9rem;
+    }
+
+    .homecare-hero-trust span+span {
+        padding-left: 0;
+        border-left: 0;
+    }
+
+    .homecare-hero-trust i {
+        font-size: 1.35rem;
+    }
+
+    .section-padding {
+        padding: 24px 0 45px;
+    }
+
+    .section-padding>.container>.row {
+        display: block;
+    }
+
+    .booking-info {
+        margin-bottom: 20px;
+        padding: 25px 22px;
+        border-radius: 20px;
+    }
+
+    .booking-info-heading {
+        gap: 12px;
+        margin-bottom: 17px;
+    }
+
+    .booking-info-icon {
+        flex-basis: 65px;
+        width: 65px;
+        height: 60px;
+        font-size: 2.6rem;
+    }
+
+    .booking-info h3 {
+        font-size: 1.35rem !important;
+    }
+
+    .booking-info p {
+        font-size: .96rem !important;
+        margin-bottom: 19px !important;
+    }
+
+    .booking-info ul li {
+        font-size: .92rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .booking-form-wrapper {
+        padding: 0 19px 23px;
+        border-radius: 21px;
+    }
+
+    .booking-form-wrapper .section-title {
+        margin-left: -19px;
+        margin-right: -19px;
+        margin-bottom: 13px;
+    }
+
+    .form-title-ribbon {
+        width: 94%;
+        min-height: 61px;
+        gap: 11px;
+        padding: 7px 18px;
+    }
+
+    .form-title-icon {
+        flex-basis: 47px;
+        width: 47px;
+        height: 47px;
+        font-size: 1.5rem;
+    }
+
+    .booking-form-wrapper .section-title h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .booking-form-wrapper .section-title>p {
+        padding: 11px 15px 3px;
+        font-size: .91rem !important;
+    }
+
+    #homeCareForm>.row {
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    #homeCareForm>.row>[class*="col-"] {
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+
+    #homeCareForm .form-control,
+    #homeCareForm .form-select,
+    #homeCareForm input,
+    #homeCareForm textarea {
+        font-size: 16px !important;
+    }
+
+    .service-input-wrapper {
+        flex-direction: column;
+    }
+
+    .btn-add-service {
+        width: 100%;
+    }
+
+    #homeCareForm .homecare-submit-btn,
+    #homeCareForm button[type="submit"] {
+        min-height: 55px;
+        padding: 12px 15px;
+        font-size: .94rem !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .homecare-hero-label {
+        font-size: .65rem;
+    }
+
+    .booking-form-wrapper {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .booking-form-wrapper .section-title {
+        margin-left: -14px;
+        margin-right: -14px;
+    }
+
+    .form-title-ribbon {
+        padding-left: 13px;
+    }
+
+    .form-title-ribbon h2 {
+        font-size: 1.15rem !important;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

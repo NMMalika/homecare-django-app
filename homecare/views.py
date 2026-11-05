@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal,ROUND_FLOOR
+from django.db.models import Sum
+
 import logging
 
 from django.conf import settings
@@ -15,6 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
+from django.forms import inlineformset_factory
 
 from core.models import SiteSettings
 
@@ -22,6 +25,7 @@ from .forms import (
     HomeCareRequestForm,
     PaymentSubmissionForm,
     QuotationForm,
+    QuotationItemForm,
     QuotationItemFormSet,
     ReferralForm,
 )
@@ -30,6 +34,7 @@ from .models import (
     HomeCareRequest,
     HomeCareRequestAttachment,
     Quotation,
+    QuotationItem,
     Referral,
     ReferralAttachment,
     Payment,
@@ -230,95 +235,183 @@ def request_success(request):
 # ============================================================
 
 
+
+# ============================================================
+# REFER A PATIENT
+# ============================================================
+
+
+
+
+
 def refer_a_patient(request):
 
     if request.method == "POST":
 
-        form = ReferralForm(
+        referral_form = ReferralForm(request.POST)
+        homecare_form = HomeCareRequestForm(
             request.POST,
             request.FILES,
         )
 
-        if form.is_valid():
+        if referral_form.is_valid() and homecare_form.is_valid():
 
-            referral = form.save()
+            try:
+                with transaction.atomic():
 
-            custom_services = form.cleaned_data.get("custom_services")
+                    # -----------------------------------------
+                    # GET PATIENT INFORMATION
+                    # -----------------------------------------
 
-            if custom_services:
+                    patient_name = homecare_form.cleaned_data["full_name"]
+                    patient_email = homecare_form.cleaned_data["email"]
+                    patient_phone = homecare_form.cleaned_data["phone"]
 
-                referral.additional_notes += (
-                    f"\n\n[Custom Requested Services]: " f"{custom_services}"
+                    # -----------------------------------------
+                    # SAVE REFERRER INFORMATION
+                    # -----------------------------------------
+
+                    referral = referral_form.save(commit=False)
+
+                    # These fields are stored on the Referral model.
+                    # They are populated from HomeCareRequestForm.
+                    referral.patient_name = patient_name
+                    referral.patient_email = patient_email
+                    referral.patient_phone = patient_phone
+
+                    if not referral.additional_notes:
+                        referral.additional_notes = ""
+
+                    # -----------------------------------------
+                    # CUSTOM SERVICES
+                    # -----------------------------------------
+
+                    custom_services = (
+                        homecare_form.cleaned_data.get("custom_services") or ""
+                    ).strip()
+
+                    if custom_services:
+
+                        referral.additional_notes += (
+                            "\n\n[Custom Requested Services]: "
+                            f"{custom_services}"
+                        )
+
+                    referral.save()
+
+                    # -----------------------------------------
+                    # SAVE PATIENT HOME CARE REQUEST
+                    # -----------------------------------------
+
+                    homecare_request = homecare_form.save(commit=False)
+
+                    facility_name = (
+                        referral.referring_facility.strip()
+                        if referral.referring_facility
+                        else ""
+                    )
+
+                    facility_info = (
+                        f" ({facility_name})"
+                        if facility_name
+                        else ""
+                    )
+
+                    referrer_info = (
+                        f"\n\nReferred by: {referral.referrer_name}"
+                        f"{facility_info}"
+                        f"\nEmail: {referral.referrer_email}"
+                        f"\nPhone: {referral.referrer_phone}"
+                    )
+
+                    if custom_services:
+
+                        referrer_info += (
+                            "\n\nCustom Requested Services: "
+                            f"{custom_services}"
+                        )
+
+                    existing_description = (
+                        homecare_request.description or ""
+                    )
+
+                    homecare_request.description = (
+                        existing_description + referrer_info
+                    )
+
+                    homecare_request.save()
+
+                    # Save selected existing services.
+                    homecare_form.save_m2m()
+
+                    # -----------------------------------------
+                    # LINK SELECTED SERVICES TO REFERRAL
+                    # -----------------------------------------
+
+                    referral.services_needed.set(
+                        homecare_request.services.all()
+                    )
+
+                    # -----------------------------------------
+                    # LINK HOME CARE REQUEST TO REFERRAL
+                    # -----------------------------------------
+
+                    referral.homecare_request = homecare_request
+
+                    referral.save(
+                        update_fields=[
+                            "homecare_request",
+                        ]
+                    )
+
+                    # -----------------------------------------
+                    # SAVE ATTACHMENTS
+                    # -----------------------------------------
+
+                    uploaded_files = request.FILES.getlist(
+                        "attachments"
+                    )
+
+                    for uploaded_file in uploaded_files:
+
+                        ref_attachment = ReferralAttachment.objects.create(
+                            referral=referral,
+                            file=uploaded_file,
+                        )
+
+                        HomeCareRequestAttachment.objects.create(
+                            homecare_request=homecare_request,
+                            file=ref_attachment.file,
+                        )
+
+                messages.success(
+                    request,
+                    "Thank you! Your referral has been submitted. "
+                    "Our care team will review the details and contact "
+                    "the patient with a quotation.",
                 )
 
-                referral.save(update_fields=["additional_notes"])
+                return redirect("homecare:referral_success")
 
-            files = request.FILES.getlist("attachments")
-
-            for f in files:
-
-                ReferralAttachment.objects.create(
-                    referral=referral,
-                    file=f,
+            except Exception:
+                # The atomic transaction rolls back if saving fails.
+                messages.error(
+                    request,
+                    "We could not submit your referral. "
+                    "Please check your information and try again.",
                 )
-
-            facility_name = (
-                referral.referring_facility.strip()
-                if referral.referring_facility
-                else ""
-            )
-
-            facility_info = f" ({facility_name})" if facility_name else ""
-
-            homecare_request = HomeCareRequest.objects.create(
-                full_name=referral.patient_name,
-                email=referral.patient_email,
-                phone=referral.patient_phone,
-                location="To be confirmed",
-                preferred_date=(timezone.now().date() + timedelta(days=1)),
-                preferred_time="09:00:00",
-                description=(
-                    f"Referred by: "
-                    f"{referral.referrer_name}"
-                    f"{facility_info} "
-                    f"({referral.referrer_email}, "
-                    f"{referral.referrer_phone}).\n\n"
-                    f"Notes: "
-                    f"{referral.additional_notes}"
-                ),
-            )
-
-            homecare_request.services.set(referral.services_needed.all())
-
-            for ref_attachment in referral.attachments.all():
-
-                HomeCareRequestAttachment.objects.create(
-                    homecare_request=homecare_request,
-                    file=ref_attachment.file,
-                )
-
-            referral.homecare_request = homecare_request
-
-            referral.save(update_fields=["homecare_request"])
-
-            messages.success(
-                request,
-                "Thank you! Your referral has been submitted. "
-                "Our care team will review the details and contact "
-                "the patient with a quotation.",
-            )
-
-            return redirect("homecare:referral_success")
 
     else:
 
-        form = ReferralForm()
+        referral_form = ReferralForm()
+        homecare_form = HomeCareRequestForm()
 
     return render(
         request,
         "homecare/referral_form.html",
         {
-            "form": form,
+            "referral_form": referral_form,
+            "homecare_form": homecare_form,
         },
     )
 
@@ -465,12 +558,10 @@ def appointment_success(request):
 # ============================================================
 
 
+
 @login_required
 @require_http_methods(["GET", "POST"])
-def create_quotation(
-    request,
-    request_id,
-):
+def create_quotation(request, request_id):
 
     homecare_request = get_object_or_404(
         HomeCareRequest.objects.prefetch_related("services"),
@@ -481,11 +572,7 @@ def create_quotation(
     # PREVENT DUPLICATE QUOTATIONS
     # --------------------------------------------------------
 
-    if hasattr(
-        homecare_request,
-        "quotation",
-    ):
-
+    if hasattr(homecare_request, "quotation"):
         messages.warning(
             request,
             "A quotation already exists for this request.",
@@ -497,10 +584,42 @@ def create_quotation(
         )
 
     # --------------------------------------------------------
+    # CREATE INITIAL SERVICE ITEMS
+    # --------------------------------------------------------
+
+    initial_items = [
+        {
+            "service": service.pk,
+            "name": service.name,
+            "quantity": Decimal("1.00"),
+            "unit_price": service.price,
+            "description": "",
+        }
+        for service in homecare_request.services.all()
+    ]
+
+    # At least one blank row if no services were selected.
+    extra_forms = max(len(initial_items), 1)
+
+    # --------------------------------------------------------
+    # DYNAMIC FORMSET
+    # --------------------------------------------------------
+
+    DynamicQuotationItemFormSet = inlineformset_factory(
+        Quotation,
+        QuotationItem,
+        form=QuotationItemForm,
+        extra=extra_forms,
+        can_delete=True,
+    )
+
+    # --------------------------------------------------------
     # CREATE UNSAVED QUOTATION
     # --------------------------------------------------------
 
-    quotation_instance = Quotation(homecare_request=homecare_request)
+    quotation_instance = Quotation(
+        homecare_request=homecare_request
+    )
 
     # --------------------------------------------------------
     # POST
@@ -513,11 +632,12 @@ def create_quotation(
             instance=quotation_instance,
         )
 
-        # We cannot save an inline formset until the
-        # quotation itself exists.
-        #
-        # Validate quotation form first.
-        if form.is_valid():
+        item_formset = DynamicQuotationItemFormSet(
+            request.POST,
+            instance=quotation_instance,
+        )
+
+        if form.is_valid() and item_formset.is_valid():
 
             try:
 
@@ -531,15 +651,18 @@ def create_quotation(
 
                     quotation.homecare_request = homecare_request
 
-                    quotation.payment_status = Quotation.PaymentStatus.PENDING
+                    quotation.payment_status = (
+                        Quotation.PaymentStatus.PENDING
+                    )
 
                     now = timezone.now()
 
                     quotation.sent_at = now
 
-                    quotation.payment_deadline = now + timedelta(hours=24)
+                    quotation.payment_deadline = (
+                        now + timedelta(hours=24)
+                    )
 
-                    # Initial values.
                     quotation.base_amount = Decimal("0.00")
                     quotation.amount = Decimal("0.00")
 
@@ -549,58 +672,44 @@ def create_quotation(
                     # SAVE LINE ITEMS
                     # ----------------------------------------
 
-                    item_formset = QuotationItemFormSet(
-                        request.POST,
-                        instance=quotation,
-                    )
-
-                    if not item_formset.is_valid():
-
-                        # Roll back the quotation.
-                        raise ValueError("Please correct the quotation items.")
+                    item_formset.instance = quotation
 
                     items = item_formset.save(commit=False)
 
-                    # ----------------------------------------
-                    # SAVE / DELETE ITEMS
-                    # ----------------------------------------
-
                     for item in items:
 
-                        # Existing service.
                         if item.service:
 
-                            # If staff leaves name blank,
-                            # use the actual database service name.
-                            if not item.name.strip():
+                            if not (item.name or "").strip():
                                 item.name = item.service.name
 
-                        # Custom service.
                         else:
 
                             item.name = (item.name or "").strip()
 
                             if not item.name:
-
                                 raise ValueError(
-                                    "Every custom service " "must have a name."
+                                    "Every custom service must have a name."
                                 )
 
-                        # Server-side line total.
                         item.line_total = item.calculate_total()
 
                         item.save()
 
-                    # Delete rows marked for deletion.
-                    for item in item_formset.deleted_objects:
+                    # ----------------------------------------
+                    # DELETE REMOVED ITEMS
+                    # ----------------------------------------
 
+                    for item in item_formset.deleted_objects:
                         item.delete()
 
                     # ----------------------------------------
                     # SECURE SERVER-SIDE TOTAL
                     # ----------------------------------------
 
-                    quotation.base_amount = quotation.calculate_items_total()
+                    quotation.base_amount = (
+                        quotation.calculate_items_total()
+                    )
 
                     quotation.amount = quotation.calculate_total()
 
@@ -616,7 +725,9 @@ def create_quotation(
                     # UPDATE HOME CARE REQUEST
                     # ----------------------------------------
 
-                    homecare_request.status = HomeCareRequest.Status.PAYMENT_PENDING
+                    homecare_request.status = (
+                        HomeCareRequest.Status.PAYMENT_PENDING
+                    )
 
                     homecare_request.save(
                         update_fields=[
@@ -625,20 +736,22 @@ def create_quotation(
                         ]
                     )
 
-                # ------------------------------------------------
+                # --------------------------------------------
                 # BUILD SECURE QUOTATION URL
-                # ------------------------------------------------
+                # --------------------------------------------
 
                 quotation_url = request.build_absolute_uri(
                     reverse(
                         "homecare:quotation_detail",
-                        kwargs={"token": quotation.access_token},
+                        kwargs={
+                            "token": quotation.access_token,
+                        },
                     )
                 )
 
-                # ------------------------------------------------
+                # --------------------------------------------
                 # SEND EMAIL
-                # ------------------------------------------------
+                # --------------------------------------------
 
                 try:
 
@@ -649,12 +762,14 @@ def create_quotation(
 
                     messages.success(
                         request,
-                        ("Quotation saved and sent " "successfully to the client."),
+                        "Quotation saved and sent successfully to the client.",
                     )
 
                 except Exception as e:
 
-                    logger.exception("Failed to send quotation email.")
+                    logger.exception(
+                        "Failed to send quotation email."
+                    )
 
                     messages.warning(
                         request,
@@ -672,19 +787,14 @@ def create_quotation(
 
             except ValueError as e:
 
-                messages.error(
-                    request,
-                    str(e),
-                )
+                messages.error(request, str(e))
 
-        # ----------------------------------------------------
-        # FORM INVALID
-        # ----------------------------------------------------
+        else:
 
-        item_formset = QuotationItemFormSet(
-            request.POST,
-            instance=quotation_instance,
-        )
+            messages.error(
+                request,
+                "Please correct the errors in the quotation form."
+            )
 
     # --------------------------------------------------------
     # GET
@@ -696,23 +806,7 @@ def create_quotation(
             instance=quotation_instance,
         )
 
-        # Existing requested services become the initial
-        # quotation lines.
-        initial_items = []
-
-        for service in homecare_request.services.all():
-
-            initial_items.append(
-                {
-                    "service": service.pk,
-                    "name": service.name,
-                    "quantity": Decimal("1.00"),
-                    "unit_price": service.price,
-                    "description": "",
-                }
-            )
-
-        item_formset = QuotationItemFormSet(
+        item_formset = DynamicQuotationItemFormSet(
             instance=quotation_instance,
             initial=initial_items,
         )
@@ -728,16 +822,16 @@ def create_quotation(
             "form": form,
             "item_formset": item_formset,
             "homecare_request": homecare_request,
-            "calculated_total": (
-                sum(
-                    (service.price for service in homecare_request.services.all()),
-                    Decimal("0.00"),
-                )
+            "calculated_total": sum(
+                (
+                    service.price
+                    for service in homecare_request.services.all()
+                ),
+                Decimal("0.00"),
             ),
             "is_consultation": False,
         },
     )
-
 
 def send_quotation_email(
     quotation,
@@ -1531,15 +1625,10 @@ def payment_submitted(
 
 # ============================================================
 # VERIFY PAYMENT
-# ============================================================
-
+# ===========================================================
 
 @login_required
-def verify_payment(
-    request,
-    payment_id,
-):
-
+def verify_payment(request, payment_id):
     next_url = request.POST.get("next") or request.GET.get("next")
     referer = request.META.get("HTTP_REFERER", "")
 
@@ -1558,44 +1647,62 @@ def verify_payment(
         redirect_target = reverse("admin:homecare_payment_changelist")
 
     if request.method != "POST":
-        messages.error(
-            request,
-            "Invalid payment verification request.",
-        )
-        return redirect(redirect_target)
-
-    payment = get_object_or_404(
-        Payment.objects.select_related(
-            "quotation",
-            "quotation__homecare_request",
-            "quotation__consultation",
-        ),
-        id=payment_id,
-    )
-
-    if payment.status == Payment.Status.VERIFIED:
-        messages.info(
-            request,
-            "This payment has already been verified.",
-        )
-        return redirect(redirect_target)
-
-    if payment.status == Payment.Status.REJECTED:
-        messages.error(
-            request,
-            "A rejected payment cannot be verified.",
-        )
+        messages.error(request, "Invalid payment verification request.")
         return redirect(redirect_target)
 
     action = request.POST.get("action")
+
+    if action not in ("verify", "reject", None, ""):
+        messages.error(request, "Invalid payment action.")
+        return redirect(redirect_target)
+
+    initial_payment = get_object_or_404(
+        Payment.objects.only("id", "quotation_id"),
+        id=payment_id,
+    )
+
     now = timezone.now()
 
-    # Handle REJECT Action
+    # =========================================================
+    # REJECT PAYMENT
+    # =========================================================
     if action == "reject":
-        payment.status = Payment.Status.REJECTED
-        payment.verified_by = request.user
-        payment.verified_at = now
-        payment.save(update_fields=["status", "verified_by", "verified_at"])
+        with transaction.atomic():
+            # Lock the quotation first to serialize actions on
+            # different payments belonging to the same quotation.
+            Quotation.objects.select_for_update().get(
+                pk=initial_payment.quotation_id
+            )
+
+            payment = get_object_or_404(
+                Payment.objects.select_for_update(),
+                id=payment_id,
+            )
+
+            if payment.status == Payment.Status.VERIFIED:
+                messages.info(
+                    request,
+                    "This payment has already been verified.",
+                )
+                return redirect(redirect_target)
+
+            if payment.status == Payment.Status.REJECTED:
+                messages.info(
+                    request,
+                    "This payment has already been rejected.",
+                )
+                return redirect(redirect_target)
+
+            payment.status = Payment.Status.REJECTED
+            payment.verified_by = request.user
+            payment.verified_at = now
+            payment.save(
+                update_fields=[
+                    "status",
+                    "verified_by",
+                    "verified_at",
+                ]
+            )
 
         messages.warning(
             request,
@@ -1603,46 +1710,268 @@ def verify_payment(
         )
         return redirect(redirect_target)
 
-    # Handle VERIFY Action
-    quotation = payment.quotation
-    homecare_request = quotation.homecare_request
-    consultation = quotation.consultation
-
+    # =========================================================
+    # VERIFY PAYMENT
+    # =========================================================
     with transaction.atomic():
+
+        # Lock the quotation row only.
+        # Related nullable objects are loaded but not locked.
+        quotation = get_object_or_404(
+            Quotation.objects
+            .select_related(
+                "homecare_request",
+                "consultation",
+            )
+            .select_for_update(of=("self",)),
+            pk=initial_payment.quotation_id,
+        )
+
+        payment = get_object_or_404(
+            Payment.objects.select_for_update(),
+            id=payment_id,
+        )
+
+        if payment.status == Payment.Status.VERIFIED:
+            messages.info(
+                request,
+                "This payment has already been verified.",
+            )
+            return redirect(redirect_target)
+
+        if payment.status == Payment.Status.REJECTED:
+            messages.error(
+                request,
+                "A rejected payment cannot be verified.",
+            )
+            return redirect(redirect_target)
+
         payment.status = Payment.Status.VERIFIED
         payment.verified_at = now
         payment.verified_by = request.user
-        payment.save(update_fields=["status", "verified_at", "verified_by"])
 
-        quotation.payment_status = Quotation.PaymentStatus.PAID
-        quotation.paid_at = now
-        quotation.save(update_fields=["payment_status", "paid_at", "updated_at"])
+        payment.save(
+            update_fields=[
+                "status",
+                "verified_at",
+                "verified_by",
+            ]
+        )
 
+        # -----------------------------------------------------
+        # CALCULATE TOTAL VERIFIED PAYMENTS
+        # -----------------------------------------------------
+        verified_total = quotation.payments.filter(
+            status=Payment.Status.VERIFIED
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or Decimal("0.00")
+
+        quotation_amount = Decimal(str(quotation.amount))
+
+        fully_paid = verified_total >= quotation_amount
+
+        if fully_paid:
+            quotation.payment_status = Quotation.PaymentStatus.PAID
+            quotation.paid_at = quotation.paid_at or now
+        else:
+            quotation.payment_status = Quotation.PaymentStatus.PENDING
+            quotation.paid_at = None
+
+        quotation.save(
+            update_fields=[
+                "payment_status",
+                "paid_at",
+                "updated_at",
+            ]
+        )
+
+        homecare_request = quotation.homecare_request
+        consultation = quotation.consultation
+
+        # =====================================================
+        # HOME CARE PAYMENT
+        # =====================================================
         if homecare_request:
-            homecare_request.status = HomeCareRequest.Status.CONFIRMED
-            homecare_request.confirmed_at = now
-            homecare_request.save(
-                update_fields=["status", "confirmed_at", "updated_at"]
-            )
-            transaction.on_commit(lambda: send_payment_confirmation_email(payment))
-            messages.success(
-                request,
-                "Payment verified successfully. Home care request confirmed.",
-            )
 
+            if fully_paid:
+
+                homecare_request.status = HomeCareRequest.Status.CONFIRMED
+                homecare_request.confirmed_at = (
+                    homecare_request.confirmed_at or now
+                )
+
+                homecare_request.save(
+                    update_fields=[
+                        "status",
+                        "confirmed_at",
+                        "updated_at",
+                    ]
+                )
+
+                # ---------------------------------------------
+                # AWARD REFERRAL POINTS
+                # ---------------------------------------------
+                # ---------------------------------------------
+                # AWARD REFERRAL POINTS
+                # Only after the quotation is fully paid.
+                # ---------------------------------------------
+                referral_points_awarded = 0
+
+                referral = getattr(
+                    homecare_request,
+                    "referral_source",
+                    None,
+                )
+
+                if referral:
+                    # Lock the referral to prevent duplicate awards.
+                    referral = Referral.objects.select_for_update().get(pk=referral.pk)
+
+                    # Recheck its status after acquiring the lock.
+                    if referral.status == Referral.Status.PENDING:
+
+                        site_settings = SiteSettings.load()
+
+                        amount_per_unit = Decimal(
+                            str(site_settings.referral_points_amount_unit)
+                        )
+
+                        points_per_unit = int(site_settings.referral_points_per_unit)
+
+                        if amount_per_unit > Decimal("0"):
+
+                            # Never award points on more than the
+                            # quotation's actual payable amount.
+                            eligible_amount = min(
+                                verified_total,
+                                quotation_amount,
+                            )
+
+                            # Calculate only complete payment units.
+                            complete_units = int(
+                                (eligible_amount / amount_per_unit).to_integral_value(
+                                    rounding=ROUND_FLOOR
+                                )
+                            )
+
+                            referral_points_awarded = complete_units * points_per_unit
+
+                        # Add the earned points to this referral.
+                        referral.loyalty_points_awarded += referral_points_awarded
+
+                        # Mark completed so this referral cannot
+                        # earn the same points again.
+                        referral.status = Referral.Status.COMPLETED
+
+                        referral.save(
+                            update_fields=[
+                                "status",
+                                "loyalty_points_awarded",
+                                "updated_at",
+                            ]
+                        )
+
+                transaction.on_commit(
+                    lambda payment_id=payment.id: (
+                        send_payment_confirmation_email(
+                            Payment.objects.get(pk=payment_id)
+                        )
+                    )
+                )
+
+                if referral_points_awarded > 0:
+                    messages.success(
+                        request,
+                        (
+                            "Payment verified successfully. "
+                            "Home care request confirmed. "
+                            f"{referral_points_awarded} referral "
+                            "points awarded."
+                        ),
+                    )
+                else:
+                    messages.success(
+                        request,
+                        (
+                            "Payment verified successfully. "
+                            "Home care request confirmed."
+                        ),
+                    )
+
+            else:
+                # Payment received, but the quotation still
+                # has an outstanding balance.
+                homecare_request.status = (
+                    HomeCareRequest.Status.PAYMENT_RECEIVED
+                )
+
+                homecare_request.save(
+                    update_fields=[
+                        "status",
+                        "updated_at",
+                    ]
+                )
+
+                messages.success(
+                    request,
+                    (
+                        "Payment verified successfully. "
+                        "This is a partial payment. "
+                        f"Outstanding balance: "
+                        f"{quotation_amount - verified_total:.2f}."
+                    ),
+                )
+
+        # =====================================================
+        # CONSULTATION PAYMENT
+        # =====================================================
         elif consultation:
-            consultation.status = Consultation.Status.PAID
-            consultation.save(update_fields=["status", "updated_at"])
-            transaction.on_commit(
-                lambda: send_consultation_payment_confirmation_email(payment)
-            )
-            messages.success(
+
+            if fully_paid:
+                consultation.status = Consultation.Status.PAID
+
+                consultation.save(
+                    update_fields=[
+                        "status",
+                        "updated_at",
+                    ]
+                )
+
+                transaction.on_commit(
+                    lambda payment_id=payment.id: (
+                        send_consultation_payment_confirmation_email(
+                            Payment.objects.get(pk=payment_id)
+                        )
+                    )
+                )
+
+                messages.success(
+                    request,
+                    "Payment verified successfully. Consultation marked as PAID.",
+                )
+
+            else:
+                messages.success(
+                    request,
+                    (
+                        "Payment verified successfully. "
+                        "The consultation quotation still has an "
+                        f"outstanding balance of "
+                        f"{quotation_amount - verified_total:.2f}."
+                    ),
+                )
+
+        else:
+            messages.warning(
                 request,
-                "Payment verified successfully. Consultation marked as PAID.",
+                (
+                    "Payment verified, but no linked home-care "
+                    "request or consultation was found."
+                ),
             )
 
     return redirect(redirect_target)
-
 
 # ============================================================
 # HOME CARE PAYMENT CONFIRMATION EMAIL

@@ -1,233 +1,537 @@
-/* ==========================================================================
-   Referral Form Page Stylesheet
+/* ========================================================================== 
+   HANDS-ON HEALTH | PROFESSIONAL REFERRAL FORM
+   Save as: static/homecare/css/referral.css
+   Works with the referral.html template supplied in this conversation.
    ========================================================================== */
 
-/* --- Centering & Layout Overrides --- */
-.container {
-    margin-right: auto !important;
+:root {
+    --ref-primary: #087f8c;
+    --ref-primary-dark: #066570;
+    --ref-primary-soft: #e8f6f6;
+    --ref-ink: #17313b;
+    --ref-muted: #647985;
+    --ref-border: #dce7eb;
+    --ref-surface: #ffffff;
+    --ref-page: #f3f8fa;
+    --ref-danger: #c0394b;
+    --ref-radius: 18px;
+    --ref-shadow: 0 22px 60px rgba(20, 55, 68, .10);
+}
+
+/* Page background and layout — scoped to the page containing #referralForm */
+body:has(#referralForm) {
+    background: var(--ref-page);
+}
+
+body:has(#referralForm)>.container,
+body:has(#referralForm) .container.py-5 {
+    max-width: 1180px;
     margin-left: auto !important;
+    margin-right: auto !important;
+    padding-top: clamp(2rem, 5vw, 4.5rem) !important;
+    padding-bottom: clamp(3rem, 7vw, 6rem) !important;
 }
 
-.container.py-5 {
-    padding-bottom: 6rem !important;
-    /* Ensures generous space above the footer */
-}
-
-.row {
-    margin-right: 0 !important;
+body:has(#referralForm) .row.justify-content-center {
     margin-left: 0 !important;
+    margin-right: 0 !important;
     justify-content: center !important;
 }
 
-/* --- Card & Container Layout --- */
-.card {
-    border-radius: 12px;
-    background-color: #ffffff;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-    margin-right: auto !important;
-    margin-left: auto !important;
-    margin-bottom: 3rem !important;
+/* Main referral card */
+.card:has(#referralForm) {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto 2.5rem !important;
+    padding: clamp(1.35rem, 3.5vw, 3.25rem) !important;
+    border: 1px solid rgba(8, 127, 140, .10) !important;
+    border-radius: 24px !important;
+    background: var(--ref-surface);
+    box-shadow: var(--ref-shadow) !important;
 }
 
-.card h2 {
-    color: #1e293b;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+.card:has(#referralForm)::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 7px;
+    background: linear-gradient(90deg, #087f8c, #35b7aa, #9bd9cb);
 }
 
-/* Center Form Header Elements */
-.card .text-primary.text-uppercase,
-.card h2,
-.card p.text-muted {
+.card:has(#referralForm)>.text-primary.text-uppercase {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    margin: .25rem auto .9rem;
+    padding: .48rem .9rem;
+    border: 1px solid #cce9e7;
+    border-radius: 999px;
+    background: var(--ref-primary-soft);
+    color: var(--ref-primary-dark) !important;
+    font-size: .72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: .13em;
+}
+
+.card:has(#referralForm)>h2 {
+    margin-bottom: .8rem !important;
+    color: var(--ref-ink);
+    font-size: clamp(1.8rem, 3.5vw, 2.55rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.045em;
     text-align: center;
-    display: block;
 }
 
-/* --- Section Dividers --- */
-h5.border-bottom {
-    color: #0d6efd;
-    font-size: 1.1rem;
-    letter-spacing: 0.01em;
-    border-bottom-color: #e2e8f0 !important;
+.card:has(#referralForm)>p.text-muted {
+    max-width: 650px;
+    margin: 0 auto 2.2rem !important;
+    color: var(--ref-muted) !important;
+    font-size: 1rem;
+    line-height: 1.75;
+    text-align: center;
 }
 
-/* --- Form Controls & Labels --- */
-.form-label {
-    color: #334155;
-    font-size: 0.9rem;
-    margin-bottom: 0.35rem;
+/* Form rhythm */
+#referralForm {
+    color: var(--ref-ink);
 }
 
-.form-control,
-.form-select {
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 0.625rem 0.875rem;
-    font-size: 0.95rem;
-    color: #1e293b;
-    background-color: #ffffff;
-    transition: all 0.2s ease-in-out;
+#referralForm>.row,
+#referralForm .row.g-3 {
+    margin-left: 0;
+    margin-right: 0;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-    outline: 0;
+#referralForm .row.g-3>[class*="col-"],
+#referralForm .row>[class*="col-"] {
+    min-width: 0;
 }
 
-/* --- Input Group & Add Button Styling --- */
-.input-group {
+/* Section headings */
+#referralForm h5.border-bottom {
     display: flex;
-    align-items: stretch;
+    align-items: center;
+    gap: .7rem;
+    margin: 2.1rem 0 1.25rem !important;
+    padding: 0 0 .85rem !important;
+    border-bottom: 1px solid var(--ref-border) !important;
+    color: var(--ref-primary-dark);
+    font-size: 1.05rem;
+    font-weight: 800 !important;
+    letter-spacing: -.015em;
 }
 
-.input-group .form-control {
+#referralForm h5.border-bottom::before {
+    content: "";
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    background: var(--ref-primary);
+    box-shadow: 0 0 0 5px var(--ref-primary-soft);
+}
+
+/* Labels and helper text */
+#referralForm .form-label {
+    display: inline-block;
+    margin-bottom: .48rem;
+    color: #29434d;
+    font-size: .88rem;
+    font-weight: 700 !important;
+}
+
+#referralForm small.text-muted,
+#referralForm .text-muted.small {
+    display: block;
+    margin-top: .45rem;
+    color: #71858e !important;
+    font-size: .79rem;
+    line-height: 1.55;
+}
+
+/* Inputs, selects and textareas */
+#referralForm .form-control,
+#referralForm .form-select,
+#referralForm input[type="text"],
+#referralForm input[type="email"],
+#referralForm input[type="tel"],
+#referralForm input[type="date"],
+#referralForm input[type="time"],
+#referralForm input[type="file"],
+#referralForm select,
+#referralForm textarea {
+    display: block;
+    width: 100%;
+    min-height: 50px;
+    padding: .78rem .95rem;
+    border: 1px solid var(--ref-border);
+    border-radius: 11px;
+    background-color: #fbfdfe;
+    color: var(--ref-ink);
+    font-family: inherit;
+    font-size: .94rem;
+    line-height: 1.45;
+    box-shadow: 0 1px 2px rgba(20, 55, 68, .025);
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease, transform .2s ease;
+}
+
+#referralForm textarea {
+    min-height: 145px;
+    resize: vertical;
+}
+
+#referralForm input::placeholder,
+#referralForm textarea::placeholder {
+    color: #9aabb2;
+    opacity: 1;
+}
+
+#referralForm .form-control:hover,
+#referralForm .form-select:hover,
+#referralForm input:hover,
+#referralForm select:hover,
+#referralForm textarea:hover {
+    border-color: #b8d3d8;
+    background-color: #fff;
+}
+
+#referralForm .form-control:focus,
+#referralForm .form-select:focus,
+#referralForm input:focus,
+#referralForm select:focus,
+#referralForm textarea:focus {
+    border-color: var(--ref-primary) !important;
+    outline: 0;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(8, 127, 140, .13) !important;
+}
+
+#referralForm .form-control:disabled,
+#referralForm input:disabled,
+#referralForm select:disabled,
+#referralForm textarea:disabled {
+    cursor: not-allowed;
+    background: #f1f5f7;
+    opacity: .75;
+}
+
+/* Services search and Add button */
+#referralForm #serviceSearchInput {
+    min-width: 0;
+    min-height: 52px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.input-group .btn-outline-primary,
-#addServiceBtn {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    padding: 0.625rem 1.25rem;
-    font-weight: 600;
-    font-size: 0.925rem;
-    color: #ffffff;
-    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-    border: none;
-    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.input-group .btn-outline-primary:hover,
-#addServiceBtn:hover {
-    background: linear-gradient(135deg, #1172ff 0%, #0a58ca 100%);
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-    transform: translateY(-1px);
-    color: #ffffff;
-}
-
-.input-group .btn-outline-primary:active,
-#addServiceBtn:active {
-    transform: translateY(0);
-}
-
-/* --- Dynamic Selected Services Container --- */
-.selected-services-container {
-    min-height: 54px;
-    background-color: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    padding: 8px 12px;
+#referralForm .input-group {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    margin-top: 10px;
+    align-items: stretch;
+    flex-wrap: nowrap;
 }
 
-/* Dynamic Badge Item */
-.service-badge {
-    background: #eef2ff;
-    color: #1e40af;
-    border: 1px solid #c7d2fe;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-    animation: badgePop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.service-badge .remove-btn {
-    cursor: pointer;
+#referralForm #addServiceBtn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    gap: .55rem;
+    min-width: 112px;
+    padding: .7rem 1.2rem;
+    border: 1px solid var(--ref-primary);
+    border-radius: 0 11px 11px 0;
+    background: linear-gradient(135deg, var(--ref-primary), #0a9b9b);
+    color: #fff;
+    font-size: .9rem;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 5px 13px rgba(8, 127, 140, .18);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+#referralForm #addServiceBtn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow: 0 8px 18px rgba(8, 127, 140, .24);
+}
+
+#referralForm #addServiceBtn:active {
+    transform: translateY(0);
+}
+
+/* Selected service chips */
+#referralForm .selected-services-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .6rem;
+    min-height: 66px;
+    margin-top: .75rem;
+    padding: .85rem;
+    border: 1px dashed #b9d5d9;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #f5fbfb, #f9fcfd);
+}
+
+#referralForm #noServicesNotice {
+    margin: 0;
+    color: #82949b !important;
+    font-size: .83rem;
+}
+
+#referralForm .service-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    max-width: 100%;
+    padding: .48rem .55rem .48rem .85rem;
+    border: 1px solid #c8e7e4;
+    border-radius: 999px;
+    background: #e9f7f5;
+    color: #086b70;
+    font-size: .83rem;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 5px rgba(20, 55, 68, .04);
+    animation: referralChipIn .18s ease-out;
+}
+
+#referralForm .service-badge .remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 23px;
+    width: 23px;
+    height: 23px;
+    border: 0;
     border-radius: 50%;
-    background-color: rgba(30, 64, 175, 0.1);
-    color: #1e40af;
-    font-size: 14px;
+    background: rgba(8, 107, 112, .10);
+    color: #086b70;
+    font-size: 1.1rem;
     line-height: 1;
-    transition: all 0.15s ease;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
 }
 
-.service-badge .remove-btn:hover {
-    background-color: #ef4444;
-    color: #ffffff;
+#referralForm .service-badge .remove-btn:hover {
+    transform: rotate(90deg);
+    background: var(--ref-danger);
+    color: #fff;
 }
 
-/* --- Submit Container & Centered Button --- */
-#referralForm .col-12.mt-4 {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    margin-top: 2rem !important;
-    padding-bottom: 0.5rem;
-}
-
-.btn-primary.w-100,
-#referralForm button[type="submit"] {
-    display: inline-block !important;
-    width: 100% !important;
-    max-width: 360px !important;
-    margin: 0 auto !important;
-    padding: 0.85rem 2rem;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-align: center;
-    color: #ffffff;
-    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.28);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+/* File upload area */
+#referralForm input[type="file"] {
+    min-height: auto;
+    padding: .65rem;
+    background: #f8fbfc;
     cursor: pointer;
 }
 
-.btn-primary.w-100:hover,
+#referralForm input[type="file"]::file-selector-button {
+    margin: -.25rem .8rem -.25rem -.25rem;
+    padding: .58rem .9rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--ref-primary-soft);
+    color: var(--ref-primary-dark);
+    font-weight: 750;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+
+#referralForm input[type="file"]::file-selector-button:hover {
+    background: #d7efed;
+}
+
+/* Validation messages and Django errors */
+#referralForm .text-danger.small {
+    margin-top: .38rem;
+    color: var(--ref-danger) !important;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+#referralForm .alert-danger {
+    margin: 1rem 0 1.5rem;
+    padding: .9rem 1rem;
+    border: 1px solid #f1c8ce;
+    border-radius: 11px;
+    background: #fff5f6;
+    color: #9e293a;
+}
+
+/* Submit button */
+#referralForm .col-12.mt-4 {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+    width: 100%;
+    margin-top: 2.3rem !important;
+    padding-top: 1.4rem;
+    border-top: 1px solid #edf2f4;
+}
+
+#referralForm button[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 390px;
+    min-height: 56px;
+    padding: .95rem 1.8rem !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #087f8c 0%, #079b9b 100%) !important;
+    color: #fff !important;
+    font-size: .98rem;
+    font-weight: 800 !important;
+    letter-spacing: .015em;
+    box-shadow: 0 9px 22px rgba(8, 127, 140, .23);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    cursor: pointer;
+}
+
 #referralForm button[type="submit"]:hover {
-    background: linear-gradient(135deg, #1172ff 0%, #0b5ed7 100%);
-    box-shadow: 0 8px 22px rgba(13, 110, 253, 0.38);
     transform: translateY(-2px);
-    color: #ffffff;
+    filter: brightness(1.04);
+    box-shadow: 0 13px 27px rgba(8, 127, 140, .29);
 }
 
-.btn-primary.w-100:active,
 #referralForm button[type="submit"]:active {
-    transform: translateY(1px);
-    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+    transform: translateY(0);
+    box-shadow: 0 5px 13px rgba(8, 127, 140, .2);
 }
 
-/* --- Completely Hide Django Native Select Outputs --- */
-.d-none,
-select[multiple] {
+#referralForm button:focus-visible,
+#referralForm .remove-btn:focus-visible {
+    outline: 3px solid rgba(8, 127, 140, .35);
+    outline-offset: 3px;
+}
+
+/* Keep Django's hidden custom-services field hidden, but do not hide every .d-none
+   element site-wide. The multiple select is hidden only in this form. */
+#referralForm #id_custom_services,
+#referralForm select[multiple] {
     display: none !important;
 }
 
-/* Keyframe Animations */
-@keyframes badgePop {
+/* Responsive refinements */
+@media (max-width: 767.98px) {
+    body:has(#referralForm) .container.py-5 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .card:has(#referralForm) {
+        padding: 1.35rem !important;
+        border-radius: 18px !important;
+    }
+
+    .card:has(#referralForm)>p.text-muted {
+        font-size: .92rem;
+    }
+
+    #referralForm h5.border-bottom {
+        margin-top: 1.65rem !important;
+    }
+
+    #referralForm #addServiceBtn {
+        min-width: 88px;
+        padding-left: .85rem;
+        padding-right: .85rem;
+    }
+}
+
+@media (max-width: 420px) {
+    #referralForm .input-group {
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    #referralForm #serviceSearchInput {
+        flex: 1 1 100%;
+        border-radius: 10px;
+    }
+
+    #referralForm #addServiceBtn {
+        width: 100%;
+        min-height: 47px;
+        border-radius: 10px;
+    }
+
+    #referralForm button[type="submit"] {
+        max-width: 100%;
+    }
+}
+
+@keyframes referralChipIn {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: translateY(4px) scale(.97);
     }
 
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0) scale(1);
     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #referralForm *,
+    .card:has(#referralForm) {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+
+/* ==========================================================
+   CRITICAL FIX: FORCE REFERRAL INPUTS TO BE VISIBLE
+   ========================================================== */
+
+#referralForm input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+#referralForm select:not([multiple]),
+#referralForm textarea {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 52px !important;
+    padding: 13px 16px !important;
+    margin-bottom: 8px !important;
+    border: 1px solid #cbdde2 !important;
+    border-radius: 11px !important;
+    background: #ffffff !important;
+    color: #17313b !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+    box-shadow: 0 2px 8px rgba(20, 55, 68, 0.04) !important;
+    box-sizing: border-box !important;
+}
+
+#referralForm textarea {
+    min-height: 145px !important;
+    resize: vertical;
+}
+
+#referralForm input:focus,
+#referralForm select:focus,
+#referralForm textarea:focus {
+    border-color: #087f8c !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(8, 127, 140, 0.13) !important;
+    background: #ffffff !important;
+}
+
+/* Preserve Django's intentionally hidden fields */
+#referralForm input[type="hidden"],
+#referralForm select[multiple] {
+    display: none !important;
 }

@@ -860,6 +860,27 @@ class QuotationAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    # ========================================================
+    # PAGINATION
+    # ========================================================
+
+    list_per_page = 10
+    list_max_show_all = 100
+    show_full_result_count = False
+
+    # ========================================================
+    # OPTIMIZE PAYMENT QUERIES
+    # ========================================================
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+
+        return queryset.select_related(
+            "quotation",
+            "quotation__consultation",
+            "quotation__homecare_request",
+            "verified_by",
+        )
 
     list_display = (
         "id",
@@ -1700,7 +1721,6 @@ class PaymentAdmin(admin.ModelAdmin):
         "verify_payments",
         "reject_payments",
     ]
-
 
     def has_module_permission(self, request):
         return True

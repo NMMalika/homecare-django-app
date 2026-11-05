@@ -1,4 +1,4 @@
-
+from decimal import Decimal
 from django.db import models
 
 
@@ -126,6 +126,27 @@ class SiteSettings(models.Model):
         help_text=(
             "Additional payment instructions shown to "
             "clients on quotations and payment pages."
+        ),
+    )
+        # =========================================================
+    # REFERRAL LOYALTY POINTS
+    # =========================================================
+
+    referral_points_amount_unit = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("100.00"),
+        help_text=(
+            "Amount that must be paid and verified to earn "
+            "one points unit. Default: 100."
+        ),
+    )
+
+    referral_points_per_unit = models.PositiveIntegerField(
+        default=1,
+        help_text=(
+            "Number of referral points earned for each "
+            "complete payment amount unit. Default: 1."
         ),
     )
 

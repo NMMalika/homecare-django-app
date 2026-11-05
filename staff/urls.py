@@ -169,10 +169,10 @@ urlpatterns = [
         name="homecare_request_delete",
     ),
     path(
-    "homecare/<int:pk>/",
-    views.homecare_request_detail,
-    name="homecare_request_detail",
-),
+        "homecare/<int:pk>/",
+        views.homecare_request_detail,
+        name="homecare_request_detail",
+    ),
     # =========================================================
     # REFERRALS
     # =========================================================
@@ -180,6 +180,11 @@ urlpatterns = [
         "referrals/",
         views.referrals,
         name="referrals",
+    ),
+    path(
+        "referral-rewards/",
+        views.referral_rewards,
+        name="referral_rewards",
     ),
     # =========================================================
     # CONSULTATIONS / APPOINTMENTS

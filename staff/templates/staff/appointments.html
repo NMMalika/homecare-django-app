@@ -456,6 +456,69 @@
         font-size: 13px;
     }
 
+    /* PAGINATION */
+    .sh-appointments .sh-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 18px 20px;
+        border-top: 1px solid #e2e8f0;
+        background: #fff;
+    }
+
+    .sh-appointments .sh-pagination-info {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .sh-appointments .sh-pagination-info strong {
+        color: #0f172a;
+    }
+
+    .sh-appointments .sh-pagination-links {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .sh-appointments .sh-page-link {
+        display: inline-flex;
+        min-width: 36px;
+        min-height: 36px;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #475569;
+        font-size: 12px;
+        font-weight: 750;
+        text-decoration: none;
+        transition: background .2s, border-color .2s;
+    }
+
+    .sh-appointments .sh-page-link:hover {
+        border-color: #0d9488;
+        background: #f0fdfa;
+        color: #0f766e;
+    }
+
+    .sh-appointments .sh-page-link.sh-page-active {
+        border-color: #0f766e;
+        background: #0f766e;
+        color: #fff;
+    }
+
+    .sh-appointments .sh-page-link.sh-page-disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+
     @media (max-width: 768px) {
         .sh-appointments {
             padding: 15px;
@@ -495,12 +558,21 @@
             flex-direction: column;
             padding: 16px;
         }
+
+        .sh-appointments .sh-pagination {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .sh-appointments .sh-pagination-links {
+            width: 100%;
+        }
     }
 </style>
 
 <div class="sh-appointments">
 
-    <!-- PAGE HEADER -->
     <div class="sh-page-header">
         <div>
             <div class="sh-eyebrow">Hands-On Health / Patient Management</div>
@@ -510,7 +582,6 @@
                 scheduling and telemedicine access.
             </p>
         </div>
-
         <div class="sh-header-icon">
             <i class="fas fa-calendar-check"></i>
         </div>
@@ -519,13 +590,10 @@
     <!-- STATUS FILTER -->
     <div class="sh-panel">
         <form method="get" class="sh-filter-body">
-
             <div class="sh-filter-group">
                 <label for="sh-status">Consultation status</label>
-
                 <select name="status" id="sh-status">
                     <option value="">All consultations</option>
-
                     {% for value, label in status_choices %}
                     <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>
                         {{ label }}
@@ -535,17 +603,14 @@
             </div>
 
             <button type="submit" class="sh-btn sh-btn-primary">
-                <i class="fas fa-filter"></i>
-                Apply Filter
+                <i class="fas fa-filter"></i> Apply Filter
             </button>
 
             {% if current_status %}
             <a href="{% url 'staff:appointments' %}" class="sh-btn sh-btn-light">
-                <i class="fas fa-times"></i>
-                Clear Filter
+                <i class="fas fa-times"></i> Clear Filter
             </a>
             {% endif %}
-
         </form>
     </div>
 
@@ -554,15 +619,11 @@
         <div class="sh-summary">
             <div>
                 <div class="sh-summary-label">
-                    {% if current_status %}
-                    Filtered consultations
-                    {% else %}
-                    Total consultation records
-                    {% endif %}
+                    {% if current_status %}Filtered consultations{% else %}Total consultation records{% endif %}
                 </div>
 
                 <div class="sh-summary-number">
-                    {{ appointments|length }}
+                    {% if paginator %}{{ paginator.count }}{% else %}{{ appointments|length }}{% endif %}
                 </div>
 
                 <div class="sh-summary-note">
@@ -582,24 +643,20 @@
 
     <!-- CONSULTATION TABLE -->
     <div class="sh-panel">
-
         <div class="sh-table-heading">
             <h2>
                 <i class="fas fa-clipboard-list" style="color:#0d9488; margin-right:7px;"></i>
                 Consultation Records
             </h2>
-
             <div class="sh-table-count">
-                {{ appointments|length }}
-                consultation{{ appointments|length|pluralize }}
+                {% if paginator %}{{ paginator.count }}{% else %}{{ appointments|length }}{% endif %}
+                consultation{% if paginator.count != 1 %}s{% endif %}
             </div>
         </div>
 
         {% if appointments %}
-
         <div class="sh-table-wrap">
             <table class="sh-table">
-
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -616,39 +673,29 @@
                         <th>Created at</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {% for appointment in appointments %}
-
-                    <tr {% if selected_appointment_id|stringformat:"s" == appointment.pk|stringformat:"s" %}
-                        class="sh-selected-row" {% endif %}>
-
-                        <!-- ID -->
+                    <tr {% if selected_appointment_id|stringformat:"s" == appointment.pk|stringformat:"s" %} class="sh-selected-row" {% endif %}>
                         <td>
                             <a class="sh-id" href="{% url 'admin:homecare_consultation_change' appointment.pk %}">
                                 {{ appointment.pk }}
                             </a>
                         </td>
 
-                        <!-- PATIENT -->
                         <td>
                             <div class="sh-patient">
-                                {{ appointment.first_name }}
-                                {{ appointment.last_name }}
+                                {{ appointment.first_name }} {{ appointment.last_name }}
                             </div>
                         </td>
 
-                        <!-- EMAIL -->
                         <td>
                             {% if appointment.email %}
-                            <span>{{ appointment.email }}</span>
+                            {{ appointment.email }}
                             {% else %}
                             <span class="sh-muted">Not provided</span>
                             {% endif %}
                         </td>
 
-                        <!-- PHONE -->
                         <td>
                             {% if appointment.phone %}
                             {{ appointment.phone }}
@@ -657,29 +704,22 @@
                             {% endif %}
                         </td>
 
-                        <!-- REQUESTED DATE -->
                         <td>
                             {% if appointment.requested_date %}
-                            <span class="sh-date">
-                                {{ appointment.requested_date|date:"M. d, Y" }}
-                            </span>
+                            <span class="sh-date">{{ appointment.requested_date|date:"M. d, Y" }}</span>
                             {% else %}
                             <span class="sh-muted">Not specified</span>
                             {% endif %}
                         </td>
 
-                        <!-- REQUESTED TIME -->
                         <td>
                             {% if appointment.requested_time %}
-                            <span class="sh-date">
-                                {{ appointment.requested_time|time:"g:i A" }}
-                            </span>
+                            <span class="sh-date">{{ appointment.requested_time|time:"g:i A" }}</span>
                             {% else %}
                             <span class="sh-muted">Not specified</span>
                             {% endif %}
                         </td>
 
-                        <!-- DOCTOR -->
                         <td>
                             {% if appointment.doctor %}
                             <div style="font-weight:750;color:#0f172a;">
@@ -694,181 +734,158 @@
                             {% endif %}
                         </td>
 
-                        <!-- STATUS -->
                         <td>
                             {% with status=appointment.status|default:""|lower %}
                             <span class="sh-status
-                                            {% if status == 'pending' %}
-                                                sh-pending
-                                            {% elif status == 'quoted' %}
-                                                sh-quoted
-                                            {% elif status == 'payment_pending' %}
-                                                sh-payment-pending
-                                            {% elif status == 'paid' %}
-                                                sh-paid
-                                            {% elif status == 'scheduled' %}
-                                                sh-scheduled
-                                            {% elif status == 'in_progress' %}
-                                                sh-in-progress
-                                            {% elif status == 'completed' %}
-                                                sh-completed
-                                            {% elif status == 'cancelled' %}
-                                                sh-cancelled
-                                            {% else %}
-                                                sh-default-status
-                                            {% endif %}
-                                        ">
+                                {% if status == 'pending' %}sh-pending
+                                {% elif status == 'quoted' %}sh-quoted
+                                {% elif status == 'payment_pending' %}sh-payment-pending
+                                {% elif status == 'paid' %}sh-paid
+                                {% elif status == 'scheduled' %}sh-scheduled
+                                {% elif status == 'in_progress' %}sh-in-progress
+                                {% elif status == 'completed' %}sh-completed
+                                {% elif status == 'cancelled' %}sh-cancelled
+                                {% else %}sh-default-status{% endif %}">
                                 <span class="sh-status-dot"></span>
                                 {{ appointment.get_status_display|default:appointment.status }}
                             </span>
                             {% endwith %}
                         </td>
 
-                        <!-- QUOTATION -->
                         <td class="sh-action-cell">
                             {% if appointment.quotation %}
-                            <a class="sh-btn sh-btn-quote" href="{% url 'staff:quotation_detail' appointment.quotation.pk %}">
-                            
-                                <i class="fas fa-file-invoice-dollar"></i>
-                                View Quote
-                            
+                            <a class="sh-btn sh-btn-quote"
+                                href="{% url 'staff:quotation_detail' appointment.quotation.pk %}">
+                                <i class="fas fa-file-invoice-dollar"></i> View Quote
                             </a>
                             {% elif appointment.status == "PENDING" %}
                             <a class="sh-btn sh-btn-primary"
                                 href="{% url 'staff:consultation_quotation' appointment.pk %}">
-                                <i class="fas fa-plus-circle"></i>
-                                Create Quote
+                                <i class="fas fa-plus-circle"></i> Create Quote
                             </a>
                             {% else %}
                             <span class="sh-muted">No quotation</span>
                             {% endif %}
                         </td>
 
-                        
-                        <!-- NEXT STEP -->
                         <td class="sh-action-cell">
-                        
                             {% if appointment.status == "PENDING" %}
-                        
-                            <a class="sh-btn sh-btn-next" href="{% url 'staff:consultation_quotation' appointment.pk %}">
-                                <i class="fas fa-file-invoice"></i>
-                                Create Quotation
+                            <a class="sh-btn sh-btn-next"
+                                href="{% url 'staff:consultation_quotation' appointment.pk %}">
+                                <i class="fas fa-file-invoice"></i> Create Quotation
                             </a>
-                        
                             {% elif appointment.status == "QUOTED" or appointment.status == "PAYMENT_PENDING" %}
-                        
                             <span class="sh-action-text" style="color:#1d4ed8;">
-                                <i class="fas fa-hourglass-half"></i>
-                                Awaiting Payment
+                                <i class="fas fa-hourglass-half"></i> Awaiting Payment
                             </span>
-                        
                             {% elif appointment.status == "PAID" %}
-                        
-                            <a class="sh-btn sh-btn-next" href="{% url 'homecare:schedule_consultation' appointment.pk %}">
-                                <i class="fas fa-calendar-plus"></i>
-                                Add Consultation Slots
+                            <a class="sh-btn sh-btn-next"
+                                href="{% url 'homecare:schedule_consultation' appointment.pk %}">
+                                <i class="fas fa-calendar-plus"></i> Add Consultation Slots
                             </a>
-                        
                             {% elif appointment.status == "SCHEDULED" %}
-                        
-                            <span class="sh-action-text">
-                                <i class="fas fa-video"></i>
-                                Ready for Telemedicine
-                            </span>
-                        
+                            <span class="sh-action-text"><i class="fas fa-video"></i> Ready for Telemedicine</span>
                             {% elif appointment.status == "IN_PROGRESS" %}
-                        
-                            <span class="sh-action-text" style="color:#0369a1;">
-                                <i class="fas fa-stethoscope"></i>
-                                In Progress
-                            </span>
-                        
+                            <span class="sh-action-text" style="color:#0369a1;"><i class="fas fa-stethoscope"></i> In
+                                Progress</span>
                             {% elif appointment.status == "COMPLETED" %}
-                        
-                            <span class="sh-action-text">
-                                <i class="fas fa-check-circle"></i>
-                                Completed
-                            </span>
-                        
+                            <span class="sh-action-text"><i class="fas fa-check-circle"></i> Completed</span>
                             {% elif appointment.status == "CANCELLED" %}
-                        
-                            <span class="sh-action-text" style="color:#b91c1c;">
-                                <i class="fas fa-times-circle"></i>
-                                Cancelled
-                            </span>
-                        
+                            <span class="sh-action-text" style="color:#b91c1c;"><i class="fas fa-times-circle"></i>
+                                Cancelled</span>
                             {% else %}
-                        
                             <span class="sh-muted">Review consultation</span>
-                        
                             {% endif %}
-                        
                         </td>
 
-                        <!-- TELEMEDICINE -->
                         <td>
                             {% if appointment.status == "SCHEDULED" or appointment.status == "IN_PROGRESS" %}
-
                             {% if appointment.patient_join_url or appointment.doctor_join_url %}
-
                             <div class="sh-telemedicine">
-
                                 {% if appointment.patient_join_url %}
                                 <a class="sh-tele-link" href="{{ appointment.patient_join_url }}" target="_blank"
                                     rel="noopener noreferrer">
-                                    <i class="fas fa-user"></i>
-                                    Patient
+                                    <i class="fas fa-user"></i> Patient
                                 </a>
                                 {% endif %}
-
                                 {% if appointment.doctor_join_url %}
                                 <a class="sh-tele-link sh-doctor-link" href="{{ appointment.doctor_join_url }}"
                                     target="_blank" rel="noopener noreferrer">
-                                    <i class="fas fa-user-md"></i>
-                                    Doctor
+                                    <i class="fas fa-user-md"></i> Doctor
                                 </a>
                                 {% endif %}
-
                             </div>
-
                             {% else %}
-
                             <span class="sh-muted">Links unavailable</span>
-
                             {% endif %}
-
                             {% else %}
-
                             <span class="sh-muted">Not scheduled</span>
-
                             {% endif %}
                         </td>
 
-                        <!-- CREATED AT -->
                         <td>
                             {% if appointment.created_at %}
-                            <div class="sh-date">
-                                {{ appointment.created_at|date:"M. d, Y" }}
-                            </div>
-                            <div class="sh-subtext">
-                                {{ appointment.created_at|time:"g:i A" }}
-                            </div>
+                            <div class="sh-date">{{ appointment.created_at|date:"M. d, Y" }}</div>
+                            <div class="sh-subtext">{{ appointment.created_at|time:"g:i A" }}</div>
                             {% else %}
                             <span class="sh-muted">—</span>
                             {% endif %}
                         </td>
-
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
             </table>
         </div>
 
-        {% else %}
+        <!-- PAGINATION -->
+        {% if is_paginated %}
+        <div class="sh-pagination">
+            <div class="sh-pagination-info">
+                Showing <strong>{{ page_obj.start_index }}</strong>–<strong>{{ page_obj.end_index }}</strong>
+                of <strong>{{ paginator.count }}</strong> consultations
+            </div>
 
-        <!-- EMPTY STATE -->
+            <nav class="sh-pagination-links" aria-label="Consultation pagination">
+                {% if page_obj.has_previous %}
+                <a class="sh-page-link" href="?page=1{% if current_status %}&amp;status={{ current_status|urlencode }}{% endif %}{% if selected_appointment_id %}&amp;appointment={{ selected_appointment_id|urlencode }}{% endif %}"
+                    aria-label="First page" title="First page">
+                    <i class="fas fa-angles-left"></i>
+                </a>
+                <a class="sh-page-link" href="?page={{ page_obj.previous_page_number }}{% if current_status %}&amp;status={{ current_status|urlencode }}{% endif %}{% if selected_appointment_id %}&amp;appointment={{ selected_appointment_id|urlencode }}{% endif %}"
+                    aria-label="Previous page">
+                    <i class="fas fa-angle-left"></i> Previous
+                </a>
+                {% else %}
+                <span class="sh-page-link sh-page-disabled"><i class="fas fa-angles-left"></i></span>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <span class="sh-page-link sh-page-active" aria-current="page">{{ num }}</span>
+                {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} <a class="sh-page-link"
+                    href="?page={{ num }}{% if current_status %}&amp;status={{ current_status|urlencode }}{% endif %}{% if selected_appointment_id %}&amp;appointment={{ selected_appointment_id|urlencode }}{% endif %}">
+                    {{ num }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a class="sh-page-link" href="?page={{ page_obj.next_page_number }}{% if current_status %}&amp;status={{ current_status|urlencode }}{% endif %}{% if selected_appointment_id %}&amp;appointment={{ selected_appointment_id|urlencode }}{% endif %}"
+                        aria-label="Next page">
+                        Next <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a class="sh-page-link" href="?page={{ paginator.num_pages }}{% if current_status %}&amp;status={{ current_status|urlencode }}{% endif %}{% if selected_appointment_id %}&amp;appointment={{ selected_appointment_id|urlencode }}{% endif %}"
+                        aria-label="Last page" title="Last page">
+                        <i class="fas fa-angles-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="sh-page-link sh-page-disabled"><i class="fas fa-angles-right"></i></span>
+                    {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
         <div class="sh-empty">
             <div class="sh-empty-icon">
                 <i class="fas fa-calendar-times"></i>
@@ -876,23 +893,14 @@
 
             {% if current_status %}
             <h3>No consultations found</h3>
-            <p>
-                No consultation records match the selected status.
-                Try clearing the filter.
-            </p>
+            <p>No consultation records match the selected status. Try clearing the filter.</p>
             {% else %}
             <h3>No consultations yet</h3>
-            <p>
-                Consultation requests submitted through the
-                HomeCare app will appear here.
-            </p>
+            <p>Consultation requests submitted through the HomeCare app will appear here.</p>
             {% endif %}
         </div>
-
         {% endif %}
-
     </div>
-
 </div>
 
 {% endblock %}

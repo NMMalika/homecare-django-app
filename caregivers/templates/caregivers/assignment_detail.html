@@ -4,6 +4,143 @@
 
 {% block content %}
 
+<style>
+    /* =====================================================
+       ASSIGNMENT ACTION CENTRE
+       ===================================================== */
+
+    .assignment-action-centre {
+        border: 1px solid #e9edf3;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .assignment-action-header {
+        background: linear-gradient(135deg, #f8fafc, #eef4ff);
+        border-bottom: 1px solid #e9edf3;
+        padding: 20px 24px;
+    }
+
+    .assignment-action-header h5 {
+        font-weight: 750;
+        color: #172554;
+    }
+
+    .assignment-action-header p {
+        color: #64748b;
+        font-size: 13px;
+        margin: 5px 0 0;
+    }
+
+    .assignment-action-body {
+        padding: 24px;
+    }
+
+    .assignment-action-panel {
+        border: 1px solid #e8edf3;
+        background: #fbfcfe;
+        border-radius: 12px;
+        padding: 20px;
+        height: 100%;
+    }
+
+    .assignment-action-panel label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .assignment-action-btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 10px 16px;
+        transition: all .2s ease;
+    }
+
+    .assignment-action-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .assignment-status-result {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 17px;
+        border-radius: 11px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+    }
+
+    .assignment-status-result.declined {
+        background: #fff1f2;
+        border-color: #fecdd3;
+    }
+
+    .assignment-status-result.completed {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .assignment-status-result .status-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .assignment-status-result.declined .status-icon {
+        background: #ffe4e6;
+        color: #be123c;
+    }
+
+    .assignment-status-result h6 {
+        font-weight: 750;
+        margin-bottom: 3px;
+    }
+
+    .assignment-status-result p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .decline-reason-box {
+        background: #fff;
+        border: 1px solid #fecaca;
+        border-radius: 9px;
+        padding: 15px;
+    }
+
+    .decline-reason-box textarea {
+        resize: vertical;
+    }
+
+    @media(max-width: 576px) {
+        .assignment-action-body {
+            padding: 15px;
+        }
+
+        .assignment-action-header {
+            padding: 17px;
+        }
+
+        .assignment-action-panel {
+            padding: 15px;
+        }
+
+        .assignment-action-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+
 <div class="container-fluid py-4">
 
     <!-- HEADER -->
@@ -105,7 +242,6 @@
 
                         </div>
 
-
                         {% if assignment.homecare_request.phone %}
 
                         <div class="col-md-6 mb-3">
@@ -122,7 +258,6 @@
 
                         {% endif %}
 
-
                         {% if assignment.homecare_request.address %}
 
                         <div class="col-md-6 mb-3">
@@ -138,7 +273,6 @@
                         </div>
 
                         {% endif %}
-
 
                         {% if assignment.homecare_request.city %}
 
@@ -340,7 +474,7 @@
         </div>
 
 
-        <!-- ACTIONS -->
+        <!-- EXISTING SIDEBAR ACTIONS -->
 
         <div class="col-lg-4">
 
@@ -367,7 +501,8 @@
 
                         {% csrf_token %}
 
-                        <button type="submit" class="btn btn-success w-100">
+                        <button type="submit" class="btn btn-success w-100"
+                            onclick="return confirm('Are you sure you want to accept this assignment?');">
 
                             <i class="fa-solid fa-check me-2"></i>
                             Accept Assignment
@@ -375,7 +510,6 @@
                         </button>
 
                     </form>
-
 
                     <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal"
                         data-bs-target="#declineModal">
@@ -397,7 +531,8 @@
 
                         {% csrf_token %}
 
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="submit" class="btn btn-primary w-100"
+                            onclick="return confirm('Start this assignment?');">
 
                             <i class="fa-solid fa-play me-2"></i>
                             Start Assignment
@@ -411,7 +546,6 @@
 
                     <div class="alert alert-primary small">
                         <i class="fa-solid fa-heart-pulse me-2"></i>
-
                         This assignment is currently in progress.
                     </div>
 
@@ -450,7 +584,6 @@
 
                     <div class="alert alert-success">
                         <i class="fa-solid fa-circle-check me-2"></i>
-
                         This assignment has been completed successfully.
                     </div>
 
@@ -485,10 +618,367 @@
 
     </div>
 
+
+    <!-- =====================================================
+         NEW BOTTOM ASSIGNMENT ACTION CENTRE
+         ===================================================== -->
+
+    <div class="assignment-action-centre shadow-sm mt-5 mb-4">
+
+        <!-- SECTION HEADER -->
+
+        <div class="assignment-action-header">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="rounded-3 bg-white shadow-sm p-3">
+
+                    <i class="fa-solid fa-clipboard-check text-primary fs-4"></i>
+
+                </div>
+
+                <div>
+
+                    <h5 class="mb-0">
+                        Assignment Action Centre
+                    </h5>
+
+                    <p>
+                        Manage your assignment and track its current status.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="assignment-action-body">
+
+            <!-- PENDING ACCEPTANCE -->
+
+            {% if assignment.status == "PENDING" or assignment.status == "PENDING_ACCEPTANCE" %}
+
+            <div class="row g-4">
+
+                <div class="col-lg-5">
+
+                    <div class="assignment-action-panel">
+
+                        <div class="mb-3">
+
+                            <span class="badge bg-warning text-dark px-3 py-2">
+                                <i class="fa-solid fa-clock me-1"></i>
+                                Action Required
+                            </span>
+
+                        </div>
+
+                        <h6 class="fw-bold mb-2">
+                            Review your assignment
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+                            Please review the patient information, assignment
+                            dates and care requirements before making your decision.
+                        </p>
+
+                        <div class="mt-4">
+
+                            <form method="post" action="{% url 'caregivers:assignment_accept' assignment.pk %}">
+
+                                {% csrf_token %}
+
+                                <button type="submit" class="btn btn-success assignment-action-btn w-100"
+                                    onclick="return confirm('Are you sure you want to accept this home-care assignment?');">
+
+                                    <i class="fa-solid fa-check-circle me-2"></i>
+                                    Accept Assignment
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-7">
+
+                    <div class="assignment-action-panel">
+
+                        <h6 class="fw-bold text-danger mb-3">
+
+                            <i class="fa-solid fa-circle-xmark me-2"></i>
+                            Decline Assignment
+
+                        </h6>
+
+                        <div class="decline-reason-box">
+
+                            <form method="post" action="{% url 'caregivers:assignment_decline' assignment.pk %}"
+                                onsubmit="return confirmDeclineAssignment('{{ assignment.pk }}');">
+
+                                {% csrf_token %}
+
+                                <div class="mb-3">
+
+                                    <label for="response_note_{{ assignment.pk }}" class="form-label text-danger">
+
+                                        Reason for declining
+
+                                    </label>
+
+                                    <textarea name="response_note" id="response_note_{{ assignment.pk }}"
+                                        class="form-control decline-reason" rows="3"
+                                        placeholder="Please explain why you cannot accept this assignment..." required
+                                        minlength="3"></textarea>
+
+                                    <div class="form-text">
+                                        Your reason will be sent to the care coordination team.
+                                    </div>
+
+                                </div>
+
+                                <button type="submit" class="btn btn-outline-danger assignment-action-btn">
+
+                                    <i class="fa-solid fa-xmark me-2"></i>
+                                    Decline Assignment
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCEPTED -->
+
+            {% elif assignment.status == "ACCEPTED" %}
+
+            <div class="row g-3 align-items-center">
+
+                <div class="col-lg-7">
+
+                    <div class="assignment-status-result">
+
+                        <div class="status-icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+
+                        <div>
+
+                            <h6 class="text-success">
+                                Assignment Accepted
+                            </h6>
+
+                            <p>
+                                You have successfully accepted this assignment.
+                                You can now begin providing care.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-5">
+
+                    <form method="post" action="{% url 'caregivers:assignment_start' assignment.pk %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-primary assignment-action-btn w-100"
+                            onclick="return confirm('Start this assignment?');">
+
+                            <i class="fa-solid fa-play-circle me-2"></i>
+                            Start Assignment
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- IN PROGRESS -->
+
+            {% elif assignment.status == "IN_PROGRESS" %}
+
+            <div class="assignment-action-panel">
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+
+                        <i class="fa-solid fa-heart-pulse text-primary fs-4"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h6 class="fw-bold mb-1">
+                            Assignment In Progress
+                        </h6>
+
+                        <p class="text-muted small mb-0">
+                            Continue providing care and keeping patient records updated.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <a href="{% url 'caregivers:daily_report_create' assignment.pk %}"
+                            class="btn btn-primary assignment-action-btn w-100">
+
+                            <i class="fa-solid fa-file-medical me-2"></i>
+                            Submit Daily Report
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <a href="{% url 'caregivers:weekly_summary' assignment.pk %}"
+                            class="btn btn-outline-primary assignment-action-btn w-100">
+
+                            <i class="fa-solid fa-calendar-week me-2"></i>
+                            Weekly Summary
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPLETED -->
+
+            {% elif assignment.status == "COMPLETED" %}
+
+            <div class="assignment-status-result completed">
+
+                <div class="status-icon">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+
+                <div>
+
+                    <h6 class="text-success">
+                        Assignment Completed
+                    </h6>
+
+                    <p>
+                        This assignment has been successfully completed.
+                        Thank you for providing care.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- DECLINED -->
+
+            {% elif assignment.status == "DECLINED" %}
+
+            <div class="assignment-status-result declined">
+
+                <div class="status-icon">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+
+                <div>
+
+                    <h6 class="text-danger">
+                        Assignment Declined
+                    </h6>
+
+                    <p>
+                        You have declined this home-care assignment.
+                        The care coordination team can review your response.
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% if assignment.caregiver_response_note %}
+
+            <div class="mt-3 p-3 bg-light rounded-3">
+
+                <small class="text-muted fw-semibold d-block mb-1">
+                    <i class="fa-solid fa-comment-dots me-1"></i>
+                    Reason Provided
+                </small>
+
+                <p class="mb-0">
+                    {{ assignment.caregiver_response_note|linebreaksbr }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- CANCELLED -->
+
+            {% elif assignment.status == "CANCELLED" %}
+
+            <div class="alert alert-secondary mb-0">
+
+                <i class="fa-solid fa-ban me-2"></i>
+
+                This assignment has been cancelled. No further action is available.
+
+            </div>
+
+
+            <!-- OTHER STATUSES -->
+
+            {% else %}
+
+            <div class="alert alert-secondary mb-0">
+
+                <i class="fa-solid fa-info-circle me-2"></i>
+
+                No action is currently available for this assignment.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
 </div>
 
 
-<!-- DECLINE MODAL -->
+<!-- =====================================================
+     EXISTING DECLINE MODAL
+     ===================================================== -->
 
 <div class="modal fade" id="declineModal" tabindex="-1">
 
@@ -516,7 +1006,7 @@
                         Please provide a reason for declining this assignment.
                     </p>
 
-                    <textarea name="response_note" class="form-control" rows="4" required
+                    <textarea name="response_note" class="form-control" rows="4" required minlength="3"
                         placeholder="Reason for declining..."></textarea>
 
                 </div>
@@ -540,5 +1030,38 @@
     </div>
 
 </div>
+
+
+<script>
+    /* =====================================================
+       DECLINE CONFIRMATION
+       ===================================================== */
+
+    function confirmDeclineAssignment(assignmentId) {
+
+        const reasonField = document.getElementById(
+            'response_note_' + assignmentId
+        );
+
+        if (!reasonField) {
+            return false;
+        }
+
+        const reason = reasonField.value.trim();
+
+        if (reason.length < 3) {
+
+            alert('Please provide a valid reason for declining this assignment.');
+
+            reasonField.focus();
+
+            return false;
+        }
+
+        return confirm(
+            'Are you sure you want to decline this assignment? Your reason will be sent to the care coordination team.'
+        );
+    }
+</script>
 
 {% endblock %}

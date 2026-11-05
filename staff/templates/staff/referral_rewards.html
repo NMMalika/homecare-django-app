@@ -1,0 +1,709 @@
+{% extends "staff/base.html" %}
+
+{% block title %}
+Referral Rewards | Hands-On Health
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .rewards-page {
+        max-width: 1550px;
+        margin: 0 auto;
+        padding-bottom: 3rem;
+    }
+
+    .rewards-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .rewards-kicker {
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 7px;
+    }
+
+    .rewards-header h1 {
+        margin: 0 0 7px;
+        color: #0f172a;
+        font-size: 1.9rem;
+        font-weight: 800;
+    }
+
+    .rewards-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .rewards-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-height: 43px;
+        padding: 0 17px;
+        border-radius: 8px;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .rewards-back:hover {
+        background: #f1f5f9;
+        color: #1d4ed8;
+    }
+
+    .rewards-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .reward-stat {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.025);
+    }
+
+    .reward-stat-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 20px;
+    }
+
+    .reward-stat-icon.green {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .reward-stat-icon.purple {
+        background: #f5f3ff;
+        color: #7c3aed;
+    }
+
+    .reward-stat-icon.orange {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .reward-stat-value {
+        display: block;
+        color: #0f172a;
+        font-size: 1.65rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .reward-stat-label {
+        display: block;
+        margin-top: 5px;
+        color: #64748b;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .reward-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.025);
+    }
+
+    .reward-card-header {
+        padding: 19px 22px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .reward-card-header h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .reward-card-header p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .reward-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .reward-table {
+        width: 100%;
+        min-width: 950px;
+        border-collapse: collapse;
+    }
+
+    .reward-table th {
+        padding: 14px 18px;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        color: #64748b;
+        text-align: left;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: 0.7rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .reward-table td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        font-size: 0.84rem;
+        vertical-align: middle;
+    }
+
+    .reward-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .reward-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .referrer-name {
+        color: #0f172a;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .referrer-detail {
+        color: #64748b;
+        font-size: 0.76rem;
+        margin-top: 4px;
+    }
+
+    .balance-points {
+        color: #047857;
+        font-weight: 800;
+        font-size: 0.95rem;
+    }
+
+    .balance-value {
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .issue-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 7px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.78rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .issue-button:hover {
+        background: #1d4ed8;
+    }
+
+    .issue-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    .reward-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 190px;
+    }
+
+    .reward-form input,
+    .reward-form textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 9px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        color: #1e293b;
+        background: #ffffff;
+        font-size: 0.82rem;
+        outline: none;
+    }
+
+    .reward-form input:focus,
+    .reward-form textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .reward-form label {
+        display: block;
+        margin-bottom: 5px;
+        color: #475569;
+        font-size: 0.73rem;
+        font-weight: 800;
+    }
+
+    .reward-form small {
+        color: #64748b;
+        font-size: 0.72rem;
+    }
+
+    .reward-history-reference {
+        color: #64748b;
+        font-size: 0.73rem;
+        overflow-wrap: anywhere;
+    }
+
+    .reward-empty {
+        padding: 55px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .reward-empty i {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 32px;
+        color: #94a3b8;
+    }
+
+    .reward-empty h3 {
+        margin: 0 0 6px;
+        color: #334155;
+    }
+
+    .reward-empty p {
+        margin: 0;
+        font-size: 0.85rem;
+    }
+
+    .reward-note {
+        margin-bottom: 22px;
+        padding: 14px 17px;
+        border: 1px solid #dbeafe;
+        border-radius: 9px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 0.83rem;
+        line-height: 1.6;
+    }
+
+    .reward-note strong {
+        font-weight: 800;
+    }
+
+    @media (max-width: 1100px) {
+        .rewards-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .rewards-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .rewards-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .reward-stat {
+            padding: 17px;
+        }
+
+        .reward-card-header {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="rewards-page">
+
+    <!-- PAGE HEADER -->
+    <div class="rewards-header">
+        <div>
+            <div class="rewards-kicker">
+                <i class="fa-solid fa-gift"></i>
+                Partnership & Growth
+            </div>
+
+            <h1>Referral Rewards</h1>
+
+            <p>
+                Manage referrer balances, issue rewards and review
+                previous reward transactions.
+            </p>
+        </div>
+
+        <a href="{% url 'staff:referrals' %}" class="rewards-back">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Referrals
+        </a>
+    </div>
+
+    <!-- REWARD POLICY -->
+    <div class="reward-note">
+        <strong>Reward conversion:</strong>
+        1 referral point = N$1.00.
+        Only points earned from completed and paid referrals are
+        available for redemption.
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="rewards-stats">
+
+        <div class="reward-stat">
+            <div class="reward-stat-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div>
+                <span class="reward-stat-value">
+                    {{ total_referrers }}
+                </span>
+
+                <span class="reward-stat-label">
+                    Referrer Accounts
+                </span>
+            </div>
+        </div>
+
+        <div class="reward-stat">
+            <div class="reward-stat-icon purple">
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div>
+                <span class="reward-stat-value">
+                    {{ total_earned }}
+                </span>
+
+                <span class="reward-stat-label">
+                    Total Points Earned
+                </span>
+            </div>
+        </div>
+
+        <div class="reward-stat">
+            <div class="reward-stat-icon orange">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+            </div>
+
+            <div>
+                <span class="reward-stat-value">
+                    {{ total_redeemed }}
+                </span>
+
+                <span class="reward-stat-label">
+                    Points Redeemed
+                </span>
+            </div>
+        </div>
+
+        <div class="reward-stat">
+            <div class="reward-stat-icon green">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+
+            <div>
+                <span class="reward-stat-value">
+                    {{ total_available }}
+                </span>
+
+                <span class="reward-stat-label">
+                    Available Points
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- REFERRER BALANCES -->
+    <div class="reward-card">
+
+        <div class="reward-card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-wallet"></i>
+                    Referrer Reward Balances
+                </h2>
+
+                <p>
+                    Each email address represents one consolidated
+                    referrer account.
+                </p>
+            </div>
+        </div>
+
+        {% if reward_accounts %}
+
+        <div class="reward-table-wrap">
+            <table class="reward-table">
+
+                <thead>
+                    <tr>
+                        <th>Referrer</th>
+                        <th>Referrals</th>
+                        <th>Earned</th>
+                        <th>Redeemed</th>
+                        <th>Available</th>
+                        <th>Reward Value</th>
+                        <th>Issue Reward</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for account in reward_accounts %}
+                    <tr>
+
+                        <td>
+                            <div class="referrer-name">
+                                {{ account.name|default:"Unnamed Referrer" }}
+                            </div>
+
+                            <div class="referrer-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                {{ account.email }}
+                            </div>
+
+                            {% if account.phone %}
+                            <div class="referrer-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                {{ account.phone }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ account.referral_count }}
+                        </td>
+
+                        <td>
+                            {{ account.earned }} pts
+                        </td>
+
+                        <td>
+                            {{ account.redeemed }} pts
+                        </td>
+
+                        <td>
+                            <span class="balance-points">
+                                {{ account.available }} pts
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="balance-value">
+                                N$ {{ account.available_value|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if account.available > 0 %}
+
+                            <form method="post" action="{% url 'staff:referral_rewards' %}" class="reward-form"
+                                onsubmit="return confirm('Confirm issuing this referral reward?');">
+
+                                {% csrf_token %}
+
+                                <input type="hidden" name="referrer_email" value="{{ account.email }}">
+
+                                <div>
+                                    <label>Points to issue</label>
+
+                                    <input type="number" name="points" min="1" max="{{ account.available }}"
+                                        value="{{ account.available }}" required>
+                                </div>
+
+                                <small>
+                                    Maximum: {{ account.available }} points
+                                </small>
+
+                                <div>
+                                    <label>Notes (optional)</label>
+
+                                    <textarea name="notes" rows="2" placeholder="Payment or reward notes..."></textarea>
+                                </div>
+
+                                <button type="submit" class="issue-button">
+                                    <i class="fa-solid fa-gift"></i>
+                                    Issue Reward
+                                </button>
+
+                            </form>
+
+                            {% else %}
+
+                            <span style="color: #94a3b8; font-size: 0.8rem;">
+                                No available balance
+                            </span>
+
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="reward-empty">
+            <i class="fa-solid fa-users"></i>
+            <h3>No referrer accounts found</h3>
+            <p>Referrer accounts will appear here when referrals are registered.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- REWARD HISTORY -->
+    <div class="reward-card">
+
+        <div class="reward-card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Reward Transaction History
+                </h2>
+
+                <p>
+                    The latest 100 manually issued rewards.
+                </p>
+            </div>
+        </div>
+
+        {% if reward_history %}
+
+        <div class="reward-table-wrap">
+            <table class="reward-table">
+
+                <thead>
+                    <tr>
+                        <th>Referrer</th>
+                        <th>Points Issued</th>
+                        <th>Reward Amount</th>
+                        <th>Issued By</th>
+                        <th>Date Issued</th>
+                        <th>Reference</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for reward in reward_history %}
+                    <tr>
+
+                        <td>
+                            <div class="referrer-name">
+                                {{ reward.referrer_name }}
+                            </div>
+
+                            <div class="referrer-detail">
+                                {{ reward.referrer_email }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <strong>{{ reward.points_redeemed }} pts</strong>
+                        </td>
+
+                        <td>
+                            <strong>
+                                N$ {{ reward.reward_amount|floatformat:2 }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if reward.issued_by %}
+                            {{ reward.issued_by.get_full_name|default:reward.issued_by.username }}
+                            {% else %}
+                            Staff account unavailable
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ reward.issued_at|date:"d M Y" }}
+                            <div class="referrer-detail">
+                                {{ reward.issued_at|date:"H:i" }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="reward-history-reference">
+                                {{ reward.transaction_reference }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ reward.notes|default:"—" }}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+
+        <div class="reward-empty">
+            <i class="fa-solid fa-receipt"></i>
+            <h3>No rewards issued yet</h3>
+            <p>Issued referral rewards will appear here.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
