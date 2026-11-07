@@ -225,7 +225,13 @@ class Referral(models.Model):
             "Points awarded to the referrer "
             "after patient payment."
         ),
-    )
+   )
+
+    loyalty_points_awarded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When loyalty points were awarded for this referral.",
+   )
 
     thanked_at = models.DateTimeField(
         null=True,

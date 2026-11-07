@@ -231,19 +231,8 @@ def request_success(request):
 
 
 # ============================================================
-# REFERRAL
-# ============================================================
-
-
-
-# ============================================================
 # REFER A PATIENT
 # ============================================================
-
-
-
-
-
 def refer_a_patient(request):
 
     if request.method == "POST":
@@ -1809,13 +1798,12 @@ def verify_payment(request, payment_id):
                     ]
                 )
 
-                # ---------------------------------------------
-                # AWARD REFERRAL POINTS
-                # ---------------------------------------------
-                # ---------------------------------------------
+                                # ---------------------------------------------
                 # AWARD REFERRAL POINTS
                 # Only after the quotation is fully paid.
+                # Track awards separately from referral status.
                 # ---------------------------------------------
+
                 referral_points_awarded = 0
 
                 referral = getattr(
@@ -1825,49 +1813,65 @@ def verify_payment(request, payment_id):
                 )
 
                 if referral:
-                    # Lock the referral to prevent duplicate awards.
-                    referral = Referral.objects.select_for_update().get(pk=referral.pk)
 
-                    # Recheck its status after acquiring the lock.
-                    if referral.status == Referral.Status.PENDING:
+                    # Lock the referral to prevent duplicate awards.
+                    referral = Referral.objects.select_for_update().get(
+                        pk=referral.pk
+                    )
+
+                    # Award only if points have never been awarded.
+                    if referral.loyalty_points_awarded_at is None:
 
                         site_settings = SiteSettings.load()
 
                         amount_per_unit = Decimal(
-                            str(site_settings.referral_points_amount_unit)
+                            str(
+                                site_settings.referral_points_amount_unit
+                            )
                         )
 
-                        points_per_unit = int(site_settings.referral_points_per_unit)
+                        points_per_unit = int(
+                            site_settings.referral_points_per_unit
+                        )
 
-                        if amount_per_unit > Decimal("0"):
+                        if (
+                            amount_per_unit > Decimal("0")
+                            and points_per_unit > 0
+                        ):
 
-                            # Never award points on more than the
-                            # quotation's actual payable amount.
                             eligible_amount = min(
                                 verified_total,
                                 quotation_amount,
                             )
 
-                            # Calculate only complete payment units.
                             complete_units = int(
-                                (eligible_amount / amount_per_unit).to_integral_value(
+                                (
+                                    eligible_amount / amount_per_unit
+                                ).to_integral_value(
                                     rounding=ROUND_FLOOR
                                 )
                             )
 
-                            referral_points_awarded = complete_units * points_per_unit
+                            referral_points_awarded = (
+                                complete_units * points_per_unit
+                            )
 
-                        # Add the earned points to this referral.
-                        referral.loyalty_points_awarded += referral_points_awarded
+                        # Add the earned points.
+                        referral.loyalty_points_awarded += (
+                            referral_points_awarded
+                        )
 
-                        # Mark completed so this referral cannot
-                        # earn the same points again.
+                        # Record the award independently of status.
+                        referral.loyalty_points_awarded_at = now
+
+                        # A fully paid referral is completed.
                         referral.status = Referral.Status.COMPLETED
 
                         referral.save(
                             update_fields=[
                                 "status",
                                 "loyalty_points_awarded",
+                                "loyalty_points_awarded_at",
                                 "updated_at",
                             ]
                         )

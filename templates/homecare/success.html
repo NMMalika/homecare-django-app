@@ -1,198 +1,892 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-Request Received | Hands-On Health
+{% block title %}Request Received | Hands-On Health{% endblock %}
+
+{% block meta_description %}
+Your home care request has been successfully received by Hands-On Health. Our care coordination team will contact you
+shortly.
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'homecare/css/request_received.css' %}">
 <style>
-    /* Request Success Page Styling */
-    .request-success-section {
-        background-color: #f8fafc;
-        min-height: 85vh;
-        display: flex;
-        align-items: center;
-        padding: 3rem 1rem;
+    /* =========================================================
+   HANDS-ON HEALTH — PREMIUM REQUEST SUCCESS PAGE
+========================================================= */
+
+    :root {
+        --success-navy: #103b59;
+        --success-blue: #0879bd;
+        --success-teal: #13a68b;
+        --success-green: #07966f;
+        --success-light: #f3f8fa;
+        --success-text: #243b50;
+        --success-muted: #718397;
     }
+
+    /* Main background */
+    .request-success-section {
+        position: relative;
+        min-height: 90vh;
+        padding: 75px 15px 85px;
+        background:
+            radial-gradient(circle at 10% 15%, rgba(19, 166, 139, .09), transparent 30%),
+            radial-gradient(circle at 90% 85%, rgba(8, 121, 189, .09), transparent 30%),
+            #f4f8fa;
+        overflow: hidden;
+    }
+
+    /* Decorative background circles */
+    .request-success-section::before,
+    .request-success-section::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(8, 121, 189, .10);
+        pointer-events: none;
+    }
+
+    .request-success-section::before {
+        width: 350px;
+        height: 350px;
+        top: -180px;
+        left: -120px;
+    }
+
+    .request-success-section::after {
+        width: 420px;
+        height: 420px;
+        bottom: -240px;
+        right: -140px;
+    }
+
+    .success-container {
+        position: relative;
+        z-index: 2;
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+   SUCCESS CARD
+========================================================= */
 
     .request-success-card {
+        position: relative;
         background: #ffffff;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 1.25rem !important;
-        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05) !important;
-        max-width: 680px;
-        margin: 0 auto;
-        padding: 2.5rem 2rem !important;
+        border: 1px solid #e2ebf0;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 20px 65px rgba(16, 59, 89, .09);
     }
 
-    @media (min-width: 768px) {
-        .request-success-card {
-            padding: 3.5rem 3rem !important;
+    /* Top accent */
+    .success-card-accent {
+        height: 7px;
+        background: linear-gradient(90deg,
+                var(--success-navy),
+                var(--success-blue),
+                var(--success-teal));
+    }
+
+    .success-card-content {
+        padding: 55px 65px 45px;
+        text-align: center;
+    }
+
+    /* =========================================================
+   SUCCESS ICON
+========================================================= */
+
+    .success-icon-outer {
+        width: 112px;
+        height: 112px;
+        margin: 0 auto 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #e8faf3;
+        border-radius: 50%;
+        box-shadow: 0 0 0 12px #f3fcf8;
+        animation: successPulse 2.5s infinite;
+    }
+
+    .success-icon-inner {
+        width: 76px;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #07966f;
+        background: #ffffff;
+        border-radius: 50%;
+        font-size: 34px;
+    }
+
+    @keyframes successPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 12px #f3fcf8;
+        }
+
+        50% {
+            box-shadow: 0 0 0 19px rgba(232, 250, 243, .5);
         }
     }
 
-    /* Animated Checkmark Badge */
-    .success-icon-badge {
-        width: 80px;
-        height: 80px;
-        background-color: #ecfdf5;
-        color: #059669;
-        border-radius: 50%;
+    /* Success badge */
+    .success-status {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        font-size: 2.25rem;
-        box-shadow: 0 0 0 10px #f0fdf4;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Submission Pill */
-    .submission-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background-color: #f0fdf4;
-        color: #166534;
-        border: 1px solid #bbf7d0;
-        padding: 0.35rem 1rem;
+        gap: 8px;
+        padding: 9px 17px;
+        border: 1px solid #b9edda;
         border-radius: 50px;
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
+        background: #effbf5;
+        color: #087b59;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 19px;
     }
 
-    /* Reference Tracking Badge Box */
-    .reference-badge-box {
-        background-color: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 0.875rem;
-        padding: 1.25rem;
-        margin: 1.5rem auto;
-        max-width: 320px;
+    .success-status i {
+        font-size: 14px;
     }
 
-    .tracking-wider {
-        letter-spacing: 0.05em;
+    /* Heading */
+    .success-heading {
+        color: var(--success-navy);
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1.25;
+        margin: 0 0 15px;
+        letter-spacing: -.8px;
     }
 
-    /* Notice Box */
-    .notice-box {
-        background-color: #eff6ff;
-        border-left: 4px solid #2563eb;
-        border-radius: 0.5rem;
-        padding: 1rem 1.25rem;
+    .success-description {
+        max-width: 690px;
+        margin: 0 auto;
+        color: #61758a;
+        font-size: 16px;
+        line-height: 1.9;
+    }
+
+    /* =========================================================
+   TRACKING REFERENCE
+========================================================= */
+
+    .reference-section {
+        margin: 35px auto 30px;
+        max-width: 440px;
+    }
+
+    .reference-label {
+        display: block;
+        color: #8393a3;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .reference-box {
+        padding: 19px 20px;
+        background: linear-gradient(135deg, #f3f8fc, #edf7f7);
+        border: 1px dashed #b8d4df;
+        border-radius: 13px;
+    }
+
+    .reference-number {
+        display: block;
+        color: var(--success-blue);
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        word-break: break-word;
+    }
+
+    /* =========================================================
+   WHAT HAPPENS NEXT
+========================================================= */
+
+    .next-steps-section {
+        margin-top: 38px;
+        padding: 28px;
         text-align: left;
-        margin-bottom: 2.25rem !important;
+        background: #f7fafc;
+        border: 1px solid #e6eef3;
+        border-radius: 15px;
     }
 
-    /* Button Styling */
-    .btn-custom-primary {
-        background-color: #2563eb;
-        color: #ffffff;
-        font-weight: 600;
-        padding: 0.875rem 1.75rem;
-        border-radius: 0.625rem;
-        border: none;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-flex;
+    .next-steps-title {
+        display: flex;
         align-items: center;
+        gap: 11px;
+        color: var(--success-navy);
+        font-size: 17px;
+        font-weight: 750;
+        margin: 0 0 24px;
+    }
+
+    .next-steps-title i {
+        color: var(--success-teal);
+        font-size: 20px;
+    }
+
+    .steps-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .step-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .step-number {
+        min-width: 31px;
+        height: 31px;
+        display: flex;
         justify-content: center;
-        gap: 0.5rem;
+        align-items: center;
+        background: #e5f4f5;
+        color: var(--success-blue);
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 800;
     }
 
-    .btn-custom-primary:hover {
-        background-color: #1d4ed8;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    .step-content strong {
+        display: block;
+        color: #29465c;
+        font-size: 13px;
+        margin-bottom: 5px;
     }
 
-    .text-slate-800 {
-        color: #0f172a !important;
+    .step-content p {
+        color: #7a8b9c;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 0;
     }
 
-    .text-slate-700 {
-        color: #334155 !important;
+    /* =========================================================
+   IMPORTANT NOTICE
+========================================================= */
+
+    .success-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 19px 21px;
+        margin-top: 25px;
+        background: #edf6ff;
+        border-left: 4px solid var(--success-blue);
+        border-radius: 9px;
+        text-align: left;
     }
 
-    .text-slate-600 {
-        color: #475569 !important;
+    .success-notice i {
+        color: var(--success-blue);
+        font-size: 21px;
+        margin-top: 2px;
+    }
+
+    .success-notice strong {
+        display: block;
+        color: #194d78;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .success-notice p {
+        color: #59738a;
+        font-size: 13px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+    .success-actions {
+        display: flex;
+        justify-content: center;
+        gap: 13px;
+        flex-wrap: wrap;
+        margin-top: 32px;
+    }
+
+    .success-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 24px;
+        min-height: 49px;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none !important;
+        transition: all .25s ease;
+    }
+
+    .success-btn-primary {
+        background: linear-gradient(135deg, #0879bd, #075c94);
+        color: #ffffff !important;
+        box-shadow: 0 7px 18px rgba(8, 121, 189, .20);
+    }
+
+    .success-btn-primary:hover {
+        color: #ffffff !important;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(8, 121, 189, .30);
+    }
+
+    .success-btn-outline {
+        background: #ffffff;
+        border: 1px solid #d5e2e9;
+        color: var(--success-navy) !important;
+    }
+
+    .success-btn-outline:hover {
+        background: #f1f8fb;
+        border-color: var(--success-blue);
+        transform: translateY(-2px);
+    }
+
+    /* =========================================================
+   DYNAMIC CONTACT SECTION
+========================================================= */
+
+    .success-contact-section {
+        margin-top: 32px;
+        padding-top: 30px;
+        border-top: 1px solid #e8eef2;
+    }
+
+    .contact-heading {
+        color: var(--success-navy);
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 8px;
+    }
+
+    .contact-subheading {
+        color: #7b8d9d;
+        font-size: 13px;
+        margin-bottom: 23px;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 13px;
+        text-align: left;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 15px;
+        min-width: 0;
+        background: #f8fafb;
+        border: 1px solid #eaf0f3;
+        border-radius: 11px;
+        transition: all .2s ease;
+    }
+
+    .contact-item:hover {
+        background: #f0f8fa;
+        border-color: #cce6e8;
+    }
+
+    .contact-icon {
+        min-width: 41px;
+        height: 41px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #e6f4f6;
+        color: var(--success-blue);
+        border-radius: 10px;
+        font-size: 17px;
+    }
+
+    .contact-item.whatsapp-item .contact-icon {
+        background: #e7f9ef;
+        color: #16a765;
+    }
+
+    .contact-item.emergency-item .contact-icon {
+        background: #fff0ed;
+        color: #d65342;
+    }
+
+    .contact-details {
+        min-width: 0;
+    }
+
+    .contact-details small {
+        display: block;
+        color: #8796a4;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        margin-bottom: 4px;
+    }
+
+    .contact-details a,
+    .contact-details strong {
+        display: block;
+        color: #24465e;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    .contact-details a:hover {
+        color: var(--success-blue);
+    }
+
+    .contact-address {
+        grid-column: 1 / -1;
+    }
+
+    /* Footer */
+    .success-footer {
+        margin-top: 29px;
+        color: #91a0ad;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .success-footer strong {
+        color: var(--success-navy);
+    }
+
+    /* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+    @media (max-width: 767px) {
+
+        .request-success-section {
+            padding: 40px 12px 55px;
+            min-height: auto;
+        }
+
+        .success-card-content {
+            padding: 38px 20px 30px;
+        }
+
+        .success-icon-outer {
+            width: 94px;
+            height: 94px;
+            margin-bottom: 23px;
+        }
+
+        .success-icon-inner {
+            width: 65px;
+            height: 65px;
+            font-size: 28px;
+        }
+
+        .success-heading {
+            font-size: 27px;
+        }
+
+        .success-description {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .reference-number {
+            font-size: 23px;
+        }
+
+        .next-steps-section {
+            padding: 21px 17px;
+        }
+
+        .steps-list {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .step-content strong {
+            font-size: 14px;
+        }
+
+        .step-content p {
+            font-size: 13px;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .success-actions {
+            flex-direction: column;
+        }
+
+        .success-btn {
+            width: 100%;
+        }
+
+        .success-notice {
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .success-card-content {
+            padding: 32px 15px 25px;
+        }
+
+        .success-heading {
+            font-size: 24px;
+        }
+
+        .contact-item {
+            padding: 12px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .success-icon-outer {
+            animation: none;
+        }
+
+        .success-btn,
+        .contact-item {
+            transition: none;
+        }
     }
 </style>
 {% endblock %}
 
+
 {% block content %}
+
+{% with settings=site_settings %}
+
 <section class="request-success-section">
-    <div class="container">
-        <div class="row justify-content-center me-0 ms-0">
-            <div class="col-12 mx-auto text-center px-0">
 
-                <div class="card request-success-card">
+    <div class="success-container">
 
-                    <!-- Checkmark Icon -->
-                    <div class="success-icon-badge">
+        <div class="request-success-card">
+
+            <div class="success-card-accent"></div>
+
+            <div class="success-card-content">
+
+                <!-- SUCCESS ICON -->
+                <div class="success-icon-outer">
+                    <div class="success-icon-inner">
                         <i class="fa-solid fa-check"></i>
                     </div>
+                </div>
 
-                    <!-- Submission Pill -->
-                    <div class="mb-3">
-                        <span class="submission-pill">
-                            <i class="fa-solid fa-circle-check"></i> Submission Successful
-                        </span>
-                    </div>
+                <!-- STATUS -->
+                <div>
+                    <span class="success-status">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Submission Successful
+                    </span>
+                </div>
 
-                    <h1 class="h3 fw-bold text-slate-800 mb-2">
-                        Request Received!
-                    </h1>
+                <!-- MAIN MESSAGE -->
+                <h1 class="success-heading">
+                    Your Request Has Been Received!
+                </h1>
 
-                    <p class="text-slate-600 fs-6 mb-4 px-md-3">
-                        Thank you for trusting <strong>Hands-On Health</strong>. We have securely logged your home care
-                        request, and our clinical care coordination team is reviewing your details to reach out shortly.
-                    </p>
+                <p class="success-description">
+                    Thank you for choosing
+                    <strong>{{ settings.business_name|default:"Hands-On Health" }}</strong>.
+                    We appreciate the trust you have placed in our care team.
 
-                    <!-- Reference Badge Box -->
-                    {% if reference %}
-                    <div class="reference-badge-box text-center">
-                        <span class="text-uppercase text-muted fw-bold small d-block mb-1">Your Tracking
-                            Reference</span>
-                        <span class="fs-5 fw-bold text-primary tracking-wider font-monospace">
+                    Your home care request has been successfully submitted
+                    and our team will carefully review your requirements
+                    before contacting you to discuss the next steps.
+                </p>
+
+
+                <!-- TRACKING REFERENCE -->
+                {% if reference %}
+                <div class="reference-section">
+
+                    <span class="reference-label">
+                        Your Home Care Tracking Reference
+                    </span>
+
+                    <div class="reference-box">
+                        <span class="reference-number">
                             #{{ reference }}
                         </span>
                     </div>
-                    {% endif %}
 
-                    <!-- Information Note -->
-                    <div class="notice-box">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="fa-solid fa-bell text-primary fs-5 flex-shrink-0"></i>
-                            <div class="small text-slate-700">
-                                Please keep an eye on your email inbox or phone. Our team typically responds within a
-                                few hours to coordinate arrangements.
+                    <small style="color:#8293a2;">
+                        Please keep this reference for future communication.
+                    </small>
+
+                </div>
+                {% endif %}
+
+
+                <!-- WHAT HAPPENS NEXT -->
+                <div class="next-steps-section">
+
+                    <h3 class="next-steps-title">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        What Happens Next?
+                    </h3>
+
+                    <div class="steps-list">
+
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Request Review</strong>
+                                <p>
+                                    Our care coordination team reviews
+                                    your submitted information and care needs.
+                                </p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Action Button -->
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Personal Contact</strong>
+                                <p>
+                                    Our team contacts you to clarify
+                                    requirements and discuss suitable arrangements.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Care Arrangement</strong>
+                                <p>
+                                    We discuss availability, services,
+                                    quotation and the next steps for care.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- IMPORTANT NOTICE -->
+                <div class="success-notice">
+
+                    <i class="fa-solid fa-bell"></i>
+
                     <div>
-                        <a href="{% url 'home' %}" class="btn-custom-primary">
-                            <i class="fa-solid fa-house"></i> Return to Homepage
-                        </a>
+                        <strong>Please Keep Your Phone Available</strong>
+
+                        <p>
+                            Please monitor your phone and email for
+                            communication from our care coordination team.
+                            Submitting this request does not automatically
+                            confirm a care booking. Arrangements will be
+                            confirmed after review and agreement with our team.
+                        </p>
                     </div>
 
                 </div>
 
-                <!-- Footer Support Link -->
-                <div class="mt-4 text-center">
-                    <p class="small text-muted mb-0">
-                        Have an urgent query? <a href="#" class="text-primary text-decoration-none fw-semibold">Contact
-                            Our Care Desk</a>
+
+                <!-- ACTION BUTTONS -->
+                <div class="success-actions">
+
+                    <a href="{% url 'home' %}" class="success-btn success-btn-primary">
+                        <i class="fa-solid fa-house"></i>
+                        Return to Homepage
+                    </a>
+
+                    {% if settings.phone %}
+                    <a href="tel:{{ settings.phone }}" class="success-btn success-btn-outline">
+                        <i class="fa-solid fa-phone"></i>
+                        Call Our Team
+                    </a>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- DYNAMIC BUSINESS CONTACT INFORMATION -->
+                <div class="success-contact-section">
+
+                    <h3 class="contact-heading">
+                        We're Here to Help
+                    </h3>
+
+                    <p class="contact-subheading">
+                        Need assistance or have additional questions?
+                        Contact our team directly.
                     </p>
+
+                    <div class="contact-grid">
+
+                        <!-- PHONE -->
+                        {% if settings.phone %}
+                        <div class="contact-item">
+
+                            <div class="contact-icon">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+
+                            <div class="contact-details">
+                                <small>Call Us</small>
+                                <a href="tel:{{ settings.phone }}">
+                                    {{ settings.phone }}
+                                </a>
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+
+                        <!-- EMAIL -->
+                        {% if settings.email %}
+                        <div class="contact-item">
+
+                            <div class="contact-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+
+                            <div class="contact-details">
+                                <small>Email Us</small>
+                                <a href="mailto:{{ settings.email }}">
+                                    {{ settings.email }}
+                                </a>
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+
+                        <!-- WHATSAPP -->
+                        {% if settings.whatsapp %}
+                        {% with whatsapp_number=settings.whatsapp|cut:" "|cut:"+"|cut:"-"|cut:"("|cut:")" %}
+                        <div class="contact-item whatsapp-item">
+
+                            <div class="contact-icon">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </div>
+
+                            <div class="contact-details">
+                                <small>WhatsApp Support</small>
+                                <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener noreferrer">
+                                    Chat With Our Team
+                                </a>
+                            </div>
+
+                        </div>
+                        {% endwith %}
+                        {% endif %}
+
+
+                        <!-- EMERGENCY PHONE -->
+                        {% if settings.emergency_phone %}
+                        <div class="contact-item emergency-item">
+
+                            <div class="contact-icon">
+                                <i class="fa-solid fa-kit-medical"></i>
+                            </div>
+
+                            <div class="contact-details">
+                                <small>Emergency Contact</small>
+                                <a href="tel:{{ settings.emergency_phone }}">
+                                    {{ settings.emergency_phone }}
+                                </a>
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+
+                        <!-- BUSINESS ADDRESS -->
+                        {% if settings.address or settings.city or settings.country %}
+                        <div class="contact-item contact-address">
+
+                            <div class="contact-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+
+                            <div class="contact-details">
+                                <small>Our Location</small>
+
+                                <strong>
+                                    {% if settings.address %}
+                                    {{ settings.address }}
+                                    {% endif %}
+
+                                    {% if settings.city %}
+                                    {% if settings.address %}, {% endif %}
+                                    {{ settings.city }}
+                                    {% endif %}
+
+                                    {% if settings.country %}
+                                    {% if settings.address or settings.city %}, {% endif %}
+                                    {{ settings.country }}
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+                <div class="success-footer">
+
+                    <strong>{{ settings.business_name|default:"Hands-On Health" }}</strong>
+
+                    <br>
+
+                    Compassionate Care. Professional Support. Care at Home.
+
+                    <br>
+
+                    Thank you for allowing us to be part of your care journey.
+
+                    {% if settings.website %}
+                    <br>
+                    <a href="{{ settings.website }}" target="_blank" rel="noopener noreferrer"
+                        style="color:#0879bd;text-decoration:none;">
+                        Visit Our Website
+                    </a>
+                    {% endif %}
+
                 </div>
 
             </div>
         </div>
+
     </div>
+
 </section>
+
+{% endwith %}
+
 {% endblock %}
