@@ -547,7 +547,6 @@ def appointment_success(request):
 # ============================================================
 
 
-
 @login_required
 @require_http_methods(["GET", "POST"])
 def create_quotation(request, request_id):
@@ -1487,16 +1486,13 @@ def payment_placeholder(
         },
     )
 
-
 # ============================================================
-# SUBMIT PAYMENT
+# SUBMIT PAYMENT - PREVENT DUPLICATE QUOTATION PAYMENTS
 # ============================================================
 
 
-def submit_payment(
-    request,
-    token,
-):
+@login_required
+def submit_payment(request, token):
 
     quotation = get_object_or_404(
         Quotation.objects.select_related(
@@ -1508,68 +1504,157 @@ def submit_payment(
 
     site_settings = SiteSettings.load()
     payment_options = _payment_options(site_settings)
+
     homecare_request = quotation.homecare_request
     consultation = quotation.consultation
+
+    # --------------------------------------------------------
+    # CHECK EXISTING PAYMENT
+    # --------------------------------------------------------
+
+    existing_payment = quotation.payments.filter(
+        status__in=[
+            Payment.Status.PENDING,
+            Payment.Status.VERIFIED,
+        ]
+    ).first()
+
+    if quotation.payment_status == Quotation.PaymentStatus.PAID or existing_payment:
+        messages.warning(
+            request,
+            "Payment has already been submitted for this quotation "
+            "or the quotation has already been paid. "
+            "Please do not pay again.",
+        )
+
+        return redirect(
+            "homecare:payment_submitted",
+            token=quotation.access_token,
+        )
+
+    # --------------------------------------------------------
+    # POST PAYMENT
+    # --------------------------------------------------------
 
     if request.method == "POST":
 
         form = _configure_payment_form(
-            PaymentSubmissionForm(request.POST), payment_options
+            PaymentSubmissionForm(request.POST),
+            payment_options,
         )
 
         if form.is_valid():
 
             chosen_method = form.cleaned_data.get("payment_method")
+
             if (
                 chosen_method not in payment_options
                 or not payment_options[chosen_method]["available"]
             ):
                 form.add_error(
-                    "payment_method", "Please choose an available payment method."
-                )
-                return render(
-                    request,
-                    "homecare/payment_form.html",
-                    {
-                        "quotation": quotation,
-                        "homecare_request": homecare_request,
-                        "consultation": consultation,
-                        "form": form,
-                        "site_settings": site_settings,
-                        "payment_options": payment_options,
-                        "site_settings": site_settings,
-                        "payment_options": payment_options,
-                    },
+                    "payment_method",
+                    "Please choose an available payment method.",
                 )
 
-            payment = form.save(commit=False)
-            payment.quotation = quotation
-            payment.amount = quotation.amount
-            payment.status = Payment.Status.PENDING
-            payment.save()
+            else:
 
-            if homecare_request:
-                homecare_request.status = HomeCareRequest.Status.PAYMENT_RECEIVED
-                homecare_request.save(update_fields=["status", "updated_at"])
+                try:
 
-            elif consultation:
-                consultation.status = Consultation.Status.PAYMENT_PENDING
-                consultation.save(update_fields=["status", "updated_at"])
+                    with transaction.atomic():
 
-            messages.success(
-                request,
-                "Payment submitted successfully. "
-                "Our team will verify your payment shortly.",
-            )
+                        # Lock quotation to prevent simultaneous
+                        # duplicate payment submissions.
 
-            return redirect(
-                "homecare:payment_submitted",
-                token=quotation.access_token,
-            )
+                        locked_quotation = Quotation.objects.select_for_update().get(
+                            pk=quotation.pk
+                        )
+
+                        duplicate = locked_quotation.payments.filter(
+                            status__in=[
+                                Payment.Status.PENDING,
+                                Payment.Status.VERIFIED,
+                            ]
+                        ).exists()
+
+                        if (
+                            locked_quotation.payment_status
+                            == Quotation.PaymentStatus.PAID
+                            or duplicate
+                        ):
+                            messages.warning(
+                                request,
+                                "A payment has already been submitted "
+                                "for this quotation. "
+                                "Please do not pay again.",
+                            )
+
+                            return redirect(
+                                "homecare:payment_submitted",
+                                token=quotation.access_token,
+                            )
+
+                        payment = form.save(commit=False)
+
+                        payment.quotation = locked_quotation
+                        payment.amount = locked_quotation.amount
+                        payment.status = Payment.Status.PENDING
+
+                        payment.save()
+
+                        if homecare_request:
+
+                            homecare_request.status = (
+                                HomeCareRequest.Status.PAYMENT_RECEIVED
+                            )
+
+                            homecare_request.save(
+                                update_fields=[
+                                    "status",
+                                    "updated_at",
+                                ]
+                            )
+
+                        elif consultation:
+
+                            consultation.status = Consultation.Status.PAYMENT_PENDING
+
+                            consultation.save(
+                                update_fields=[
+                                    "status",
+                                    "updated_at",
+                                ]
+                            )
+
+                    messages.success(
+                        request,
+                        "Payment submitted successfully. "
+                        "Our team will verify your payment shortly.",
+                    )
+
+                    return redirect(
+                        "homecare:payment_submitted",
+                        token=quotation.access_token,
+                    )
+
+                except Exception:
+
+                    logger.exception(
+                        "Payment submission failed for quotation #%s",
+                        quotation.id,
+                    )
+
+                    messages.error(
+                        request,
+                        "We could not submit your payment. "
+                        "Please contact our support team.",
+                    )
 
     else:
 
-        form = _configure_payment_form(PaymentSubmissionForm(), payment_options)
+        form = _configure_payment_form(
+            PaymentSubmissionForm(),
+            payment_options,
+        )
 
     return render(
         request,
@@ -1579,6 +1664,8 @@ def submit_payment(
             "homecare_request": homecare_request,
             "consultation": consultation,
             "form": form,
+            "site_settings": site_settings,
+            "payment_options": payment_options,
         },
     )
 
@@ -1732,6 +1819,20 @@ def verify_payment(request, payment_id):
             messages.error(
                 request,
                 "A rejected payment cannot be verified.",
+            )
+            return redirect(redirect_target)
+
+        another_verified_payment = quotation.payments.filter(
+            status=Payment.Status.VERIFIED
+        ).exclude(pk=payment.pk).exists()
+
+        if another_verified_payment or (
+            quotation.payment_status == Quotation.PaymentStatus.PAID
+        ):
+            messages.error(
+                request,
+                "This quotation already has a verified payment. "
+                "The duplicate payment cannot be verified.",
             )
             return redirect(redirect_target)
 
